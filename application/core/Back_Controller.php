@@ -60,4 +60,15 @@ class Back_Controller extends MX_Controller
 
         echo json_encode($response);
     }
+
+    public function _remap($method, $params = array())
+    {
+        if (!method_exists($this, $method)) {
+            $this->output->set_status_header('404');
+            $this->load->view('notFound/index');
+            return;
+        }
+
+        return call_user_func_array(array($this, $method), $params);
+    }
 }
