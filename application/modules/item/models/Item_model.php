@@ -1,0 +1,202 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Item_model extends CI_Model
+{
+    var $column_order = array(
+        'null',
+        'null',
+        'i.ITEM_CODE',
+        'i.ITEM_DESCRIPTION',
+        'i.PART_NUMBER',
+        'i.UOM_CODE',
+        'a.DISPLAY_NAME',
+        'b.DISPLAY_NAME',
+        'c.DISPLAY_NAME',
+        'd.DISPLAY_NAME',
+        'e.DISPLAY_NAME',
+        'f.DISPLAY_NAME',
+        'i.PRICE_LAST_BUY',
+        'i.PRICE_LAST_SELL',
+        'i.LEAD_TIME',
+        'i.ITEM_KMS',
+        'i.APPROVE_FLAG',
+        'i.ACTIVE_FLAG'
+    );
+
+    var $column_search = array(
+        'i.ITEM_ID',
+        'i.ITEM_CODE',
+        'i.ITEM_DESCRIPTION',
+        'i.PART_NUMBER',
+        'i.UOM_CODE',
+        'a.DISPLAY_NAME',
+        'b.DISPLAY_NAME',
+        'c.DISPLAY_NAME',
+        'd.DISPLAY_NAME',
+        'e.DISPLAY_NAME',
+        'f.DISPLAY_NAME',
+        'i.PRICE_LAST_BUY',
+        'i.PRICE_LAST_SELL',
+        'i.LEAD_TIME',
+        'i.ITEM_KMS',
+        'i.APPROVE_FLAG',
+        'i.ACTIVE_FLAG'
+    );
+
+    var $order = array('i.ITEM_ID' => 'DESC');
+
+    private function _get_datatables_query()
+    {
+        $this->db->select('
+            i.ITEM_ID AS ID,
+            i.ITEM_CODE AS KODE_ITEM,
+            LEFT(i.ITEM_DESCRIPTION, 30) AS NAMA_ITEM,
+            i.PART_NUMBER,
+            i.UOM_CODE AS UOM,
+            a.DISPLAY_NAME AS JENIS,
+            b.DISPLAY_NAME AS KATEGORY,
+            c.DISPLAY_NAME AS MADE_IN,
+            d.DISPLAY_NAME AS KOMODITI,
+            e.DISPLAY_NAME AS BRAND,
+            f.DISPLAY_NAME AS TRADE,
+            i.PRICE_LAST_BUY,
+            i.PRICE_LAST_SELL,
+            i.LEAD_TIME,
+            i.ITEM_KMS AS KONSY,
+            i.APPROVE_FLAG AS APPROVED,
+            i.ACTIVE_FLAG AS STATUS
+        ');
+        $this->db->from('item i');
+        $this->db->join('erp_lookup_value a', 'i.JENIS_ID = a.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value b', 'i.GROUP_ID = b.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value c', 'i.MADE_IN_ID = c.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value d', 'i.TIPE_ID = d.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value e', 'i.MEREK_ID = e.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value f', 'i.TYPE_ID = f.ERP_LOOKUP_VALUE_ID', 'left');
+
+        $i = 0;
+        foreach ($this->column_search as $i => $item) {
+            if ($item === 'null') continue;
+
+            $search_value = $_POST['columns'][$i + 1]['search']['value'] ?? '';
+            if ($search_value != '') {
+                $lower = strtolower(trim($search_value));
+                $search_value_db = $search_value;
+
+                if (in_array($lower, ['yes', 'y'])) {
+                    $search_value_db = 'Y';
+                } elseif (in_array($lower, ['no', 'n'])) {
+                    $search_value_db = 'N';
+                }
+
+                if (!isset($first_like)) {
+                    $this->db->group_start();
+                    $this->db->like($item, $search_value_db);
+                    $first_like = true;
+                } else {
+                    $this->db->or_like($item, $search_value_db);
+                }
+            }
+            $i++;
+        }
+
+        if (isset($first_like)) {
+            $this->db->group_end();
+        }
+
+        if (isset($_POST['order'])) {
+            $col_index = $_POST['order'][0]['column'];
+            if (isset($this->column_order[$col_index]) && $this->column_order[$col_index] != null) {
+                $this->db->order_by($this->column_order[$col_index], $_POST['order'][0]['dir']);
+            }
+        } else if (isset($this->order)) {
+            $order = $this->order;
+            $this->db->order_by(key($order), $order[key($order)]);
+        }
+    }
+
+    function get_datatables()
+    {
+        $this->_get_datatables_query();
+        if ($_POST['length'] != -1)
+            $this->db->limit(
+                $_POST['length'],
+                $_POST['start']
+            );
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function count_filtered()
+    {
+        $this->_get_datatables_query();
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    function count_all()
+    {
+        $this->db->select('
+            i.ITEM_ID AS ID,
+            i.ITEM_CODE KODE_ITEM,
+            LEFT(i.ITEM_DESCRIPTION, 30) NAMA_ITEM,
+            i.PART_NUMBER PART_NUMBER,
+            i.UOM_CODE UOM,
+            a.DISPLAY_NAME JENIS,
+            b.DISPLAY_NAME KATEGORY,
+            c.DISPLAY_NAME MADE_IN,
+            d.DISPLAY_NAME KOMODITI,
+            e.DISPLAY_NAME BRAND,
+            f.DISPLAY_NAME TRADE,
+            i.PRICE_LAST_BUY,
+            i.PRICE_LAST_SELL,
+            i.LEAD_TIME,
+            i.ITEM_KMS KONSY,
+            i.APPROVE_FLAG APPROVED,
+            i.ACTIVE_FLAG STATUS');
+        $this->db->from('item i');
+        $this->db->join('erp_lookup_value a', 'i.JENIS_ID = a.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value b', 'i.GROUP_ID = b.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value c', 'i.MADE_IN_ID = c.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value d', 'i.TIPE_ID = d.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value e', 'i.MEREK_ID = e.ERP_LOOKUP_VALUE_ID', 'left');
+        $this->db->join('erp_lookup_value f', 'i.TYPE_ID = f.ERP_LOOKUP_VALUE_ID', 'left');
+        return $this->db->count_all_results();
+    }
+
+    public function getBrand()
+    {
+        return $this->db->query("SELECT b.ERP_LOOKUP_VALUE_ID, b.DISPLAY_NAME Brand_Name, b.DESCRIPTION Brand_Code, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'MEREK' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getCategory()
+    {
+        return $this->db->query("SELECT b.ERP_LOOKUP_VALUE_ID, b.DISPLAY_NAME Category_Name, b.DESCRIPTION Category_Code, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'GROUP' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getUom()
+    {
+        return $this->db->query("SELECT a.* FROM uom a WHERE a.ACTIVE_FLAG = 'Y' ORDER BY a.PRIMARY_FLAG DESC, a.UOM_CODE");
+    }
+
+    public function getType()
+    {
+        return $this->db->query("SELECT b.DISPLAY_NAME Trade_Type, b.DESCRIPTION Trade_Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TYPEINVENTORY' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getRak()
+    {
+        return $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'RAK' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getMadeIn()
+    {
+        return $this->db->query("SELECT b.DISPLAY_NAME Made_In, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'MADE_IN' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getKomoditi()
+    {
+        return $this->db->query("SELECT b.DISPLAY_NAME Komoditi, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TIPE' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+}
