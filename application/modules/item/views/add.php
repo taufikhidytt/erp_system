@@ -25,16 +25,22 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary">
-                                    <i class="ri ri-reply-fill"></i> Back
-                                </a>
+                        <form action="" method="post">
+                            <div class="row mb-2">
+                                <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
+                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit">
+                                        <i class="ri ri-check-double-fill"></i> Submit
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);">
+                                        <i class="ri ri-eraser-fill"></i> Undo
+                                    </button>
+                                    <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary">
+                                        <i class="ri ri-reply-fill"></i> Back
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <form action="" method="post">
-                                <div class="row">
+                            <div class="row">
+                                <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
                                             <label for="brand">Brand:</label>
@@ -419,27 +425,19 @@
                                             <div class="text-danger"><?= form_error('status_flag') ?></div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit">
-                                                    <i class="ri ri-check-double-fill"></i> Submit
-                                                </button>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                                <button type="reset" class="btn btn-warning btn-sm" name="submit">
-                                                    <i class="ri ri-eraser-fill"></i> Undo
-                                                </button>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- container-fluid -->
+</div>
+<!-- container-fluid -->
 </div>
 <!-- End Page-content -->
 

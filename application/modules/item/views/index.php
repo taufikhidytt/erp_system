@@ -1,3 +1,18 @@
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .table-striped>tbody>tr:nth-of-type(odd) {
+        --bs-table-accent-bg: #e2e2e2ff;
+    }
+
+    #table_filter {
+        display: none;
+        position: absolute;
+    }
+</style>
+
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
 <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
@@ -8,7 +23,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h1><?= $title ?></h1>
+                    <h1></h1>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
@@ -35,7 +50,7 @@
                         </div>
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-bordered table-striped text-center" id="table">
+                                <table class="table table-striped text-center" id="table">
                                     <thead>
                                         <tr>
                                             <th>

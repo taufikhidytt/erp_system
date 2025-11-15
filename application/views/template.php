@@ -31,6 +31,11 @@
     <link href="<?= base_url() ?>assets/admin/libs/select2/css/select2-bootstrap-5-theme.min.css" rel="stylesheet" type="text/css" />
 
     <style>
+        body {
+            /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; */
+            font-family: Tahoma !important;
+        }
+
         #loading {
             position: fixed;
             top: 0;
@@ -66,6 +71,56 @@
             100% {
                 transform: rotate(360deg);
             }
+        }
+
+        .page-content {
+            font-size: 12px;
+        }
+
+        /* ===================== */
+        /* Global XS Form Size   */
+        /* ===================== */
+        .form-xs .form-control,
+        .form-xs .form-select,
+        .form-xs textarea.form-control {
+            height: 30px !important;
+            min-height: 30px !important;
+            padding: 2px 6px !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* Input-group icon */
+        .form-xs .input-group-text {
+            height: 30px !important;
+            padding: 2px 6px !important;
+            font-size: 0.75rem !important;
+        }
+
+        /* ===================== */
+        /* Select2 XS            */
+        /* ===================== */
+        .form-xs .select2-container .select2-selection--single {
+            height: 30px !important;
+            min-height: 30px !important;
+            padding: 0 6px !important;
+            font-size: 0.75rem !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-xs .select2-selection__rendered {
+            line-height: 22px !important;
+            font-size: 0.75rem !important;
+        }
+
+        .form-xs .select2-selection__arrow {
+            height: 22px !important;
+        }
+
+        /* Textarea fix */
+        .form-xs textarea {
+            resize: vertical;
+            /* allowed */
         }
     </style>
 

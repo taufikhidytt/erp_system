@@ -32,16 +32,18 @@ class Item extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            if ($item->APPROVED == 'N') {
-                $approve = '<form action="' . base_url('item/approveIndex') . '" method="post" class="d-inline">
-                    <input type="hidden" name="idApprove" value="' . $this->encrypt->encode($item->ID) . '">
-                    <button type="submit" id="btn-approve" ata-toggle="tooltip" data-placement="bottom" title="Approve" style="background:transparent; border:none;">
-                        <i class="ri ri-thumb-up-fill" style="color: #5664D2;"></i>
-                    </button>
-                </form> |';
-            } else {
-                $approve = '';
-            }
+
+            // if ($item->APPROVED == 'N') {
+            //     $approve = '<form action="' . base_url('item/approveIndex') . '" method="post" class="d-inline">
+            //         <input type="hidden" name="idApprove" value="' . $this->encrypt->encode($item->ID) . '">
+            //         <button type="submit" id="btn-approve" ata-toggle="tooltip" data-placement="bottom" title="Approve" style="background:transparent; border:none;">
+            //             <i class="ri ri-thumb-up-fill" style="color: #5664D2;"></i>
+            //         </button>
+            //     </form> |';
+            // } else {
+            //     $approve = '';
+            // }
+
             $row['action'] = '
             <div class="d-flex gap-1">
             ' . $approve . '
