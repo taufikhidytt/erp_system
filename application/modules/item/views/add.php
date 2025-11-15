@@ -43,6 +43,16 @@
                                 <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
+                                            <label for="code_item">Code Item:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-barcode-box-fill"></i>
+                                                </span>
+                                                <input type="text" name="code_item" id="code_item" class="form-control <?= form_error('code_item') ? 'is-invalid' : null; ?>" disabled readonly>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('code_item') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <label for="brand">Brand:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -220,7 +230,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-6 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="kubikasi">Kubikasi:</label>
                                                     <div class="input-group">
@@ -231,7 +241,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-6 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="weight">Weight:</label>
                                                     <div class="input-group">
@@ -242,36 +252,19 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="made_in">Made In:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-swap-fill"></i>
-                                                </span>
-                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Made In --</option>
-                                                    <?php foreach ($made_in->result() as $mi): ?>
-                                                        <option value="<?= $mi->ERP_LOOKUP_VALUE_ID ?>" <?= set_value('made_in') == $mi->ERP_LOOKUP_VALUE_ID ? 'selected' : null ?>><?= strtoupper($mi->Made_In) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                                <div class="mb-3">
+                                                    <label class="mb-4"></label>
+                                                    <div class="input-group">
+                                                        <select name="satuan_weight" id="satuan_weight" class="form-control select2 <?= form_error('satuan_weight') ? 'is-invalid' : null; ?>">
+                                                            <?php foreach ($uom->result() as $um): ?>
+                                                                <option value="<?= $um->UOM_CODE ?>" <?= set_value('satuan_weight') == $um->UOM_CODE ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="text-danger"><?= form_error('satuan_weight') ?></div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="komoditi">Komoditi:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pen-nib-fill"></i>
-                                                </span>
-                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Komoditi --</option>
-                                                    <?php foreach ($komoditi->result() as $kd): ?>
-                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= set_value('komoditi') == $kd->ERP_LOOKUP_VALUE_ID ? 'selected' : null ?>><?= strtoupper($kd->Note) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('komoditi') ?></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
@@ -399,6 +392,36 @@
                                             </div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="made_in">Made In:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-swap-fill"></i>
+                                                </span>
+                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Made In --</option>
+                                                    <?php foreach ($made_in->result() as $mi): ?>
+                                                        <option value="<?= $mi->ERP_LOOKUP_VALUE_ID ?>" <?= set_value('made_in') == $mi->ERP_LOOKUP_VALUE_ID ? 'selected' : null ?>><?= strtoupper($mi->Made_In) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="komoditi">Komoditi:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-pen-nib-fill"></i>
+                                                </span>
+                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Komoditi --</option>
+                                                    <?php foreach ($komoditi->result() as $kd): ?>
+                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= set_value('komoditi') == $kd->ERP_LOOKUP_VALUE_ID ? 'selected' : null ?>><?= strtoupper($kd->Note) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('komoditi') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <div class="row justify-content-start">
                                                 <div class="col-lg-3 col-md-4 col-sm-6">
                                                     <label class="form-check-label" for="konsinyasi" style="margin-right: 20px;">
@@ -457,6 +480,8 @@
         } else {
             $('#new_product_name_required').html('');
         }
+
+        $('#new_product_name_required').html('');
 
         $('#brand, #category').on('change', updateDescription);
         $('#part_number').on('keyup', updateDescription);

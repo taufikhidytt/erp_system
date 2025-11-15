@@ -25,28 +25,34 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <div class="row mb-2">
-                            <div class="col-lg-6 col-md-6 col-sm-12 text-start">
-                                <?php if ($data->APPROVE_FLAG == 'N'): ?>
-                                    <form action="<?= base_url('item/approve') ?>" method="post" class="d-inline">
-                                        <input type="hidden" name="idApprove" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
-                                        <button type="submit" id="btn-approve" class="btn btn-success btn-sm">
-                                            <i class="ri ri-thumb-up-fill"></i> Approve
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
+                        <form action="" method="post">
+                            <div class="row mb-2">
+                                <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
+                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit">
+                                        <i class="ri ri-check-double-fill"></i> Submit
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);">
+                                        <i class="ri ri-eraser-fill"></i> Undo
+                                    </button>
+                                    <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary">
+                                        <i class="ri ri-reply-fill"></i> Back
+                                    </a>
+                                </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary">
-                                    <i class="ri ri-reply-fill"></i> Back
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <form action="" method="post">
+                            <div class="row form-xs">
                                 <div class="row">
                                     <input type="hidden" name="id" id="id" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="code_item">Code Item:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-barcode-box-fill"></i>
+                                                </span>
+                                                <input type="text" name="code_item" id="code_item" class="form-control <?= form_error('code_item') ? 'is-invalid' : null; ?>" value="<?= $this->input->post('code_item') ?? $data->ITEM_CODE; ?>" disabled readonly>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('code_item') ?></div>
+                                        </div>
                                         <div class="mb-3">
                                             <label for="brand">Brand:</label>
                                             <span class="text-danger">*</span>
@@ -230,7 +236,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-6 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="kubikasi">Kubikasi:</label>
                                                     <div class="input-group">
@@ -241,7 +247,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-6 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="weight">Weight:</label>
                                                     <div class="input-group">
@@ -252,38 +258,20 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="made_in">Made In:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-swap-fill"></i>
-                                                </span>
-                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Made In --</option>
-                                                    <?php $param = $this->input->post('made_in') ?? $data->MADE_IN_ID; ?>
-                                                    <?php foreach ($made_in->result() as $mi): ?>
-                                                        <option value="<?= $mi->ERP_LOOKUP_VALUE_ID ?>" <?= $mi->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($mi->Made_In) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                                <div class="mb-3">
+                                                    <label class="mb-4"></label>
+                                                    <div class="input-group">
+                                                        <select name="satuan_weight" id="satuan_weight" class="form-control select2 <?= form_error('satuan_weight') ? 'is-invalid' : null; ?>">
+                                                            <?php $param = $this->input->post('satuan_weight') ?? $data->CUSTOM5; ?>
+                                                            <?php foreach ($uom->result() as $um): ?>
+                                                                <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="text-danger"><?= form_error('satuan_weight') ?></div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="komoditi">Komoditi:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pen-nib-fill"></i>
-                                                </span>
-                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Komoditi --</option>
-                                                    <?php $param = $this->input->post('komoditi') ?? $data->TIPE_ID; ?>
-                                                    <?php foreach ($komoditi->result() as $kd): ?>
-                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= $kd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($kd->Note) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('komoditi') ?></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
@@ -415,6 +403,38 @@
                                             </div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="made_in">Made In:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-swap-fill"></i>
+                                                </span>
+                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Made In --</option>
+                                                    <?php $param = $this->input->post('made_in') ?? $data->MADE_IN_ID; ?>
+                                                    <?php foreach ($made_in->result() as $mi): ?>
+                                                        <option value="<?= $mi->ERP_LOOKUP_VALUE_ID ?>" <?= $mi->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($mi->Made_In) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="komoditi">Komoditi:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-pen-nib-fill"></i>
+                                                </span>
+                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Komoditi --</option>
+                                                    <?php $param = $this->input->post('komoditi') ?? $data->TIPE_ID; ?>
+                                                    <?php foreach ($komoditi->result() as $kd): ?>
+                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= $kd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($kd->Note) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('komoditi') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <div class="row justify-content-start">
                                                 <div class="col-lg-3 col-md-4 col-sm-6">
                                                     <label class="form-check-label" for="konsinyasi" style="margin-right: 20px;">
@@ -440,100 +460,103 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('status_flag') ?></div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <button type="submit" class="btn btn-primary btn-sm" name="submit" id="submit">
-                                                    <i class="ri ri-check-double-fill"></i> Submit
-                                                </button>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                            </form>
+                        </form>
+                        <div class="col-lg-6 col-md-6 col-sm-12 text-start">
+                            <?php if ($data->APPROVE_FLAG == 'N'): ?>
+                                <form action="<?= base_url('item/approve') ?>" method="post" class="d-inline">
+                                    <input type="hidden" name="idApprove" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
+                                    <button type="submit" id="btn-approve" class="btn btn-success btn-sm">
+                                        <i class="ri ri-thumb-up-fill"></i> Approve
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
                     </div>
-                    <hr class="m-3">
-                    <div class="card-body border m-3">
-                        <!-- Nav tabs -->
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab" aria-selected="false">
-                                    <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                    <span class="d-none d-sm-block">Account</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab" aria-selected="true">
-                                    <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                    <span class="d-none d-sm-block">Lorem 1</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#messages" role="tab" aria-selected="false">
-                                    <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
-                                    <span class="d-none d-sm-block">Lorem 2</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#settings" role="tab" aria-selected="false">
-                                    <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
-                                    <span class="d-none d-sm-block">Lorem 3</span>
-                                </a>
-                            </li>
-                        </ul>
+                </div>
+                <hr class="m-3">
+                <div class="card-body border m-3">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab" aria-selected="false">
+                                <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
+                                <span class="d-none d-sm-block">Account</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab" aria-selected="true">
+                                <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+                                <span class="d-none d-sm-block">Lorem 1</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#messages" role="tab" aria-selected="false">
+                                <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
+                                <span class="d-none d-sm-block">Lorem 2</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#settings" role="tab" aria-selected="false">
+                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
+                                <span class="d-none d-sm-block">Lorem 3</span>
+                            </a>
+                        </li>
+                    </ul>
 
-                        <!-- Tab panes -->
-                        <div class="tab-content p-3 text-muted">
-                            <div class="tab-pane" id="home" role="tabpanel">
-                                <p class="mb-0">
-                                    Raw denim you probably haven't heard of them jean shorts Austin.
-                                    Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache
-                                    cliche tempor, williamsburg carles vegan helvetica. Reprehenderit
-                                    butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi,
-                                    qui irure terry richardson ex squid. Aliquip placeat salvia cillum
-                                    iphone. Seitan aliquip quis cardigan american apparel, butcher
-                                    voluptate nisi qui.
-                                </p>
-                            </div>
-                            <div class="tab-pane active" id="profile" role="tabpanel">
-                                <p class="mb-0">
-                                    Food truck fixie locavore, accusamus mcsweeney's marfa nulla
-                                    single-origin coffee squid. Exercitation +1 labore velit, blog
-                                    sartorial PBR leggings next level wes anderson artisan four loko
-                                    farm-to-table craft beer twee. Qui photo booth letterpress,
-                                    commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
-                                    vinyl cillum PBR. Homo nostrud organic, assumenda labore
-                                    aesthetic magna delectus.
-                                </p>
-                            </div>
-                            <div class="tab-pane" id="messages" role="tabpanel">
-                                <p class="mb-0">
-                                    Etsy mixtape wayfarers, ethical wes anderson tofu before they
-                                    sold out mcsweeney's organic lomo retro fanny pack lo-fi
-                                    farm-to-table readymade. Messenger bag gentrify pitchfork
-                                    tattooed craft beer, iphone skateboard locavore carles etsy
-                                    salvia banksy hoodie helvetica. DIY synth PBR banksy irony.
-                                    Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh
-                                    mi whatever gluten yr.
-                                </p>
-                            </div>
-                            <div class="tab-pane" id="settings" role="tabpanel">
-                                <p class="mb-0">
-                                    Trust fund seitan letterpress, keytar raw denim keffiyeh etsy
-                                    art party before they sold out master cleanse gluten-free squid
-                                    scenester freegan cosby sweater. Fanny pack portland seitan DIY,
-                                    art party locavore wolf cliche high life echo park Austin. Cred
-                                    vinyl keffiyeh DIY salvia PBR, banh mi before they sold out
-                                    farm-to-table VHS.
-                                </p>
-                            </div>
+                    <!-- Tab panes -->
+                    <div class="tab-content p-3 text-muted">
+                        <div class="tab-pane" id="home" role="tabpanel">
+                            <p class="mb-0">
+                                Raw denim you probably haven't heard of them jean shorts Austin.
+                                Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache
+                                cliche tempor, williamsburg carles vegan helvetica. Reprehenderit
+                                butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi,
+                                qui irure terry richardson ex squid. Aliquip placeat salvia cillum
+                                iphone. Seitan aliquip quis cardigan american apparel, butcher
+                                voluptate nisi qui.
+                            </p>
+                        </div>
+                        <div class="tab-pane active" id="profile" role="tabpanel">
+                            <p class="mb-0">
+                                Food truck fixie locavore, accusamus mcsweeney's marfa nulla
+                                single-origin coffee squid. Exercitation +1 labore velit, blog
+                                sartorial PBR leggings next level wes anderson artisan four loko
+                                farm-to-table craft beer twee. Qui photo booth letterpress,
+                                commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
+                                vinyl cillum PBR. Homo nostrud organic, assumenda labore
+                                aesthetic magna delectus.
+                            </p>
+                        </div>
+                        <div class="tab-pane" id="messages" role="tabpanel">
+                            <p class="mb-0">
+                                Etsy mixtape wayfarers, ethical wes anderson tofu before they
+                                sold out mcsweeney's organic lomo retro fanny pack lo-fi
+                                farm-to-table readymade. Messenger bag gentrify pitchfork
+                                tattooed craft beer, iphone skateboard locavore carles etsy
+                                salvia banksy hoodie helvetica. DIY synth PBR banksy irony.
+                                Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh
+                                mi whatever gluten yr.
+                            </p>
+                        </div>
+                        <div class="tab-pane" id="settings" role="tabpanel">
+                            <p class="mb-0">
+                                Trust fund seitan letterpress, keytar raw denim keffiyeh etsy
+                                art party before they sold out master cleanse gluten-free squid
+                                scenester freegan cosby sweater. Fanny pack portland seitan DIY,
+                                art party locavore wolf cliche high life echo park Austin. Cred
+                                vinyl keffiyeh DIY salvia PBR, banh mi before they sold out
+                                farm-to-table VHS.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- container-fluid -->
+</div>
+<!-- container-fluid -->
 </div>
 <!-- End Page-content -->
 
@@ -553,6 +576,8 @@
         } else {
             $('#new_product_name_required').html('');
         }
+
+        $('#new_product_name_required').html('');
 
         $('#brand, #category').on('change', updateDescription);
         $('#part_number').on('keyup', updateDescription);

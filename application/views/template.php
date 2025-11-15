@@ -120,7 +120,6 @@
         /* Textarea fix */
         .form-xs textarea {
             resize: vertical;
-            /* allowed */
         }
     </style>
 
