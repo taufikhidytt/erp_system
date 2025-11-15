@@ -6,8 +6,6 @@
     <title><?= $title ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="<?= base_url() ?>assets/logo/logo.png">
     <!-- Bootstrap Css -->
     <link href="<?= base_url() ?>assets/admin/auth/css/bootstrap.min.css" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->

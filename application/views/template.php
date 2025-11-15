@@ -1,13 +1,9 @@
 <!DOCTYPE html>
-<html lang="<?= $this->session->userdata('site_lang') ?? 'id' ?>">
 
 <head>
     <meta charset="utf-8" />
     <title><?= $title; ?> | <?= $this->session->userdata('name_ub'); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="<?= base_url() ?>assets/logo/logo.png">
 
     <!-- DataTables -->
     <link href="<?= base_url() ?>assets/admin/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />

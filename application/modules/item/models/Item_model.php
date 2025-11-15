@@ -1,4 +1,7 @@
 <?php
+
+use phpDocumentor\Reflection\Types\This;
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Item_model extends CI_Model
@@ -198,5 +201,124 @@ class Item_model extends CI_Model
     public function getKomoditi()
     {
         return $this->db->query("SELECT b.DISPLAY_NAME Komoditi, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TIPE' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getJenis()
+    {
+        return $this->db->query("SELECT b.DISPLAY_NAME Jenis_Item, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'JENIS' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getGrade()
+    {
+        return $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'GRADE' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+    }
+
+    public function getSupplier()
+    {
+        return $this->db->query("SELECT a.PERSON_ID, a.PERSON_NAME Supplier, a.PERSON_CODE Kode FROM person a JOIN person_site b ON (a.PERSON_ID = b.PERSON_ID) WHERE a.FLAG_SUPP = 1 AND a.ACTIVE_FLAG = 'Y' GROUP BY a.PERSON_ID ORDER BY a.PERSON_NAME");
+    }
+
+    public function add($post)
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        $params = array(
+            'ITEM_CODE'         => $post['item_code'] ? htmlspecialchars($post['item_code']) : null,
+            'MEREK_ID'          => $post['brand'] ? htmlspecialchars($post['brand']) : null,
+            'GROUP_ID'          => $post['category'] ? htmlspecialchars($post['category']) : null,
+            'PART_NUMBER'       => $post['part_number'] ? htmlspecialchars($post['part_number']) : null,
+            'ITEM_DESCRIPTION'  => $post['description'] ? htmlspecialchars($post['description']) : null,
+            'ASSY_CODE'         => $post['assy_code'] ? htmlspecialchars($post['assy_code']) : null,
+            'UOM_CODE'          => $post['satuan'] ? htmlspecialchars($post['satuan']) : null,
+            'TYPE_ID'           => $post['type'] ? htmlspecialchars($post['type']) : null,
+            'MIN_STOCK'         => $post['min_stock'] ? htmlspecialchars($post['min_stock']) : null,
+            'LEAD_TIME'         => $post['lead_time'] ? htmlspecialchars($post['lead_time']) : null,
+            'LOKASI'            => $post['lokasi'] ? htmlspecialchars($post['lokasi']) : null,
+            'LOKASI_ID'         => $post['rak'] ? htmlspecialchars($post['rak']) : null,
+            'PANJANG'           => $post['length'] ? htmlspecialchars($post['length']) : null,
+            'CUSTOM1'           => 'M',
+            'LEBAR'             => $post['width'] ? htmlspecialchars($post['width']) : null,
+            'CUSTOM2'           => 'M',
+            'TINGGI'            => $post['height'] ? htmlspecialchars($post['height']) : null,
+            'CUSTOM3'           => 'M',
+            'BERAT'             => $post['weight'] ? htmlspecialchars($post['weight']) : null,
+            'CUSTOM4'           => 'M',
+            'M3'                => $post['kubikasi'] ? htmlspecialchars($post['kubikasi']) : null,
+            'MADE_IN_ID'        => $post['made_in'] ? htmlspecialchars($post['made_in']) : null,
+            'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
+            'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
+            'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
+            'PERSON_ID'         => $post['supplier'] ? htmlspecialchars($post['supplier']) : null,
+            'OBSOLETE_FLAG'     => $post['obsolete'] ? htmlspecialchars($post['obsolete']) : null,
+            'PRODUK_BARU'       => $post['new_product_name'] ? htmlspecialchars($post['new_product_name']) : null,
+            'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
+            'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
+            'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
+            'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
+            'ITEM_KMS'          => $post['konsinyasi'] ? htmlspecialchars($post['konsinyasi']) : null,
+            'ACTIVE_FLAG'       => $post['status_flag'] ? htmlspecialchars($post['status_flag']) : null,
+            'CREATED_BY'        => $this->session->userdata('id'),
+            'CREATED_DATE'      => date('Y-m-d H:i:s'),
+        );
+        $this->db->insert('item', $params);
+    }
+
+    public function getItemId($id)
+    {
+        $this->db->from('item');
+        $this->db->where('item_id', $id);
+        return $this->db->get();
+    }
+
+    public function update($post)
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        $params = array(
+            'MEREK_ID'          => $post['brand'] ? htmlspecialchars($post['brand']) : null,
+            'GROUP_ID'          => $post['category'] ? htmlspecialchars($post['category']) : null,
+            'PART_NUMBER'       => $post['part_number'] ? htmlspecialchars($post['part_number']) : null,
+            'ITEM_DESCRIPTION'  => $post['description'] ? htmlspecialchars($post['description']) : null,
+            'ASSY_CODE'         => $post['assy_code'] ? htmlspecialchars($post['assy_code']) : null,
+            'UOM_CODE'          => $post['satuan'] ? htmlspecialchars($post['satuan']) : null,
+            'TYPE_ID'           => $post['type'] ? htmlspecialchars($post['type']) : null,
+            'MIN_STOCK'         => $post['min_stock'] ? htmlspecialchars($post['min_stock']) : null,
+            'LEAD_TIME'         => $post['lead_time'] ? htmlspecialchars($post['lead_time']) : null,
+            'LOKASI'            => $post['lokasi'] ? htmlspecialchars($post['lokasi']) : null,
+            'LOKASI_ID'         => $post['rak'] ? htmlspecialchars($post['rak']) : null,
+            'PANJANG'           => $post['length'] ? htmlspecialchars($post['length']) : null,
+            'CUSTOM1'           => 'M',
+            'LEBAR'             => $post['width'] ? htmlspecialchars($post['width']) : null,
+            'CUSTOM2'           => 'M',
+            'TINGGI'            => $post['height'] ? htmlspecialchars($post['height']) : null,
+            'CUSTOM3'           => 'M',
+            'BERAT'             => $post['weight'] ? htmlspecialchars($post['weight']) : null,
+            'CUSTOM4'           => 'M',
+            'M3'                => $post['kubikasi'] ? htmlspecialchars($post['kubikasi']) : null,
+            'MADE_IN_ID'        => $post['made_in'] ? htmlspecialchars($post['made_in']) : null,
+            'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
+            'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
+            'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
+            'PERSON_ID'         => $post['supplier'] ? htmlspecialchars($post['supplier']) : null,
+            'OBSOLETE_FLAG'     => $post['obsolete'] ? htmlspecialchars($post['obsolete']) : null,
+            'PRODUK_BARU'       => $post['new_product_name'] ? htmlspecialchars($post['new_product_name']) : null,
+            'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
+            'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
+            'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
+            'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
+            'ITEM_KMS'          => $post['konsinyasi'] ? htmlspecialchars($post['konsinyasi']) : null,
+            'ACTIVE_FLAG'       => $post['status_flag'] ? htmlspecialchars($post['status_flag']) : null,
+            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+        );
+        $this->db->where('ITEM_ID', $post['id']);
+        $this->db->update('item', $params);
+    }
+
+    public function approve($id)
+    {
+        $param = array(
+            'APPROVE_FLAG'  => 'Y',
+        );
+        $this->db->where('ITEM_ID', $id);
+        $this->db->update('item', $param);
     }
 }
