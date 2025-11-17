@@ -99,36 +99,36 @@ function setVariableMysql()
 {
     $ci = &get_instance();
 
-    $setParamA = $ci->dbFatra->query("SELECT PROGRAM_CODE1, ERP_LOOKUP_VALUE_ID FROM erp_lookup_value WHERE PROGRAM_CODE1 IS NOT NULL AND PROGRAM_CODE1 <> '' AND PROGRAM_CODE1 NOT LIKE '% %' AND PROGRAM_CODE1 NOT LIKE '%-%'");
+    $setParamA = $ci->db->query("SELECT PROGRAM_CODE1, ERP_LOOKUP_VALUE_ID FROM erp_lookup_value WHERE PROGRAM_CODE1 IS NOT NULL AND PROGRAM_CODE1 <> '' AND PROGRAM_CODE1 NOT LIKE '% %' AND PROGRAM_CODE1 NOT LIKE '%-%'");
 
     foreach ($setParamA->result() as $spa) {
-        $data[] = $ci->dbFatra->query("SELECT Erp_Lookup_Value_Id INTO @{$spa->PROGRAM_CODE1} FROM Erp_Lookup_Value WHERE Erp_Lookup_Value_Id = {$spa->ERP_LOOKUP_VALUE_ID}");
+        $data[] = $ci->db->query("SELECT Erp_Lookup_Value_Id INTO @{$spa->PROGRAM_CODE1} FROM Erp_Lookup_Value WHERE Erp_Lookup_Value_Id = {$spa->ERP_LOOKUP_VALUE_ID}");
     }
 
-    $setParamB = $ci->dbFatra->query("SELECT PROGRAM_CODE, ERP_LOOKUP_SET_ID FROM erp_lookup_set WHERE PROGRAM_CODE IS NOT NULL AND PROGRAM_CODE <> '' AND PROGRAM_CODE NOT LIKE '% %' AND PROGRAM_CODE NOT LIKE '%-%'");
+    $setParamB = $ci->db->query("SELECT PROGRAM_CODE, ERP_LOOKUP_SET_ID FROM erp_lookup_set WHERE PROGRAM_CODE IS NOT NULL AND PROGRAM_CODE <> '' AND PROGRAM_CODE NOT LIKE '% %' AND PROGRAM_CODE NOT LIKE '%-%'");
 
     foreach ($setParamB->result() as $spb) {
-        $ci->dbFatra->query("SELECT Erp_Lookup_Set_Id INTO @{$spb->PROGRAM_CODE} FROM Erp_Lookup_Set WHERE Erp_Lookup_Set_Id = {$spb->ERP_LOOKUP_SET_ID}");
+        $ci->db->query("SELECT Erp_Lookup_Set_Id INTO @{$spb->PROGRAM_CODE} FROM Erp_Lookup_Set WHERE Erp_Lookup_Set_Id = {$spb->ERP_LOOKUP_SET_ID}");
     }
 
-    $setParamC = $ci->dbFatra->query("SELECT COA_ID, PROGRAM_ACCOUNT FROM coa_setup");
+    $setParamC = $ci->db->query("SELECT COA_ID, PROGRAM_ACCOUNT FROM coa_setup");
 
     foreach ($setParamC->result() as $spc) {
-        $ci->dbFatra->query("SELECT Coa_Id INTO @{$spc->PROGRAM_ACCOUNT} FROM Coa_Setup WHERE Program_Account = '{$spc->PROGRAM_ACCOUNT}'");
+        $ci->db->query("SELECT Coa_Id INTO @{$spc->PROGRAM_ACCOUNT} FROM Coa_Setup WHERE Program_Account = '{$spc->PROGRAM_ACCOUNT}'");
     }
 
-    $ci->dbFatra->query("SET @SINKRON = 0;");
-    $ci->dbFatra->query("SET TX_ISOLATION = 'READ-COMMITTED'");
-    $ci->dbFatra->query("SET COMPLETION_TYPE = 0;");
-    $ci->dbFatra->query("SET AUTOCOMMIT = 1;");
-    $ci->dbFatra->query("SET @NO_MINUS_FLAG = FALSE;");
-    $ci->dbFatra->query("SET @TAHUNAN = 0;");
-    $ci->dbFatra->query("SET @STATUS_OK = 1;");
-    $ci->dbFatra->query("SET @ARCHIVE = 0;");
-    $ci->dbFatra->query("SET @STOK = 0.00;");
-    $ci->dbFatra->query("SET @REPROSES_HPP = 1;");
-    $ci->dbFatra->query("SET @PEMBULATAN_PPN = 0;");
-    $ci->dbFatra->query("SET @BARIS = 5;");
+    $ci->db->query("SET @SINKRON = 0;");
+    $ci->db->query("SET TX_ISOLATION = 'READ-COMMITTED'");
+    $ci->db->query("SET COMPLETION_TYPE = 0;");
+    $ci->db->query("SET AUTOCOMMIT = 1;");
+    $ci->db->query("SET @NO_MINUS_FLAG = FALSE;");
+    $ci->db->query("SET @TAHUNAN = 0;");
+    $ci->db->query("SET @STATUS_OK = 1;");
+    $ci->db->query("SET @ARCHIVE = 0;");
+    $ci->db->query("SET @STOK = 0.00;");
+    $ci->db->query("SET @REPROSES_HPP = 1;");
+    $ci->db->query("SET @PEMBULATAN_PPN = 0;");
+    $ci->db->query("SET @BARIS = 5;");
 }
 
 function connNewDatabase()

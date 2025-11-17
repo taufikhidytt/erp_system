@@ -1,11 +1,13 @@
 <?php
-
-use phpDocumentor\Reflection\Types\This;
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Item_model extends CI_Model
 {
+    public function __construct()
+    {
+        setVariableMysql();
+    }
+
     var $column_order = array(
         'null',
         'null',
@@ -306,6 +308,13 @@ class Item_model extends CI_Model
             'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
             'ITEM_KMS'          => $post['konsinyasi'] ? htmlspecialchars($post['konsinyasi']) : null,
             'ACTIVE_FLAG'       => $post['status_flag'] ? htmlspecialchars($post['status_flag']) : null,
+            'COA_ID'            => $post['acc_persediaan'] ? htmlspecialchars($post['acc_persediaan']) : null,
+            'COA_SUSPEND_ID'    => $post['acc_utang_suspend'] ? htmlspecialchars($post['acc_utang_suspend']) : null,
+            'COA_HPP_ID'        => $post['acc_hpp'] ? htmlspecialchars($post['acc_hpp']) : null,
+            'COA_JUAL_ID'       => $post['acc_penjualan_barang'] ? htmlspecialchars($post['acc_penjualan_barang']) : null,
+            'COA_RET_JUAL_ID'   =>
+            'COA_RET_BELI_ID'
+            'COA_DISC_JUAL_ID'
             'LAST_UPDATE_BY'    => $this->session->userdata('id'),
             'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
         );
@@ -320,5 +329,70 @@ class Item_model extends CI_Model
         );
         $this->db->where('ITEM_ID', $id);
         $this->db->update('item', $param);
+    }
+
+    public function getAccount()
+    {
+        return $this->db->query("SELECT a.COA_ID, a.COA_CODE, a.COA_NAME FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' ORDER BY a.COA_NAME ASC");
+    }
+
+    public function getAccPersediaan()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @INVENTORY");
+    }
+
+    public function getAccUtangSuspend()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @HUTANG_S");
+    }
+
+    public function getAccHpp()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @HPP");
+    }
+
+    public function getPenjualanBarang()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @PENJUALAN");
+    }
+
+    public function getReturPenjualan()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @RET_JUAL");
+    }
+
+    public function getReturPembelian()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @RET_BELI");
+    }
+
+    public function getDiscPenjualan()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @JUAL_DISC");
+    }
+
+    public function getPenjualanJasa()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @JASA_JUAL");
+    }
+
+    public function getPembelian()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @JASA_BELI");
+    }
+
+    public function getDiscPenjualanJasa()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @JUAL_DISC");
+    }
+
+    public function getPembelianUangMuka()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @UMUKA_BELI");
+    }
+
+    public function getPenjualanUangMuka()
+    {
+        return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @UMUKA_JUAL");
     }
 }

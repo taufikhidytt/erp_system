@@ -36,7 +36,7 @@ class Item extends Back_Controller
             // if ($item->APPROVED == 'N') {
             //     $approve = '<form action="' . base_url('item/approveIndex') . '" method="post" class="d-inline">
             //         <input type="hidden" name="idApprove" value="' . $this->encrypt->encode($item->ID) . '">
-            //         <button type="submit" id="btn-approve" ata-toggle="tooltip" data-placement="bottom" title="Approve" style="background:transparent; border:none;">
+            //         <button type="submit" id="btn-approve" data-toggle="tooltip" data-placement="bottom" title="Approve" style="background:transparent; border:none;">
             //             <i class="ri ri-thumb-up-fill" style="color: #5664D2;"></i>
             //         </button>
             //     </form> |';
@@ -205,6 +205,19 @@ class Item extends Back_Controller
                     $data['grade'] = $this->item->getGrade();
                     $data['supplier'] = $this->item->getSupplier();
                     $data['data'] = $query->row();
+                    $data['account'] = $this->item->getAccount();
+                    $data['acc_persediaan'] = $this->item->getAccPersediaan()->row();
+                    $data['acc_utang_suspend'] = $this->item->getAccUtangSuspend()->row();
+                    $data['acc_hpp'] = $this->item->getAccHpp()->row();
+                    $data['acc_penjualan_barang'] = $this->item->getPenjualanBarang()->row();
+                    $data['acc_retur_penjualan'] = $this->item->getReturPenjualan()->row();
+                    $data['acc_retur_pembelian'] = $this->item->getReturPembelian()->row();
+                    $data['acc_disc_penjualan'] = $this->item->getDiscPenjualan()->row();
+                    $data['acc_penjualan_jasa'] = $this->item->getPenjualanJasa()->row();
+                    $data['acc_pembelian'] = $this->item->getPembelian()->row();
+                    $data['acc_disc_penjualan_jasa'] = $this->item->getDiscPenjualanJasa()->row();
+                    $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
+                    $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
                     $this->template->load('template', 'item/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -224,6 +237,7 @@ class Item extends Back_Controller
                     }
                 }
                 $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
+                debuging($post);
                 $this->item->update($post);
                 if ($this->db->affected_rows() > 0) {
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data baru!');

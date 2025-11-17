@@ -230,7 +230,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="kubikasi">Kubikasi:</label>
                                                     <div class="input-group">
@@ -241,7 +241,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="weight">Weight:</label>
                                                     <div class="input-group">
@@ -252,7 +252,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="mb-3">
                                                     <label class="mb-4"></label>
                                                     <div class="input-group">

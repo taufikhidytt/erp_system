@@ -39,8 +39,8 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="row form-xs">
-                                <div class="row">
+                            <div class="row">
+                                <div class="row form-xs">
                                     <input type="hidden" name="id" id="id" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
@@ -236,7 +236,7 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="kubikasi">Kubikasi:</label>
                                                     <div class="input-group">
@@ -247,7 +247,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="mb-3">
                                                     <label for="weight">Weight:</label>
                                                     <div class="input-group">
@@ -258,7 +258,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="mb-3">
                                                     <label class="mb-4"></label>
                                                     <div class="input-group">
@@ -286,7 +286,7 @@
                                                     <?php $param = $this->input->post('jenis') ?? $data->JENIS_ID; ?>
                                                     <option value="">-- Selected Jenis --</option>
                                                     <?php foreach ($jenis->result() as $js): ?>
-                                                        <option value="<?= $js->ERP_LOOKUP_VALUE_ID ?>" <?= $js->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($js->Jenis_Item) ?></option>
+                                                        <option value="<?= $js->ERP_LOOKUP_VALUE_ID ?>" <?= $js->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?> data-name="<?= strtolower($js->Jenis_Item) ?>"><?= strtoupper($js->Jenis_Item) ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -462,6 +462,250 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <hr class="m-3">
+                                <div class="card-body border m-3">
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#account" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none data-toggle=" tooltip" data-placement="bottom" title="Account"" ><i class=" ri ri-book-mark-fill"></i></span>
+                                                <span class="d-none d-sm-block">Account</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
+                                                <span class="d-none d-sm-block">Lorem 1</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#messages" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
+                                                <span class="d-none d-sm-block">Lorem 2</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#settings" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
+                                                <span class="d-none d-sm-block">Lorem 3</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div class="tab-content p-3 text-muted">
+                                        <div class="tab-pane active form-xs" id="account" role="tabpanel">
+                                            <div class="form-box" id="barang">
+                                                <div class="row mb-3">
+                                                    <label for="acc_persediaan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Persediaan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_persediaan" id="acc_persediaan" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_persediaan') ?? $acc_persediaan->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_persediaan" id="code_acc_persediaan" class="form-control" value="<?= $this->input->post('code_acc_persediaan'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_utang_suspend" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Utang Suspend</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_utang_suspend" id="acc_utang_suspend" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_utang_suspend') ?? $acc_utang_suspend->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_utang_suspend" id="code_acc_utang_suspend" class="form-control" value="<?= $this->input->post('code_acc_utang_suspend'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_hpp" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. HPP</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_hpp" id="acc_hpp" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_hpp') ?? $acc_hpp->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_hpp" id="code_acc_hpp" class="form-control" value="<?= $this->input->post('code_acc_hpp'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_penjualan_barang" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Barang</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_penjualan_barang" id="acc_penjualan_barang" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_penjualan_barang') ?? $acc_penjualan_barang->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_penjualan_barang" id="code_acc_penjualan_barang" class="form-control" value="<?= $this->input->post('code_acc_penjualan_barang'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_retur_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_retur_penjualan" id="acc_retur_penjualan" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_retur_penjualan') ?? $acc_retur_penjualan->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_retur_penjualan" id="code_acc_retur_penjualan" class="form-control" value="<?= $this->input->post('code_acc_retur_penjualan'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_retur_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Pembelian</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_retur_pembelian" id="acc_retur_pembelian" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_retur_pembelian') ?? $acc_retur_pembelian->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_retur_pembelian" id="code_acc_retur_pembelian" class="form-control" value="<?= $this->input->post('code_acc_retur_pembelian'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_disc_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_disc_penjualan" id="acc_disc_penjualan" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_disc_penjualan') ?? $acc_disc_penjualan->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_disc_penjualan" id="code_acc_disc_penjualan" class="form-control" value="<?= $this->input->post('code_acc_disc_penjualan'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-box" id="jasa">
+                                                <div class="row mb-3">
+                                                    <label for="acc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Jasa</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_penjualan_jasa" id="acc_penjualan_jasa" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_penjualan_jasa') ?? $acc_penjualan_jasa->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_penjualan_jasa" id="code_acc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_penjualan_jasa'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_pembelian" id="acc_pembelian" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_pembelian') ?? $acc_pembelian->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_pembelian" id="code_acc_pembelian" class="form-control" value="<?= $this->input->post('code_acc_pembelian'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_disc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_disc_penjualan_jasa" id="acc_disc_penjualan_jasa" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_disc_penjualan_jasa') ?? $acc_disc_penjualan_jasa->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_disc_penjualan_jasa" id="code_acc_disc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_disc_penjualan_jasa'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-box" id="uang_muka">
+                                                <div class="row mb-3">
+                                                    <label for="acc_pembelian_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_pembelian_uang_muka" id="acc_pembelian_uang_muka" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_pembelian_uang_muka') ?? $acc_pembelian_uang_muka->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_pembelian_uang_muka" id="code_acc_pembelian_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_pembelian_uang_muka'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_penjualan_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_penjualan_uang_muka" id="acc_penjualan_uang_muka" class="form-control select2">
+                                                            <?php $param = $this->input->post('acc_penjualan_uang_muka') ?? $acc_penjualan_uang_muka->COA_ID; ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_penjualan_uang_muka" id="code_acc_penjualan_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_penjualan_uang_muka'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="profile" role="tabpanel">
+                                            <p class="mb-0">
+                                                Food truck fixie locavore, accusamus mcsweeney's marfa nulla
+                                                single-origin coffee squid. Exercitation +1 labore velit, blog
+                                                sartorial PBR leggings next level wes anderson artisan four loko
+                                                farm-to-table craft beer twee. Qui photo booth letterpress,
+                                                commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
+                                                vinyl cillum PBR. Homo nostrud organic, assumenda labore
+                                                aesthetic magna delectus.
+                                            </p>
+                                        </div>
+                                        <div class="tab-pane" id="messages" role="tabpanel">
+                                            <p class="mb-0">
+                                                Etsy mixtape wayfarers, ethical wes anderson tofu before they
+                                                sold out mcsweeney's organic lomo retro fanny pack lo-fi
+                                                farm-to-table readymade. Messenger bag gentrify pitchfork
+                                                tattooed craft beer, iphone skateboard locavore carles etsy
+                                                salvia banksy hoodie helvetica. DIY synth PBR banksy irony.
+                                                Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh
+                                                mi whatever gluten yr.
+                                            </p>
+                                        </div>
+                                        <div class="tab-pane" id="settings" role="tabpanel">
+                                            <p class="mb-0">
+                                                Trust fund seitan letterpress, keytar raw denim keffiyeh etsy
+                                                art party before they sold out master cleanse gluten-free squid
+                                                scenester freegan cosby sweater. Fanny pack portland seitan DIY,
+                                                art party locavore wolf cliche high life echo park Austin. Cred
+                                                vinyl keffiyeh DIY salvia PBR, banh mi before they sold out
+                                                farm-to-table VHS.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                         <div class="col-lg-6 col-md-6 col-sm-12 text-start">
                             <?php if ($data->APPROVE_FLAG == 'N'): ?>
@@ -472,83 +716,6 @@
                                     </button>
                                 </form>
                             <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-                <hr class="m-3">
-                <div class="card-body border m-3">
-                    <!-- Nav tabs -->
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-bs-toggle="tab" href="#home" role="tab" aria-selected="false">
-                                <span class="d-block d-sm-none"><i class="fas fa-home"></i></span>
-                                <span class="d-none d-sm-block">Account</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#profile" role="tab" aria-selected="true">
-                                <span class="d-block d-sm-none"><i class="far fa-user"></i></span>
-                                <span class="d-none d-sm-block">Lorem 1</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#messages" role="tab" aria-selected="false">
-                                <span class="d-block d-sm-none"><i class="far fa-envelope"></i></span>
-                                <span class="d-none d-sm-block">Lorem 2</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#settings" role="tab" aria-selected="false">
-                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
-                                <span class="d-none d-sm-block">Lorem 3</span>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <!-- Tab panes -->
-                    <div class="tab-content p-3 text-muted">
-                        <div class="tab-pane" id="home" role="tabpanel">
-                            <p class="mb-0">
-                                Raw denim you probably haven't heard of them jean shorts Austin.
-                                Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache
-                                cliche tempor, williamsburg carles vegan helvetica. Reprehenderit
-                                butcher retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi,
-                                qui irure terry richardson ex squid. Aliquip placeat salvia cillum
-                                iphone. Seitan aliquip quis cardigan american apparel, butcher
-                                voluptate nisi qui.
-                            </p>
-                        </div>
-                        <div class="tab-pane active" id="profile" role="tabpanel">
-                            <p class="mb-0">
-                                Food truck fixie locavore, accusamus mcsweeney's marfa nulla
-                                single-origin coffee squid. Exercitation +1 labore velit, blog
-                                sartorial PBR leggings next level wes anderson artisan four loko
-                                farm-to-table craft beer twee. Qui photo booth letterpress,
-                                commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
-                                vinyl cillum PBR. Homo nostrud organic, assumenda labore
-                                aesthetic magna delectus.
-                            </p>
-                        </div>
-                        <div class="tab-pane" id="messages" role="tabpanel">
-                            <p class="mb-0">
-                                Etsy mixtape wayfarers, ethical wes anderson tofu before they
-                                sold out mcsweeney's organic lomo retro fanny pack lo-fi
-                                farm-to-table readymade. Messenger bag gentrify pitchfork
-                                tattooed craft beer, iphone skateboard locavore carles etsy
-                                salvia banksy hoodie helvetica. DIY synth PBR banksy irony.
-                                Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh
-                                mi whatever gluten yr.
-                            </p>
-                        </div>
-                        <div class="tab-pane" id="settings" role="tabpanel">
-                            <p class="mb-0">
-                                Trust fund seitan letterpress, keytar raw denim keffiyeh etsy
-                                art party before they sold out master cleanse gluten-free squid
-                                scenester freegan cosby sweater. Fanny pack portland seitan DIY,
-                                art party locavore wolf cliche high life echo park Austin. Cred
-                                vinyl keffiyeh DIY salvia PBR, banh mi before they sold out
-                                farm-to-table VHS.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -708,6 +875,100 @@
                 }
             })
         });
+
+        $('#acc_persediaan').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_persediaan').val(code);
+        });
+        $('#acc_persediaan').change();
+
+        $('#acc_utang_suspend').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_utang_suspend').val(code);
+        });
+        $('#acc_utang_suspend').change();
+
+        $('#acc_hpp').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_hpp').val(code);
+        });
+        $('#acc_hpp').change();
+
+        $('#acc_penjualan_barang').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_penjualan_barang').val(code);
+        });
+        $('#acc_penjualan_barang').change();
+
+        $('#acc_retur_penjualan').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_retur_penjualan').val(code);
+        });
+        $('#acc_retur_penjualan').change();
+
+        $('#acc_retur_pembelian').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_retur_pembelian').val(code);
+        });
+        $('#acc_retur_pembelian').change();
+
+        $('#acc_disc_penjualan').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_disc_penjualan').val(code);
+        });
+        $('#acc_disc_penjualan').change();
+
+        $('#acc_penjualan_jasa').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_penjualan_jasa').val(code);
+        });
+        $('#acc_penjualan_jasa').change();
+
+        $('#acc_pembelian').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_pembelian').val(code);
+        });
+        $('#acc_pembelian').change();
+
+        $('#acc_disc_penjualan_jasa').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_disc_penjualan_jasa').val(code);
+        });
+        $('#acc_disc_penjualan_jasa').change();
+
+        $('#acc_pembelian_uang_muka').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_pembelian_uang_muka').val(code);
+        });
+        $('#acc_pembelian_uang_muka').change();
+
+        $('#acc_penjualan_uang_muka').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_penjualan_uang_muka').val(code);
+        });
+        $('#acc_penjualan_uang_muka').change();
+
+        $('#jenis').on('change', function() {
+
+            let formName = $(this).find(':selected').data('name');
+
+            // sembunyikan form & hapus name input
+            $('.form-box').hide().find('input, select, textarea').each(function() {
+                $(this).data('name', $(this).attr('name')).removeAttr('name');
+            });
+
+            // $('.form-box').hide();
+
+            if (formName) {
+                let name = formName.replace(/\s+/g, '_');
+                $('#' + name).show().find('input, select, textarea').each(function() {
+                    $(this).attr('name', $(this).data('name'));
+                });
+                // $('#' + name).show();
+            }
+        });
+
+        $('#jenis').trigger('change');
     });
 
     function updateDescription() {
