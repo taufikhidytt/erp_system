@@ -250,18 +250,94 @@ class Item_model extends CI_Model
             'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
             'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
             'PERSON_ID'         => $post['supplier'] ? htmlspecialchars($post['supplier']) : null,
-            'OBSOLETE_FLAG'     => $post['obsolete'] ? htmlspecialchars($post['obsolete']) : null,
-            'PRODUK_BARU'       => $post['new_product_name'] ? htmlspecialchars($post['new_product_name']) : null,
             'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
             'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
             'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
             'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
-            'ITEM_KMS'          => $post['konsinyasi'] ? htmlspecialchars($post['konsinyasi']) : null,
-            'ACTIVE_FLAG'       => $post['status_flag'] ? htmlspecialchars($post['status_flag']) : null,
-            'CREATED_BY'        => $this->session->userdata('id'),
-            'CREATED_DATE'      => date('Y-m-d H:i:s'),
+            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
         );
+
+        if (!empty($post['obsolete'])) {
+            $params['OBSOLETE_FLAG'] = htmlspecialchars($post['obsolete']);
+        } else {
+            $params['OBSOLETE_FLAG'] = null;
+        }
+
+        if (!empty($post['new_product_name'])) {
+            $params['PRODUK_BARU'] = htmlspecialchars($post['new_product_name']);
+        } else {
+            $params['PRODUK_BARU'] = null;
+        }
+
+        if (!empty($post['konsinyasi'])) {
+            $params['ITEM_KMS'] = htmlspecialchars($post['konsinyasi']);
+        } else {
+            $params['ITEM_KMS'] = null;
+        }
+
+        if (!empty($post['status_flag'])) {
+            $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
+        } else {
+            $params['ACTIVE_FLAG'] = null;
+        }
+
+        $params['COA_ID'] = null;
+        $params['COA_JUAL_ID'] = null;
+        $params['COA_DISC_JUAL_ID'] = null;
+
+        if (!empty($post['acc_persediaan'])) {
+            $params['COA_ID'] = htmlspecialchars($post['acc_persediaan']);
+        } elseif (!empty($post['acc_pembelian'])) {
+            $params['COA_ID'] = htmlspecialchars($post['acc_pembelian']);
+        } elseif (!empty($post['acc_pembelian_uang_muka'])) {
+            $params['COA_ID'] = htmlspecialchars($post['acc_pembelian_uang_muka']);
+        }
+
+
+        if (!empty($post['acc_penjualan_barang'])) {
+            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_barang']);
+        } elseif (!empty($post['acc_penjualan_jasa'])) {
+            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_jasa']);
+        } elseif (!empty($post['acc_penjualan_uang_muka'])) {
+            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_uang_muka']);
+        }
+
+
+        if (!empty($post['acc_disc_penjualan'])) {
+            $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan']);
+        } elseif (!empty($post['acc_disc_penjualan_jasa'])) {
+            $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan_jasa']);
+        }
+
+
+        // BARANG
+        if (!empty($post['acc_utang_suspend'])) {
+            $params['COA_SUSPEND_ID'] = htmlspecialchars($post['acc_utang_suspend']);
+        } else {
+            $params['COA_SUSPEND_ID'] = null;
+        }
+
+        if (!empty($post['acc_hpp'])) {
+            $params['COA_HPP_ID'] = htmlspecialchars($post['acc_hpp']);
+        } else {
+            $params['COA_HPP_ID'] = null;
+        }
+
+        if (!empty($post['acc_retur_penjualan'])) {
+            $params['COA_RET_JUAL_ID'] = htmlspecialchars($post['acc_retur_penjualan']);
+        } else {
+            $params['COA_RET_JUAL_ID'] = null;
+        }
+
+        if (!empty($post['acc_retur_pembelian'])) {
+            $params['COA_RET_BELI_ID'] = htmlspecialchars($post['acc_retur_pembelian']);
+        } else {
+            $params['COA_RET_BELI_ID'] = null;
+        }
+
         $this->db->insert('item', $params);
+        return $this->db->insert_id();
     }
 
     public function getItemId($id)
@@ -300,24 +376,92 @@ class Item_model extends CI_Model
             'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
             'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
             'PERSON_ID'         => $post['supplier'] ? htmlspecialchars($post['supplier']) : null,
-            'OBSOLETE_FLAG'     => $post['obsolete'] ? htmlspecialchars($post['obsolete']) : null,
-            'PRODUK_BARU'       => $post['new_product_name'] ? htmlspecialchars($post['new_product_name']) : null,
             'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
             'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
             'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
             'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
-            'ITEM_KMS'          => $post['konsinyasi'] ? htmlspecialchars($post['konsinyasi']) : null,
-            'ACTIVE_FLAG'       => $post['status_flag'] ? htmlspecialchars($post['status_flag']) : null,
-            'COA_ID'            => $post['acc_persediaan'] ? htmlspecialchars($post['acc_persediaan']) : null,
-            'COA_SUSPEND_ID'    => $post['acc_utang_suspend'] ? htmlspecialchars($post['acc_utang_suspend']) : null,
-            'COA_HPP_ID'        => $post['acc_hpp'] ? htmlspecialchars($post['acc_hpp']) : null,
-            'COA_JUAL_ID'       => $post['acc_penjualan_barang'] ? htmlspecialchars($post['acc_penjualan_barang']) : null,
-            'COA_RET_JUAL_ID'   =>
-            'COA_RET_BELI_ID'
-            'COA_DISC_JUAL_ID'
             'LAST_UPDATE_BY'    => $this->session->userdata('id'),
             'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
         );
+
+        if (!empty($post['obsolete'])) {
+            $params['OBSOLETE_FLAG'] = htmlspecialchars($post['obsolete']);
+        } else {
+            $params['OBSOLETE_FLAG'] = null;
+        }
+
+        if (!empty($post['new_product_name'])) {
+            $params['PRODUK_BARU'] = htmlspecialchars($post['new_product_name']);
+        } else {
+            $params['PRODUK_BARU'] = null;
+        }
+
+        if (!empty($post['konsinyasi'])) {
+            $params['ITEM_KMS'] = htmlspecialchars($post['konsinyasi']);
+        } else {
+            $params['ITEM_KMS'] = null;
+        }
+
+        if (!empty($post['status_flag'])) {
+            $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
+        } else {
+            $params['ACTIVE_FLAG'] = null;
+        }
+
+        $params['COA_ID'] = null;
+        $params['COA_JUAL_ID'] = null;
+        $params['COA_DISC_JUAL_ID'] = null;
+
+        if (!empty($post['acc_persediaan'])) {
+            $params['COA_ID'] = htmlspecialchars($post['acc_persediaan']);
+        } elseif (!empty($post['acc_pembelian'])) {
+            $params['COA_ID'] = htmlspecialchars($post['acc_pembelian']);
+        } elseif (!empty($post['acc_pembelian_uang_muka'])) {
+            $params['COA_ID'] = htmlspecialchars($post['acc_pembelian_uang_muka']);
+        }
+
+
+        if (!empty($post['acc_penjualan_barang'])) {
+            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_barang']);
+        } elseif (!empty($post['acc_penjualan_jasa'])) {
+            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_jasa']);
+        } elseif (!empty($post['acc_penjualan_uang_muka'])) {
+            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_uang_muka']);
+        }
+
+
+        if (!empty($post['acc_disc_penjualan'])) {
+            $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan']);
+        } elseif (!empty($post['acc_disc_penjualan_jasa'])) {
+            $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan_jasa']);
+        }
+
+
+        // BARANG
+        if (!empty($post['acc_utang_suspend'])) {
+            $params['COA_SUSPEND_ID'] = htmlspecialchars($post['acc_utang_suspend']);
+        } else {
+            $params['COA_SUSPEND_ID'] = null;
+        }
+
+        if (!empty($post['acc_hpp'])) {
+            $params['COA_HPP_ID'] = htmlspecialchars($post['acc_hpp']);
+        } else {
+            $params['COA_HPP_ID'] = null;
+        }
+
+        if (!empty($post['acc_retur_penjualan'])) {
+            $params['COA_RET_JUAL_ID'] = htmlspecialchars($post['acc_retur_penjualan']);
+        } else {
+            $params['COA_RET_JUAL_ID'] = null;
+        }
+
+        if (!empty($post['acc_retur_pembelian'])) {
+            $params['COA_RET_BELI_ID'] = htmlspecialchars($post['acc_retur_pembelian']);
+        } else {
+            $params['COA_RET_BELI_ID'] = null;
+        }
+
         $this->db->where('ITEM_ID', $post['id']);
         $this->db->update('item', $params);
     }
@@ -394,5 +538,24 @@ class Item_model extends CI_Model
     public function getPenjualanUangMuka()
     {
         return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @UMUKA_JUAL");
+    }
+
+    public function getUomChild()
+    {
+        return $this->db->order_by('ITEM_UOM_ID', 'ASC')->get('item_uom')->result_array();
+    }
+
+    public function insert_batch($data)
+    {
+        return $this->db->insert_batch('item_uom', $data);
+    }
+
+    public function delete_by_ids($ids)
+    {
+        if (!empty($ids)) {
+            $this->db->where_in('ITEM_UOM_ID', $ids);
+            return $this->db->delete('item_uom');
+        }
+        return false;
     }
 }

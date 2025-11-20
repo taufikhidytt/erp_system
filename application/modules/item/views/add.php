@@ -276,9 +276,8 @@
                                                     <i class="ri ri-arrow-up-down-fill"></i>
                                                 </span>
                                                 <select name="jenis" id="jenis" class="form-control select2 <?= form_error('jenis') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Jenis --</option>
                                                     <?php foreach ($jenis->result() as $js): ?>
-                                                        <option value="<?= $js->ERP_LOOKUP_VALUE_ID ?>" <?= set_value('jenis') == $js->ERP_LOOKUP_VALUE_ID ? 'selected' : null ?>><?= strtoupper($js->Jenis_Item) ?></option>
+                                                        <option value="<?= $js->ERP_LOOKUP_VALUE_ID ?>" <?= set_value('jenis') == $js->ERP_LOOKUP_VALUE_ID ? 'selected' : null ?> data-name="<?= strtolower($js->Jenis_Item) ?>"><?= strtoupper($js->Jenis_Item) ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -453,6 +452,375 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <hr class="m-3">
+                                <div class="card-body border m-3">
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#detail" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-none d-sm-block">Detail</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#account" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none data-toggle=" tooltip" data-placement="bottom" title="Account"" ><i class=" ri ri-book-mark-fill"></i></span>
+                                                <span class="d-none d-sm-block">Account</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#saldo_awal_program" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none"><i class="ri ri-money-dollar-box-fill"></i></span>
+                                                <span class="d-none d-sm-block">Saldo Awal Program</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#harga" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
+                                                <span class="d-none d-sm-block">Harga</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#diskon" role="tab" aria-selected="false">
+                                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
+                                                <span class="d-none d-sm-block">Diskon</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div class="tab-content p-3 text-muted">
+                                        <div class="tab-pane active form-xs" id="detail" role="tabpanel">
+                                            <button type="button" id="addRow" class="btn btn-success btn-sm btn-custom">+</button>
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm btn-custom">-</button>
+
+                                            <table id="tableSatuan" class="table table-bordered mt-3">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" id="chkAll"></th>
+                                                        <th>No</th>
+                                                        <th>Satuan Lain</th>
+                                                        <th>Konversi</th>
+                                                        <th>Keterangan</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php if (!empty($uomChild)): ?>
+                                                        <?php foreach ($uomChild as $index => $row): ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <input type="checkbox" class="chkRow">
+                                                                    <input type="hidden" name="id[]" value="<?= $row['ITEM_UOM_ID']; ?>">
+                                                                </td>
+
+                                                                <td class="rowNo"><?= $index + 1; ?>.</td>
+
+                                                                <td>
+                                                                    <input type="text" name="satuan_lain[]" class="form-control auto-save"
+                                                                        value="<?= htmlspecialchars($row['UOM_CODE']); ?>" readonly>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="number" name="konversi[]" class="form-control auto-save"
+                                                                        step="0.01" value="<?= htmlspecialchars($row['TO_QTY']); ?>" readonly>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="text" name="keterangan[]" class="form-control auto-save" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    <?php else: ?>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="checkbox" class="chkRow">
+                                                            </td>
+
+                                                            <td class="rowNo">1.</td>
+
+                                                            <td>
+                                                                <select name="satuan_lain[]" class="form-select select-uom auto-save">
+                                                                    <option value=""></option>
+                                                                    <?php foreach ($uom->result() as $um): ?>
+                                                                        <option value="<?= $um->UOM_CODE ?>">
+                                                                            <?= $um->DESCRIPTION ?>
+                                                                        </option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="number" name="konversi[]" class="form-control auto-save">
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="text" name="keterangan[]" class="form-control auto-save" disabled>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endif; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="tab-pane form-xs" id="account" role="tabpanel">
+                                            <div class="form-box" id="barang">
+                                                <div class="row mb-3">
+                                                    <label for="acc_persediaan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Persediaan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_persediaan" id="acc_persediaan" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_persediaan');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_ID) ? $data->COA_ID : $acc_persediaan->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_persediaan" id="code_acc_persediaan" class="form-control" value="<?= $this->input->post('code_acc_persediaan'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_utang_suspend" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Utang Suspend</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_utang_suspend" id="acc_utang_suspend" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_utang_suspend');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_SUSPEND_ID) ? $data->COA_SUSPEND_ID : $acc_utang_suspend->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_utang_suspend" id="code_acc_utang_suspend" class="form-control" value="<?= $this->input->post('code_acc_utang_suspend'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_hpp" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. HPP</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_hpp" id="acc_hpp" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_hpp');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_HPP_ID) ? $data->COA_HPP_ID : $acc_hpp->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_hpp" id="code_acc_hpp" class="form-control" value="<?= $this->input->post('code_acc_hpp'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_penjualan_barang" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Barang</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_penjualan_barang" id="acc_penjualan_barang" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_penjualan_barang');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_JUAL_ID) ? $data->COA_JUAL_ID : $acc_penjualan_barang->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_penjualan_barang" id="code_acc_penjualan_barang" class="form-control" value="<?= $this->input->post('code_acc_penjualan_barang'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_retur_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_retur_penjualan" id="acc_retur_penjualan" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_retur_penjualan');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_RET_JUAL_ID) ? $data->COA_RET_JUAL_ID : $acc_retur_penjualan->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_retur_penjualan" id="code_acc_retur_penjualan" class="form-control" value="<?= $this->input->post('code_acc_retur_penjualan'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_retur_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Pembelian</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_retur_pembelian" id="acc_retur_pembelian" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_retur_pembelian');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_RET_BELI_ID) ? $data->COA_RET_BELI_ID : $acc_retur_pembelian->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_retur_pembelian" id="code_acc_retur_pembelian" class="form-control" value="<?= $this->input->post('code_acc_retur_pembelian'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_disc_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_disc_penjualan" id="acc_disc_penjualan" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_disc_penjualan');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_DISC_JUAL_ID) ? $data->COA_DISC_JUAL_ID : $acc_disc_penjualan->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_disc_penjualan" id="code_acc_disc_penjualan" class="form-control" value="<?= $this->input->post('code_acc_disc_penjualan'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-box" id="jasa">
+                                                <div class="row mb-3">
+                                                    <label for="acc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Jasa</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_penjualan_jasa" id="acc_penjualan_jasa" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_penjualan_jasa');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_JUAL_ID) ? $data->COA_JUAL_ID : $acc_penjualan_jasa->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_penjualan_jasa" id="code_acc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_penjualan_jasa'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_pembelian" id="acc_pembelian" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_pembelian');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_ID) ? $data->COA_ID : $acc_pembelian->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_pembelian" id="code_acc_pembelian" class="form-control" value="<?= $this->input->post('code_acc_pembelian'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_disc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_disc_penjualan_jasa" id="acc_disc_penjualan_jasa" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_disc_penjualan_jasa');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_DISC_JUAL_ID) ? $data->COA_DISC_JUAL_ID : $acc_disc_penjualan_jasa->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_disc_penjualan_jasa" id="code_acc_disc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_disc_penjualan_jasa'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-box" id="uang_muka">
+                                                <div class="row mb-3">
+                                                    <label for="acc_pembelian_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_pembelian_uang_muka" id="acc_pembelian_uang_muka" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_pembelian_uang_muka');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_ID) ? $data->COA_ID : $acc_pembelian_uang_muka->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_pembelian_uang_muka" id="code_acc_pembelian_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_pembelian_uang_muka'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <label for="acc_penjualan_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan</label>
+                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                                        <select name="acc_penjualan_uang_muka" id="acc_penjualan_uang_muka" class="form-control select2">
+                                                            <?php
+                                                            $param = $this->input->post('acc_penjualan_uang_muka');
+
+                                                            if (empty($param)) {
+                                                                $param = !empty($data->COA_JUAL_ID) ? $data->COA_JUAL_ID : $acc_penjualan_uang_muka->COA_ID;
+                                                            }
+                                                            ?>
+                                                            <?php foreach ($account->result() as $ac): ?>
+                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-2 col-md-2 col-sm-12">
+                                                        <input type="text" name="code_acc_penjualan_uang_muka" id="code_acc_penjualan_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_penjualan_uang_muka'); ?>" disabled>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="saldo_awal_program" role="tabpanel">
+                                            <h5 class="mb-0">Module Saldo Awal Coming Soon</h5>
+                                        </div>
+                                        <div class="tab-pane" id="harga" role="tabpanel">
+                                            <h5 class="mb-0">Module Harga Coming Soon</h5>
+                                        </div>
+                                        <div class="tab-pane" id="diskon" role="tabpanel">
+                                            <h5 class="mb-0">Module Diskon Coming Soon</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -495,11 +863,15 @@
         });
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
+        $('.select2, .select-uom').each(function() {
             $(this).select2({
                 theme: 'bootstrap-5',
                 dropdownParent: $(this).parent(),
             });
+        });
+
+        $(".select-uom").select2({
+            width: '100%'
         });
 
         var flashsuccess = $('#flashSuccess').data('success');
@@ -593,6 +965,196 @@
                 $('#new_product_name').prop('disabled', true).val('');
             }
         });
+
+        $('#acc_persediaan').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_persediaan').val(code);
+        });
+        $('#acc_persediaan').change();
+
+        $('#acc_utang_suspend').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_utang_suspend').val(code);
+        });
+        $('#acc_utang_suspend').change();
+
+        $('#acc_hpp').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_hpp').val(code);
+        });
+        $('#acc_hpp').change();
+
+        $('#acc_penjualan_barang').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_penjualan_barang').val(code);
+        });
+        $('#acc_penjualan_barang').change();
+
+        $('#acc_retur_penjualan').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_retur_penjualan').val(code);
+        });
+        $('#acc_retur_penjualan').change();
+
+        $('#acc_retur_pembelian').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_retur_pembelian').val(code);
+        });
+        $('#acc_retur_pembelian').change();
+
+        $('#acc_disc_penjualan').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_disc_penjualan').val(code);
+        });
+        $('#acc_disc_penjualan').change();
+
+        $('#acc_penjualan_jasa').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_penjualan_jasa').val(code);
+        });
+        $('#acc_penjualan_jasa').change();
+
+        $('#acc_pembelian').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_pembelian').val(code);
+        });
+        $('#acc_pembelian').change();
+
+        $('#acc_disc_penjualan_jasa').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_disc_penjualan_jasa').val(code);
+        });
+        $('#acc_disc_penjualan_jasa').change();
+
+        $('#acc_pembelian_uang_muka').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_pembelian_uang_muka').val(code);
+        });
+        $('#acc_pembelian_uang_muka').change();
+
+        $('#acc_penjualan_uang_muka').on('change', function() {
+            let code = $(this).find(':selected').data('code');
+            $('#code_acc_penjualan_uang_muka').val(code);
+        });
+        $('#acc_penjualan_uang_muka').change();
+
+        $('#jenis').on('change', function() {
+
+            let formName = $(this).find(':selected').data('name');
+
+            // sembunyikan form & hapus name input
+            $('.form-box').hide().find('input, select, textarea').each(function() {
+                $(this).data('name', $(this).attr('name')).removeAttr('name');
+            });
+
+            // $('.form-box').hide();
+
+            if (formName) {
+                let name = formName.replace(/\s+/g, '_');
+                $('#' + name).show().find('input, select, textarea').each(function() {
+                    $(this).attr('name', $(this).data('name'));
+                });
+                // $('#' + name).show();
+            }
+        });
+
+        $('#jenis').trigger('change');
+
+        // Tambah baris baru
+        $("#addRow").click(function() {
+            <?php
+            $option_uom = "";
+            foreach ($uom->result() as $um) {
+                $option_uom .= '<option value="' . $um->UOM_CODE . '">' . strtoupper($um->DESCRIPTION) . '</option>';
+            }
+            ?>
+            var rowCount = $("#tableSatuan tbody tr").length + 1;
+            var newRow = `<tr>
+            <td><input type="checkbox" class="chkRow"></td>
+            <td class="rowNo">${rowCount}.</td>
+            <td>
+                <select name="satuan_lain[]" class="form-select select-uom auto-save">
+                    <?= $option_uom; ?>
+                </select>
+            </td>
+            <td><input type="number" name="konversi[]" class="form-control auto-save"></td>
+            <td><input type="text" name="keterangan[]" class="form-control auto-save" disabled></td>
+        </tr>`;
+            $("#tableSatuan tbody").append(newRow);
+            $(".select-uom").select2({
+                width: '100%'
+            });
+        });
+
+        // Centang semua
+        $("#chkAll").change(function() {
+            $(".chkRow").prop('checked', $(this).prop('checked'));
+        });
+
+        $("#removeRow").click(function() {
+
+            var idsToDelete = [];
+
+            $("#tableSatuan tbody input.chkRow:checked").each(function() {
+                var row = $(this).closest("tr");
+                var id = row.find('input[name="id[]"]').val();
+
+                if (id > 0) {
+                    idsToDelete.push(id);
+                }
+
+                row.remove();
+            });
+
+            updateRowNumber();
+
+            if (idsToDelete.length > 0) {
+                $('#loading').show();
+                $.ajax({
+                    url: "<?= site_url('item/ajax_delete'); ?>",
+                    type: "POST",
+                    data: {
+                        ids: idsToDelete
+                    },
+                    dataType: "json",
+                    success: function(res) {
+                        $('#loading').hide();
+                        Swal.fire({
+                            title: 'Selamat!',
+                            text: 'Anda berhasil menghapus data!',
+                            icon: 'success',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $('#loading').hide();
+                        Swal.fire({
+                            title: 'Gagal',
+                            text: 'Hapus data!',
+                            icon: 'error',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            location.reload();
+                        });
+                    }
+                });
+            }
+        });
+
+        // Blok input & format tampilan
+        $(document).on("keyup", 'input[name="konversi[]"]', function(e) {
+
+            // Blok e, E, +, -
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+                e.preventDefault();
+                this.value = this.value.replace(/[eE+\-]/g, "");
+                return;
+            }
+        });
     });
 
     function updateDescription() {
@@ -607,5 +1169,12 @@
         let description = parts.join(' ');
 
         $('#description').val(description);
+    }
+
+    // Update nomor urut
+    function updateRowNumber() {
+        $("#tableSatuan tbody tr").each(function(index) {
+            $(this).find(".rowNo").text((index + 1) + ".");
+        });
     }
 </script>
