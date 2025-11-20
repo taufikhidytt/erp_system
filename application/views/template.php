@@ -143,8 +143,13 @@
                 <div class="d-flex">
                     <!-- LOGO -->
                     <div class="navbar-brand-box align-content-center">
-                        <a href="<?= base_url('dashboard') ?>">
-                            <h5 class="text-white"><?= strtoupper($this->session->userdata('name_ub')) ?></h5>
+                        <a href="<?= base_url('dashboard') ?>" class="logo logo-light">
+                            <span class="logo-sm">
+                                <img src="<?= base_url('assets/logo/' . $this->session->userdata('logo')) ?>" alt="logo-sm-light" height="70">
+                            </span>
+                            <span class="logo-lg">
+                                <h5 class="text-white"><?= strtoupper($this->session->userdata('name_ub')) ?></h5>
+                            </span>
                         </a>
                     </div>
 

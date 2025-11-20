@@ -61,7 +61,7 @@ class Auth extends MX_Controller
                     if ($data->END_DATE >= date('Y-m-d H:i:s') or $data->END_DATE == NULL) {
                         if ('*' . strtoupper(sha1(sha1($password, true))) == $data->PASSWORD) {
                             $infoUB = $this->db->query("
-                                    SELECT DISTINCT NAME 
+                                    SELECT DISTINCT NAME, LOGO_FILENAME AS LOGO
                                     FROM setup a 
                                     JOIN address b ON a.address_id = b.address_id
                                 ")->row();
@@ -76,6 +76,7 @@ class Auth extends MX_Controller
                                 'view_flag'     => $data->VIEW_FLAG,
                                 'print_flag'    => $data->PRINT_FLAG,
                                 'name_ub'       => $infoUB->NAME,
+                                'logo'          => $infoUB->LOGO,
                                 'logged_in'     => TRUE
                             ];
 
