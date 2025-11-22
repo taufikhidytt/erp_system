@@ -14,7 +14,7 @@ class Dashboard extends Back_Controller
         try {
             // debuging($this->session->userdata());
             $data['title'] = 'Dashboard';
-            $data['heading'] = 'Dashboard';
+            $data['breadcrumb'] = 'Dashboard';
             $this->template->load('template', 'dashboard/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

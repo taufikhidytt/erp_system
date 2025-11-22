@@ -182,12 +182,12 @@ class Item_model extends CI_Model
 
     public function getUom()
     {
-        return $this->db->query("SELECT a.* FROM uom a WHERE a.ACTIVE_FLAG = 'Y' ORDER BY a.PRIMARY_FLAG DESC, a.UOM_CODE");
+        return $this->db->query("SELECT a.* FROM uom a WHERE a.ACTIVE_FLAG = 'Y' ORDER BY CASE WHEN a.PRIMARY_FLAG = 'Y' THEN 0 ELSE 1 END");
     }
 
     public function getType()
     {
-        return $this->db->query("SELECT b.DISPLAY_NAME Trade_Type, b.DESCRIPTION Trade_Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TYPEINVENTORY' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+        return $this->db->query("SELECT b.DISPLAY_NAME Trade_Type, b.DESCRIPTION Trade_Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TYPEINVENTORY' AND b.ACTIVE_FLAG = 'Y' ORDER BY CASE WHEN Default_Flag = 'Y' THEN 0 ELSE 1 END, ERP_LOOKUP_VALUE_ID");
     }
 
     public function getRak()
@@ -202,17 +202,17 @@ class Item_model extends CI_Model
 
     public function getKomoditi()
     {
-        return $this->db->query("SELECT b.DISPLAY_NAME Komoditi, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TIPE' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+        return $this->db->query("SELECT b.DISPLAY_NAME Komoditi, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'TIPE' AND b.ACTIVE_FLAG = 'Y' ORDER BY CASE WHEN Default_Flag = 'Y' THEN 0 ELSE 1 END, ERP_LOOKUP_VALUE_ID");
     }
 
     public function getJenis()
     {
-        return $this->db->query("SELECT b.DISPLAY_NAME Jenis_Item, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'JENIS' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+        return $this->db->query("SELECT b.DISPLAY_NAME Jenis_Item, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'JENIS' AND b.ACTIVE_FLAG = 'Y' ORDER BY CASE WHEN Default_Flag = 'Y' THEN 0 ELSE 1 END, ERP_LOOKUP_VALUE_ID");
     }
 
     public function getGrade()
     {
-        return $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'GRADE' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+        return $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'GRADE' AND b.ACTIVE_FLAG = 'Y' ORDER BY CASE WHEN Default_Flag = 'Y' THEN 0 ELSE 1 END, ERP_LOOKUP_VALUE_ID");
     }
 
     public function getSupplier()
@@ -224,7 +224,8 @@ class Item_model extends CI_Model
     {
         date_default_timezone_set('Asia/Jakarta');
         $params = array(
-            'ITEM_CODE'         => $post['item_code'] ? htmlspecialchars($post['item_code']) : null,
+            // 'ITEM_CODE'         => $post['item_code'] ? htmlspecialchars($post['item_code']) : null,
+            'ITEM_CODE'         => null,
             'MEREK_ID'          => $post['brand'] ? htmlspecialchars($post['brand']) : null,
             'GROUP_ID'          => $post['category'] ? htmlspecialchars($post['category']) : null,
             'PART_NUMBER'       => $post['part_number'] ? htmlspecialchars($post['part_number']) : null,
@@ -243,7 +244,7 @@ class Item_model extends CI_Model
             'TINGGI'            => $post['height'] ? htmlspecialchars($post['height']) : null,
             'CUSTOM3'           => 'M',
             'BERAT'             => $post['weight'] ? htmlspecialchars($post['weight']) : null,
-            'CUSTOM4'           => $post['satuan_weight'] ? htmlspecialchars($post['satuan_weight']) : null,
+            'CUSTOM4'           => 'KG',
             'M3'                => $post['kubikasi'] ? htmlspecialchars($post['kubikasi']) : null,
             'MADE_IN_ID'        => $post['made_in'] ? htmlspecialchars($post['made_in']) : null,
             'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
@@ -369,7 +370,7 @@ class Item_model extends CI_Model
             'TINGGI'            => $post['height'] ? htmlspecialchars($post['height']) : null,
             'CUSTOM3'           => 'M',
             'BERAT'             => $post['weight'] ? htmlspecialchars($post['weight']) : null,
-            'CUSTOM4'           => $post['satuan_weight'] ? htmlspecialchars($post['satuan_weight']) : null,
+            'CUSTOM4'           => 'Kg',
             'M3'                => $post['kubikasi'] ? htmlspecialchars($post['kubikasi']) : null,
             'MADE_IN_ID'        => $post['made_in'] ? htmlspecialchars($post['made_in']) : null,
             'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
@@ -540,9 +541,13 @@ class Item_model extends CI_Model
         return $this->db->query("SELECT a.*, SUBSTR( CONCAT(a.COA_CODE, ' ', a.COA_NAME), 1, 50 ) AS ACCOUNT_DESC, IFNULL(ac.ACCOUNT_NAME2, a.COA_NAME) AS ACCOUNT_NAME2 FROM coa a LEFT JOIN account ac ON (ac.ACCOUNT_ID = a.ACCOUNT_ID) WHERE a.ACTIVE_FLAG = 'Y' AND a.COA_ID = @UMUKA_JUAL");
     }
 
-    public function getUomChild()
+    public function getUomChild($id)
     {
-        return $this->db->order_by('ITEM_UOM_ID', 'ASC')->get('item_uom')->result_array();
+        $this->db->select('*');
+        $this->db->from('item_uom');
+        $this->db->where('ITEM_ID', $id);
+        $this->db->order_by('ITEM_UOM_ID', 'ASC');
+        return $this->db->get();
     }
 
     public function insert_batch($data)
@@ -557,5 +562,11 @@ class Item_model extends CI_Model
             return $this->db->delete('item_uom');
         }
         return false;
+    }
+
+    public function deleteItem($id)
+    {
+        $this->db->where('ITEM_ID', $id);
+        $this->db->delete('item');
     }
 }

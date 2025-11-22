@@ -145,7 +145,7 @@
                     <div class="navbar-brand-box align-content-center">
                         <a href="<?= base_url('dashboard') ?>" class="logo logo-light">
                             <span class="logo-sm">
-                                <img src="<?= base_url('assets/logo/' . $this->session->userdata('logo')) ?>" alt="logo-sm-light" height="70">
+                                <img src="<?= base_url('assets/logo/' . $this->session->userdata('logo')) ?>" alt="logo-sm-light" height="30">
                             </span>
                             <span class="logo-lg">
                                 <h5 class="text-white"><?= strtoupper($this->session->userdata('name_ub')) ?></h5>
@@ -218,7 +218,8 @@
                                             <li class="menu-title">Main Menus</li>
                                             <li>
                                                 <a href="<?= base_url('dashboard') ?>" class="waves-effect">
-                                                    DASHBOARD
+                                                    <i class="ri-dashboard-line"></i>
+                                                    <span>Dashboard</span>
                                                 </a>
                                             </li>
 

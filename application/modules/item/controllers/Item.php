@@ -14,7 +14,7 @@ class Item extends Back_Controller
     {
         try {
             $data['title'] = 'Item';
-            $data['heading'] = 'Item';
+            $data['breadcrumb'] = 'Item';
             $this->template->load('template', 'item/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -31,7 +31,7 @@ class Item extends Back_Controller
         foreach ($list as $item) {
             $no++;
             $row = array();
-            $row['no'] = $no;
+            $row['no'] = $no . '.';
 
             // if ($item->APPROVED == 'N') {
             //     $approve = '<form action="' . base_url('item/approveIndex') . '" method="post" class="d-inline">
@@ -52,7 +52,10 @@ class Item extends Back_Controller
                 </a>
             </div>
             ';
-            $row['kode_item'] = $item->KODE_ITEM ? $item->KODE_ITEM : '-';
+            $row['kode_item'] = '
+            <a href="' . base_url('item/detail/' . $this->encrypt->encode($item->ID)) . '">
+                ' . ($item->KODE_ITEM ? $item->KODE_ITEM : '-') . '
+            </a>';
             $row['nama_item'] = $item->NAMA_ITEM ? $item->NAMA_ITEM : '-';
             $row['part_number'] = $item->PART_NUMBER ? $item->PART_NUMBER : '-';
             $row['uom'] = $item->UOM ? $item->UOM : '-';
@@ -112,7 +115,7 @@ class Item extends Back_Controller
 
             if ($this->form_validation->run() == false) {
                 $data['title'] = 'Tambah Item';
-                $data['heading'] = 'Tambah Item';
+                $data['breadcrumb'] = 'Tambah Item';
                 $data['brand'] = $this->item->getBrand();
                 $data['category'] = $this->item->getCategory();
                 $data['uom'] = $this->item->getUom();
@@ -151,7 +154,7 @@ class Item extends Back_Controller
                     $post['lokasi'] = null;
                 }
                 $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
-                $post['item_code'] = $this->generateNomor();
+                // $post['item_code'] = $this->generateNomor();
                 $idItem = $this->item->add($post);
                 if ($this->db->affected_rows() > 0) {
                     date_default_timezone_set('Asia/Jakarta');
@@ -279,7 +282,7 @@ class Item extends Back_Controller
                 $query = $this->item->getItemId($id);
                 if ($query->num_rows() > 0) {
                     $data['title'] = 'Detail';
-                    $data['heading'] = 'Detail';
+                    $data['breadcrumb'] = 'Detail';
                     $data['brand'] = $this->item->getBrand();
                     $data['category'] = $this->item->getCategory();
                     $data['uom'] = $this->item->getUom();
@@ -304,7 +307,7 @@ class Item extends Back_Controller
                     $data['acc_disc_penjualan_jasa'] = $this->item->getDiscPenjualanJasa()->row();
                     $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
                     $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
-                    $data['uomChild'] = $this->item->getUomChild();
+                    $data['uomChild'] = $this->item->getUomChild($id);
                     $this->template->load('template', 'item/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -495,6 +498,21 @@ class Item extends Back_Controller
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'no_ids']);
+        }
+    }
+
+    public function deleteItem()
+    {
+        try {
+            $id = $this->encrypt->decode($this->input->post('id'));
+            $this->item->deleteItem($id);
+            if ($this->db->affected_rows() > 0) {
+                return sendSuccess('success', 'Selamat anda berhasil menghapus data!');
+            } else {
+                return sendSuccess('error', 'Gagal hapus data!');
+            }
+        } catch (Exception $err) {
+            return sendError('Server error', $err->getMessage());
         }
     }
 }

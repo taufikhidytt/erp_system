@@ -8,13 +8,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h1><?= $title ?></h1>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
                                 <a href="<?= base_url('item') ?>">Item</a>
                             </li>
-                            <li class="breadcrumb-item active"><?= $heading ?></li>
+                            <li class="breadcrumb-item active"><?= $breadcrumb ?></li>
                         </ol>
                     </div>
                 </div>
@@ -28,14 +27,20 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit">
-                                        <i class="ri ri-check-double-fill"></i> Submit
+                                    <a href="<?= base_url('item/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
+                                        <i class="ri ri-add-box-fill"></i>
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
+                                        <i class="ri ri-check-double-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);">
-                                        <i class="ri ri-eraser-fill"></i> Undo
+                                    <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Hapus">
+                                        <i class="fa fa-trash"></i>
                                     </button>
-                                    <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary">
-                                        <i class="ri ri-reply-fill"></i> Back
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
+                                        <i class="ri ri-eraser-fill"></i>
+                                    </button>
+                                    <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Kembali">
+                                        <i class="ri ri-reply-fill"></i>
                                     </a>
                                 </div>
                             </div>
@@ -168,17 +173,12 @@
                                                     <label for="lead_time">Lead Time:</label>
                                                     <span class="text-danger">*</span>
                                                     <div class="row">
-                                                        <div class="col-lg-8 col-md-6 col-sm-12">
-                                                            <div class="input-group">
-                                                                <span class="input-group-text">
-                                                                    <i class="ri ri-rocket-2-fill"></i>
-                                                                </span>
-                                                                <input type="number" min="1" name="lead_time" id="lead_time" class="form-control <?= form_error('lead_time') ? 'is-invalid' : null; ?>" placeholder="Enter Lead Time" value="<?= $this->input->post('lead_time') ?? ($data->lead_time ?? '1'); ?>">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-4 col-md-6 col-sm-12">
-                                                            <br>
-                                                            <p>Weeks</p>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">
+                                                                <i class="ri ri-rocket-2-fill"></i>
+                                                            </span>
+                                                            <input type="number" min="1" name="lead_time" id="lead_time" class="form-control <?= form_error('lead_time') ? 'is-invalid' : null; ?>" placeholder="Enter Lead Time" value="<?= $this->input->post('lead_time') ?? ($data->lead_time ?? '1'); ?>">
+                                                            <span class="input-group-text">Weeks</span>
                                                         </div>
                                                     </div>
                                                     <div class="text-danger"><?= form_error('lead_time') ?></div>
@@ -200,76 +200,69 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="length">Length:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" min="1" name="length" id="length" class="form-control <?= form_error('length') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('length') ?? (rtrim(rtrim($data->PANJANG, '0'), '.') ?? '1'); ?>">
+                                        <div class="border p-2">
+                                            <div class="row">
+                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label for="length">Length:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">
+                                                                <i class="ri ri-increase-decrease-fill"></i>
+                                                            </span>
+                                                            <input type="number" min="1" name="length" id="length" class="form-control <?= form_error('length') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('length') ?? (rtrim(rtrim($data->PANJANG, '0'), '.') ?? '1'); ?>">
+                                                            <span class="input-group-text">Meter</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label for="width">Width:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">
+                                                                <i class="ri ri-increase-decrease-fill"></i>
+                                                            </span>
+                                                            <input type="number" min="1" name="width" id="width" class="form-control <?= form_error('width') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('width') ?? (rtrim(rtrim($data->LEBAR, '0'), '.') ?? '1'); ?>">
+                                                            <span class="input-group-text">Meter</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4 col-md-12 col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label for="height">Height:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">
+                                                                <i class="ri ri-increase-decrease-fill"></i>
+                                                            </span>
+                                                            <input type="number" min="1" name="height" id="height" class="form-control <?= form_error('height') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('height') ?? (rtrim(rtrim($data->TINGGI, '0'), '.') ?? '1'); ?>">
+                                                            <span class="input-group-text">Meter</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="width">Width:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" min="1" name="width" id="width" class="form-control <?= form_error('width') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('width') ?? (rtrim(rtrim($data->LEBAR, '0'), '.') ?? '1'); ?>">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label for="kubikasi">Kubikasi:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">
+                                                                <i class="ri ri-increase-decrease-fill"></i>
+                                                            </span>
+                                                            <input type="number" min="1" name="kubikasi" id="kubikasi" class="form-control <?= form_error('kubikasi') ? 'is-invalid' : null; ?>" placeholder="" value="<?= $this->input->post('kubikasi') ?? (rtrim(rtrim($data->M3, '0'), '.') ?? '1'); ?>" disabled>
+                                                            <span class="input-group-text">M3</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-12 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="height">Height:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" min="1" name="height" id="height" class="form-control <?= form_error('height') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('height') ?? (rtrim(rtrim($data->TINGGI, '0'), '.') ?? '1'); ?>">
+                                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                                    <div class="mb-3">
+                                                        <label for="weight">Weight:</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">
+                                                                <i class="ri ri-increase-decrease-fill"></i>
+                                                            </span>
+                                                            <input type="number" min="1" name="weight" id="weight" class="form-control <?= form_error('weight') ? 'is-invalid' : null; ?>" placeholder="Kilogram" value="<?= $this->input->post('weight') ?? $data->BERAT; ?>">
+                                                            <span class="input-group-text">Kg</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-4 col-md-4 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="kubikasi">Kubikasi:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" min="1" name="kubikasi" id="kubikasi" class="form-control <?= form_error('kubikasi') ? 'is-invalid' : null; ?>" placeholder="" value="<?= $this->input->post('kubikasi') ?? (rtrim(rtrim($data->M3, '0'), '.') ?? '1'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="weight">Weight:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" min="1" name="weight" id="weight" class="form-control <?= form_error('weight') ? 'is-invalid' : null; ?>" placeholder="Kilogram" value="<?= $this->input->post('weight') ?? $data->BERAT; ?>">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-md-4 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label class="mb-4"></label>
-                                                    <div class="input-group">
-                                                        <select name="satuan_weight" id="satuan_weight" class="form-control select2 <?= form_error('satuan_weight') ? 'is-invalid' : null; ?>">
-                                                            <?php $param = $this->input->post('satuan_weight') ?? $data->CUSTOM5; ?>
-                                                            <?php foreach ($uom->result() as $um): ?>
-                                                                <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('satuan_weight') ?></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -300,7 +293,6 @@
                                                     <i class="ri ri-arrow-up-down-fill"></i>
                                                 </span>
                                                 <select name="grade" id="grade" class="form-control select2 <?= form_error('grade') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Grade --</option>
                                                     <?php $param = $this->input->post('grade') ?? $data->GRADE_ID; ?>
                                                     <?php foreach ($grade->result() as $gd): ?>
                                                         <option value="<?= $gd->ERP_LOOKUP_VALUE_ID ?>" <?= $gd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($gd->Grade) ?></option>
@@ -377,12 +369,12 @@
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6 col-sm-12">
                                                 <div class="mb-3">
-                                                    <label for="min_order_quantity">MOQ:</label>
+                                                    <label for="min_order_quantity">Min. Ord Qty:</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">
-                                                            <i class="ri ri-sticky-note-fill"></i>
+                                                            <i class="ri ri-increase-decrease-fill"></i>
                                                         </span>
-                                                        <input type="number" name="min_order_quantity" id="min_order_quantity" class="form-control <?= form_error('min_order_quantity') ? 'is-invalid' : null ?>" value="<?= $this->input->post('min_order_quantity') ?? $data->MOQ; ?>" placeholder="Enter MOQ">
+                                                        <input type="number" name="min_order_quantity" id="min_order_quantity" class="form-control <?= form_error('min_order_quantity') ? 'is-invalid' : null ?>" value="<?= $this->input->post('min_order_quantity') ?? $data->MOQ; ?>" placeholder="Enter Min. Ord Qty">
                                                     </div>
                                                     <div class="text-danger"><?= form_error('min_order_quantity') ?></div>
                                                 </div>
@@ -470,31 +462,31 @@
                                     <ul class="nav nav-tabs" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" data-bs-toggle="tab" href="#detail" role="tab" aria-selected="true">
-                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Detail"><i class="ri ri-eye-2-fill"></i></span>
                                                 <span class="d-none d-sm-block">Detail</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" data-bs-toggle="tab" href="#account" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none data-toggle=" tooltip" data-placement="bottom" title="Account"" ><i class=" ri ri-book-mark-fill"></i></span>
+                                                <span class="d-block d-sm-none" data-toggle=" tooltip" data-placement="bottom" title="Account"><i class=" ri ri-book-mark-fill"></i></span>
                                                 <span class="d-none d-sm-block">Account</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" data-bs-toggle="tab" href="#saldo_awal_program" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none"><i class="ri ri-money-dollar-box-fill"></i></span>
+                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Saldo Awal Program"><i class="ri ri-money-dollar-box-fill"></i></span>
                                                 <span class="d-none d-sm-block">Saldo Awal Program</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" data-bs-toggle="tab" href="#harga" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
+                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Harga"><i class="fas fa-cog"></i></span>
                                                 <span class="d-none d-sm-block">Harga</span>
                                             </a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" data-bs-toggle="tab" href="#diskon" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none"><i class="fas fa-cog"></i></span>
+                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Diskon"><i class="fas fa-cog"></i></span>
                                                 <span class="d-none d-sm-block">Diskon</span>
                                             </a>
                                         </li>
@@ -502,76 +494,77 @@
                                     <!-- Tab panes -->
                                     <div class="tab-content p-3 text-muted">
                                         <div class="tab-pane active form-xs" id="detail" role="tabpanel">
-                                            <button type="button" id="addRow" class="btn btn-success btn-sm btn-custom">+</button>
-                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm btn-custom">-</button>
+                                            <button type="button" id="addRow" class="btn btn-success btn-sm">+</button>
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm">-</button>
+                                            <div class="table-responsive">
+                                                <table id="tableSatuan" class="table table-bordered mt-3 w-100">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input type="checkbox" id="chkAll"></th>
+                                                            <th>No</th>
+                                                            <th>Satuan Lain</th>
+                                                            <th>Konversi</th>
+                                                            <th>Keterangan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php if (!empty($uomChild)): ?>
+                                                            <?php foreach ($uomChild->result_array() as $index => $row): ?>
+                                                                <tr>
+                                                                    <td>
+                                                                        <input type="checkbox" class="chkRow">
+                                                                        <input type="hidden" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
+                                                                    </td>
 
-                                            <table id="tableSatuan" class="table table-bordered mt-3">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input type="checkbox" id="chkAll"></th>
-                                                        <th>No</th>
-                                                        <th>Satuan Lain</th>
-                                                        <th>Konversi</th>
-                                                        <th>Keterangan</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php if (!empty($uomChild)): ?>
-                                                        <?php foreach ($uomChild as $index => $row): ?>
+                                                                    <td class="rowNo"><?= $index + 1; ?>.</td>
+
+                                                                    <td>
+                                                                        <input type="text" name="satuan_lain[]" class="form-control auto-save"
+                                                                            value="<?= htmlspecialchars($row['UOM_CODE']); ?>" readonly>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input type="number" name="konversi[]" class="form-control auto-save"
+                                                                            step="0.01" value="<?= htmlspecialchars($row['TO_QTY']); ?>" readonly>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input type="text" name="keterangan[]" class="form-control auto-save" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        <?php else: ?>
                                                             <tr>
                                                                 <td>
                                                                     <input type="checkbox" class="chkRow">
-                                                                    <input type="hidden" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
+                                                                    <input type="hidden" name="id_satuan_uom_detail[]" value="0">
                                                                 </td>
 
-                                                                <td class="rowNo"><?= $index + 1; ?>.</td>
+                                                                <td class="rowNo">1.</td>
 
                                                                 <td>
-                                                                    <input type="text" name="satuan_lain[]" class="form-control auto-save"
-                                                                        value="<?= htmlspecialchars($row['UOM_CODE']); ?>" readonly>
+                                                                    <select name="satuan_lain[]" class="form-select select-uom auto-save">
+                                                                        <option value=""></option>
+                                                                        <?php foreach ($uom->result() as $um): ?>
+                                                                            <option value="<?= $um->UOM_CODE ?>">
+                                                                                <?= $um->DESCRIPTION ?>
+                                                                            </option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
                                                                 </td>
 
                                                                 <td>
-                                                                    <input type="number" name="konversi[]" class="form-control auto-save"
-                                                                        step="0.01" value="<?= htmlspecialchars($row['TO_QTY']); ?>" readonly>
+                                                                    <input type="number" name="konversi[]" class="form-control auto-save">
                                                                 </td>
 
                                                                 <td>
-                                                                    <input type="text" name="keterangan[]" class="form-control auto-save" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                    <input type="text" name="keterangan[]" class="form-control auto-save" disabled>
                                                                 </td>
                                                             </tr>
-                                                        <?php endforeach; ?>
-                                                    <?php else: ?>
-                                                        <tr>
-                                                            <td>
-                                                                <input type="checkbox" class="chkRow">
-                                                                <input type="hidden" name="id_satuan_uom_detail[]" value="0">
-                                                            </td>
-
-                                                            <td class="rowNo">1.</td>
-
-                                                            <td>
-                                                                <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                                                                    <option value=""></option>
-                                                                    <?php foreach ($uom->result() as $um): ?>
-                                                                        <option value="<?= $um->UOM_CODE ?>">
-                                                                            <?= $um->DESCRIPTION ?>
-                                                                        </option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                            </td>
-
-                                                            <td>
-                                                                <input type="number" name="konversi[]" class="form-control auto-save">
-                                                            </td>
-
-                                                            <td>
-                                                                <input type="text" name="keterangan[]" class="form-control auto-save" disabled>
-                                                            </td>
-                                                        </tr>
-                                                    <?php endif; ?>
-                                                </tbody>
-                                            </table>
+                                                        <?php endif; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                         <div class="tab-pane form-xs" id="account" role="tabpanel">
                                             <div class="form-box" id="barang">
@@ -875,6 +868,11 @@
 
         $('#brand, #category').on('change', updateDescription);
         $('#part_number').on('keyup', updateDescription);
+
+        $('#satuan').on('change', function() {
+            let value = $(this).val();
+            $('#satuan2').val(value).trigger('change');
+        });
 
         $('#obsolete').on('change', function() {
             if ($(this).is(':checked')) {
@@ -1262,6 +1260,68 @@
                 this.value = this.value.replace(/[eE+\-]/g, "");
                 return;
             }
+        });
+
+        $(document).on('click', '.btn-delete', function() {
+            var id = $(this).data('id'); // ambil id terenkripsi
+
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin menghapus data ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yess, Hapus data ini!',
+                cancelButtonText: 'Batal!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url('item/deleteItem') ?>",
+                        method: "POST",
+                        data: {
+                            id: id
+                        },
+                        success: function(response) {
+                            $('#loading').hide();
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Sukses',
+                                    text: response.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    $('#table').DataTable().ajax.reload(null, false);
+                                });
+                            } else {
+                                $('#loading').hide();
+                                Swal.fire({
+                                    title: 'Warning',
+                                    text: response.message,
+                                    icon: 'warning',
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    $('#table').DataTable().ajax.reload(null, false);
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading').hide();
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Gagal hapus data!',
+                                icon: 'error',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                $('#table').DataTable().ajax.reload(null, false);
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 

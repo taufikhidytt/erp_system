@@ -11,6 +11,24 @@
         display: none;
         position: absolute;
     }
+
+    /* Paksa width kolom "Nama Item" */
+    #table th:nth-child(4),
+    #table td:nth-child(4) {
+        width: 500px !important;
+    }
+
+    /* Jangan wrap teks agar width stabil */
+    #table th,
+    #table td {
+        white-space: nowrap;
+    }
+
+    /* Agar filter row tetap rapi */
+    .column_search {
+        width: 100%;
+        box-sizing: border-box;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
@@ -23,12 +41,11 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h1></h1>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
                                 <a href="">
-                                    <?= $heading ?>
+                                    <?= $breadcrumb ?>
                                 </a>
                             </li>
                         </ol>
@@ -106,22 +123,22 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="17" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr>
+                                        <tr class="align-top">
                                             <th>No</th>
-                                            <th>Action</th>
+                                            <th></th>
                                             <th>Kode Item</th>
                                             <th>Nama Item</th>
                                             <th>Part Number</th>
                                             <th>UoM</th>
                                             <th>Jenis</th>
                                             <th>Kategori</th>
-                                            <th>Made In</th>
                                             <th>Komoditi</th>
                                             <th>Brand</th>
                                             <th>Trade</th>
-                                            <th>Price Last Buy</th>
-                                            <th>Price Last Sell</th>
+                                            <th>Last Buy</th>
+                                            <th>Last Sell</th>
                                             <th>Lead Time</th>
+                                            <th>Made In</th>
                                             <th>Konsy</th>
                                             <th>Approved</th>
                                             <th>Status</th>
@@ -144,6 +161,7 @@
 <script>
     $(document).ready(function() {
         var table = $('#table').DataTable({
+            "autoWidth": false,
             "searching": true,
             "processing": true,
             "serverSide": true,
@@ -153,6 +171,9 @@
                 "type": "POST"
             },
             "columnDefs": [{
+                "width": "500px",
+                "targets": [3, 4],
+            }, {
                 "targets": [0, 1],
                 "orderable": false,
                 "searchable": false
@@ -186,9 +207,6 @@
                     "data": "kategori"
                 },
                 {
-                    "data": "made_in"
-                },
-                {
                     "data": "komoditi"
                 },
                 {
@@ -207,6 +225,9 @@
                     "data": "lead_time"
                 },
                 {
+                    "data": "made_in"
+                },
+                {
                     "data": "konsy"
                 },
                 {
@@ -218,7 +239,6 @@
             ]
         });
 
-        // 🔍 Pencarian per kolom
         $('.column_search').on('keyup change', function() {
             // let i = $(this).data('column');
             table
