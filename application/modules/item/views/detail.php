@@ -1282,6 +1282,7 @@
                         data: {
                             id: id
                         },
+                        dataType: 'json',
                         success: function(response) {
                             $('#loading').hide();
                             if (response.success) {
