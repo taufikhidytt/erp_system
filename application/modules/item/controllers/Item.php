@@ -505,12 +505,17 @@ class Item extends Back_Controller
     {
         try {
             $id = $this->encrypt->decode($this->input->post('id'));
-            $this->item->deleteItem($id);
-            if ($this->db->affected_rows() > 0) {
-                return sendSuccess('success', 'Selamat anda berhasil menghapus data!');
-            } else {
-                return sendSuccess('error', 'Gagal hapus data!');
+            $result = $this->item->deleteItem($id);
+
+            if ($result['status'] === 'error') {
+                return sendWarning($result['message']);
             }
+
+            if ($result['affected'] == 0) {
+                return sendWarning('Gagal hapus data item!');
+            }
+
+            return sendSuccess('success', 'Selamat anda berhasil menghapus data!');
         } catch (Exception $err) {
             return sendError('Server error', $err->getMessage());
         }

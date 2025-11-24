@@ -1293,7 +1293,7 @@
                                     confirmButtonColor: '#3085d6',
                                     confirmButtonText: 'Ok'
                                 }).then((result) => {
-                                    $('#table').DataTable().ajax.reload(null, false);
+                                    window.location.href = "<?= base_url('item') ?>";
                                 });
                             } else {
                                 $('#loading').hide();

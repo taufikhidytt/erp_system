@@ -568,5 +568,19 @@ class Item_model extends CI_Model
     {
         $this->db->where('ITEM_ID', $id);
         $this->db->delete('item');
+
+        $error = $this->db->error();
+
+        if ($error['code'] != 0) {
+            return [
+                'status'  => 'error',
+                'message' => $error['message']
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'affected' => $this->db->affected_rows()
+        ];
     }
 }
