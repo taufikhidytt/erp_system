@@ -23,7 +23,7 @@
         white-space: nowrap;
         height: 30px !important;
         min-height: 30px !important;
-        padding-top: 10px !important;
+        padding-top: 12px !important;
         padding-bottom: 1px !important;
         padding-right: 6px !important;
         padding-left: 6px !important;
@@ -147,7 +147,7 @@
                                             <th>Made In</th>
                                             <th>Konsy</th>
                                             <th>Approved</th>
-                                            <th>Status</th>
+                                            <th>Obsolete</th>
                                         </tr>
                                     </thead>
                                     <tbody>

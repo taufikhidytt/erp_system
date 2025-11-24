@@ -67,7 +67,7 @@ class Item extends Back_Controller
             $row['trade'] = $item->TRADE ? $item->TRADE : '-';
             $row['price_last_buy'] = $item->PRICE_LAST_BUY ? number_format($item->PRICE_LAST_BUY, 2) : '-';
             $row['price_last_sell'] = $item->PRICE_LAST_SELL ? number_format($item->PRICE_LAST_SELL, 2) : '-';
-            $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME : '-';
+            $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " weeks" : '-';
             if ($item->KONSY == 'Y') {
                 $returnKonsy = 'Yes';
             } elseif ($item->KONSY == 'N') {
@@ -78,7 +78,7 @@ class Item extends Back_Controller
             $row['konsy'] = $returnKonsy;
             $item->KONSY == 'Y' ? 'Yes' : 'No';
             $row['approved'] = $item->APPROVED == 'Y' ? 'Yes' : 'No';
-            $row['status'] = $item->STATUS == 'Y' ? 'Yes' : 'No';
+            $row['status'] = $item->OBSOLETE == 'Y' ? 'Yes' : 'No';
             $data[] = $row;
         }
 

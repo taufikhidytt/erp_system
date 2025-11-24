@@ -511,11 +511,11 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('konsinyasi') ?></div>
                                         </div>
-                                        <div class="mb-3">
+                                        <!-- <div class="mb-3">
                                             <div class="row justify-content-start">
                                                 <div class="col-lg-3 col-md-4 col-sm-6">
                                                     <label class="form-check-label" for="status_flag">
-                                                        Status
+                                                        Active
                                                     </label>
                                                 </div>
                                                 <div class="col-lg-2 col-md-4 col-sm-6">
@@ -523,7 +523,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-danger"><?= form_error('status_flag') ?></div>
-                                        </div>
+                                        </div> -->
                                         <div class="row">
 
                                         </div>

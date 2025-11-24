@@ -1,7 +1,5 @@
 <?php
 
-use phpDocumentor\Reflection\Types\This;
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Item_model extends CI_Model
@@ -29,7 +27,7 @@ class Item_model extends CI_Model
         'i.LEAD_TIME',
         'i.ITEM_KMS',
         'i.APPROVE_FLAG',
-        'i.ACTIVE_FLAG'
+        'i.OBSOLETE_FLAG'
     );
 
     var $column_search = array(
@@ -49,7 +47,7 @@ class Item_model extends CI_Model
         'i.LEAD_TIME',
         'i.ITEM_KMS',
         'i.APPROVE_FLAG',
-        'i.ACTIVE_FLAG'
+        'i.OBSOLETE_FLAG'
     );
 
     var $order = array('i.ITEM_ID' => 'DESC');
@@ -73,7 +71,7 @@ class Item_model extends CI_Model
             i.LEAD_TIME,
             i.ITEM_KMS AS KONSY,
             i.APPROVE_FLAG AS APPROVED,
-            i.ACTIVE_FLAG AS STATUS
+            i.OBSOLETE_FLAG AS OBSOLETE
         ');
         $this->db->from('item i');
         $this->db->join('erp_lookup_value a', 'i.JENIS_ID = a.ERP_LOOKUP_VALUE_ID', 'left');
@@ -162,7 +160,7 @@ class Item_model extends CI_Model
             i.LEAD_TIME,
             i.ITEM_KMS KONSY,
             i.APPROVE_FLAG APPROVED,
-            i.ACTIVE_FLAG STATUS');
+            i.OBSOLETE_FLAG OBSOLETE');
         $this->db->from('item i');
         $this->db->join('erp_lookup_value a', 'i.JENIS_ID = a.ERP_LOOKUP_VALUE_ID', 'left');
         $this->db->join('erp_lookup_value b', 'i.GROUP_ID = b.ERP_LOOKUP_VALUE_ID', 'left');
@@ -258,6 +256,7 @@ class Item_model extends CI_Model
             'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
             'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
             'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
+            'ACTIVE_FLAG'       => null,
             'LAST_UPDATE_BY'    => $this->session->userdata('id'),
             'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
         );
@@ -280,11 +279,11 @@ class Item_model extends CI_Model
             $params['ITEM_KMS'] = null;
         }
 
-        if (!empty($post['status_flag'])) {
-            $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
-        } else {
-            $params['ACTIVE_FLAG'] = null;
-        }
+        // if (!empty($post['status_flag'])) {
+        //     $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
+        // } else {
+        //     $params['ACTIVE_FLAG'] = null;
+        // }
 
         $params['COA_ID'] = null;
         $params['COA_JUAL_ID'] = null;
@@ -384,6 +383,7 @@ class Item_model extends CI_Model
             'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
             'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
             'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
+            'ACTIVE_FLAG'       => NULL,
             'LAST_UPDATE_BY'    => $this->session->userdata('id'),
             'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
         );
@@ -406,11 +406,11 @@ class Item_model extends CI_Model
             $params['ITEM_KMS'] = null;
         }
 
-        if (!empty($post['status_flag'])) {
-            $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
-        } else {
-            $params['ACTIVE_FLAG'] = null;
-        }
+        // if (!empty($post['status_flag'])) {
+        //     $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
+        // } else {
+        //     $params['ACTIVE_FLAG'] = null;
+        // }
 
         $params['COA_ID'] = null;
         $params['COA_JUAL_ID'] = null;
