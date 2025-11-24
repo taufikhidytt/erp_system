@@ -15,7 +15,10 @@
     }
 
     /* Jangan wrap teks agar width stabil */
-    #table th,
+    #table th {
+        white-space: nowrap;
+    }
+
     #table td {
         white-space: nowrap;
         height: 30px !important;

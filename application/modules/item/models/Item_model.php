@@ -1,4 +1,7 @@
 <?php
+
+use phpDocumentor\Reflection\Types\This;
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Item_model extends CI_Model
@@ -483,11 +486,28 @@ class Item_model extends CI_Model
 
     public function approve($id)
     {
+        date_default_timezone_set('Asia/Jakarta');
         $param = array(
-            'APPROVE_FLAG'  => 'Y',
+            'APPROVE_FLAG'      => 'Y',
+            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
         );
         $this->db->where('ITEM_ID', $id);
         $this->db->update('item', $param);
+
+        $error = $this->db->error();
+
+        if ($error['code'] != 0) {
+            return [
+                'status'  => 'error',
+                'message' => $error['message']
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'affected' => $this->db->affected_rows()
+        ];
     }
 
     public function getAccount()

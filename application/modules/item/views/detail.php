@@ -452,6 +452,13 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('status_flag') ?></div>
                                         </div>
+                                        <div class="float-end">
+                                            <?php if ($data->APPROVE_FLAG == 'N'): ?>
+                                                <button type="button" class="btn btn-primary btn-sm btn-approve" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Approve">
+                                                    <i class="ri ri-thumb-up-fill"></i> Approve
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -827,16 +834,6 @@
                                 </div>
                             </div>
                         </form>
-                        <div class="col-lg-6 col-md-6 col-sm-12 text-start">
-                            <?php if ($data->APPROVE_FLAG == 'N'): ?>
-                                <form action="<?= base_url('item/approve') ?>" method="post" class="d-inline">
-                                    <input type="hidden" name="idApprove" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
-                                    <button type="submit" id="btn-approve" class="btn btn-primary btn-sm">
-                                        <i class="ri ri-thumb-up-fill"></i> Approve
-                                    </button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -984,25 +981,6 @@
             } else {
                 $('#new_product_name').prop('disabled', true).val('');
             }
-        });
-
-        $(document).on('click', '#btn-approve', function(e) {
-            e.preventDefault();
-            var link = $(this).parent('form');
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin approve data ini?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#43a700ff',
-                cancelButtonColor: '#ff0022ff',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    link.submit();
-                }
-            })
         });
 
         $('#acc_persediaan').on('change', function() {
@@ -1260,6 +1238,68 @@
                 this.value = this.value.replace(/[eE+\-]/g, "");
                 return;
             }
+        });
+
+        $(document).on('click', '.btn-approve', function() {
+            var id = $(this).data('id'); // ambil id terenkripsi
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Ingin approve data ini?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#ff0022ff',
+                confirmButtonText: 'Yess, Approve data ini!',
+                cancelButtonText: 'Cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "<?= base_url('item/approve') ?>",
+                        method: "POST",
+                        data: {
+                            id: id
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            $('#loading').hide();
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Sukses',
+                                    text: response.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    window.location.href = "<?= base_url('item/detail/') ?>" + id;
+                                });
+                            } else {
+                                $('#loading').hide();
+                                Swal.fire({
+                                    title: 'Warning',
+                                    text: response.message,
+                                    icon: 'warning',
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    window.location.href = "<?= base_url('item/detail/') ?>" + id;
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading').hide();
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Gagal hapus data!',
+                                icon: 'error',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                window.location.href = "<?= base_url('item/detail/') ?>" + id;
+                            });
+                        }
+                    });
+                }
+            });
         });
 
         $(document).on('click', '.btn-delete', function() {

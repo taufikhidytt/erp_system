@@ -417,15 +417,22 @@ class Item extends Back_Controller
 
     public function approve()
     {
-        $post = $this->input->post();
-        $id = $this->encrypt->decode($post['idApprove']);
-        $this->item->approve($id);
-        if ($this->db->affected_rows() > 0) {
-            $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data baru!');
-            redirect('item/detail/' . $post['idApprove']);
-        } else {
-            $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-            redirect('item/detail/' . $post['idApprove']);
+        try {
+            $post = $this->input->post();
+            $id = $this->encrypt->decode($post['id']);
+            $result = $this->item->approve($id);
+
+            if ($result['status'] === 'error') {
+                return sendWarning($result['message']);
+            }
+
+            if ($result['affected'] == 0) {
+                return sendWarning('Gagal approve data item!');
+            }
+
+            return sendSuccess('success', 'Selamat anda berhasil approve data!');
+        } catch (Exception $err) {
+            return sendError('Server error', $err->getMessage());
         }
     }
 
