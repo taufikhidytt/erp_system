@@ -244,6 +244,7 @@
                                             ?>
                                                 <li>
                                                     <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                                        <i class="<?= $main->MENU_ICON; ?>"></i>
                                                         <span><?= $main->PROMPT ?></span>
                                                     </a>
                                                     <?php if ($child->num_rows() > 0): ?>
