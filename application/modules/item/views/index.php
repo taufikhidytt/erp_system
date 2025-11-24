@@ -1,10 +1,6 @@
 <style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
     .table-striped>tbody>tr:nth-of-type(odd) {
-        --bs-table-accent-bg: #e2e2e2ff;
+        --bs-table-accent-bg: #eff2f7;
     }
 
     #table_filter {
@@ -22,6 +18,13 @@
     #table th,
     #table td {
         white-space: nowrap;
+        height: 30px !important;
+        min-height: 30px !important;
+        padding-top: 10px !important;
+        padding-bottom: 1px !important;
+        padding-right: 6px !important;
+        padding-left: 6px !important;
+        font-size: 0.75rem !important;
     }
 
     /* Agar filter row tetap rapi */
@@ -123,7 +126,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="17" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr class="align-top">
+                                        <tr class="align-content-center">
                                             <th>No</th>
                                             <th></th>
                                             <th>Kode Item</th>

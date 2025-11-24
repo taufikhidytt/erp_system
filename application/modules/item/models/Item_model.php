@@ -465,6 +465,20 @@ class Item_model extends CI_Model
 
         $this->db->where('ITEM_ID', $post['id']);
         $this->db->update('item', $params);
+
+        $error = $this->db->error();
+
+        if ($error['code'] != 0) {
+            return [
+                'status'  => 'error',
+                'message' => $error['message']
+            ];
+        }
+
+        return [
+            'status' => 'success',
+            'affected' => $this->db->affected_rows()
+        ];
     }
 
     public function approve($id)

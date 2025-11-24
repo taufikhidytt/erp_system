@@ -329,14 +329,20 @@ class Item extends Back_Controller
                     $post['lokasi'] = null;
                 }
                 $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
-                $this->item->update($post);
-                if ($this->db->affected_rows() > 0) {
-                    $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data baru!');
-                    redirect('item/detail/' . $idInput);
-                } else {
-                    $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
+                $result = $this->item->update($post);
+
+                if ($result['status'] === 'error') {
+                    $this->session->set_flashdata('warning', $result['message']);
                     redirect('item/detail/' . $idInput);
                 }
+
+                if ($result['affected'] == 0) {
+                    $this->session->set_flashdata('warning', 'Gagal ubah data item!');
+                    redirect('item/detail/' . $idInput);
+                }
+
+                $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data!');
+                redirect('item/detail/' . $idInput);
             }
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

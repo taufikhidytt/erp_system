@@ -32,7 +32,7 @@
 
     <style>
         body {
-            /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; */
+            /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
             font-family: Tahoma !important;
         }
 
