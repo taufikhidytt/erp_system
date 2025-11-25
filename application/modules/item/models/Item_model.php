@@ -261,9 +261,9 @@ class Item_model extends CI_Model
         );
 
         if (!empty($post['obsolete'])) {
-            $params['OBSOLETE_FLAG'] = htmlspecialchars($post['obsolete']);
+            $params['OBSOLETE_FLAG'] = 'Y';
         } else {
-            $params['OBSOLETE_FLAG'] = null;
+            $params['OBSOLETE_FLAG'] = 'N';
         }
 
         if (!empty($post['new_product_name'])) {
@@ -273,9 +273,9 @@ class Item_model extends CI_Model
         }
 
         if (!empty($post['konsinyasi'])) {
-            $params['ITEM_KMS'] = htmlspecialchars($post['konsinyasi']);
+            $params['ITEM_KMS'] = 'Y';
         } else {
-            $params['ITEM_KMS'] = null;
+            $params['ITEM_KMS'] = 'N';
         }
 
         if (!empty($post['supplier'])) {
@@ -394,9 +394,9 @@ class Item_model extends CI_Model
         );
 
         if (!empty($post['obsolete'])) {
-            $params['OBSOLETE_FLAG'] = htmlspecialchars($post['obsolete']);
+            $params['OBSOLETE_FLAG'] = 'Y';
         } else {
-            $params['OBSOLETE_FLAG'] = null;
+            $params['OBSOLETE_FLAG'] = 'N';
         }
 
         if (!empty($post['new_product_name'])) {
@@ -406,16 +406,10 @@ class Item_model extends CI_Model
         }
 
         if (!empty($post['konsinyasi'])) {
-            $params['ITEM_KMS'] = htmlspecialchars($post['konsinyasi']);
+            $params['ITEM_KMS'] = 'Y';
         } else {
-            $params['ITEM_KMS'] = null;
+            $params['ITEM_KMS'] = 'N';
         }
-
-        // if (!empty($post['status_flag'])) {
-        //     $params['ACTIVE_FLAG'] = htmlspecialchars($post['status_flag']);
-        // } else {
-        //     $params['ACTIVE_FLAG'] = null;
-        // }
 
         $params['COA_ID'] = null;
         $params['COA_JUAL_ID'] = null;

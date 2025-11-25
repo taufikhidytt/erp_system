@@ -500,7 +500,7 @@
                                                             <th>Satuan Lain</th>
                                                             <th>Konversi</th>
                                                             <th>Keterangan</th>
-                                                            <th>Active</th>
+                                                            <th>Default</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -509,7 +509,7 @@
                                                                 <tr>
                                                                     <td>
                                                                         <input type="checkbox" class="chkRow">
-                                                                        <input type="text" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
+                                                                        <input type="hidden" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
                                                                     </td>
 
                                                                     <td class="rowNo"><?= $index + 1; ?>.</td>

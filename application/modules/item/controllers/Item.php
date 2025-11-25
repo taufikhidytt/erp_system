@@ -46,7 +46,7 @@ class Item extends Back_Controller
             $row['trade'] = $item->TRADE ? $item->TRADE : '-';
             $row['price_last_buy'] = $item->PRICE_LAST_BUY ? number_format($item->PRICE_LAST_BUY, 2) : '-';
             $row['price_last_sell'] = $item->PRICE_LAST_SELL ? number_format($item->PRICE_LAST_SELL, 2) : '-';
-            $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " weeks" : '-';
+            $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Weeks" : '-';
             if ($item->KONSY == 'Y') {
                 $returnKonsy = 'Yes';
             } elseif ($item->KONSY == 'N') {
@@ -296,7 +296,6 @@ class Item extends Back_Controller
                     $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
                     $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
                     $data['uomChild'] = $this->item->getUomChild($id);
-                    // debuging($data['uomChild']->result());
                     $this->template->load('template', 'item/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -318,6 +317,7 @@ class Item extends Back_Controller
                     $post['lokasi'] = null;
                 }
                 $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
+
                 $result = $this->item->update($post);
 
                 if ($result['status'] === 'error') {
