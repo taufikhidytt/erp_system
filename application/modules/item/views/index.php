@@ -1,4 +1,11 @@
 <style>
+    .dt-buttons .btn {
+        background-color: #0d6efd;
+        /* warna biru Bootstrap primary */
+        border-color: #0d6efd;
+        color: white;
+    }
+
     .table-striped>tbody>tr:nth-of-type(odd) {
         --bs-table-accent-bg: #eff2f7;
     }
@@ -64,20 +71,18 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <div class="row mb-2">
+                        <!-- <div class="row mb-2">
                             <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
                                 <a href="<?= base_url('item/add') ?>" class="btn btn-sm btn-primary">
                                     <i class="ri ri-add-circle-fill"></i> Tambah Item
                                 </a>
                             </div>
-                        </div>
+                        </div> -->
                         <div class="row">
                             <div class="table-responsive">
                                 <table class="table table-striped text-center" id="table">
                                     <thead>
                                         <tr>
-                                            <th>
-                                            </th>
                                             <th>
                                             </th>
                                             <th>
@@ -131,7 +136,6 @@
                                         </tr>
                                         <tr class="align-content-center">
                                             <th>No</th>
-                                            <th></th>
                                             <th>Kode Item</th>
                                             <th>Nama Item</th>
                                             <th>Part Number</th>
@@ -167,6 +171,14 @@
 <script>
     $(document).ready(function() {
         var table = $('#table').DataTable({
+            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
+            buttons: [{
+                text: '<i class="ri ri-add-circle-fill"></i> Tambah Item',
+                className: 'btn btn-sm btn-primary',
+                action: function(e, dt, node, config) {
+                    window.location.href = "<?= base_url('item/add') ?>";
+                }
+            }],
             "autoWidth": false,
             "searching": true,
             "processing": true,
@@ -178,19 +190,14 @@
             },
             "columnDefs": [{
                 "width": "500px",
-                "targets": [3, 4],
+                "targets": [2, 3],
             }, {
-                "targets": [0, 1],
+                "targets": [0],
                 "orderable": false,
                 "searchable": false
             }],
             "columns": [{
                     "data": "no",
-                    "orderable": false,
-                    "searchable": false,
-                },
-                {
-                    "data": "action",
                     "orderable": false,
                     "searchable": false,
                 },

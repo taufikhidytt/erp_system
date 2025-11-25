@@ -54,7 +54,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-barcode-box-fill"></i>
                                                 </span>
-                                                <input type="text" name="code_item" id="code_item" class="form-control <?= form_error('code_item') ? 'is-invalid' : null; ?>" value="<?= $this->input->post('code_item') ?? $data->ITEM_CODE; ?>" disabled readonly>
+                                                <input type="text" name="code_item" id="code_item" class="form-control <?= form_error('code_item') ? 'is-invalid' : null; ?>" value="<?= $this->input->post('code_item') ?? $data->ITEM_CODE; ?>" placeholder="Auto Generate" disabled readonly>
                                             </div>
                                             <div class="text-danger"><?= form_error('code_item') ?></div>
                                         </div>
@@ -302,24 +302,8 @@
                                             <div class="text-danger"><?= form_error('grade') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="supplier">Supplier:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-arrow-up-down-fill"></i>
-                                                </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php $param = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $param ? 'selected' : null ?>><?= strtoupper($sp->Supplier) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('supplier') ?></div>
-                                        </div>
-                                        <div class="mb-3">
                                             <div class="form-check form-check-right">
-                                                <input class="form-check-input" type="checkbox" name="obsolete" id="obsolete" value="Y" <?= (set_value('obsolete', $data->OBSOLETE_FLAG ?? '') === 'Y') ? 'checked' : null ?>>
+                                                <input type="checkbox" class="form-check-input" name="obsolete" id="obsolete" <?= set_value('obsolete', $data->OBSOLETE_FLAG ?? '') === 'Y' ? 'checked' : '' ?>>
                                                 <label class="form-check-label" for="obsolete" style="margin-right: 20px;">
                                                     Obsolete
                                                 </label>
@@ -427,6 +411,23 @@
                                             <div class="text-danger"><?= form_error('komoditi') ?></div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="supplier">Supplier:</label>
+                                            <span class="text-danger" id="supplier_required"></span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-arrow-up-down-fill"></i>
+                                                </span>
+                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Supplier --</option>
+                                                    <?php $param = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
+                                                    <?php foreach ($supplier->result() as $sp): ?>
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $param ? 'selected' : null ?>><?= strtoupper($sp->Supplier) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('supplier') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <div class="row justify-content-start">
                                                 <div class="col-lg-3 col-md-4 col-sm-6">
                                                     <label class="form-check-label" for="konsinyasi" style="margin-right: 20px;">
@@ -434,24 +435,11 @@
                                                     </label>
                                                 </div>
                                                 <div class="col-lg-3 col-md-4 col-sm-6">
-                                                    <input class="form-check-input" type="checkbox" name="konsinyasi" id="konsinyasi" value="Y" <?= (set_value('konsinyasi', $data->ITEM_KMS ?? '') === 'Y') ? 'checked' : null ?>>
+                                                    <input type="checkbox" class="form-check-input" name="konsinyasi" id="konsinyasi" <?= set_value('konsinyasi', $data->ITEM_KMS ?? '') === 'Y' ? 'checked' : '' ?>>
                                                 </div>
                                             </div>
                                             <div class="text-danger"><?= form_error('konsinyasi') ?></div>
                                         </div>
-                                        <!-- <div class="mb-3">
-                                            <div class="row justify-content-start">
-                                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                                    <label class="form-check-label" for="status_flag">
-                                                        Active
-                                                    </label>
-                                                </div>
-                                                <div class="col-lg-2 col-md-4 col-sm-6">
-                                                    <input class="form-check-input" type="checkbox" name="status_flag" id="status_flag" value="Y" <?= (set_value('status_flag', $data->ACTIVE_FLAG ?? '') === 'Y') ? 'checked' : null ?>>
-                                                </div>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('status_flag') ?></div>
-                                        </div> -->
                                         <div class="float-start">
                                             <?php if ($data->APPROVE_FLAG == 'N'): ?>
                                                 <button type="button" class="btn btn-primary btn-sm btn-approve" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Approve">
@@ -501,10 +489,10 @@
                                     <!-- Tab panes -->
                                     <div class="tab-content p-3 text-muted">
                                         <div class="tab-pane active form-xs" id="detail" role="tabpanel">
-                                            <button type="button" id="addRow" class="btn btn-success btn-sm">+</button>
-                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm">-</button>
+                                            <button type="button" id="addRow" class="btn btn-success btn-sm" style="width: 30px;">+</button>
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                             <div class="table-responsive">
-                                                <table id="tableSatuan" class="table table-bordered mt-3 w-100">
+                                                <table id="tableSatuan" class="table mt-3 w-100">
                                                     <thead>
                                                         <tr>
                                                             <th><input type="checkbox" id="chkAll"></th>
@@ -512,6 +500,7 @@
                                                             <th>Satuan Lain</th>
                                                             <th>Konversi</th>
                                                             <th>Keterangan</th>
+                                                            <th>Active</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -520,54 +509,33 @@
                                                                 <tr>
                                                                     <td>
                                                                         <input type="checkbox" class="chkRow">
-                                                                        <input type="hidden" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
+                                                                        <input type="text" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
                                                                     </td>
 
                                                                     <td class="rowNo"><?= $index + 1; ?>.</td>
 
                                                                     <td>
-                                                                        <input type="text" name="satuan_lain[]" class="form-control auto-save"
-                                                                            value="<?= htmlspecialchars($row['UOM_CODE']); ?>" readonly>
+                                                                        <select name="satuan_lain[]" class="form-select select-uom auto-save">
+                                                                            <?php $param = $this->input->post('satuan_lain') ?? $row['UOM_CODE']; ?>
+                                                                            <?php foreach ($uom->result() as $um): ?>
+                                                                                <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
+                                                                            <?php endforeach; ?>
+                                                                        </select>
                                                                     </td>
 
                                                                     <td>
-                                                                        <input type="number" name="konversi[]" class="form-control auto-save"
-                                                                            step="0.01" value="<?= htmlspecialchars($row['TO_QTY']); ?>" readonly>
+                                                                        <input type="number" name="konversi[]" class="form-control auto-save" step="0.01" value="<?= htmlspecialchars($row['TO_QTY']); ?>">
                                                                     </td>
 
                                                                     <td>
-                                                                        <input type="text" name="keterangan[]" class="form-control auto-save" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                        <input type="text" name="keterangan[]" class="form-control" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <input type="checkbox" name="status_satuan_detail[]" <?= set_value('status_satuan_detail', $row['BASE_UOM_FLAG']) === 'Y' ? 'checked' : '' ?> value="Y" class="auto-save">
                                                                     </td>
                                                                 </tr>
                                                             <?php endforeach; ?>
-                                                        <?php else: ?>
-                                                            <tr>
-                                                                <td>
-                                                                    <input type="checkbox" class="chkRow">
-                                                                    <input type="hidden" name="id_satuan_uom_detail[]" value="0">
-                                                                </td>
-
-                                                                <td class="rowNo">1.</td>
-
-                                                                <td>
-                                                                    <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                                                                        <option value=""></option>
-                                                                        <?php foreach ($uom->result() as $um): ?>
-                                                                            <option value="<?= $um->UOM_CODE ?>">
-                                                                                <?= $um->DESCRIPTION ?>
-                                                                            </option>
-                                                                        <?php endforeach; ?>
-                                                                    </select>
-                                                                </td>
-
-                                                                <td>
-                                                                    <input type="number" name="konversi[]" class="form-control auto-save">
-                                                                </td>
-
-                                                                <td>
-                                                                    <input type="text" name="keterangan[]" class="form-control auto-save" disabled>
-                                                                </td>
-                                                            </tr>
                                                         <?php endif; ?>
                                                     </tbody>
                                                 </table>
@@ -575,7 +543,7 @@
                                         </div>
                                         <div class="tab-pane form-xs" id="account" role="tabpanel">
                                             <div class="form-box" id="barang">
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_persediaan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Persediaan</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_persediaan" id="acc_persediaan" class="form-control select2">
@@ -595,7 +563,7 @@
                                                         <input type="text" name="code_acc_persediaan" id="code_acc_persediaan" class="form-control" value="<?= $this->input->post('code_acc_persediaan'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_utang_suspend" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Utang Suspend</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_utang_suspend" id="acc_utang_suspend" class="form-control select2">
@@ -615,7 +583,7 @@
                                                         <input type="text" name="code_acc_utang_suspend" id="code_acc_utang_suspend" class="form-control" value="<?= $this->input->post('code_acc_utang_suspend'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_hpp" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. HPP</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_hpp" id="acc_hpp" class="form-control select2">
@@ -635,7 +603,7 @@
                                                         <input type="text" name="code_acc_hpp" id="code_acc_hpp" class="form-control" value="<?= $this->input->post('code_acc_hpp'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_penjualan_barang" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Barang</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_penjualan_barang" id="acc_penjualan_barang" class="form-control select2">
@@ -655,7 +623,7 @@
                                                         <input type="text" name="code_acc_penjualan_barang" id="code_acc_penjualan_barang" class="form-control" value="<?= $this->input->post('code_acc_penjualan_barang'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_retur_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Penjualan</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_retur_penjualan" id="acc_retur_penjualan" class="form-control select2">
@@ -675,7 +643,7 @@
                                                         <input type="text" name="code_acc_retur_penjualan" id="code_acc_retur_penjualan" class="form-control" value="<?= $this->input->post('code_acc_retur_penjualan'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_retur_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Pembelian</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_retur_pembelian" id="acc_retur_pembelian" class="form-control select2">
@@ -695,7 +663,7 @@
                                                         <input type="text" name="code_acc_retur_pembelian" id="code_acc_retur_pembelian" class="form-control" value="<?= $this->input->post('code_acc_retur_pembelian'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_disc_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_disc_penjualan" id="acc_disc_penjualan" class="form-control select2">
@@ -717,7 +685,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-box" id="jasa">
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Jasa</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_penjualan_jasa" id="acc_penjualan_jasa" class="form-control select2">
@@ -737,7 +705,7 @@
                                                         <input type="text" name="code_acc_penjualan_jasa" id="code_acc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_penjualan_jasa'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_pembelian" id="acc_pembelian" class="form-control select2">
@@ -757,7 +725,7 @@
                                                         <input type="text" name="code_acc_pembelian" id="code_acc_pembelian" class="form-control" value="<?= $this->input->post('code_acc_pembelian'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_disc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_disc_penjualan_jasa" id="acc_disc_penjualan_jasa" class="form-control select2">
@@ -779,7 +747,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-box" id="uang_muka">
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_pembelian_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_pembelian_uang_muka" id="acc_pembelian_uang_muka" class="form-control select2">
@@ -799,7 +767,7 @@
                                                         <input type="text" name="code_acc_pembelian_uang_muka" id="code_acc_pembelian_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_pembelian_uang_muka'); ?>" disabled>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
+                                                <div class="row">
                                                     <label for="acc_penjualan_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan</label>
                                                     <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                                         <select name="acc_penjualan_uang_muka" id="acc_penjualan_uang_muka" class="form-control select2">
@@ -855,13 +823,23 @@
 
         $('#new_product_name').prop('disabled', !$('#obsolete').is(':checked'));
 
-        if ($('#obsolete').val() == 'Y') {
+        const obsolete = $('#obsolete').val();
+
+        if (obsolete.trim() === 'Y') {
             $('#new_product_name_required').html('*');
         } else {
             $('#new_product_name_required').html('');
         }
 
-        $('#new_product_name_required').html('');
+        $('#supplier').prop('disabled', !$('#konsinyasi').is(':checked'));
+
+        const konsinyasi = $('#konsinyasi').val();
+
+        if (konsinyasi.trim() === 'Y') {
+            $('#supplier_required').html('*');
+        } else {
+            $('#supplier_required').html('');
+        }
 
         $('#brand, #category').on('change', updateDescription);
         $('#part_number').on('keyup', updateDescription);
@@ -869,14 +847,6 @@
         $('#satuan').on('change', function() {
             let value = $(this).val();
             $('#satuan2').val(value).trigger('change');
-        });
-
-        $('#obsolete').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#new_product_name_required').html('*');
-            } else {
-                $('#new_product_name_required').html('');
-            }
         });
 
         //Initialize Select2 Elements
@@ -977,9 +947,21 @@
 
         $('#obsolete').on('change', function() {
             if ($(this).is(':checked')) {
+                $('#new_product_name_required').html('*');
                 $('#new_product_name').prop('disabled', false);
             } else {
-                $('#new_product_name').prop('disabled', true).val('');
+                $('#new_product_name_required').html('');
+                $('#new_product_name').prop('disabled', true);
+            }
+        });
+
+        $('#konsinyasi').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#supplier_required').html('*');
+                $('#supplier').prop('disabled', false);
+            } else {
+                $('#supplier_required').html('');
+                $('#supplier').prop('disabled', true);
             }
         });
 
@@ -1101,7 +1083,7 @@
             });
         });
 
-        // / Auto save baris baru saat blur
+        // Auto save baris baru saat blur
         $(document).on("blur", ".auto-save", function() {
             var row = $(this).closest("tr");
             var id = row.find('input[name="id_satuan_uom_detail[]"]').val();
@@ -1110,7 +1092,7 @@
             var satuan = row.find('select[name="satuan_lain[]"]').val();
             var konversi = row.find('input[name="konversi[]"]').val();
 
-            // Hanya save jika baris baru
+            // Hanya save jika baris baru / add
             if (id == 0) {
 
                 if (satuan === "" || konversi === "" || konversi == 0) {
@@ -1126,6 +1108,67 @@
                 $('#loading').show();
                 $.ajax({
                     url: "<?php echo site_url('item/ajax_save'); ?>",
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function(res) {
+                        if (res.status === 'success') {
+                            $('#loading').hide();
+                            row.find('input[name="id_satuan_uom_detail[]"]').val('saved');
+                            Swal.fire({
+                                title: 'Sukses',
+                                text: 'Selamat anda berhasil menyimpan data!',
+                                icon: 'success',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        } else if (res.message) {
+                            $('#loading').hide();
+                            Swal.fire({
+                                title: 'Warning',
+                                text: res.message,
+                                icon: 'warning',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        } else {
+                            $('#loading').hide();
+                            Swal.fire({
+                                title: 'Warning',
+                                text: 'Gagal save data!',
+                                icon: 'warning',
+                                confirmButtonColor: '#3085d6',
+                                confirmButtonText: 'Ok'
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        }
+                    }
+                });
+            } else {
+
+                // Hanya save jika ada nilai id / update
+                if (satuan === "" || konversi === "" || konversi == 0) {
+                    return;
+                }
+
+                var statusCheckbox = row.find('input[name="status_satuan_detail[]"]:checked');
+                var status = statusCheckbox.length ? 'Y' : 'N';
+
+                var data = {
+                    'id_item': idItem,
+                    'id_satuan_uom_detail[]': [row.find('input[name="id_satuan_uom_detail[]"]').val()],
+                    'satuan_lain[]': [row.find('select[name="satuan_lain[]"]').val()],
+                    'konversi[]': [row.find('input[name="konversi[]"]').val()],
+                    'status_satuan_detail[]': [status],
+                };
+                $('#loading').show();
+                $.ajax({
+                    url: "<?php echo site_url('item/ajax_update'); ?>",
                     type: "POST",
                     data: data,
                     dataType: "json",

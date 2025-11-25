@@ -26,32 +26,11 @@ class Item extends Back_Controller
         $list = $this->item->get_datatables();
         $data = array();
         $no = $_POST['start'];
-        $approve = '';
 
         foreach ($list as $item) {
             $no++;
             $row = array();
             $row['no'] = $no . '.';
-
-            // if ($item->APPROVED == 'N') {
-            //     $approve = '<form action="' . base_url('item/approveIndex') . '" method="post" class="d-inline">
-            //         <input type="hidden" name="idApprove" value="' . $this->encrypt->encode($item->ID) . '">
-            //         <button type="submit" id="btn-approve" data-toggle="tooltip" data-placement="bottom" title="Approve" style="background:transparent; border:none;">
-            //             <i class="ri ri-thumb-up-fill" style="color: #5664D2;"></i>
-            //         </button>
-            //     </form> |';
-            // } else {
-            //     $approve = '';
-            // }
-
-            $row['action'] = '
-            <div class="d-flex gap-1">
-            ' . $approve . '
-                <a href="' . base_url('item/detail/' . $this->encrypt->encode($item->ID)) . '" data-toggle="tooltip" data-placement="bottom" title="Detail">
-                    <i class="ri ri-zoom-in-fill"></i>
-                </a>
-            </div>
-            ';
             $row['kode_item'] = '
             <a href="' . base_url('item/detail/' . $this->encrypt->encode($item->ID)) . '">
                 ' . ($item->KODE_ITEM ? $item->KODE_ITEM : '-') . '
@@ -111,6 +90,10 @@ class Item extends Back_Controller
 
             if ($this->input->post('obsolete')) {
                 $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
+            }
+
+            if ($this->input->post('konsinyasi')) {
+                $this->form_validation->set_rules('supplier', 'Supplier', 'trim|required');
             }
 
             if ($this->form_validation->run() == false) {
@@ -277,6 +260,11 @@ class Item extends Back_Controller
             if ($this->input->post('obsolete')) {
                 $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
             }
+
+            if ($this->input->post('konsinyasi')) {
+                $this->form_validation->set_rules('supplier', 'Supplier', 'trim|required');
+            }
+
             if ($this->form_validation->run() == FALSE) {
                 $id = $this->encrypt->decode($id);
                 $query = $this->item->getItemId($id);
@@ -308,6 +296,7 @@ class Item extends Back_Controller
                     $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
                     $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
                     $data['uomChild'] = $this->item->getUomChild($id);
+                    // debuging($data['uomChild']->result());
                     $this->template->load('template', 'item/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -492,6 +481,55 @@ class Item extends Back_Controller
 
         if (!empty($dataToInsert)) {
             $this->item->insert_batch($dataToInsert);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'nothing_to_save']);
+        }
+    }
+
+    public function ajax_update()
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+            return;
+        }
+
+        $post = $this->input->post();
+
+        $dataToInsert = [];
+        if (!empty($post['satuan_lain'])) {
+            $count = count($post['satuan_lain']);
+            for ($i = 0; $i < $count; $i++) {
+                $id = isset($post['id_satuan_uom_detail'][$i]) ? intval($post['id_satuan_uom_detail'][$i]) : 0;
+
+                if ($id != 0 && !empty(trim($post['satuan_lain'][$i]))) {
+                    $validateParentUom = $this->db->query("SELECT UOM_CODE FROM item WHERE ITEM_ID = '{$this->encrypt->decode($post['id_item'])}' AND UOM_CODE = '{$post['satuan_lain'][$i]}'");
+
+                    $validate = $this->db->query("SELECT UOM_CODE FROM item_uom WHERE ITEM_ID = '{$this->encrypt->decode($post['id_item'])}' AND UOM_CODE = '{$post['satuan_lain'][$i]}' AND ITEM_UOM_ID != '{$id}'");
+                    if ($validateParentUom->num_rows() > 0) {
+                        return sendWarning('Uom sudah tersedia pada item!');
+                    } else if ($validate->num_rows() > 0) {
+                        return sendWarning('Uom sudah tersedia!');
+                    } else {
+                        $dataToInsert[] = [
+                            'ITEM_UOM_ID'       => $id,
+                            'ITEM_ID'           => $this->encrypt->decode($post['id_item']),
+                            'UOM_CODE'          => $post['satuan_lain'][$i],
+                            'TO_QTY'            => floatval($post['konversi'][$i]),
+                            'BASE_UOM_FLAG'     => $post['status_satuan_detail'][$i],
+                            'CREATED_BY'        => $this->session->userdata('id'),
+                            'CREATED_DATE'      => date('Y-m-d H:i:s'),
+                            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+                            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                }
+            }
+        }
+
+        if (!empty($dataToInsert)) {
+            $this->item->updateSatuanUomDetail($dataToInsert);
             echo json_encode(['status' => 'success']);
         } else {
             echo json_encode(['status' => 'nothing_to_save']);

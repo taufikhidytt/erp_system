@@ -101,7 +101,7 @@ class Item_model extends CI_Model
                     $this->db->like($item, $search_value_db);
                     $first_like = true;
                 } else {
-                    $this->db->or_like($item, $search_value_db);
+                    $this->db->like($item, $search_value_db);
                 }
             }
             $i++;
@@ -251,7 +251,6 @@ class Item_model extends CI_Model
             'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
             'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
             'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
-            'PERSON_ID'         => $post['supplier'] ? htmlspecialchars($post['supplier']) : null,
             'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
             'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
             'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
@@ -277,6 +276,12 @@ class Item_model extends CI_Model
             $params['ITEM_KMS'] = htmlspecialchars($post['konsinyasi']);
         } else {
             $params['ITEM_KMS'] = null;
+        }
+
+        if (!empty($post['supplier'])) {
+            $params['PERSON_ID'] = htmlspecialchars($post['supplier']);
+        } else {
+            $params['PERSON_ID'] = null;
         }
 
         // if (!empty($post['status_flag'])) {
@@ -587,6 +592,20 @@ class Item_model extends CI_Model
     public function insert_batch($data)
     {
         return $this->db->insert_batch('item_uom', $data);
+    }
+
+    public function updateSatuanUomDetail($data)
+    {
+        foreach ($data as $row) {
+
+            $id = $row['ITEM_UOM_ID'];
+
+            unset($row['ITEM_UOM_ID']);
+
+            $this->db->where('ITEM_UOM_ID', $id);
+            $this->db->update('item_uom', $row);
+        }
+        return true;
     }
 
     public function delete_by_ids($ids)
