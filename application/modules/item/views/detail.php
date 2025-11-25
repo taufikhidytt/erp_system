@@ -367,7 +367,7 @@
                                                 <div class="mb-3">
                                                     <label class="mb-4"></label>
                                                     <div class="input-group">
-                                                        <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>">
+                                                        <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
                                                             <?php $param = $this->input->post('satuan2') ?? $data->CUSTOM5; ?>
                                                             <?php foreach ($uom->result() as $um): ?>
                                                                 <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
