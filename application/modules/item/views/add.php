@@ -465,13 +465,11 @@
                                                 <div class="mb-3">
                                                     <label class="mb-4"></label>
                                                     <div class="input-group">
-                                                        <input type="text" name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
-
-                                                        <!-- <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
+                                                        <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
                                                             <?php foreach ($uom->result() as $um): ?>
                                                                 <option value="<?= $um->UOM_CODE ?>" <?= set_value('satuan2') == $um->UOM_CODE ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
                                                             <?php endforeach; ?>
-                                                        </select> -->
+                                                        </select>
                                                     </div>
                                                     <div class="text-danger"><?= form_error('satuan2') ?></div>
                                                 </div>
@@ -956,9 +954,6 @@
         var width = $('#width').val();
         var height = $('#height').val();
 
-        let satuanParent = $('#satuan').val();
-        $('#satuan2').val(satuanParent);
-
         var jumlah = length * width * height;
         $('#kubikasi').val(jumlah);
 
@@ -987,7 +982,7 @@
 
         $('#satuan').on('change', function() {
             let value = $(this).val();
-            $('#satuan2').val(value);
+            $('#satuan2').val(value).trigger('change');
         });
 
         //Initialize Select2 Elements

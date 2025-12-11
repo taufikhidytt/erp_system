@@ -71,13 +71,6 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <!-- <div class="row mb-2">
-                            <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                <a href="<?= base_url('item/add') ?>" class="btn btn-sm btn-primary">
-                                    <i class="ri ri-add-circle-fill"></i> Tambah Item
-                                </a>
-                            </div>
-                        </div> -->
                         <div class="row">
                             <div class="table-responsive">
                                 <table class="table table-striped text-center" id="table">
@@ -104,9 +97,6 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
@@ -123,6 +113,9 @@
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="14" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="15" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
@@ -183,6 +176,7 @@
             "searching": true,
             "processing": true,
             "serverSide": true,
+            "ordering": false,
             "order": [],
             "ajax": {
                 "url": "<?= site_url('item/get_data'); ?>",

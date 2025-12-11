@@ -367,14 +367,12 @@
                                                 <div class="mb-3">
                                                     <label class="mb-4"></label>
                                                     <div class="input-group">
-                                                        <input type="text" name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
-
-                                                        <!-- <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
+                                                        <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
                                                             <?php $param = $this->input->post('satuan2') ?? $data->CUSTOM5; ?>
                                                             <?php foreach ($uom->result() as $um): ?>
                                                                 <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
                                                             <?php endforeach; ?>
-                                                        </select> -->
+                                                        </select>
                                                     </div>
                                                     <div class="text-danger"><?= form_error('satuan2') ?></div>
                                                 </div>
@@ -819,9 +817,6 @@
         var length = $('#length').val();
         var width = $('#width').val();
         var height = $('#height').val();
-
-        let satuanParent = $('#satuan').val();
-        $('#satuan2').val(satuanParent);
 
         var jumlah = length * width * height;
         $('#kubikasi').val(jumlah);
