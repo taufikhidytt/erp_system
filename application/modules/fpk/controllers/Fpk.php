@@ -1,0 +1,558 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Fpk extends Back_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+        belum_login();
+        rules();
+        $this->load->model('Fpk_model', 'fpk');
+    }
+    public function index()
+    {
+        try {
+            $data['title'] = 'FPK';
+            $data['breadcrumb'] = 'FPK';
+            $this->template->load('template', 'fpk/index', $data);
+        } catch (Exception $err) {
+            return sendError('Server Error', $err->getMessage());
+        }
+    }
+
+    public function get_data()
+    {
+        $list = $this->fpk->get_datatables();
+        $data = array();
+        $no = $_POST['start'];
+
+        foreach ($list as $fpk) {
+            $no++;
+            $row = array();
+            $row['no'] = $no . '.';
+            $row['status'] = $fpk->Status ? $fpk->Status : '-';
+            $row['no_transaksi'] = '
+            <a href="' . base_url('fpk/detail/' . $this->encrypt->encode($fpk->PR_ID)) . '">
+                ' . ($fpk->No_Transaksi ? $fpk->No_Transaksi : '-') . '
+            </a>';
+            $row['no_referensi'] = $fpk->No_Referensi ? $fpk->No_Referensi : '-';
+            $row['tanggal'] = $fpk->Tanggal ? date('d M Y, H:i', strtotime($fpk->Tanggal)) : '-';
+            $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('d M Y, H:i', strtotime($fpk->Dibutuhkan)) : '-';
+            $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
+            $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
+            $row['total'] = $fpk->Total ? number_format($fpk->Total, 0, ',', '.') : '-';
+            $data[] = $row;
+        }
+
+        $output = array(
+            "draw" => $_POST['draw'],
+            "recordsTotal" => $this->fpk->count_all(),
+            "recordsFiltered" => $this->fpk->count_filtered(),
+            "data" => $data,
+        );
+
+        echo json_encode($output);
+    }
+
+    public function add()
+    {
+        try {
+            // untuk fungsi validation callback HMVC
+            $this->form_validation->CI = &$this;
+
+            $this->form_validation->set_rules('brand', 'Brand', 'trim|required');
+            $this->form_validation->set_rules('category', 'Category', 'trim|required');
+            $this->form_validation->set_rules('part_number', 'Part Number', 'trim|required|callback_check_part_supplier_kms');
+            $this->form_validation->set_rules('description', 'Description', 'trim|required');
+            $this->form_validation->set_rules('satuan', 'Satuan', 'trim|required');
+            $this->form_validation->set_rules('type', 'Type', 'trim|required');
+            $this->form_validation->set_rules('lead_time', 'Lead time', 'trim|required');
+            $this->form_validation->set_rules('komoditi', 'Komoditi', 'trim|required');
+            $this->form_validation->set_rules('jenis', 'Jenis', 'trim|required');
+            $this->form_validation->set_rules('grade', 'Grade', 'trim|required');
+
+            if ($this->input->post('obsolete')) {
+                $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
+            }
+
+            if ($this->input->post('konsinyasi')) {
+                $this->form_validation->set_rules('supplier', 'Supplier', 'trim|required');
+            }
+
+            if ($this->form_validation->run() == false) {
+                $data['title'] = 'Tambah Item';
+                $data['breadcrumb'] = 'Tambah Item';
+                $data['brand'] = $this->item->getBrand();
+                $data['category'] = $this->item->getCategory();
+                $data['uom'] = $this->item->getUom();
+                $data['type'] = $this->item->getType();
+                $data['rak'] = $this->item->getRak();
+                $data['made_in'] = $this->item->getMadeIn();
+                $data['komoditi'] = $this->item->getKomoditi();
+                $data['jenis'] = $this->item->getJenis();
+                $data['grade'] = $this->item->getGrade();
+                $data['supplier'] = $this->item->getSupplier();
+                $data['account'] = $this->item->getAccount();
+                $data['acc_persediaan'] = $this->item->getAccPersediaan()->row();
+                $data['acc_utang_suspend'] = $this->item->getAccUtangSuspend()->row();
+                $data['acc_hpp'] = $this->item->getAccHpp()->row();
+                $data['acc_penjualan_barang'] = $this->item->getPenjualanBarang()->row();
+                $data['acc_retur_penjualan'] = $this->item->getReturPenjualan()->row();
+                $data['acc_retur_pembelian'] = $this->item->getReturPembelian()->row();
+                $data['acc_disc_penjualan'] = $this->item->getDiscPenjualan()->row();
+                $data['acc_penjualan_jasa'] = $this->item->getPenjualanJasa()->row();
+                $data['acc_pembelian'] = $this->item->getPembelian()->row();
+                $data['acc_disc_penjualan_jasa'] = $this->item->getDiscPenjualanJasa()->row();
+                $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
+                $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
+                $this->template->load('template', 'item/add', $data);
+            } else {
+                $post = $this->input->post();
+                if ($post['rak'] != '') {
+                    $queryLokasi = $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'RAK' AND b.ACTIVE_FLAG = 'Y' AND b.ERP_LOOKUP_VALUE_ID = {$post['rak']} ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+
+                    if ($queryLokasi->num_rows() > 0) {
+                        $post['lokasi'] = $queryLokasi->row()->Grade;
+                    } else {
+                        $post['lokasi'] = null;
+                    }
+                } else {
+                    $post['lokasi'] = null;
+                }
+                $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
+                // $post['item_code'] = $this->generateNomor();
+                $idItem = $this->item->add($post);
+                if ($this->db->affected_rows() > 0) {
+                    date_default_timezone_set('Asia/Jakarta');
+                    $dataToInsert = [];
+                    if (!empty($post['satuan_lain'])) {
+                        $count = count($post['satuan_lain']);
+                        for ($i = 0; $i < $count; $i++) {
+                            $id = isset($post['id'][$i]) ? intval($post['id'][$i]) : 0;
+
+                            if ($id === 0 && !empty(trim($post['satuan_lain'][$i]))) {
+                                $validateParentUom = $this->db->query("SELECT UOM_CODE FROM item WHERE ITEM_ID = '{$idItem}' AND UOM_CODE = '{$post['satuan_lain'][$i]}'");
+
+                                $validate = $this->db->query("SELECT UOM_CODE FROM item_uom WHERE ITEM_ID = '{$idItem}' AND UOM_CODE = '{$post['satuan_lain'][$i]}'");
+                                if ($validateParentUom->num_rows() > 0) {
+                                    $this->session->set_flashdata('warning', 'Data master item berhasil tersimpan, UoM detail sudah terdaftar pada master item silahakan pilih UoM lainnya!');
+                                    redirect('item/detail/' . $this->encrypt->encode($idItem));
+                                } else if ($validate->num_rows() > 0) {
+                                    $this->session->set_flashdata('warning', 'Data master item berhasil tersimpan, UoM detail sudah tersedia silahakan pilih UoM lainnya!');
+                                    redirect('item/detail/' . $this->encrypt->encode($idItem));
+                                } else {
+                                    $dataToInsert[] = [
+                                        'ITEM_ID'           => $idItem,
+                                        'UOM_CODE'          => $post['satuan_lain'][$i],
+                                        'TO_QTY'            => floatval($post['konversi'][$i]),
+                                        'BASE_UOM_FLAG'     => 'N',
+                                        'CREATED_BY'        => $this->session->userdata('id'),
+                                        'CREATED_DATE'      => date('Y-m-d H:i:s'),
+                                        'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+                                        'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                    if (!empty($dataToInsert)) {
+                        $this->item->insert_batch($dataToInsert);
+                        if ($this->db->affected_rows() > 0) {
+                            $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
+                            redirect('item/detail/' . $this->encrypt->encode($idItem));
+                        } else {
+                            $this->session->set_flashdata('warning', 'Gagal menyimpan data detail!');
+                            redirect('item/detail/' . $this->encrypt->encode($idItem));
+                        }
+                    } else {
+                        $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data baru!');
+                        redirect('item/detail/' . $this->encrypt->encode($idItem));
+                    }
+                } else {
+                    $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
+                    redirect('item');
+                }
+            }
+        } catch (Exception $err) {
+            return sendError('Server Error', $err->getMessage());
+        }
+    }
+
+    private function generateNomor()
+    {
+        $post = $this->input->post();
+
+        // Get Brand Code
+        $brand = $this->db->query("
+            SELECT b.DESCRIPTION AS Brand_Code 
+            FROM erp_lookup_set a 
+            INNER JOIN erp_lookup_value b 
+                ON a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID 
+            WHERE a.PROGRAM_CODE = 'MEREK' 
+                AND b.ACTIVE_FLAG = 'Y' 
+                AND b.ERP_LOOKUP_VALUE_ID = '{$post['brand']}'
+        ")->row_array();
+
+        // Get Category Code
+        $category = $this->db->query("
+            SELECT b.DESCRIPTION AS Category_Code 
+            FROM erp_lookup_set a 
+            INNER JOIN erp_lookup_value b 
+                ON a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID 
+            WHERE a.PROGRAM_CODE = 'GROUP' 
+                AND b.ACTIVE_FLAG = 'Y' 
+                AND b.ERP_LOOKUP_VALUE_ID = '{$post['category']}'
+        ")->row_array();
+
+        // Cari sequence terbesar berdasarkan BRAND saja
+        $seqQuery = $this->db->query("
+            SELECT MAX(CAST(SUBSTRING_INDEX(ITEM_CODE, '.', -1) AS UNSIGNED)) AS last_sequence
+            FROM item
+            WHERE ITEM_CODE LIKE '{$brand['Brand_Code']}.%'
+        ")->row_array();
+
+        $lastSeq = $seqQuery['last_sequence'] ? $seqQuery['last_sequence'] : 0;
+        $nextSeq = $lastSeq + 1;
+
+        // Format 5 digit
+        $sequenceFormatted = sprintf("%05d", $nextSeq);
+
+        // Generate kode baru
+        $kode = $brand['Brand_Code'] . '.' . $category['Category_Code'] . '.' . $sequenceFormatted;
+
+        return $kode;
+    }
+
+    public function detail($id)
+    {
+        try {
+            // untuk fungsi validation callback HMVC
+            $this->form_validation->CI = &$this;
+
+            $this->form_validation->set_rules('brand', 'Brand', 'trim|required');
+            $this->form_validation->set_rules('category', 'Category', 'trim|required');
+            $this->form_validation->set_rules('part_number', 'Part Number', 'trim|required|callback_update_check_part_supplier_kms');
+            $this->form_validation->set_rules('description', 'Description', 'trim|required');
+            $this->form_validation->set_rules('satuan', 'Satuan', 'trim|required');
+            $this->form_validation->set_rules('type', 'Type', 'trim|required');
+            $this->form_validation->set_rules('lead_time', 'Lead time', 'trim|required');
+            $this->form_validation->set_rules('komoditi', 'Komoditi', 'trim|required');
+            $this->form_validation->set_rules('jenis', 'Jenis', 'trim|required');
+            $this->form_validation->set_rules('grade', 'Grade', 'trim|required');
+
+            if ($this->input->post('obsolete')) {
+                $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
+            }
+
+            if ($this->input->post('konsinyasi')) {
+                $this->form_validation->set_rules('supplier', 'Supplier', 'trim|required');
+            }
+
+            if ($this->form_validation->run() == FALSE) {
+                $id = $this->encrypt->decode($id);
+                $query = $this->item->getItemId($id);
+                if ($query->num_rows() > 0) {
+                    $data['title'] = 'Detail';
+                    $data['breadcrumb'] = 'Detail';
+                    $data['brand'] = $this->item->getBrand();
+                    $data['category'] = $this->item->getCategory();
+                    $data['uom'] = $this->item->getUom();
+                    $data['type'] = $this->item->getType();
+                    $data['rak'] = $this->item->getRak();
+                    $data['made_in'] = $this->item->getMadeIn();
+                    $data['komoditi'] = $this->item->getKomoditi();
+                    $data['jenis'] = $this->item->getJenis();
+                    $data['grade'] = $this->item->getGrade();
+                    $data['supplier'] = $this->item->getSupplier();
+                    $data['data'] = $query->row();
+                    $data['account'] = $this->item->getAccount();
+                    $data['acc_persediaan'] = $this->item->getAccPersediaan()->row();
+                    $data['acc_utang_suspend'] = $this->item->getAccUtangSuspend()->row();
+                    $data['acc_hpp'] = $this->item->getAccHpp()->row();
+                    $data['acc_penjualan_barang'] = $this->item->getPenjualanBarang()->row();
+                    $data['acc_retur_penjualan'] = $this->item->getReturPenjualan()->row();
+                    $data['acc_retur_pembelian'] = $this->item->getReturPembelian()->row();
+                    $data['acc_disc_penjualan'] = $this->item->getDiscPenjualan()->row();
+                    $data['acc_penjualan_jasa'] = $this->item->getPenjualanJasa()->row();
+                    $data['acc_pembelian'] = $this->item->getPembelian()->row();
+                    $data['acc_disc_penjualan_jasa'] = $this->item->getDiscPenjualanJasa()->row();
+                    $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
+                    $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
+                    $data['uomChild'] = $this->item->getUomChild($id);
+                    $this->template->load('template', 'item/detail', $data);
+                } else {
+                    $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
+                    redirect('item');
+                }
+            } else {
+                $post = $this->input->post();
+                $idInput = $this->input->post('id');
+                $post['id'] = $this->encrypt->decode($idInput);
+                if ($post['rak'] != '') {
+                    $queryLokasi = $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'RAK' AND b.ACTIVE_FLAG = 'Y' AND b.ERP_LOOKUP_VALUE_ID = {$post['rak']} ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
+
+                    if ($queryLokasi->num_rows() > 0) {
+                        $post['lokasi'] = $queryLokasi->row()->Grade;
+                    } else {
+                        $post['lokasi'] = null;
+                    }
+                } else {
+                    $post['lokasi'] = null;
+                }
+                $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
+
+                $result = $this->item->update($post);
+
+                if ($result['status'] === 'error') {
+                    $this->session->set_flashdata('warning', $result['message']);
+                    redirect('item/detail/' . $idInput);
+                }
+
+                if ($result['affected'] == 0) {
+                    $this->session->set_flashdata('warning', 'Gagal ubah data item!');
+                    redirect('item/detail/' . $idInput);
+                }
+
+                $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data!');
+                redirect('item/detail/' . $idInput);
+            }
+        } catch (Exception $err) {
+            return sendError('Server Error', $err->getMessage());
+        }
+    }
+
+    function check_part_supplier_kms()
+    {
+        $post = $this->input->post();
+        if ($this->input->post('part_number')) {
+            $part_number = $post['part_number'];
+        } else {
+            $part_number = null;
+        }
+
+        if ($this->input->post('supplier')) {
+            $supplier = $post['supplier'];
+        } else {
+            $supplier = null;
+        }
+
+        if ($this->input->post('konsinyasi')) {
+            $konsinyasi = $post['konsinyasi'];
+        } else {
+            $konsinyasi = null;
+        }
+
+        $query = $this->db->query("SELECT PART_NUMBER, PERSON_ID, ITEM_KMS FROM item WHERE PART_NUMBER = '$part_number' AND PERSON_ID = '$supplier' AND ITEM_KMS = '$konsinyasi'");
+        if ($query->num_rows() > 0) {
+            $this->form_validation->set_message('check_part_supplier_kms', 'Data part number, supplier dan konsinyasi sudah tersedia');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function update_check_part_supplier_kms()
+    {
+        $post = $this->input->post();
+        if ($this->input->post('id')) {
+            $id = $this->encrypt->decode($post['id']);
+        } else {
+            $id = null;
+        }
+
+        if ($this->input->post('part_number')) {
+            $part_number = $post['part_number'];
+        } else {
+            $part_number = null;
+        }
+
+        if ($this->input->post('supplier')) {
+            $supplier = $post['supplier'];
+        } else {
+            $supplier = null;
+        }
+
+        if ($this->input->post('konsinyasi')) {
+            $konsinyasi = $post['konsinyasi'];
+        } else {
+            $konsinyasi = null;
+        }
+
+        $query = $this->db->query("SELECT PART_NUMBER, PERSON_ID, ITEM_KMS FROM item WHERE PART_NUMBER = '$part_number' AND PERSON_ID = '$supplier' AND ITEM_KMS = '$konsinyasi' AND ITEM_ID != '$id'");
+        if ($query->num_rows() > 0) {
+            $this->form_validation->set_message('update_check_part_supplier_kms', 'Data part number, supplier dan konsinyasi sudah tersedia');
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function approve()
+    {
+        try {
+            $post = $this->input->post();
+            $id = $this->encrypt->decode($post['id']);
+            $result = $this->item->approve($id);
+
+            if ($result['status'] === 'error') {
+                return sendWarning($result['message']);
+            }
+
+            if ($result['affected'] == 0) {
+                return sendWarning('Gagal approve data item!');
+            }
+
+            return sendSuccess('success', 'Selamat anda berhasil approve data!');
+        } catch (Exception $err) {
+            return sendError('Server error', $err->getMessage());
+        }
+    }
+
+    public function approveIndex()
+    {
+        $post = $this->input->post();
+        $id = $this->encrypt->decode($post['idApprove']);
+        $this->item->approve($id);
+        if ($this->db->affected_rows() > 0) {
+            $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data baru!');
+            redirect('item');
+        } else {
+            $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
+            redirect('item');
+        }
+    }
+
+    public function ajax_save()
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+            return;
+        }
+
+        $post = $this->input->post();
+
+        $dataToInsert = [];
+        if (!empty($post['satuan_lain'])) {
+            $count = count($post['satuan_lain']);
+            for ($i = 0; $i < $count; $i++) {
+                $id = isset($post['id_satuan_uom_detail'][$i]) ? intval($post['id_satuan_uom_detail'][$i]) : 0;
+
+                if ($id === 0 && !empty(trim($post['satuan_lain'][$i]))) {
+                    $validateParentUom = $this->db->query("SELECT UOM_CODE FROM item WHERE ITEM_ID = '{$this->encrypt->decode($post['id_item'])}' AND UOM_CODE = '{$post['satuan_lain'][$i]}'");
+
+                    $validate = $this->db->query("SELECT UOM_CODE FROM item_uom WHERE ITEM_ID = '{$this->encrypt->decode($post['id_item'])}' AND UOM_CODE = '{$post['satuan_lain'][$i]}'");
+                    if ($validateParentUom->num_rows() > 0) {
+                        return sendWarning('Uom sudah tersedia pada item!');
+                    } else if ($validate->num_rows() > 0) {
+                        return sendWarning('Uom sudah tersedia!');
+                    } else {
+                        $dataToInsert[] = [
+                            'ITEM_ID'           => $this->encrypt->decode($post['id_item']),
+                            'UOM_CODE'          => $post['satuan_lain'][$i],
+                            'TO_QTY'            => floatval($post['konversi'][$i]),
+                            'BASE_UOM_FLAG'     => 'N',
+                            'CREATED_BY'        => $this->session->userdata('id'),
+                            'CREATED_DATE'      => date('Y-m-d H:i:s'),
+                            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+                            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                }
+            }
+        }
+
+        if (!empty($dataToInsert)) {
+            $this->item->insert_batch($dataToInsert);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'nothing_to_save']);
+        }
+    }
+
+    public function ajax_update()
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+            return;
+        }
+
+        $post = $this->input->post();
+
+        $dataToInsert = [];
+        if (!empty($post['satuan_lain'])) {
+            $count = count($post['satuan_lain']);
+            for ($i = 0; $i < $count; $i++) {
+                $id = isset($post['id_satuan_uom_detail'][$i]) ? intval($post['id_satuan_uom_detail'][$i]) : 0;
+
+                if ($id != 0 && !empty(trim($post['satuan_lain'][$i]))) {
+                    $validateParentUom = $this->db->query("SELECT UOM_CODE FROM item WHERE ITEM_ID = '{$this->encrypt->decode($post['id_item'])}' AND UOM_CODE = '{$post['satuan_lain'][$i]}'");
+
+                    $validate = $this->db->query("SELECT UOM_CODE FROM item_uom WHERE ITEM_ID = '{$this->encrypt->decode($post['id_item'])}' AND UOM_CODE = '{$post['satuan_lain'][$i]}' AND ITEM_UOM_ID != '{$id}'");
+                    if ($validateParentUom->num_rows() > 0) {
+                        return sendWarning('Uom sudah tersedia pada item!');
+                    } else if ($validate->num_rows() > 0) {
+                        return sendWarning('Uom sudah tersedia!');
+                    } else {
+                        $dataToInsert[] = [
+                            'ITEM_UOM_ID'       => $id,
+                            'ITEM_ID'           => $this->encrypt->decode($post['id_item']),
+                            'UOM_CODE'          => $post['satuan_lain'][$i],
+                            'TO_QTY'            => floatval($post['konversi'][$i]),
+                            'BASE_UOM_FLAG'     => $post['status_satuan_detail'][$i],
+                            'CREATED_BY'        => $this->session->userdata('id'),
+                            'CREATED_DATE'      => date('Y-m-d H:i:s'),
+                            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+                            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                }
+            }
+        }
+
+        if (!empty($dataToInsert)) {
+            $this->item->updateSatuanUomDetail($dataToInsert);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'nothing_to_save']);
+        }
+    }
+
+    public function ajax_delete()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+            return;
+        }
+
+        $ids = $this->input->post('ids');
+        if (!empty($ids)) {
+            $this->item->delete_by_ids($ids);
+            echo json_encode(['status' => 'success']);
+        } else {
+            echo json_encode(['status' => 'no_ids']);
+        }
+    }
+
+    public function deleteItem()
+    {
+        try {
+            $id = $this->encrypt->decode($this->input->post('id'));
+            $result = $this->item->deleteItem($id);
+
+            if ($result['status'] === 'error') {
+                return sendWarning($result['message']);
+            }
+
+            if ($result['affected'] == 0) {
+                return sendWarning('Gagal hapus data item!');
+            }
+
+            return sendSuccess('success', 'Selamat anda berhasil menghapus data!');
+        } catch (Exception $err) {
+            return sendError('Server error', $err->getMessage());
+        }
+    }
+}

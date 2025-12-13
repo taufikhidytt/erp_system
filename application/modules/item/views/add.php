@@ -78,7 +78,7 @@
                                                         <option
                                                             value="<?= $br->ERP_LOOKUP_VALUE_ID ?>"
                                                             <?= set_value('brand') ==  $br->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $br->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($br->Brand_Name) ?>
+                                                            <?= strtoupper($br->Brand_Name) . ' - [' . strtoupper($br->Brand_Code) . ']' ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -109,7 +109,7 @@
                                                         <option
                                                             value="<?= $ct->ERP_LOOKUP_VALUE_ID ?>"
                                                             <?= set_value('category') ==  $ct->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $ct->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ct->Category_Name) ?>
+                                                            <?= strtoupper($ct->Category_Name) . ' - [' . strtoupper($ct->Category_Code) . ']' ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -528,7 +528,7 @@
                                                         <option
                                                             value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>"
                                                             <?= set_value('komoditi') ==  $kd->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $kd->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($kd->Note) ?>
+                                                            <?= strtoupper($kd->Note) . ' - [' . strtoupper($kd->Komoditi) . ']' ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -545,7 +545,7 @@
                                                 <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Supplier --</option>
                                                     <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') == $sp->PERSON_ID ? 'selected' : null ?>><?= strtoupper($sp->Supplier) ?></option>
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') == $sp->PERSON_ID ? 'selected' : null ?>><?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>

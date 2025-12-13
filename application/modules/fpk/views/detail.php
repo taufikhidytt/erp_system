@@ -69,7 +69,7 @@
                                                     <option value="">-- Selected Brand --</option>
                                                     <?php $param = $this->input->post('brand') ?? $data->MEREK_ID; ?>
                                                     <?php foreach ($brand->result() as $br): ?>
-                                                        <option value="<?= $br->ERP_LOOKUP_VALUE_ID ?>" <?= $br->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($br->Brand_Name) . ' - [' . strtoupper($br->Brand_Code) . ']' ?></option>
+                                                        <option value="<?= $br->ERP_LOOKUP_VALUE_ID ?>" <?= $br->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($br->Brand_Name) ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -86,7 +86,7 @@
                                                     <option value="">-- Selected Category --</option>
                                                     <?php $param = $this->input->post('category') ?? $data->GROUP_ID; ?>
                                                     <?php foreach ($category->result() as $ct): ?>
-                                                        <option value="<?= $ct->ERP_LOOKUP_VALUE_ID; ?>" <?= $ct->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?> data-name="<?= strtoupper($ct->Category_Name); ?>"><?= strtoupper($ct->Category_Name) . ' - [' . strtoupper($ct->Category_Code) . ']' ?></option>
+                                                        <option value="<?= $ct->ERP_LOOKUP_VALUE_ID; ?>" <?= $ct->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?> data-name="<?= strtoupper($ct->Category_Name); ?>"><?= strtoupper($ct->Category_Code) ?> ~ [<?= strtoupper($ct->Category_Name); ?>]</option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -404,7 +404,7 @@
                                                     <option value="">-- Selected Komoditi --</option>
                                                     <?php $param = $this->input->post('komoditi') ?? $data->TIPE_ID; ?>
                                                     <?php foreach ($komoditi->result() as $kd): ?>
-                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= $kd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($kd->Note) . ' - [' . strtoupper($kd->Komoditi) . ']' ?></option>
+                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= $kd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($kd->Note) ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
@@ -421,7 +421,7 @@
                                                     <option value="">-- Selected Supplier --</option>
                                                     <?php $param = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
                                                     <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $param ? 'selected' : null ?>><?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?></option>
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $param ? 'selected' : null ?>><?= strtoupper($sp->Supplier) ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
