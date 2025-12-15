@@ -61,54 +61,23 @@ class Fpk extends Back_Controller
             // untuk fungsi validation callback HMVC
             $this->form_validation->CI = &$this;
 
-            $this->form_validation->set_rules('brand', 'Brand', 'trim|required');
-            $this->form_validation->set_rules('category', 'Category', 'trim|required');
-            $this->form_validation->set_rules('part_number', 'Part Number', 'trim|required|callback_check_part_supplier_kms');
-            $this->form_validation->set_rules('description', 'Description', 'trim|required');
-            $this->form_validation->set_rules('satuan', 'Satuan', 'trim|required');
-            $this->form_validation->set_rules('type', 'Type', 'trim|required');
-            $this->form_validation->set_rules('lead_time', 'Lead time', 'trim|required');
-            $this->form_validation->set_rules('komoditi', 'Komoditi', 'trim|required');
-            $this->form_validation->set_rules('jenis', 'Jenis', 'trim|required');
-            $this->form_validation->set_rules('grade', 'Grade', 'trim|required');
-
-            if ($this->input->post('obsolete')) {
-                $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
-            }
-
-            if ($this->input->post('konsinyasi')) {
-                $this->form_validation->set_rules('supplier', 'Supplier', 'trim|required');
-            }
+            $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
+            $this->form_validation->set_rules('category', 'category', 'trim|required');
+            $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
+            $this->form_validation->set_rules('tanggal_dibutuhkan', 'tanggal dibutuhkan', 'trim|required');
+            $this->form_validation->set_rules('gudang', 'gudang', 'trim|required');
+            $this->form_validation->set_rules('sales', 'sales', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah Item';
-                $data['breadcrumb'] = 'Tambah Item';
-                $data['brand'] = $this->item->getBrand();
-                $data['category'] = $this->item->getCategory();
-                $data['uom'] = $this->item->getUom();
-                $data['type'] = $this->item->getType();
-                $data['rak'] = $this->item->getRak();
-                $data['made_in'] = $this->item->getMadeIn();
-                $data['komoditi'] = $this->item->getKomoditi();
-                $data['jenis'] = $this->item->getJenis();
-                $data['grade'] = $this->item->getGrade();
-                $data['supplier'] = $this->item->getSupplier();
-                $data['account'] = $this->item->getAccount();
-                $data['acc_persediaan'] = $this->item->getAccPersediaan()->row();
-                $data['acc_utang_suspend'] = $this->item->getAccUtangSuspend()->row();
-                $data['acc_hpp'] = $this->item->getAccHpp()->row();
-                $data['acc_penjualan_barang'] = $this->item->getPenjualanBarang()->row();
-                $data['acc_retur_penjualan'] = $this->item->getReturPenjualan()->row();
-                $data['acc_retur_pembelian'] = $this->item->getReturPembelian()->row();
-                $data['acc_disc_penjualan'] = $this->item->getDiscPenjualan()->row();
-                $data['acc_penjualan_jasa'] = $this->item->getPenjualanJasa()->row();
-                $data['acc_pembelian'] = $this->item->getPembelian()->row();
-                $data['acc_disc_penjualan_jasa'] = $this->item->getDiscPenjualanJasa()->row();
-                $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
-                $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
-                $this->template->load('template', 'item/add', $data);
+                $data['title'] = 'Tambah FPK';
+                $data['breadcrumb'] = 'Tambah FPK';
+                $data['supplier'] = $this->fpk->getSupplier();
+                $data['gudang'] = $this->fpk->getGudang();
+                $data['sales'] = $this->fpk->getSales();
+                $this->template->load('template', 'fpk/add', $data);
             } else {
                 $post = $this->input->post();
+                debuging($post);
                 if ($post['rak'] != '') {
                     $queryLokasi = $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'RAK' AND b.ACTIVE_FLAG = 'Y' AND b.ERP_LOOKUP_VALUE_ID = {$post['rak']} ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
 
