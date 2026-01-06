@@ -210,24 +210,5 @@
                 text: flasherror,
             })
         }
-
-        $(document).on('click', '#btn-approve', function(e) {
-            e.preventDefault();
-            var link = $(this).parent('form');
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin approve data ini?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#43a700ff',
-                cancelButtonColor: '#ff0022ff',
-                confirmButtonText: 'Yes',
-                cancelButtonText: 'No'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    link.submit();
-                }
-            })
-        });
     });
 </script>

@@ -1,3 +1,23 @@
+<style>
+    .form-xs textarea.form-control {
+        height: 80px !important;
+        min-height: 30px !important;
+        padding: 2px 6px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .form-xs textarea {
+        resize: vertical;
+    }
+
+    .auto-width {
+        width: 5ch;
+        /* default awal */
+        min-width: 70px;
+        max-width: 590px;
+    }
+</style>
+
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
 <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
@@ -11,7 +31,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('item') ?>" class="text-decoration-underline">Item</a>
+                                <a href="<?= base_url('fpk') ?>" class="text-decoration-underline">FPK</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -27,778 +47,301 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('item/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
+                                    <a href="<?= base_url('fpk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-check-double-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Hapus">
-                                        <i class="fa fa-trash"></i>
-                                    </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
                                         <i class="ri ri-eraser-fill"></i>
                                     </button>
-                                    <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Kembali">
+                                    <a href="<?= base_url('fpk') ?>" class="btn btn-sm btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Kembali">
                                         <i class="ri ri-reply-fill"></i>
                                     </a>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="row form-xs">
-                                    <input type="hidden" name="id" id="id" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <label for="code_item">Code Item:</label>
+                                            <input type="hidden" name="pr_id" id="pr_id" value="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                                            <label for="no_transaksi">No Transaksi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-barcode-box-fill"></i>
                                                 </span>
-                                                <input type="text" name="code_item" id="code_item" class="form-control <?= form_error('code_item') ? 'is-invalid' : null; ?>" value="<?= $this->input->post('code_item') ?? $data->ITEM_CODE; ?>" placeholder="Auto Generate" disabled readonly>
+                                                <input type="text" name="no_transaksi" id="no_transaksi" class="form-control <?= form_error('no_transaksi') ? 'is-invalid' : null; ?>" placeholder="Auto Generate" value="<?= $this->input->post('no_transaksi') ?? $data->DOCUMENT_NO; ?>" disabled readonly>
                                             </div>
-                                            <div class="text-danger"><?= form_error('code_item') ?></div>
+                                            <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="brand">Brand:</label>
-                                            <span class="text-danger">*</span>
+                                            <label for="no_referensi">No Referensi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
-                                                    <i class="ri ri-database-2-fill"></i>
+                                                    <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="brand" id="brand" class="form-control select2 <?= form_error('brand') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Brand --</option>
-                                                    <?php $param = $this->input->post('brand') ?? $data->MEREK_ID; ?>
-                                                    <?php foreach ($brand->result() as $br): ?>
-                                                        <option value="<?= $br->ERP_LOOKUP_VALUE_ID ?>" <?= $br->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($br->Brand_Name) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi') ?? $data->DOCUMENT_REFF_NO; ?>">
                                             </div>
-                                            <div class="text-danger"><?= form_error('brand') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="category">Category:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-server-fill"></i>
-                                                </span>
-                                                <select name="category" id="category" class="form-control select2 <?= form_error('category') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Category --</option>
-                                                    <?php $param = $this->input->post('category') ?? $data->GROUP_ID; ?>
-                                                    <?php foreach ($category->result() as $ct): ?>
-                                                        <option value="<?= $ct->ERP_LOOKUP_VALUE_ID; ?>" <?= $ct->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?> data-name="<?= strtoupper($ct->Category_Name); ?>"><?= strtoupper($ct->Category_Code) ?> ~ [<?= strtoupper($ct->Category_Name); ?>]</option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('category') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="part_number">Part Number:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-barcode-box-line"></i>
-                                                </span>
-                                                <input type="text" name="part_number" id="part_number" class="form-control <?= form_error('part_number') ? 'is-invalid' : null; ?>" placeholder="Enter Part Number" value="<?= $this->input->post('part_number') ?? $data->PART_NUMBER; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('part_number') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="description">Description:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-sticky-note-2-fill"></i>
-                                                </span>
-                                                <textarea name="description" id="description" class="form-control <?= form_error('description') ? 'is-invalid' : null ?>" placeholder="Enter Description"><?= $this->input->post('description') ?? $data->ITEM_DESCRIPTION; ?></textarea>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('description') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="assy_code">Assy Code:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-barcode-line"></i>
-                                                </span>
-                                                <input type="text" name="assy_code" id="assy_code" class="form-control <?= form_error('assy_code') ? 'is-invalid' : null; ?>" placeholder="Enter Assy Code" value="<?= $this->input->post('assy_code') ?? $data->ASSY_CODE; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="satuan">Satuan:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-quill-pen-fill"></i>
-                                                </span>
-                                                <select name="satuan" id="satuan" class="form-control select2 <?= form_error('satuan') ? 'is-invalid' : null; ?>">
-                                                    <?php $param = $this->input->post('satuan') ?? $data->UOM_CODE; ?>
-                                                    <?php foreach ($uom->result() as $um): ?>
-                                                        <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('satuan') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="type">Type:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-swap-fill"></i>
-                                                </span>
-                                                <select name="type" id="type" class="form-control select2 <?= form_error('type') ? 'is-invalid' : null; ?>">
-                                                    <?php $param = $this->input->post('type') ?? $data->TYPE_ID; ?>
-                                                    <?php foreach ($type->result() as $tp): ?>
-                                                        <option value="<?= $tp->ERP_LOOKUP_VALUE_ID ?>" <?= $tp->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($tp->Trade_Type) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('type') ?></div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="min_stock">Min Stock:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" min="0" name="min_stock" id="min_stock" class="form-control <?= form_error('min_stock') ? 'is-invalid' : null; ?>" placeholder="Enter Min Stock" value="<?= $this->input->post('min_stock') ?? rtrim(rtrim($data->MIN_STOCK, '0'), '.'); ?>">
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('min_stock') ?></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="lead_time">Lead Time:</label>
-                                                    <span class="text-danger">*</span>
-                                                    <div class="row">
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">
-                                                                <i class="ri ri-rocket-2-fill"></i>
-                                                            </span>
-                                                            <input type="number" min="1" name="lead_time" id="lead_time" class="form-control <?= form_error('lead_time') ? 'is-invalid' : null; ?>" placeholder="Enter Lead Time" value="<?= $this->input->post('lead_time') ?? ($data->lead_time ?? '1'); ?>">
-                                                            <span class="input-group-text">Weeks</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('lead_time') ?></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="rak">Rak:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-archive-drawer-fill"></i>
-                                                </span>
-                                                <select name="rak" id="rak" class="form-control select2 <?= form_error('rak') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Rak --</option>
-                                                    <?php $param = $this->input->post('rak') ?? $data->LOKASI_ID; ?>
-                                                    <?php foreach ($rak->result() as $rk): ?>
-                                                        <option value="<?= $rk->ERP_LOOKUP_VALUE_ID ?>" <?= $rk->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($rk->Grade) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="border p-2">
-                                            <div class="row">
-                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label for="length">Length:</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">
-                                                                <i class="ri ri-increase-decrease-fill"></i>
-                                                            </span>
-                                                            <input type="number" min="1" name="length" id="length" class="form-control <?= form_error('length') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('length') ?? (rtrim(rtrim($data->PANJANG, '0'), '.') ?? '1'); ?>">
-                                                            <span class="input-group-text">Meter</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label for="width">Width:</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">
-                                                                <i class="ri ri-increase-decrease-fill"></i>
-                                                            </span>
-                                                            <input type="number" min="1" name="width" id="width" class="form-control <?= form_error('width') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('width') ?? (rtrim(rtrim($data->LEBAR, '0'), '.') ?? '1'); ?>">
-                                                            <span class="input-group-text">Meter</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-4 col-md-12 col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label for="height">Height:</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">
-                                                                <i class="ri ri-increase-decrease-fill"></i>
-                                                            </span>
-                                                            <input type="number" min="1" name="height" id="height" class="form-control <?= form_error('height') ? 'is-invalid' : null; ?>" placeholder="Meter" value="<?= $this->input->post('height') ?? (rtrim(rtrim($data->TINGGI, '0'), '.') ?? '1'); ?>">
-                                                            <span class="input-group-text">Meter</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-6 col-md-6 col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label for="kubikasi">Kubikasi:</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">
-                                                                <i class="ri ri-increase-decrease-fill"></i>
-                                                            </span>
-                                                            <input type="number" min="1" name="kubikasi" id="kubikasi" class="form-control <?= form_error('kubikasi') ? 'is-invalid' : null; ?>" placeholder="" value="<?= $this->input->post('kubikasi') ?? (rtrim(rtrim($data->M3, '0'), '.') ?? '1'); ?>" disabled>
-                                                            <span class="input-group-text">M3</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 col-md-6 col-sm-12">
-                                                    <div class="mb-3">
-                                                        <label for="weight">Weight:</label>
-                                                        <div class="input-group">
-                                                            <span class="input-group-text">
-                                                                <i class="ri ri-increase-decrease-fill"></i>
-                                                            </span>
-                                                            <input type="number" min="1" name="weight" id="weight" class="form-control <?= form_error('weight') ? 'is-invalid' : null; ?>" placeholder="Kilogram" value="<?= $this->input->post('weight') ?? $data->BERAT; ?>">
-                                                            <span class="input-group-text">Kg</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-12 col-sm-12">
-                                        <div class="mb-3">
-                                            <label for="jenis">Jenis:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-arrow-up-down-fill"></i>
-                                                </span>
-                                                <select name="jenis" id="jenis" class="form-control select2 <?= form_error('jenis') ? 'is-invalid' : null; ?>">
-                                                    <?php $param = $this->input->post('jenis') ?? $data->JENIS_ID; ?>
-                                                    <option value="">-- Selected Jenis --</option>
-                                                    <?php foreach ($jenis->result() as $js): ?>
-                                                        <option value="<?= $js->ERP_LOOKUP_VALUE_ID ?>" <?= $js->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?> data-name="<?= strtolower($js->Jenis_Item) ?>"><?= strtoupper($js->Jenis_Item) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('jenis') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="grade">Grade:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-arrow-up-down-fill"></i>
-                                                </span>
-                                                <select name="grade" id="grade" class="form-control select2 <?= form_error('grade') ? 'is-invalid' : null; ?>">
-                                                    <?php $param = $this->input->post('grade') ?? $data->GRADE_ID; ?>
-                                                    <?php foreach ($grade->result() as $gd): ?>
-                                                        <option value="<?= $gd->ERP_LOOKUP_VALUE_ID ?>" <?= $gd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($gd->Grade) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('grade') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="form-check form-check-right">
-                                                <input type="checkbox" class="form-check-input" name="obsolete" id="obsolete" <?= set_value('obsolete', $data->OBSOLETE_FLAG ?? '') === 'Y' ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="obsolete" style="margin-right: 20px;">
-                                                    Obsolete
-                                                </label>
-                                                <div class="text-danger"><?= form_error('obsolete') ?></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="new_product_name">New Product Name:</label>
-                                            <span class="text-danger" id="new_product_name_required"></span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-sticky-note-2-fill"></i>
-                                                </span>
-                                                <textarea name="new_product_name" id="new_product_name" class="form-control <?= form_error('new_product_name') ? 'is-invalid' : null ?>" placeholder="Enter New Product Name"><?= $this->input->post('new_product_name') ?? $data->PRODUK_BARU; ?></textarea>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('new_product_name') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="hpp">HPP:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-money-dollar-box-fill"></i>
-                                                </span>
-                                                <?php $hpp_flag = $this->db->query("SELECT OPEN_FLAG FROM period ORDER BY PERIOD_NAME LIMIT 1");
-                                                if ($hpp_flag->num_rows() > 0) {
-                                                    if ($hpp_flag->row()->OPEN_FLAG == 'Y') {
-                                                        $status_hpp_flag = '';
-                                                    } else {
-                                                        $status_hpp_flag = 'disabled';
-                                                    }
-                                                }
-                                                ?>
-                                                <input type="number" name="hpp" id="hpp" class="form-control <?= form_error('hpp') ? 'is-invalid' : null; ?>" placeholder="Enter Hpp" value="<?= $this->input->post('hpp') ?? rtrim(rtrim($data->HPP_AWAL, '0'), '.'); ?>" <?= $status_hpp_flag ?>>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('hpp') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="keterangan">Keterangan:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-sticky-note-fill"></i>
-                                                </span>
-                                                <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan') ?? $data->NOTE; ?></textarea>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('keterangan') ?></div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="min_order_quantity">Min. Ord Qty:</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-increase-decrease-fill"></i>
-                                                        </span>
-                                                        <input type="number" name="min_order_quantity" id="min_order_quantity" class="form-control <?= form_error('min_order_quantity') ? 'is-invalid' : null ?>" value="<?= $this->input->post('min_order_quantity') ?? $data->MOQ; ?>" placeholder="Enter Min. Ord Qty">
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('min_order_quantity') ?></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label class="mb-4"></label>
-                                                    <div class="input-group">
-                                                        <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
-                                                            <?php $param = $this->input->post('satuan2') ?? $data->CUSTOM5; ?>
-                                                            <?php foreach ($uom->result() as $um): ?>
-                                                                <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('satuan2') ?></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="made_in">Made In:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-swap-fill"></i>
-                                                </span>
-                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Made In --</option>
-                                                    <?php $param = $this->input->post('made_in') ?? $data->MADE_IN_ID; ?>
-                                                    <?php foreach ($made_in->result() as $mi): ?>
-                                                        <option value="<?= $mi->ERP_LOOKUP_VALUE_ID ?>" <?= $mi->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($mi->Made_In) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="komoditi">Komoditi:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pen-nib-fill"></i>
-                                                </span>
-                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Komoditi --</option>
-                                                    <?php $param = $this->input->post('komoditi') ?? $data->TIPE_ID; ?>
-                                                    <?php foreach ($komoditi->result() as $kd): ?>
-                                                        <option value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>" <?= $kd->ERP_LOOKUP_VALUE_ID == $param ? 'selected' : null ?>><?= strtoupper($kd->Note) ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('komoditi') ?></div>
+                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="supplier">Supplier:</label>
-                                            <span class="text-danger" id="supplier_required"></span>
+                                            <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
-                                                    <i class="ri ri-arrow-up-down-fill"></i>
+                                                    <i class="ri ri-pantone-line"></i>
                                                 </span>
                                                 <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Supplier --</option>
-                                                    <?php $param = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
+                                                    <?php $params = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
                                                     <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $param ? 'selected' : null ?>><?= strtoupper($sp->Supplier) ?></option>
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $params ? 'selected' : null ?>>
+                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
+                                                        </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
                                         </div>
-                                        <div class="mb-3">
-                                            <div class="row justify-content-start">
-                                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                                    <label class="form-check-label" for="konsinyasi" style="margin-right: 20px;">
-                                                        Konsinyasi
-                                                    </label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                                    <input type="checkbox" class="form-check-input" name="konsinyasi" id="konsinyasi" <?= set_value('konsinyasi', $data->ITEM_KMS ?? '') === 'Y' ? 'checked' : '' ?>>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="mb-3">
+                                                    <label for="tanggal">Tanggal:</label>
+                                                    <span class="text-danger">*</span>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">
+                                                            <i class="ri ri-calendar-2-fill"></i>
+                                                        </span>
+                                                        <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? $data->DOCUMENT_DATE; ?>">
+                                                    </div>
+                                                    <div class="text-danger"><?= form_error('tanggal') ?></div>
                                                 </div>
                                             </div>
-                                            <div class="text-danger"><?= form_error('konsinyasi') ?></div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="mb-3">
+                                                    <label for="tanggal_dibutuhkan">Tanggal Dibutuhkan:</label>
+                                                    <span class="text-danger">*</span>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">
+                                                            <i class="ri ri-calendar-event-fill"></i>
+                                                        </span>
+                                                        <input type="datetime-local" name="tanggal_dibutuhkan" id="tanggal_dibutuhkan" class="form-control <?= form_error('tanggal_dibutuhkan') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal Dibutuhkan" value="<?= $this->input->post('tanggal_dibutuhkan') ?? $data->NEED_DATE; ?>">
+                                                    </div>
+                                                    <div class="text-danger"><?= form_error('tanggal_dibutuhkan') ?></div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="float-start">
-                                            <?php if ($data->APPROVE_FLAG == 'N'): ?>
-                                                <button type="button" class="btn btn-primary btn-sm btn-approve" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Approve">
-                                                    <i class="ri ri-thumb-up-fill"></i> Approve
-                                                </button>
-                                            <?php endif; ?>
+                                        <div class="mb-3">
+                                            <label for="gudang">Gudang:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-home-gear-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($gudang->result() as $gd) {
+                                                    if ($gd->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $gd->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Gudang --</option>
+                                                    <?php endif; ?>
+                                                    <?php $param = $this->input->post('gudang') ?? $data->WAREHOUSE_ID; ?>
+                                                    <?php foreach ($gudang->result() as $gd): ?>
+                                                        <option
+                                                            value="<?= $gd->WAREHOUSE_ID ?>"
+                                                            <?= $gd->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($gd->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('gudang') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sales">Sales:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-user-2-fill"></i>
+                                                </span>
+                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Sales --</option>
+                                                    <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
+                                                    <?php foreach ($sales->result() as $sl): ?>
+                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $sl->KARYAWAN_ID == $param ? 'selected' : null ?>>
+                                                            <?= strtoupper($sl->FIRST_NAME) . ' - [' . strtoupper($sl->LAST_NAME) . ']' ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('sales') ?></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row form-xs">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="mb-3">
+                                        <label for="keterangan">Keterangan:</label>
+                                        <div class="input-group">
+                                            <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan') ?? $data->NOTE; ?></textarea>
+                                        </div>
+                                        <div class="text-danger"><?= form_error('keterangan') ?></div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
-                                <hr class="m-3">
-                                <div class="card-body border m-3">
+                                <div class="card-body">
                                     <!-- Nav tabs -->
                                     <ul class="nav nav-tabs" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" data-bs-toggle="tab" href="#detail" role="tab" aria-selected="true">
-                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Detail"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
                                                 <span class="d-none d-sm-block">Detail</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-bs-toggle="tab" href="#account" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none" data-toggle=" tooltip" data-placement="bottom" title="Account"><i class=" ri ri-book-mark-fill"></i></span>
-                                                <span class="d-none d-sm-block">Account</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-bs-toggle="tab" href="#saldo_awal_program" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Saldo Awal Program"><i class="ri ri-money-dollar-box-fill"></i></span>
-                                                <span class="d-none d-sm-block">Saldo Awal Program</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-bs-toggle="tab" href="#harga" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Harga"><i class="fas fa-cog"></i></span>
-                                                <span class="d-none d-sm-block">Harga</span>
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-bs-toggle="tab" href="#diskon" role="tab" aria-selected="false">
-                                                <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Diskon"><i class="fas fa-cog"></i></span>
-                                                <span class="d-none d-sm-block">Diskon</span>
                                             </a>
                                         </li>
                                     </ul>
                                     <!-- Tab panes -->
                                     <div class="tab-content p-3 text-muted">
-                                        <div class="tab-pane active form-xs" id="detail" role="tabpanel">
-                                            <button type="button" id="addRow" class="btn btn-success btn-sm" style="width: 30px;">+</button>
+                                        <div class="tab-pane active" id="detail" role="tabpanel">
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
-                                            <div class="table-responsive">
-                                                <table id="tableSatuan" class="table mt-3 w-100">
-                                                    <thead>
-                                                        <tr>
-                                                            <th><input type="checkbox" id="chkAll"></th>
-                                                            <th>No</th>
-                                                            <th>Satuan Lain</th>
-                                                            <th>Konversi</th>
-                                                            <th>Keterangan</th>
-                                                            <th>Default</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php if (!empty($uomChild)): ?>
-                                                            <?php foreach ($uomChild->result_array() as $index => $row): ?>
-                                                                <tr>
-                                                                    <td>
-                                                                        <input type="checkbox" class="chkRow">
-                                                                        <input type="hidden" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
-                                                                    </td>
-
-                                                                    <td class="rowNo"><?= $index + 1; ?>.</td>
-
-                                                                    <td>
-                                                                        <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                                                                            <?php $param = $this->input->post('satuan_lain') ?? $row['UOM_CODE']; ?>
-                                                                            <?php foreach ($uom->result() as $um): ?>
-                                                                                <option value="<?= $um->UOM_CODE ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
-                                                                            <?php endforeach; ?>
-                                                                        </select>
-                                                                    </td>
-
-                                                                    <td>
-                                                                        <input type="number" name="konversi[]" class="form-control auto-save" step="0.01" value="<?= htmlspecialchars($row['TO_QTY']); ?>">
-                                                                    </td>
-
-                                                                    <td>
-                                                                        <input type="text" name="keterangan[]" class="form-control" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
-                                                                    </td>
-
-                                                                    <td>
-                                                                        <input type="checkbox" name="status_satuan_detail[]" <?= set_value('status_satuan_detail', $row['BASE_UOM_FLAG']) === 'Y' ? 'checked' : '' ?> value="Y" class="auto-save">
-                                                                    </td>
-                                                                </tr>
-                                                            <?php endforeach; ?>
-                                                        <?php endif; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane form-xs" id="account" role="tabpanel">
-                                            <div class="form-box" id="barang">
-                                                <div class="row">
-                                                    <label for="acc_persediaan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Persediaan</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_persediaan" id="acc_persediaan" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_persediaan');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_ID) ? $data->COA_ID : $acc_persediaan->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_persediaan" id="code_acc_persediaan" class="form-control" value="<?= $this->input->post('code_acc_persediaan'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_utang_suspend" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Utang Suspend</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_utang_suspend" id="acc_utang_suspend" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_utang_suspend');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_SUSPEND_ID) ? $data->COA_SUSPEND_ID : $acc_utang_suspend->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_utang_suspend" id="code_acc_utang_suspend" class="form-control" value="<?= $this->input->post('code_acc_utang_suspend'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_hpp" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. HPP</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_hpp" id="acc_hpp" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_hpp');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_HPP_ID) ? $data->COA_HPP_ID : $acc_hpp->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_hpp" id="code_acc_hpp" class="form-control" value="<?= $this->input->post('code_acc_hpp'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_penjualan_barang" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Barang</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_penjualan_barang" id="acc_penjualan_barang" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_penjualan_barang');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_JUAL_ID) ? $data->COA_JUAL_ID : $acc_penjualan_barang->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_penjualan_barang" id="code_acc_penjualan_barang" class="form-control" value="<?= $this->input->post('code_acc_penjualan_barang'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_retur_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Penjualan</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_retur_penjualan" id="acc_retur_penjualan" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_retur_penjualan');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_RET_JUAL_ID) ? $data->COA_RET_JUAL_ID : $acc_retur_penjualan->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_retur_penjualan" id="code_acc_retur_penjualan" class="form-control" value="<?= $this->input->post('code_acc_retur_penjualan'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_retur_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Ret. Pembelian</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_retur_pembelian" id="acc_retur_pembelian" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_retur_pembelian');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_RET_BELI_ID) ? $data->COA_RET_BELI_ID : $acc_retur_pembelian->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_retur_pembelian" id="code_acc_retur_pembelian" class="form-control" value="<?= $this->input->post('code_acc_retur_pembelian'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_disc_penjualan" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_disc_penjualan" id="acc_disc_penjualan" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_disc_penjualan');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_DISC_JUAL_ID) ? $data->COA_DISC_JUAL_ID : $acc_disc_penjualan->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_disc_penjualan" id="code_acc_disc_penjualan" class="form-control" value="<?= $this->input->post('code_acc_disc_penjualan'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-box" id="jasa">
-                                                <div class="row">
-                                                    <label for="acc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan Jasa</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_penjualan_jasa" id="acc_penjualan_jasa" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_penjualan_jasa');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_JUAL_ID) ? $data->COA_JUAL_ID : $acc_penjualan_jasa->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_penjualan_jasa" id="code_acc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_penjualan_jasa'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_pembelian" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_pembelian" id="acc_pembelian" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_pembelian');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_ID) ? $data->COA_ID : $acc_pembelian->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_pembelian" id="code_acc_pembelian" class="form-control" value="<?= $this->input->post('code_acc_pembelian'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_disc_penjualan_jasa" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Disc. Penjualan</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_disc_penjualan_jasa" id="acc_disc_penjualan_jasa" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_disc_penjualan_jasa');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_DISC_JUAL_ID) ? $data->COA_DISC_JUAL_ID : $acc_disc_penjualan_jasa->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_disc_penjualan_jasa" id="code_acc_disc_penjualan_jasa" class="form-control" value="<?= $this->input->post('code_acc_disc_penjualan_jasa'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-box" id="uang_muka">
-                                                <div class="row">
-                                                    <label for="acc_pembelian_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Pembelian</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_pembelian_uang_muka" id="acc_pembelian_uang_muka" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_pembelian_uang_muka');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_ID) ? $data->COA_ID : $acc_pembelian_uang_muka->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_pembelian_uang_muka" id="code_acc_pembelian_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_pembelian_uang_muka'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                                <div class="row">
-                                                    <label for="acc_penjualan_uang_muka" class="col-lg-2 col-md-2 col-sm-12 col-form-label">Acc. Penjualan</label>
-                                                    <div class="col-lg-8 col-md-8 col-sm-12 mb-3 mb-sm-3">
-                                                        <select name="acc_penjualan_uang_muka" id="acc_penjualan_uang_muka" class="form-control select2">
-                                                            <?php
-                                                            $param = $this->input->post('acc_penjualan_uang_muka');
-
-                                                            if (empty($param)) {
-                                                                $param = !empty($data->COA_JUAL_ID) ? $data->COA_JUAL_ID : $acc_penjualan_uang_muka->COA_ID;
-                                                            }
-                                                            ?>
-                                                            <?php foreach ($account->result() as $ac): ?>
-                                                                <option value="<?= $ac->COA_ID ?>" <?= $ac->COA_ID == $param ? 'selected' : null ?> data-code="<?= $ac->COA_CODE ?>"><?= $ac->COA_NAME ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-lg-2 col-md-2 col-sm-12">
-                                                        <input type="text" name="code_acc_penjualan_uang_muka" id="code_acc_penjualan_uang_muka" class="form-control" value="<?= $this->input->post('code_acc_penjualan_uang_muka'); ?>" disabled>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="saldo_awal_program" role="tabpanel">
-                                            <h5 class="mb-0">Module Saldo Awal Coming Soon</h5>
-                                        </div>
-                                        <div class="tab-pane" id="harga" role="tabpanel">
-                                            <h5 class="mb-0">Module Harga Coming Soon</h5>
-                                        </div>
-                                        <div class="tab-pane" id="diskon" role="tabpanel">
-                                            <h5 class="mb-0">Module Diskon Coming Soon</h5>
+                                            <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
+                                                <i class="ri ri-command-fill"></i> Browse Item
+                                            </button>
                                         </div>
                                     </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="table-detail">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th></th>
+                                                    <th>
+                                                        <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
+                                                    </th>
+                                                    <th>Nama Item</th>
+                                                    <th>Kode Item</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Satuan</th>
+                                                    <th>Harga Input</th>
+                                                    <th>Harga</th>
+                                                    <th>Subtotal</th>
+                                                    <th>Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php $dataDetail = $this->db->query("SELECT pr_detail.*, item.ITEM_CODE FROM pr_detail JOIN item ON item.ITEM_ID = pr_detail.ITEM_ID WHERE pr_detail.PR_ID = {$data->PR_ID}");
+                                                if ($dataDetail->num_rows() > 0) { ?>
+                                                    <?php
+                                                    $no = 1;
+                                                    foreach ($dataDetail->result() as $dd): ?>
+                                                        <tr>
+                                                            <td><?= $no++ ?></td>
+                                                            <td>
+                                                                <input type="hidden" name="detail[pr_detail][]" id="pr_detail" value="<?= $this->encrypt->encode($dd->PR_DETAIL_ID); ?>">
+                                                            </td>
+                                                            <td>
+                                                                <input type="checkbox" class="chkDetail">
+                                                            </td>
+                                                            <td>
+                                                                <?= $dd->ITEM_DESCRIPTION ?>
+                                                                <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
+                                                            </td>
+                                                            <td>
+                                                                <?= $dd->ITEM_CODE ?>
+                                                                <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
+                                                            </td>
+                                                            <td>
+                                                                <input type="number" class="form-control form-control-sm qty auto-width" name="detail[qty][]" value="<?= rtrim(rtrim($this->input->post('detail[qty][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
+                                                            </td>
+                                                            <td>
+                                                                <?php $data_uom_selected = $this->db->query("SELECT
+                                                                    *
+                                                                FROM (
+                                                                    -- Unit dasar (default)
+                                                                    SELECT
+                                                                        0 AS URUT,
+                                                                        i.ITEM_ID,
+                                                                        i.UOM_CODE,
+                                                                        1 AS TO_QTY,
+                                                                        CONCAT('1.00 ', i.UOM_CODE) AS KONVERSI
+                                                                    FROM item i
+                                                                    WHERE i.ITEM_ID = {$dd->ITEM_ID}
+                                                                    UNION ALL
+                                                                    -- Unit alternatif (konversi)
+                                                                    SELECT
+                                                                        1 AS URUT,
+                                                                        iu.ITEM_ID,
+                                                                        iu.UOM_CODE,
+                                                                        COALESCE(iu.TO_QTY, 1) AS TO_QTY,
+                                                                        CONCAT(
+                                                                            ROUND(COALESCE(iu.TO_QTY, 1) * 1, 2),
+                                                                            ' ',
+                                                                            i.UOM_CODE
+                                                                        ) AS KONVERSI
+                                                                    FROM item_uom iu
+                                                                    INNER JOIN item i 
+                                                                        ON iu.ITEM_ID = i.ITEM_ID
+                                                                    WHERE iu.ITEM_ID = {$dd->ITEM_ID}
+                                                                ) AS unit_data
+                                                                ORDER BY URUT, TO_QTY"); ?>
+
+                                                                <select class="form-control form-control-sm uom-select auto-width" name="detail[uom][]">
+                                                                    <?php
+                                                                    $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
+                                                                    foreach ($data_uom_selected->result() as $dus): ?>
+                                                                        <option value="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>><?= $dus->UOM_CODE ?></option>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                                <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
+                                                            </td>
+                                                            <td>
+                                                                <input type="number"
+                                                                    class="form-control form-control-sm harga-input auto-width"
+                                                                    name="detail[harga_input][]"
+                                                                    value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
+                                                            </td>
+                                                            <td>
+                                                                <span class="harga-input-b">
+                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 0, ',', '.'); ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                            </td>
+                                                            <td>
+                                                                <span class="subtotal-text">
+                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 0, ',', '.'); ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" class="form-control form-control-sm auto-width" name="detail[keterangan][]" value="<?= $this->input->post('detail[keterangan][]') ?? $dd->NOTE; ?>">
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <h6 class="fw-bold">Total</h6>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <p id="total-text">0.00</p>
+                                    <input type="hidden" name="total" id="total" value="<?= $this->input->post('total') ?? $data->TOTAL_AMOUNT; ?>">
                                 </div>
                             </div>
                         </form>
@@ -812,53 +355,67 @@
 </div>
 <!-- End Page-content -->
 
+<!-- modal -->
+<div id="modalItem" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="modalTitleForm"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="table-item">
+                        <thead>
+                            <tr class="text-nowrap">
+                                <th>
+                                    <input type="checkbox" name="checkAll" id="checkAll" class="">
+                                </th>
+                                <th>No</th>
+                                <th>Nama Item</th>
+                                <th>Kode Item</th>
+                                <th>Stock</th>
+                                <th>Satuan</th>
+                                <th>Kelompok</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="btnSubmit">Selected</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- / modal -->
+
 <script>
     $(document).ready(function() {
-        var length = $('#length').val();
-        var width = $('#width').val();
-        var height = $('#height').val();
+        var tableDetail = $('#table-detail').DataTable({
+            columnDefs: [{
+                "targets": [1, 2],
+                "orderable": false
+            }, ]
+        });
 
-        var jumlah = length * width * height;
-        $('#kubikasi').val(jumlah);
-
-        $('#new_product_name').prop('disabled', !$('#obsolete').is(':checked'));
-
-        const obsolete = $('#obsolete').val();
-
-        if (obsolete.trim() === 'Y') {
-            $('#new_product_name_required').html('*');
-        } else {
-            $('#new_product_name_required').html('');
-        }
-
-        $('#supplier').prop('disabled', !$('#konsinyasi').is(':checked'));
-
-        const konsinyasi = $('#konsinyasi').val();
-
-        if (konsinyasi.trim() === 'Y') {
-            $('#supplier_required').html('*');
-        } else {
-            $('#supplier_required').html('');
-        }
-
-        $('#brand, #category').on('change', updateDescription);
-        $('#part_number').on('keyup', updateDescription);
-
-        $('#satuan').on('change', function() {
-            let value = $(this).val();
-            $('#satuan2').val(value).trigger('change');
+        var tableItem = $('#table-item').DataTable({
+            "columnDefs": [{
+                "targets": [0, 1],
+                "orderable": false
+            }],
+            "order": []
         });
 
         //Initialize Select2 Elements
-        $('.select2, .select-uom').each(function() {
+        $('.select2').each(function() {
             $(this).select2({
                 theme: 'bootstrap-5',
                 dropdownParent: $(this).parent(),
             });
-        });
-
-        $(".select-uom").select2({
-            width: '100%'
         });
 
         var flashsuccess = $('#flashSuccess').data('success');
@@ -889,24 +446,210 @@
             })
         }
 
-        const input = $('#part_number');
-        input.on('input', function(e) {
-            if (e.key === ' ' || e.code === 'Space') {
-                e.preventDefault();
-                let teks = $(this).val();
-                teks += '-';
-                $(this).val(teks);
+        $("#supplier").data("prev", $("#supplier").val());
+
+        $("#supplier").on("change", function(e, data) {
+            let prev = $(this).data("prev");
+            let current = $(this).val();
+
+            if (prev && current !== prev && tableDetail.rows().count() > 0) {
+
+                Swal.fire({
+                    title: "Ganti Supplier?",
+                    text: "Data item yang sudah dipilih akan dihapus.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, ganti",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        tableDetail.clear().draw();
+                        $(this).data("prev", current);
+                    } else {
+                        $(this).val(prev).trigger('change.select2', {
+                            skipEvent: true
+                        });
+                    }
+                });
+            } else {
+                $(this).data("prev", current);
             }
         });
 
-        input.on('input', function() {
-            let teks = $(this).val();
-            teks = teks.replace(/\*/g, 'X');
-            teks = teks.replace(/[\s\p{P}\+=~`|$^]/gu, '-');
-            $(this).val(teks);
+        // modal
+        $("#btn-modalItem").on("click", function() {
+            $("#checkAll").prop('checked', false);
+            $('#loading').show();
+            var supplier = $('#supplier').val();
+
+            if (!supplier) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Supplier tidak terisi, Mohon isi supplier terlebih dahulu',
+                });
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "<?= base_url() ?>fpk/getItemBySupplier",
+                data: {
+                    id_supplier: supplier,
+                },
+                dataType: "json",
+                success: function(response) {
+                    $('#loading').hide();
+                    tableItem.clear().draw();
+                    if (response.status === 'success' && Array.isArray(response.data)) {
+                        response.data.forEach(function(item, i) {
+                            var checkbox = `
+                            <input type="checkbox" class="chkRow"
+                                data-id_item="${item.ITEM_ID}"
+                                data-name="${item.ITEM_DESCRIPTION}"
+                                data-code="${item.ITEM_CODE}"
+                                data-uom="${item.UOM}"
+                            >
+                            `;
+                            tableItem.row.add([
+                                checkbox,
+                                i + 1,
+                                item.ITEM_DESCRIPTION,
+                                item.ITEM_CODE,
+                                item.STOK,
+                                item.UOM,
+                                item.TIPE,
+                            ]).draw();
+                        });
+                    }
+                    $('#modalTitleForm').text('Master Item');
+                    $('#modalItem').modal('show');
+                }
+            });
         });
 
-        $('#min_stock, #lead_time, #length, #width, #height, #weight, #hpp, #min_order_quantity').on('keydown', function(e) {
+        // Centang semua
+        $("#checkAllParent").change(function() {
+            $(".chkDetail").prop('checked', $(this).prop('checked'));
+        });
+
+        $("#checkAll").change(function() {
+            $(".chkRow").prop('checked', $(this).prop('checked'));
+        });
+
+        // submit
+        $("#btnSubmit").on("click", function() {
+            let rowsAdded = false;
+            $("#table-item .chkRow:checked").each(function() {
+                let id_item = $(this).data("id_item");
+                let nama = $(this).data("name");
+                let kode = $(this).data("code");
+                let uom = $(this).data("uom");
+
+                let exists = tableDetail
+                    .column(3)
+                    .data()
+                    .toArray()
+                    .includes(kode);
+                if (exists) return;
+
+                let rowNode = tableDetail.row.add([
+                    "",
+
+                    `<input type="hidden" name="detail[pr_detail][]" value="">`,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `${nama}
+                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
+                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+
+                    `${kode}
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<input type="number" class="form-control form-control-sm qty" name="detail[qty][]" value="1">`,
+
+                    `<select class="form-control form-control-sm uom-select" name="detail[uom][]">
+                        <option value="">Loading...</option>
+                    </select>
+                    <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]">`,
+
+                    `<input type="number" class="form-control form-control-sm harga-input auto-width" name="detail[harga_input][]">`,
+
+                    `<span class="harga-input-b">0</span>
+                    <input type="hidden" name="detail[harga][]">`,
+
+                    `<span class="subtotal-text">0</span>
+                    <input type="hidden" name="detail[subtotal][]">`,
+
+                    `<input type="text" class="form-control form-control-sm auto-width" name="detail[keterangan][]">`
+                ]).draw(false).node();
+
+                rowsAdded = true;
+                loadUom($(rowNode), id_item);
+            });
+
+
+            if (rowsAdded) {
+                tableDetail.draw(false);
+            }
+            $("#modalItem").modal("hide");
+        });
+
+        hitungTotal();
+
+        $(document).on("input", ".qty, .harga-input", function() {
+            let row = $(this).closest("tr");
+            let qty = parseFloat(row.find(".qty").val()) || 0;
+            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
+
+            let subtotal = qty * harga_input;
+            row.find(".harga-input-b").text(harga_input.toLocaleString("id-ID"));
+            row.find(".subtotal-text").text(subtotal.toLocaleString("id-ID"));
+
+            row.find('input[name="detail[harga][]"]').val(harga_input);
+            row.find('input[name="detail[subtotal][]"]').val(subtotal);
+            hitungTotal();
+        });
+
+        tableDetail.on("draw.dt", function() {
+            tableDetail
+                .column(0)
+                .nodes()
+                .each(function(cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+        });
+
+        $("#removeRow").on("click", function() {
+            let rowsToRemove = tableDetail.rows().nodes().to$().filter(function() {
+                return $(this).find(".chkDetail").is(":checked");
+            });
+            if (rowsToRemove.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Tidak ada item yang dipilih!'
+                });
+                return;
+            }
+            rowsToRemove.each(function() {
+                tableDetail.row(this).remove();
+            });
+            tableDetail.draw(false);
+        });
+
+        $(document).on('change', '.uom-select', function() {
+
+            let toQty = $(this).find(':selected').data('to-qty') || 1;
+
+            $(this)
+                .closest('tr')
+                .find('.uom-to-qty')
+                .val(toQty);
+        });
+
+        $(document).on('keydown', '.qty, .harga-input', function(e) {
             if (
                 e.key === 'e' || e.key === 'E' ||
                 e.key === '+' || e.key === '-'
@@ -915,518 +658,99 @@
             }
         });
 
-        $('#min_stock,#hpp').on('input change', function() {
+        $(document).on('input change', '.qty, .harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
-            val = parseFloat(val);
-            if (val < 0) {
-                $(this).val(0);
-            }
-        });
 
-        $('#lead_time, #length, #width, #height, #weight, #min_order_quantity').on('input change', function() {
-            let val = $(this).val();
-            if (val === '') return;
             val = parseFloat(val);
             if (val < 1) {
                 $(this).val(1);
             }
-
-            let p = parseFloat($('#length').val()) || 0;
-            let l = parseFloat($('#width').val()) || 0;
-            let t = parseFloat($('#height').val()) || 0;
-
-            let kubikasi = p * l * t;
-
-            if (kubikasi > 0) {
-                $('#kubikasi').val(kubikasi);
-            } else {
-                $('#kubikasi').val('');
-            }
         });
 
-        $('#obsolete').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#new_product_name_required').html('*');
-                $('#new_product_name').prop('disabled', false);
-            } else {
-                $('#new_product_name_required').html('');
-                $('#new_product_name').prop('disabled', true);
-            }
-        });
+        $(document).on('change', '.uom-select', function() {
+            let toQty = $(this).find(':selected').data('to_qty') || 1;
 
-        $('#konsinyasi').on('change', function() {
-            if ($(this).is(':checked')) {
-                $('#supplier_required').html('*');
-                $('#supplier').prop('disabled', false);
-            } else {
-                $('#supplier_required').html('');
-                $('#supplier').prop('disabled', true);
-            }
-        });
-
-        $('#acc_persediaan').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_persediaan').val(code);
-        });
-        $('#acc_persediaan').change();
-
-        $('#acc_utang_suspend').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_utang_suspend').val(code);
-        });
-        $('#acc_utang_suspend').change();
-
-        $('#acc_hpp').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_hpp').val(code);
-        });
-        $('#acc_hpp').change();
-
-        $('#acc_penjualan_barang').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_penjualan_barang').val(code);
-        });
-        $('#acc_penjualan_barang').change();
-
-        $('#acc_retur_penjualan').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_retur_penjualan').val(code);
-        });
-        $('#acc_retur_penjualan').change();
-
-        $('#acc_retur_pembelian').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_retur_pembelian').val(code);
-        });
-        $('#acc_retur_pembelian').change();
-
-        $('#acc_disc_penjualan').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_disc_penjualan').val(code);
-        });
-        $('#acc_disc_penjualan').change();
-
-        $('#acc_penjualan_jasa').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_penjualan_jasa').val(code);
-        });
-        $('#acc_penjualan_jasa').change();
-
-        $('#acc_pembelian').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_pembelian').val(code);
-        });
-        $('#acc_pembelian').change();
-
-        $('#acc_disc_penjualan_jasa').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_disc_penjualan_jasa').val(code);
-        });
-        $('#acc_disc_penjualan_jasa').change();
-
-        $('#acc_pembelian_uang_muka').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_pembelian_uang_muka').val(code);
-        });
-        $('#acc_pembelian_uang_muka').change();
-
-        $('#acc_penjualan_uang_muka').on('change', function() {
-            let code = $(this).find(':selected').data('code');
-            $('#code_acc_penjualan_uang_muka').val(code);
-        });
-        $('#acc_penjualan_uang_muka').change();
-
-        $('#jenis').on('change', function() {
-
-            let formName = $(this).find(':selected').data('name');
-
-            // sembunyikan form & hapus name input
-            $('.form-box').hide().find('input, select, textarea').each(function() {
-                $(this).data('name', $(this).attr('name')).removeAttr('name');
-            });
-
-            if (formName) {
-                let name = formName.replace(/\s+/g, '_');
-                $('#' + name).show().find('input, select, textarea').each(function() {
-                    $(this).attr('name', $(this).data('name'));
-                });
-            }
-        });
-
-        $('#jenis').trigger('change');
-
-        // Tambah baris baru
-        $("#addRow").click(function() {
-            <?php
-            $option_uom = "";
-            foreach ($uom->result() as $um) {
-                $option_uom .= '<option value="' . $um->UOM_CODE . '">' . strtoupper($um->DESCRIPTION) . '</option>';
-            }
-            ?>
-            var rowCount = $("#tableSatuan tbody tr").length + 1;
-            var newRow = `<tr>
-            <td><input type="checkbox" class="chkRow"></td>
-            <td class="rowNo">${rowCount}.</td>
-            <td>
-                <input type="hidden" name="id_satuan_uom_detail[]" value="0">
-                <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                    <?= $option_uom; ?>
-                </select>
-            </td>
-            <td><input type="number" name="konversi[]" class="form-control auto-save"></td>
-            <td><input type="text" name="keterangan[]" class="form-control auto-save" disabled></td>
-        </tr>`;
-            $("#tableSatuan tbody").append(newRow);
-            $(".select-uom").select2({
-                width: '100%'
-            });
-        });
-
-        // Auto save baris baru saat blur
-        $(document).on("blur", ".auto-save", function() {
-            var row = $(this).closest("tr");
-            var id = row.find('input[name="id_satuan_uom_detail[]"]').val();
-            var idItem = $('#id').val();
-
-            var satuan = row.find('select[name="satuan_lain[]"]').val();
-            var konversi = row.find('input[name="konversi[]"]').val();
-
-            // Hanya save jika baris baru / add
-            if (id == 0) {
-
-                if (satuan === "" || konversi === "" || konversi == 0) {
-                    return;
-                }
-
-                var data = {
-                    'id_item': idItem,
-                    'id_satuan_uom_detail[]': [row.find('input[name="id_satuan_uom_detail[]"]').val()],
-                    'satuan_lain[]': [row.find('select[name="satuan_lain[]"]').val()],
-                    'konversi[]': [row.find('input[name="konversi[]"]').val()],
-                };
-                $('#loading').show();
-                $.ajax({
-                    url: "<?php echo site_url('item/ajax_save'); ?>",
-                    type: "POST",
-                    data: data,
-                    dataType: "json",
-                    success: function(res) {
-                        if (res.status === 'success') {
-                            $('#loading').hide();
-                            row.find('input[name="id_satuan_uom_detail[]"]').val('saved');
-                            Swal.fire({
-                                title: 'Sukses',
-                                text: 'Selamat anda berhasil menyimpan data!',
-                                icon: 'success',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        } else if (res.message) {
-                            $('#loading').hide();
-                            Swal.fire({
-                                title: 'Warning',
-                                text: res.message,
-                                icon: 'warning',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        } else {
-                            $('#loading').hide();
-                            Swal.fire({
-                                title: 'Warning',
-                                text: 'Gagal save data!',
-                                icon: 'warning',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        }
-                    }
-                });
-            } else {
-
-                // Hanya save jika ada nilai id / update
-                if (satuan === "" || konversi === "" || konversi == 0) {
-                    return;
-                }
-
-                var statusCheckbox = row.find('input[name="status_satuan_detail[]"]:checked');
-                var status = statusCheckbox.length ? 'Y' : 'N';
-
-                var data = {
-                    'id_item': idItem,
-                    'id_satuan_uom_detail[]': [row.find('input[name="id_satuan_uom_detail[]"]').val()],
-                    'satuan_lain[]': [row.find('select[name="satuan_lain[]"]').val()],
-                    'konversi[]': [row.find('input[name="konversi[]"]').val()],
-                    'status_satuan_detail[]': [status],
-                };
-                $('#loading').show();
-                $.ajax({
-                    url: "<?php echo site_url('item/ajax_update'); ?>",
-                    type: "POST",
-                    data: data,
-                    dataType: "json",
-                    success: function(res) {
-                        if (res.status === 'success') {
-                            $('#loading').hide();
-                            row.find('input[name="id_satuan_uom_detail[]"]').val('saved');
-                            Swal.fire({
-                                title: 'Sukses',
-                                text: 'Selamat anda berhasil menyimpan data!',
-                                icon: 'success',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        } else if (res.message) {
-                            $('#loading').hide();
-                            Swal.fire({
-                                title: 'Warning',
-                                text: res.message,
-                                icon: 'warning',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        } else {
-                            $('#loading').hide();
-                            Swal.fire({
-                                title: 'Warning',
-                                text: 'Gagal save data!',
-                                icon: 'warning',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                location.reload();
-                            });
-                        }
-                    }
-                });
-            }
-        });
-
-        // Centang semua
-        $("#chkAll").change(function() {
-            $(".chkRow").prop('checked', $(this).prop('checked'));
-        });
-
-        $("#removeRow").click(function() {
-
-            var idsToDelete = [];
-
-            $("#tableSatuan tbody input.chkRow:checked").each(function() {
-                var row = $(this).closest("tr");
-                var id = row.find('input[name="id_satuan_uom_detail[]"]').val();
-
-                if (id > 0) {
-                    idsToDelete.push(id);
-                }
-
-                row.remove();
-            });
-
-            updateRowNumber();
-
-            if (idsToDelete.length > 0) {
-                $('#loading').show();
-                $.ajax({
-                    url: "<?= site_url('item/ajax_delete'); ?>",
-                    type: "POST",
-                    data: {
-                        ids: idsToDelete
-                    },
-                    dataType: "json",
-                    success: function(res) {
-                        $('#loading').hide();
-                        Swal.fire({
-                            title: 'Selamat!',
-                            text: 'Anda berhasil menghapus data!',
-                            icon: 'success',
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        $('#loading').hide();
-                        Swal.fire({
-                            title: 'Gagal',
-                            text: 'Hapus data!',
-                            icon: 'error',
-                            confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'Ok'
-                        }).then((result) => {
-                            location.reload();
-                        });
-                    }
-                });
-            }
-        });
-
-        // Blok input & format tampilan
-        $(document).on("keyup", 'input[name="konversi[]"]', function(e) {
-
-            // Blok e, E, +, -
-            if (['e', 'E', '+', '-'].includes(e.key)) {
-                e.preventDefault();
-                this.value = this.value.replace(/[eE+\-]/g, "");
-                return;
-            }
-        });
-
-        $(document).on('click', '.btn-approve', function() {
-            var id = $(this).data('id'); // ambil id terenkripsi
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin approve data ini?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#ff0022ff',
-                confirmButtonText: 'Yess, Approve data ini!',
-                cancelButtonText: 'Cancel!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "<?= base_url('item/approve') ?>",
-                        method: "POST",
-                        data: {
-                            id: id
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            $('#loading').hide();
-                            if (response.success) {
-                                Swal.fire({
-                                    title: 'Sukses',
-                                    text: response.message,
-                                    icon: 'success',
-                                    confirmButtonColor: '#3085d6',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    window.location.href = "<?= base_url('item/detail/') ?>" + id;
-                                });
-                            } else {
-                                $('#loading').hide();
-                                Swal.fire({
-                                    title: 'Warning',
-                                    text: response.message,
-                                    icon: 'warning',
-                                    confirmButtonColor: '#3085d6',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    window.location.href = "<?= base_url('item/detail/') ?>" + id;
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            $('#loading').hide();
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Gagal hapus data!',
-                                icon: 'error',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                window.location.href = "<?= base_url('item/detail/') ?>" + id;
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
-        $(document).on('click', '.btn-delete', function() {
-            var id = $(this).data('id'); // ambil id terenkripsi
-
-            Swal.fire({
-                title: 'Apakah anda yakin?',
-                text: "Ingin menghapus data ini?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yess, Hapus data ini!',
-                cancelButtonText: 'Batal!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "<?= base_url('item/deleteItem') ?>",
-                        method: "POST",
-                        data: {
-                            id: id
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            $('#loading').hide();
-                            if (response.success) {
-                                Swal.fire({
-                                    title: 'Sukses',
-                                    text: response.message,
-                                    icon: 'success',
-                                    confirmButtonColor: '#3085d6',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    window.location.href = "<?= base_url('item') ?>";
-                                });
-                            } else {
-                                $('#loading').hide();
-                                Swal.fire({
-                                    title: 'Warning',
-                                    text: response.message,
-                                    icon: 'warning',
-                                    confirmButtonColor: '#3085d6',
-                                    confirmButtonText: 'Ok'
-                                }).then((result) => {
-                                    $('#table').DataTable().ajax.reload(null, false);
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            $('#loading').hide();
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Gagal hapus data!',
-                                icon: 'error',
-                                confirmButtonColor: '#3085d6',
-                                confirmButtonText: 'Ok'
-                            }).then((result) => {
-                                $('#table').DataTable().ajax.reload(null, false);
-                            });
-                        }
-                    });
-                }
-            });
+            let row = $(this).closest('tr');
+            row.find('input[name="detail[to_qty][]"]').val(toQty);
         });
     });
 
-    function updateDescription() {
-        let brandText = $('#brand option:selected').text().trim();
-        let categoryText = $('#category option:selected').data('name') || '';
-        let partNumber = $('#part_number').val().trim();
+    document.querySelectorAll('.auto-width').forEach(input => {
+        resizeInput(input);
+        input.addEventListener('input', () => resizeInput(input));
+    });
 
-        let parts = [brandText, categoryText, partNumber].filter(function(val) {
-            return val !== "" && val !== "-- Selected Brand --" && val !== "-- Selected Category --";
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('uom-select')) {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const toQty = selectedOption.getAttribute('data-to_qty');
+
+            // cari hidden input dalam satu baris/form yang sama
+            const hiddenInput = e.target.closest('td, div, tr').querySelector('.to-qty');
+            if (hiddenInput) {
+                hiddenInput.value = toQty;
+            }
+        }
+    });
+
+    // set nilai awal saat halaman pertama kali load
+    document.querySelectorAll('.uom-select').forEach(function(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        const toQty = selectedOption.getAttribute('data-to_qty');
+
+        const hiddenInput = select.closest('td, div, tr').querySelector('.to-qty');
+        if (hiddenInput) {
+            hiddenInput.value = toQty;
+        }
+    });
+
+    function hitungTotal() {
+        let total = 0;
+
+        $("tr").each(function() {
+            let subtotalText = $(this).find(".subtotal-text").text()
+                .replace(/\./g, '')
+                .replace(',', '.');
+
+            let subtotal = parseFloat(subtotalText) || 0;
+            total += subtotal;
         });
 
-        let description = parts.join(' ');
-
-        $('#description').val(description);
+        $("#total-text").text(total.toLocaleString("id-ID"));
+        $("#total").val(total);
     }
 
-    // Update nomor urut
-    function updateRowNumber() {
-        $("#tableSatuan tbody tr").each(function(index) {
-            $(this).find(".rowNo").text((index + 1) + ".");
+    function loadUom(row, itemId) {
+
+        let uomSelect = row.find('.uom-select');
+        let toQtyInput = row.find('input[name="detail[to_qty][]"]');
+
+        $.ajax({
+            url: "<?= base_url() ?>fpk/get_uom",
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                item_id: itemId
+            },
+            success: function(res) {
+                let html = '';
+
+                $.each(res.data, function(i, v) {
+                    html += `
+                    <option value="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}">
+                        ${v.UOM_CODE}
+                    </option>
+                `;
+                });
+
+                uomSelect.html(html);
+                uomSelect.trigger('change');
+            }
         });
+    }
+
+    function resizeInput(el) {
+        el.style.width = (el.value.length + 1) + 'ch';
     }
 </script>
