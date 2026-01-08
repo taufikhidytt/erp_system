@@ -42,6 +42,8 @@ class Fpk extends Back_Controller
             $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
             $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
             $row['total'] = $fpk->Total ? number_format($fpk->Total, 0, ',', '.') : '-';
+
+            $row['pr_id'] = $this->encrypt->encode($fpk->PR_ID);
             $data[] = $row;
         }
 
@@ -53,6 +55,41 @@ class Fpk extends Back_Controller
         );
 
         echo json_encode($output);
+    }
+
+    public function get_detail()
+    {
+        try {
+            $pr_id = $this->encrypt->decode($this->input->post('pr_id'));
+            $list = $this->fpk->get_detail_by_pr_id($pr_id);
+            $data = [];
+            $no = 0;
+
+            foreach ($list->result() as $d) {
+                $no++;
+                $data[] = [
+                    "no"        => $no,
+                    "item"      => $d->Item_Name,
+                    "item_code" => $d->ITEM_CODE,
+                    "entered_uom" => $d->ENTERED_UOM,
+                    "qty"       => rtrim(rtrim($d->QTY, '0'), '.'),
+                    "price"     => number_format($d->PRICE, 0, ',', '.'),
+                    "total"     => number_format($d->TOTAL, 0, ',', '.'),
+                    "note"      => $d->NOTE,
+                ];
+            }
+
+            $output = [
+                "draw" => $_POST['draw'] ?? 1,
+                "recordsTotal" => count($data),
+                "recordsFiltered" => count($data),
+                "data" => $data
+            ];
+
+            echo json_encode($output);
+        } catch (Exception $err) {
+            return sendError('Server Error', $err->getMessage());
+        }
     }
 
     public function getItemBySupplier()

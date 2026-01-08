@@ -139,6 +139,15 @@ class Fpk_model extends CI_Model
         return $this->db->count_all_results();
     }
 
+    public function get_detail_by_pr_id($pr_id)
+    {
+        $this->db->select("i.ITEM_DESCRIPTION Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL");
+        $this->db->from("pr_detail d");
+        $this->db->join("item i", "d.ITEM_ID = i.ITEM_ID");
+        $this->db->where("d.PR_ID", $pr_id);
+        return $this->db->get();
+    }
+
     public function getSupplier()
     {
         return $this->db->query("SELECT a.PERSON_ID, a.PERSON_NAME Supplier, a.PERSON_CODE Kode FROM person a JOIN person_site b ON (a.PERSON_ID = b.PERSON_ID) WHERE a.FLAG_SUPP = 1 AND a.ACTIVE_FLAG = 'Y' GROUP BY a.PERSON_ID ORDER BY a.PERSON_NAME");

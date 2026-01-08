@@ -73,6 +73,8 @@
                                             <th>
                                             </th>
                                             <th>
+                                            </th>
+                                            <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th style="width: 80%;">
@@ -98,6 +100,7 @@
                                             </th>
                                         </tr>
                                         <tr class="align-content-center">
+                                            <th></th>
                                             <th>No</th>
                                             <th>Status</th>
                                             <th>No Transaksi</th>
@@ -145,6 +148,12 @@
                 "type": "POST"
             },
             "columns": [{
+                    "className": 'details-control',
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>'
+                },
+                {
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
@@ -174,6 +183,84 @@
                     "data": "total"
                 }
             ]
+        });
+
+        // Add event listener for opening and closing details
+        $('#table tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            var icon = $(this).find('i');
+
+            var rowData = row.data();
+            var prId = rowData.pr_id; // ambil PR_ID
+
+            if (row.child.isShown()) {
+                // Close row
+                row.child.hide();
+                icon.removeClass('ri-subtract-line').addClass('ri-add-line');
+            } else {
+                // Open row dengan child row datatable
+                var childTableId = 'child-' + prId;
+                var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Item</th>
+                                    <th>Kode Item</th>
+                                    <th>Jumlah</th>
+                                    <th>Satuan</th>
+                                    <th>Harga</th>
+                                    <th>Subtotal</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                        </table>`;
+                row.child(childHtml).show();
+                icon.removeClass('ri-add-line').addClass('ri-subtract-line');
+
+                // Init DataTable pada child row
+                $('#' + childTableId).DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "<?= site_url('fpk/get_detail'); ?>",
+                        "type": "POST",
+                        "data": {
+                            pr_id: prId
+                        }
+                    },
+                    "columns": [{
+                            "data": "no"
+                        },
+                        {
+                            "data": "item"
+                        },
+                        {
+                            "data": "item_code"
+                        },
+                        {
+                            "data": "qty"
+                        },
+                        {
+                            "data": "entered_uom"
+                        },
+                        {
+                            "data": "price"
+                        },
+                        {
+                            "data": "total"
+                        },
+                        {
+                            "data": "note"
+                        }
+                    ],
+                    "paging": true,
+                    "searching": false,
+                    "ordering": false,
+                    "info": true,
+                    "autoWidth": true
+                });
+            }
         });
 
         $('.column_search').on('keyup change', function() {
@@ -211,4 +298,26 @@
             })
         }
     });
+
+    function dataDetail(details) {
+        // Sesuaikan format detail di sini
+        return `
+            <table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Total</th>
+                </tr>
+                ${details.map(d => `
+                    <tr>
+                        <td>${d.item}</td>
+                        <td>${d.qty}</td>
+                        <td>${d.price}</td>
+                        <td>${d.total}</td>
+                    </tr>
+                `).join('')}
+            </table>
+        `;
+    }
 </script>
