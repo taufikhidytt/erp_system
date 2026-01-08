@@ -33,7 +33,7 @@ class Fpk extends Back_Controller
             $row['no'] = $no . '.';
             $row['status'] = $fpk->Status ? $fpk->Status : '-';
             $row['no_transaksi'] = '
-            <a href="' . base_url('fpk/detail/' . $this->encrypt->encode($fpk->PR_ID)) . '">
+            <a href="' . base_url('fpk/detail/' . base64url_encode($this->encrypt->encode($fpk->PR_ID))) . '">
                 ' . ($fpk->No_Transaksi ? $fpk->No_Transaksi : '-') . '
             </a>';
             $row['no_referensi'] = $fpk->No_Referensi ? $fpk->No_Referensi : '-';
@@ -41,7 +41,7 @@ class Fpk extends Back_Controller
             $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('d M Y, H:i', strtotime($fpk->Dibutuhkan)) : '-';
             $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
             $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
-            $row['total'] = $fpk->Total ? number_format($fpk->Total, 0, ',', '.') : '-';
+            $row['total'] = $fpk->Total ? number_format($fpk->Total, 2, '.', ',') : '-';
 
             $row['pr_id'] = $this->encrypt->encode($fpk->PR_ID);
             $data[] = $row;
@@ -73,8 +73,8 @@ class Fpk extends Back_Controller
                     "item_code" => $d->ITEM_CODE,
                     "entered_uom" => $d->ENTERED_UOM,
                     "qty"       => rtrim(rtrim($d->QTY, '0'), '.'),
-                    "price"     => number_format($d->PRICE, 0, ',', '.'),
-                    "total"     => number_format($d->TOTAL, 0, ',', '.'),
+                    "price"     => number_format($d->PRICE, 2, '.', ','),
+                    "total"     => number_format($d->TOTAL, 2, '.', ','),
                     "note"      => $d->NOTE,
                 ];
             }
@@ -128,8 +128,8 @@ class Fpk extends Back_Controller
                     AND b.ENTERED_UOM = i.UOM_CODE
             WHERE i.ACTIVE_FLAG = 'Y'
                 AND i.APPROVE_FLAG = 'Y'
-                AND i.TYPE_ID = FN_VAR_VALUE ('INV')
-                AND i.JENIS_ID = FN_VAR_VALUE ('GOODS')
+                AND i.TYPE_ID = FN_GET_VAR_VALUE ('INV')
+                AND i.JENIS_ID = FN_GET_VAR_VALUE ('GOODS')
                 AND i.PERSON_ID = {$supplier}
             ORDER BY i.ITEM_CODE");
 
@@ -335,7 +335,7 @@ class Fpk extends Back_Controller
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
 
             if ($this->form_validation->run() == FALSE) {
-                $id = $this->encrypt->decode($id);
+                $id = $this->encrypt->decode(base64url_decode($id));
                 $query = $this->fpk->getPrId($id);
                 if ($query->num_rows() > 0) {
                     $data['title'] = 'Detail';

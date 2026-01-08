@@ -313,13 +313,13 @@
                                                             </td>
                                                             <td>
                                                                 <span class="harga-input-b">
-                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 0, ',', '.'); ?>
+                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                             </td>
                                                             <td>
                                                                 <span class="subtotal-text">
-                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 0, ',', '.'); ?>
+                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
@@ -503,6 +503,10 @@
                     tableItem.clear().draw();
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
+
+                            var stok = parseFloat(item.STOK);
+                            stok = (stok === 0) ? 0 : stok;
+
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
                                 data-id_item="${item.ITEM_ID}"
@@ -516,7 +520,7 @@
                                 i + 1,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                item.STOK,
+                                stok,
                                 item.UOM,
                                 item.TIPE,
                             ]).draw();
@@ -603,9 +607,24 @@
             let qty = parseFloat(row.find(".qty").val()) || 0;
             let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
 
+            let hargaInputDisplay = (harga_input === 0) ?
+                '0' :
+                harga_input.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
             let subtotal = qty * harga_input;
-            row.find(".harga-input-b").text(harga_input.toLocaleString("id-ID"));
-            row.find(".subtotal-text").text(subtotal.toLocaleString("id-ID"));
+
+            let subTotalDisplay = (subtotal === 0) ?
+                '0' :
+                subtotal.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
+            row.find(".subtotal-text").text(subTotalDisplay.toLocaleString("en-US"));
 
             row.find('input[name="detail[harga][]"]').val(harga_input);
             row.find('input[name="detail[subtotal][]"]').val(subtotal);
@@ -709,15 +728,19 @@
         let total = 0;
 
         $("tr").each(function() {
-            let subtotalText = $(this).find(".subtotal-text").text()
-                .replace(/\./g, '')
-                .replace(',', '.');
-
-            let subtotal = parseFloat(subtotalText) || 0;
+            let subtotalText = $(this).find(".subtotal-text").text();
+            let subtotal = Number(subtotalText.replace(/,/g, '')) || 0;
             total += subtotal;
         });
 
-        $("#total-text").text(total.toLocaleString("id-ID"));
+        let totalDisplay = (total === 0) ?
+            '0' :
+            total.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+        $("#total-text").text(totalDisplay);
         $("#total").val(total);
     }
 

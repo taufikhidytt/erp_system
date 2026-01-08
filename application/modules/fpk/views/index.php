@@ -180,7 +180,8 @@
                     "data": "gudang"
                 },
                 {
-                    "data": "total"
+                    "data": "total",
+                    "className": "text-end",
                 }
             ]
         });
@@ -192,7 +193,7 @@
             var icon = $(this).find('i');
 
             var rowData = row.data();
-            var prId = rowData.pr_id; // ambil PR_ID
+            var prId = rowData.pr_id;
 
             if (row.child.isShown()) {
                 // Close row
@@ -219,7 +220,7 @@
                 icon.removeClass('ri-add-line').addClass('ri-subtract-line');
 
                 // Init DataTable pada child row
-                $('#' + childTableId).DataTable({
+                $('#' + $.escapeSelector(childTableId)).DataTable({
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
@@ -245,10 +246,12 @@
                             "data": "entered_uom"
                         },
                         {
-                            "data": "price"
+                            "data": "price",
+                            "className": "text-end",
                         },
                         {
-                            "data": "total"
+                            "data": "total",
+                            "className": "text-end",
                         },
                         {
                             "data": "note"
