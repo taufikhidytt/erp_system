@@ -6,6 +6,10 @@
         font-size: 0.75rem !important;
     }
 
+    .view-mode {
+        cursor: pointer;
+    }
+
     .form-xs textarea {
         resize: vertical;
     }
@@ -234,10 +238,10 @@
                             </div>
                             <hr>
                             <div class="row">
-                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="col-lg-4 col-md-4 col-sm-4">
                                     <h6 class="fw-bold">Total</h6>
                                 </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="col-lg-8 col-md-8 col-sm-8">
                                     <p id="total-text">0.00</p>
                                     <input type="hidden" name="total" id="total">
                                 </div>
@@ -467,22 +471,24 @@
                     `${kode}
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
-                    `<input type="number" class="form-control form-control-sm qty" name="detail[qty][]" value="1">`,
+                    `<span class="view-mode qty-view">1.00</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
 
-                    `<select class="form-control form-control-sm uom-select" name="detail[uom][]">
+                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="">Loading...</option>
                     </select>
                     <input type="hidden" class="form-control form-control-sm" name="detail[to_qty][]">`,
 
-                    `<input type="number" class="form-control form-control-sm harga-input" name="detail[harga_input][]">`,
+                    `<span class="view-mode harga-view">0.00</span>
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]">`,
 
-                    `<span class="harga-input-b">0</span>
+                    `<span class="harga-input-b">0.00</span>
                     <input type="hidden" name="detail[harga][]">`,
 
-                    `<span class="subtotal">0</span>
+                    `<span class="subtotal">0.00</span>
                     <input type="hidden" name="detail[subtotal][]">`,
 
-                    `<input type="text" class="form-control form-control-sm" name="detail[keterangan][]">`
+                    `<input type="text" class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]">`
                 ]).draw(false).node();
 
                 rowsAdded = true;
@@ -494,6 +500,30 @@
                 tableDetail.draw(false);
             }
             $("#modalItem").modal("hide");
+        });
+
+        $(document).on("click", ".view-mode", function() {
+            let span = $(this);
+            let input = span.next(".edit-mode");
+
+            span.addClass("d-none");
+            input.removeClass("d-none").focus();
+        });
+
+        // keluar input
+        $(document).on("blur change", ".edit-mode", function() {
+            let input = $(this);
+            let span = input.prev(".view-mode");
+
+            let value = input.val();
+            if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
+                span.text(formatNumber(value, 2));
+            } else {
+                span.text(value === "" ? "0" : value);
+            }
+
+            input.addClass("d-none");
+            span.removeClass("d-none");
         });
 
         $(document).on("input", ".qty, .harga-input", function() {
@@ -589,6 +619,27 @@
         });
     });
 
+    $(document).on('keydown', '.enter-as-tab', function(e) {
+        if (e.which !== 13) return;
+
+        e.preventDefault();
+        const $row = $(this).closest('tr');
+
+        if ($(this).hasClass('qty-edit')) {
+            const $harga = $row.find('.harga-edit');
+
+            $row.find('.harga-view').addClass('d-none');
+            $harga.removeClass('d-none');
+            $harga.focus();
+            return;
+        }
+
+        if ($(this).hasClass('harga-edit')) {
+            $row.find('input[name="detail[keterangan][]"]').focus();
+            return;
+        }
+    });
+
     function hitungTotal() {
         let total = 0;
 
@@ -635,6 +686,14 @@
 
                 uomSelect.html(html);
             }
+        });
+    }
+
+    function formatNumber(value, decimal = 2) {
+        if (value === "" || isNaN(value)) return "0.00";
+        return parseFloat(value).toLocaleString("en-US", {
+            minimumFractionDigits: decimal,
+            maximumFractionDigits: decimal
         });
     }
 </script>

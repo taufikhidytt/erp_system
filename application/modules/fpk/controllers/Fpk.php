@@ -37,8 +37,8 @@ class Fpk extends Back_Controller
                 ' . ($fpk->No_Transaksi ? $fpk->No_Transaksi : '-') . '
             </a>';
             $row['no_referensi'] = $fpk->No_Referensi ? $fpk->No_Referensi : '-';
-            $row['tanggal'] = $fpk->Tanggal ? date('d M Y, H:i', strtotime($fpk->Tanggal)) : '-';
-            $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('d M Y, H:i', strtotime($fpk->Dibutuhkan)) : '-';
+            $row['tanggal'] = $fpk->Tanggal ? date('Y-m-d H:i', strtotime($fpk->Tanggal)) : '-';
+            $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('Y-m-d H:i', strtotime($fpk->Dibutuhkan)) : '-';
             $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
             $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
             $row['total'] = $fpk->Total ? number_format($fpk->Total, 2, '.', ',') : '-';
@@ -72,7 +72,7 @@ class Fpk extends Back_Controller
                     "item"      => $d->Item_Name,
                     "item_code" => $d->ITEM_CODE,
                     "entered_uom" => $d->ENTERED_UOM,
-                    "qty"       => rtrim(rtrim($d->QTY, '0'), '.'),
+                    "qty"       => number_format((float)$d->QTY, 2, '.', ''),
                     "price"     => number_format($d->PRICE, 2, '.', ','),
                     "total"     => number_format($d->TOTAL, 2, '.', ','),
                     "note"      => $d->NOTE,
