@@ -13,13 +13,39 @@
     .form-xs textarea {
         resize: vertical;
     }
+
+    #table-item {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    #table-item th,
+    #table-item td {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* class untuk text yang mau di-ellipsis */
+    .ellipsis {
+        white-space: nowrap;
+    }
+
+    /* jika ada <span> / <a> di dalam cell */
+    #table-item td span,
+    #table-item td a {
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
 <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
 
-<div class="page-content">
+<div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
         <div class="row">
@@ -204,7 +230,7 @@
                                         </li>
                                     </ul>
                                     <!-- Tab panes -->
-                                    <div class="tab-content p-3 text-muted">
+                                    <div class="tab-content py-3 text-muted">
                                         <div class="tab-pane active" id="detail" role="tabpanel">
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                             <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
@@ -258,7 +284,7 @@
 <!-- End Page-content -->
 
 <!-- modal -->
-<div id="modalItem" class="modal fade">
+<div id="modalItem" class="modal fade" style="font-size: 12px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -298,17 +324,73 @@
 <script>
     $(document).ready(function() {
         var tableDetail = $('#table-detail').DataTable({
-            columnDefs: [{
-                targets: [1],
-                orderable: false
-            }, ]
+            ordering: false
         });
 
         var tableItem = $('#table-item').DataTable({
+            autoWidth: false,
             "columnDefs": [{
                 "targets": [0, 1],
                 "orderable": false
             }],
+            columnDefs: [{
+                    targets: 0,
+                    width: "5%"
+                }, // checkbox
+                {
+                    targets: 1,
+                    width: "5%"
+                }, // no
+                {
+                    targets: 2,
+                    width: "25%",
+                    className: "eclipse",
+                    render: function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                }, // item description
+                {
+                    targets: 3,
+                    width: "20%",
+                    className: "eclipse",
+                    render: function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                }, // item code
+                {
+                    targets: 4,
+                    width: "10%",
+                    className: "eclipse",
+                    render: function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                }, // stok
+                {
+                    targets: 5,
+                    width: "10%",
+                    className: "eclipse",
+                    render: function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                }, // uom
+                {
+                    targets: 6,
+                    width: "25%",
+                    className: "eclipse",
+                    render: function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                }, // tipe
+            ],
+            autoWidth: false,
+            paging: true,
+            searching: true,
+            ordering: false,
             "order": []
         });
 
@@ -406,8 +488,7 @@
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            var stok = parseFloat(item.STOK);
-                            stok = (stok === 0) ? 0 : stok;
+                            var stok = parseFloat(item.STOK).toFixed(2);
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
@@ -564,6 +645,20 @@
                 });
         });
 
+        $("#checkAllParent").prop("checked", false);
+
+        $("#checkAllParent").on("change", function() {
+            let isChecked = $(this).is(":checked");
+            $("#table-detail .chkDetail").prop("checked", isChecked);
+        });
+
+        $(document).on("change", ".chkDetail", function() {
+            let total = $("#table-detail .chkDetail").length;
+            let checked = $("#table-detail .chkDetail:checked").length;
+
+            $("#checkAllParent").prop("checked", total > 0 && total === checked);
+        });
+
         $("#removeRow").on("click", function() {
             let rowsToRemove = tableDetail.rows().nodes().to$().filter(function() {
                 return $(this).find(".chkDetail").is(":checked");
@@ -580,6 +675,8 @@
                 tableDetail.row(this).remove();
             });
             tableDetail.draw(false);
+
+            $("#checkAllParent").prop("checked", false);
         });
 
         $(document).on('change', '.uom-select', function() {

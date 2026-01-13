@@ -22,6 +22,8 @@
     <!-- Select2-->
     <link href="<?= base_url() ?>assets/admin/libs/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
+    <link rel="stylesheet" href="<?= base_url() ?>assets/admin/css/aos.css">
+
     <style>
         #loading {
             position: fixed;
@@ -57,7 +59,7 @@
     </style>
 </head>
 
-<body data-layout="horizontal" data-topbar="dark">
+<body data-layout="horizontal" data-topbar="dark" data-aos="zoom-in">
     <div id="loading" style="display: none;">
         <div class="spinner-border text-primary" role="status">
             <span class="sr-only">Loading...</span>
@@ -127,6 +129,12 @@
     <!-- Select 2 -->
     <script src="<?= base_url() ?>assets/admin/libs/select2/js/select2.min.js"></script>
 
+    <script src="<?= base_url() ?>assets/admin/js/pages/aos.js"></script>
+
+    <script>
+        AOS.init();
+    </script>
+
     <script>
         $(document).ready(function() {
             $('#loading').hide();
@@ -138,14 +146,6 @@
             $('.select2').select2({
                 theme: 'classic',
             });
-
-            //Initialize Select2 Elements
-            // $('.select2').each(function() {
-            //     $(this).select2({
-            //         theme: 'bootstrap-5',
-            //         dropdownParent: $(this).parent(),
-            //     });
-            // });
 
             var Toast = Swal.mixin({
                 toast: true,

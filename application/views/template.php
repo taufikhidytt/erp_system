@@ -30,6 +30,8 @@
 
     <link href="<?= base_url() ?>assets/admin/libs/select2/css/select2-bootstrap-5-theme.min.css" rel="stylesheet" type="text/css" />
 
+    <link rel="stylesheet" href="<?= base_url() ?>assets/admin/css/aos.css">
+
     <style>
         body {
             /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
@@ -386,6 +388,12 @@
 
         // Update setiap 1 detik
         setInterval(updateJam, 1000);
+    </script>
+
+    <script src="<?= base_url() ?>assets/admin/js/pages/aos.js"></script>
+
+    <script>
+        AOS.init();
     </script>
 
 </body>

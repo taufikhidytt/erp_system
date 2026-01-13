@@ -42,7 +42,7 @@
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
 <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
 
-<div class="page-content">
+<div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
         <div class="row">
@@ -174,7 +174,11 @@
                     "data": "tanggal_dibutuhkan"
                 },
                 {
-                    "data": "supplier"
+                    "data": "supplier",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
                 },
                 {
                     "data": "gudang"
