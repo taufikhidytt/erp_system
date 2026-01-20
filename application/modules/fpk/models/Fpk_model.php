@@ -11,6 +11,7 @@ class Fpk_model extends CI_Model
 
     var $column_order = array(
         null,
+        null,
         "b.DISPLAY_NAME",
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
@@ -58,7 +59,6 @@ class Fpk_model extends CI_Model
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
-        $this->db->order_by('a.DOCUMENT_DATE', 'desc');
 
         $i = 0;
         foreach ($this->column_search as $item) {

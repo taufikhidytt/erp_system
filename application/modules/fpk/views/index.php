@@ -141,7 +141,7 @@
             "searching": true,
             "processing": true,
             "serverSide": true,
-            "ordering": false,
+            "ordering": true,
             "order": [],
             "ajax": {
                 "url": "<?= site_url('fpk/get_data'); ?>",

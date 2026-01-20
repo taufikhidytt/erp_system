@@ -21,30 +21,20 @@
         max-width: 590px;
     }
 
-    #table-item {
-        table-layout: fixed;
-        width: 100%;
-    }
-
-    #table-item th,
-    #table-item td {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
     /* class untuk text yang mau di-ellipsis */
     .ellipsis {
         white-space: nowrap;
     }
 
-    /* jika ada <span> / <a> di dalam cell */
-    #table-item td span,
-    #table-item td a {
-        display: inline-block;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .tr-height-30 td {
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+        line-height: 20px;
+    }
+
+    #table-detail th:nth-child(2),
+    #table-detail td:nth-child(2) {
+        display: none !important;
     }
 </style>
 
@@ -243,29 +233,31 @@
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
                                         <div class="tab-pane active" id="detail" role="tabpanel">
-                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
+                                                <i class="fa fa-trash"></i> Del
+                                            </button>
                                             <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
-                                                <i class="ri ri-command-fill"></i> Browse Item
+                                                <i class="ri ri-add-box-fill"></i> Add Item
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="table-responsive">
+                                    <div class="table-responsive overflow-auto" style="max-height: 450px;">
                                         <table class="table table-striped" id="table-detail">
-                                            <thead>
+                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
                                                 <tr>
-                                                    <th>No</th>
-                                                    <th></th>
-                                                    <th>
+                                                    <th style="width: 5%;">No</th>
+                                                    <th style="padding:0; margin:0; border:none; display: none;"></th>
+                                                    <th style="width: 5%;">
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>Nama Item</th>
-                                                    <th>Kode Item</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Satuan</th>
-                                                    <th>Harga Input</th>
-                                                    <th>Harga</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Keterangan</th>
+                                                    <th style="width: 15%;">Nama Item</th>
+                                                    <th style="width: 15%;">Kode Item</th>
+                                                    <th style="width: 10%;">Jumlah</th>
+                                                    <th style="width: 10%;">Satuan</th>
+                                                    <th style="width: 10%;">Harga Input</th>
+                                                    <th style="width: 10%;">Harga</th>
+                                                    <th style="width: 10%;">Subtotal</th>
+                                                    <th style="width: 10%;">Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -273,29 +265,50 @@
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
+                                                    $limit = 20;
                                                     foreach ($dataDetail->result() as $dd): ?>
-                                                        <tr>
-                                                            <td><?= $no++ ?></td>
-                                                            <td>
+                                                        <tr class="tr-height-30">
+                                                            <td style="width: 5%"><?= $no++ ?></td>
+                                                            <td style="display: none;">
                                                                 <input type="hidden" name="detail[pr_detail][]" id="pr_detail" value="<?= $this->encrypt->encode($dd->PR_DETAIL_ID); ?>">
                                                             </td>
-                                                            <td>
+                                                            <td style="width: 5%">
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
-                                                            <td>
-                                                                <?= $dd->ITEM_DESCRIPTION ?>
+                                                            <td style="width: 15%" class="ellipsis">
+
+                                                                <!-- <span class="ellipsis" data-toggle="tooltip"
+                                                                    data-placement="top"
+                                                                    title="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                    <?= mb_strlen($dd->ITEM_DESCRIPTION, 'UTF-8') > $limit ? mb_substr($dd->ITEM_DESCRIPTION, 0, $limit, 'UTF-8') . '...'
+                                                                        : $dd->ITEM_DESCRIPTION; ?>
+                                                                </span> -->
+
+                                                                <span class="ellipsis">
+                                                                    <?= $dd->ITEM_DESCRIPTION; ?>
+                                                                </span>
                                                                 <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                 <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
                                                             </td>
-                                                            <td>
-                                                                <?= $dd->ITEM_CODE ?>
+                                                            <td style="width: 15%" class="ellipsis">
+
+                                                                <!-- <span class="ellipsis" data-toggle="tooltip"
+                                                                    data-placement="top"
+                                                                    title="<?= $dd->ITEM_CODE ?>">
+                                                                    <?= mb_strlen($dd->ITEM_CODE, 'UTF-8') > $limit ? mb_substr($dd->ITEM_CODE, 0, $limit, 'UTF-8') . '...'
+                                                                        : $dd->ITEM_CODE; ?>
+                                                                </span> -->
+
+                                                                <span class="ellipsis">
+                                                                    <?= $dd->ITEM_CODE; ?>
+                                                                </span>
                                                                 <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
                                                             </td>
-                                                            <td>
-                                                                <span class="view-mode qty-view"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
+                                                            <td style="width: 10%" class="ellipsis text-end">
+                                                                <span class="view-mode qty-view ellipsis"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
                                                                 <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= rtrim(rtrim($this->input->post('detail[qty][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
                                                             </td>
-                                                            <td>
+                                                            <td style="width: 10%" class="ellipsis">
                                                                 <?php $data_uom_selected = $this->db->query("SELECT
                                                                     *
                                                                 FROM (
@@ -336,26 +349,26 @@
                                                                 </select>
                                                                 <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
                                                             </td>
-                                                            <td>
-                                                                <span class="view-mode harga-view"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
+                                                            <td style="width: 10%" class="ellipsis text-end">
+                                                                <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
                                                                 <input type="number"
                                                                     class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
                                                                     name="detail[harga_input][]"
                                                                     value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
                                                             </td>
-                                                            <td>
-                                                                <span class="harga-input-b">
+                                                            <td style="width: 10%" class="ellipsis text-end">
+                                                                <span class="harga-input-b ellipsis">
                                                                     <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                             </td>
-                                                            <td>
-                                                                <span class="subtotal-text">
+                                                            <td style="width: 10%" class="ellipsis text-end">
+                                                                <span class="subtotal-text ellipsis">
                                                                     <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
-                                                            <td>
+                                                            <td style="width: 10%" class="ellipsis text-end">
                                                                 <input type="text" class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" value="<?= $this->input->post('detail[keterangan][]') ?? $dd->NOTE; ?>">
                                                             </td>
                                                         </tr>
@@ -367,13 +380,22 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="row">
-                                <div class="col-lg-4 col-md-4 col-sm-4">
-                                    <h6 class="fw-bold">Total</h6>
-                                </div>
-                                <div class="col-lg-8 col-md-8 col-sm-8">
-                                    <p id="total-text">0.00</p>
-                                    <input type="hidden" name="total" id="total" value="<?= $this->input->post('total') ?? $data->TOTAL_AMOUNT; ?>">
+                            <div class="row justify-content-end">
+                                <div class="col-md-4">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="font-weight:bold;">Total</td>
+                                                <td>:</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-right" style="text-align: right">
+                                                    <p id="total-text">0.00</p>
+                                                    <input type="hidden" name="total" id="total" value="<?= $this->input->post('total') ?? number_format(rtrim(rtrim($data->TOTAL_AMOUNT, '0'), '.'), 2, '.', ','); ?>">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </form>
@@ -426,17 +448,75 @@
 <!-- / modal -->
 
 <script>
+    let tableDetail;
     $(document).ready(function() {
-        var tableDetail = $('#table-detail').DataTable({
-            ordering: false
+        tableDetail = $('#table-detail').DataTable({
+            ordering: false,
+            autoWidth: false,
+            paging: false,
+            columnDefs: [{
+                    targets: 0,
+                    width: "5%",
+                }, // no
+                {
+                    targets: 2,
+                    width: "5%"
+                }, // checkbox
+                {
+                    targets: 3,
+                    width: "15%",
+                    className: "ellipsis",
+
+                }, // nama item
+                {
+                    targets: 4,
+                    width: "15%",
+                    className: "ellipsis",
+
+                }, // code item
+                {
+                    targets: 5,
+                    width: "10%",
+                    className: "ellipsis text-end",
+
+                }, // jumlah
+                {
+                    targets: 6,
+                    width: "10%",
+                    className: "ellipsis",
+
+                }, // satuan
+                {
+                    targets: 7,
+                    width: "10%",
+                    className: "ellipsis text-end",
+
+                }, // harga input
+                {
+                    targets: 8,
+                    width: "10%",
+                    className: "ellipsis text-end",
+
+                }, // harga
+                {
+                    targets: 9,
+                    width: "10%",
+                    className: "ellipsis text-end",
+
+                }, // subtotal
+                {
+                    targets: 10,
+                    width: "10%",
+                    className: "ellipsis text-end",
+
+                }, // keterangan
+            ],
         });
+
+        toggleSupplierDisabled();
 
         var tableItem = $('#table-item').DataTable({
             autoWidth: false,
-            "columnDefs": [{
-                "targets": [0, 1],
-                "orderable": false
-            }],
             columnDefs: [{
                     targets: 0,
                     width: "5%"
@@ -447,47 +527,67 @@
                 }, // no
                 {
                     targets: 2,
-                    width: "25%",
-                    className: "eclipse",
+                    width: "20%",
+                    className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
                     }
                 }, // item description
                 {
                     targets: 3,
                     width: "20%",
-                    className: "eclipse",
+                    className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
                     }
                 }, // item code
                 {
                     targets: 4,
-                    width: "10%",
-                    className: "eclipse",
+                    width: "15%",
+                    className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
                     }
                 }, // stok
                 {
                     targets: 5,
-                    width: "10%",
-                    className: "eclipse",
+                    width: "15%",
+                    className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
                     }
                 }, // uom
                 {
                     targets: 6,
-                    width: "25%",
-                    className: "eclipse",
+                    width: "20%",
+                    className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
                     }
                 }, // tipe
             ],
@@ -495,7 +595,6 @@
             paging: true,
             searching: true,
             ordering: false,
-            "order": []
         });
 
         //Initialize Select2 Elements
@@ -553,6 +652,7 @@
                     if (result.isConfirmed) {
                         tableDetail.clear().draw();
                         $(this).data("prev", current);
+                        toggleSupplierDisabled();
                     } else {
                         $(this).val(prev).trigger('change.select2', {
                             skipEvent: true
@@ -629,20 +729,32 @@
         });
 
         // submit
-        $("#btnSubmit").on("click", function() {
+        $("#btnSubmit").on("click", function(e) {
+            e.preventDefault();
             let rowsAdded = false;
-            $("#table-item .chkRow:checked").each(function() {
+
+            let existingCodes = new Set();
+            tableDetail.rows().every(function() {
+                let node = this.node();
+                let kodeText = $(node).find('td:eq(4) span').text().trim();
+                existingCodes.add(kodeText);
+            });
+
+            let allRows = tableItem.rows().nodes();
+            let nodesToDraw = [];
+
+            $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
                 let id_item = $(this).data("id_item");
                 let nama = $(this).data("name");
                 let kode = $(this).data("code");
                 let uom = $(this).data("uom");
 
-                let exists = tableDetail
-                    .column(3)
-                    .data()
-                    .toArray()
-                    .includes(kode);
-                if (exists) return;
+                if (existingCodes.has(kode)) {
+                    $(this).prop('checked', false).prop('disabled', true);
+                    return;
+                }
+
+                existingCodes.add(kode);
 
                 let rowNode = tableDetail.row.add([
                     "",
@@ -651,14 +763,14 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `${nama}
+                    `<span class="ellipsis">${nama}</span>
                     <input type="hidden" name="detail[nama_item][]" value="${nama}">
                     <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
 
-                    `${kode}
+                    `<span class="ellipsis">${kode}</span>
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
-                    `<span class="view-mode qty-view">0.00</span>
+                    `<span class="view-mode qty-view ellipsis">1.00</span>
                     <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
@@ -666,27 +778,35 @@
                     </select>
                     <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]">`,
 
-                    `<span class="view-mode harga-view">0.00</span>
+                    `<span class="view-mode harga-view ellipsis">0.00</span>
                     <input type="number" class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]">`,
 
-                    `<span class="harga-input-b">0.00</span>
+                    `<span class="harga-input-b ellipsis">0.00</span>
                     <input type="hidden" name="detail[harga][]">`,
 
-                    `<span class="subtotal-text">0.00</span>
+                    `<span class="subtotal-text ellipsis">0.00</span>
                     <input type="hidden" name="detail[subtotal][]">`,
 
                     `<input type="text" class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]">`
                 ]).draw(false).node();
 
+                $(rowNode).addClass('tr-height-30');
+
+                nodesToDraw.push(rowNode);
+
+                $(this).prop('checked', false).prop('disabled', true);
+
                 rowsAdded = true;
                 loadUom($(rowNode), id_item);
+
+                if (rowsAdded) {
+                    tableDetail.draw(false);
+                    tableDetail.columns.adjust().draw(false); // refresh layout
+                    toggleSupplierDisabled();
+                }
+
+                $("#modalItem").modal("hide");
             });
-
-
-            if (rowsAdded) {
-                tableDetail.draw(false);
-            }
-            $("#modalItem").modal("hide");
         });
 
         $(document).on("click", ".view-mode", function() {
@@ -783,8 +903,11 @@
                 tableDetail.row(this).remove();
             });
             tableDetail.draw(false);
+            hitungTotal();
 
             $("#checkAllParent").prop("checked", false);
+
+            toggleSupplierDisabled();
         });
 
         $(document).on('change', '.uom-select', function() {
@@ -875,29 +998,33 @@
     });
 
     function hitungTotal() {
-        let total = 0;
+        let tableDetail = $('#table-detail').DataTable(); // ambil instance
 
-        $("tr").each(function() {
-            let subtotalText = $(this).find(".subtotal-text").text();
+        let total = 0;
+        tableDetail.rows().every(function() {
+            let subtotalText = $(this.node()).find(".subtotal-text").text();
             let subtotal = Number(subtotalText.replace(/,/g, '')) || 0;
             total += subtotal;
         });
 
-        let totalDisplay = (total === 0) ?
-            '0' :
+        $("#total-text").text(
             total.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
-            });
-
-        $("#total-text").text(totalDisplay);
+            })
+        );
         $("#total").val(total);
     }
+
+    let uomLoadingCount = 0;
 
     function loadUom(row, itemId) {
 
         let uomSelect = row.find('.uom-select');
         let toQtyInput = row.find('input[name="detail[to_qty][]"]');
+
+        uomLoadingCount++;
+        $('#loading').show();
 
         $.ajax({
             url: "<?= base_url() ?>fpk/get_uom",
@@ -919,6 +1046,17 @@
 
                 uomSelect.html(html);
                 uomSelect.trigger('change');
+            },
+            error: function(xhr, status, error) {
+                console.error("Error load Uom:", error);
+                uomSelect.html('<option value="">Error loading UOM</option>');
+            },
+            complete: function() {
+                uomLoadingCount--;
+
+                if (uomLoadingCount <= 0) {
+                    $('#loading').hide();
+                }
             }
         });
     }
@@ -933,5 +1071,32 @@
             minimumFractionDigits: decimal,
             maximumFractionDigits: decimal
         });
+    }
+
+    function toggleSupplierDisabled() {
+        if (!tableDetail) return;
+
+        let hasDetail = tableDetail.rows().count() > 0;
+        let $supplier = $('#supplier');
+
+        if (hasDetail) {
+            $supplier.prop('disabled', true); // blok UI
+            // buat hidden input agar value dikirim ke server
+            if ($('#supplier-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'supplier-hidden',
+                    name: $supplier.attr('name'),
+                    value: $supplier.val()
+                }).appendTo('form');
+            } else {
+                $('#supplier-hidden').val($supplier.val());
+            }
+        } else {
+            $supplier.prop('disabled', false);
+            $('#supplier-hidden').remove();
+        }
+
+        $supplier.trigger('change.select2');
     }
 </script>

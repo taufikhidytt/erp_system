@@ -358,7 +358,8 @@ class Fpk extends Back_Controller
                 $detail = $post['detail'] ?? [];
 
                 if (!$prId || empty($detail['nama_item'])) {
-                    throw new Exception('Data tidak valid');
+                    $this->session->set_flashdata('warning', 'Detail item wajib diisi!');
+                    redirect('fpk');
                 }
 
                 // ===============================

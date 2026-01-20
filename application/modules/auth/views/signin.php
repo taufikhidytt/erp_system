@@ -59,7 +59,7 @@
     </style>
 </head>
 
-<body data-layout="horizontal" data-topbar="dark" data-aos="zoom-in">
+<body data-layout="horizontal" data-topbar="dark">
     <div id="loading" style="display: none;">
         <div class="spinner-border text-primary" role="status">
             <span class="sr-only">Loading...</span>
@@ -72,7 +72,7 @@
             <div class="d-flex flex-column min-vh-100 px-3 pt-4">
                 <div class="row justify-content-center my-auto">
                     <div class="col-md-8 col-lg-6 col-xl-5">
-                        <div class="card">
+                        <div class="card" data-aos="fade-down" data-aos-duration="1500">
                             <div class="card-body p-4">
                                 <div class="text-center mt-2">
                                     <h5 class="text-primary">Welcome Back !</h5>
