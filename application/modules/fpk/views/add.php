@@ -59,7 +59,7 @@
                                         <i class="ri ri-add-box-fill"></i>
                                     </button>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-check-double-fill"></i>
+                                        <i class="ri ri-save-3-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
                                         <i class="ri ri-eraser-fill"></i>
@@ -320,6 +320,7 @@
 
 <script>
     let tableDetail;
+    let tableItem;
     $(document).ready(function() {
         tableDetail = $('#table-detail').DataTable({
             ordering: false,
@@ -384,7 +385,7 @@
             ],
         });
 
-        var tableItem = $('#table-item').DataTable({
+        tableItem = $('#table-item').DataTable({
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
@@ -535,6 +536,8 @@
 
         // modal
         $("#btn-modalItem").on("click", function() {
+            resetModalItem();
+
             $("#checkAll").prop('checked', false);
             $('#loading').show();
             var supplier = $('#supplier').val();
@@ -558,8 +561,22 @@
                 success: function(response) {
                     $('#loading').hide();
                     tableItem.clear().draw();
+
+                    let existingCodes = new Set();
+                    tableDetail.rows().every(function() {
+                        let node = this.node();
+                        let kode = $(node).find('input[name="detail[kode_item][]"]').val();
+                        if (kode) {
+                            existingCodes.add(kode);
+                        }
+                    });
+
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
+
+                            if (existingCodes.has(item.ITEM_CODE)) {
+                                return;
+                            }
 
                             var stok = parseFloat(item.STOK).toFixed(2);
 
@@ -579,8 +596,9 @@
                                 stok,
                                 item.UOM,
                                 item.TIPE,
-                            ]).draw();
+                            ]);
                         });
+                        tableItem.draw();
                     }
                     $('#modalTitleForm').text('Master Item');
                     $('#modalItem').modal('show');
@@ -866,7 +884,7 @@
                 $.each(res.data, function(i, v) {
                     html += `
                     <option value="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}">
-                        ${v.UOM_CODE}
+                        ${v.UOM_CODE} (${v.TO_QTY})
                     </option>
                 `;
                 });
@@ -918,5 +936,15 @@
             $supplier.prop('disabled', false).trigger('change.select2');
             $('#supplier-hidden').remove();
         }
+    }
+
+    function resetModalItem() {
+        tableItem.search('').columns().search('').draw();
+
+        $('#checkAll').prop('checked', false);
+
+        $('#tableItem').find('.chkRow')
+            .prop('checked', false)
+            .prop('disabled', false);
     }
 </script>

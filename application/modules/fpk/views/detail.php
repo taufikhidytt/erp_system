@@ -71,7 +71,7 @@
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-check-double-fill"></i>
+                                        <i class="ri ri-save-3-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
                                         <i class="ri ri-eraser-fill"></i>
@@ -344,7 +344,7 @@
                                                                     <?php
                                                                     $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
                                                                     foreach ($data_uom_selected->result() as $dus): ?>
-                                                                        <option value="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>><?= $dus->UOM_CODE ?></option>
+                                                                        <option value="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>><?= $dus->UOM_CODE . " (" . $dus->TO_QTY . ")" ?></option>
                                                                     <?php endforeach; ?>
                                                                 </select>
                                                                 <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
@@ -449,6 +449,7 @@
 
 <script>
     let tableDetail;
+    let tableItem;
     $(document).ready(function() {
         tableDetail = $('#table-detail').DataTable({
             ordering: false,
@@ -515,7 +516,7 @@
 
         toggleSupplierDisabled();
 
-        var tableItem = $('#table-item').DataTable({
+        tableItem = $('#table-item').DataTable({
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
@@ -666,6 +667,8 @@
 
         // modal
         $("#btn-modalItem").on("click", function() {
+            resetModalItem();
+
             $("#checkAll").prop('checked', false);
             $('#loading').show();
             var supplier = $('#supplier').val();
@@ -689,29 +692,45 @@
                 success: function(response) {
                     $('#loading').hide();
                     tableItem.clear().draw();
+
+                    let existingCodes = new Set();
+                    tableDetail.rows().every(function() {
+                        let node = this.node();
+                        let kode = $(node).find('input[name="detail[kode_item][]"]').val();
+                        if (kode) {
+                            existingCodes.add(kode);
+                        }
+                    });
+
                     if (response.status === 'success' && Array.isArray(response.data)) {
-                        response.data.forEach(function(item, i) {
+                        let no = 1;
+                        response.data.forEach(function(item) {
+
+                            if (existingCodes.has(item.ITEM_CODE)) {
+                                return;
+                            }
 
                             var stok = parseFloat(item.STOK).toFixed(2);
 
                             var checkbox = `
-                            <input type="checkbox" class="chkRow"
-                                data-id_item="${item.ITEM_ID}"
-                                data-name="${item.ITEM_DESCRIPTION}"
-                                data-code="${item.ITEM_CODE}"
-                                data-uom="${item.UOM}"
-                            >
+                                <input type="checkbox" class="chkRow"
+                                    data-id_item="${item.ITEM_ID}"
+                                    data-name="${item.ITEM_DESCRIPTION}"
+                                    data-code="${item.ITEM_CODE}"
+                                    data-uom="${item.UOM}">
                             `;
+
                             tableItem.row.add([
                                 checkbox,
-                                i + 1,
+                                no++,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
                                 stok,
                                 item.UOM,
                                 item.TIPE,
-                            ]).draw();
+                            ]);
                         });
+                        tableItem.draw();
                     }
                     $('#modalTitleForm').text('Master Item');
                     $('#modalItem').modal('show');
@@ -1098,5 +1117,15 @@
         }
 
         $supplier.trigger('change.select2');
+    }
+
+    function resetModalItem() {
+        tableItem.search('').columns().search('').draw();
+
+        $('#checkAll').prop('checked', false);
+
+        $('#tableItem').find('.chkRow')
+            .prop('checked', false)
+            .prop('disabled', false);
     }
 </script>
