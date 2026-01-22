@@ -24,6 +24,8 @@
     /* class untuk text yang mau di-ellipsis */
     .ellipsis {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .tr-height-30 td {
@@ -73,12 +75,9 @@
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
-                                        <i class="ri ri-eraser-fill"></i>
-                                    </button>
-                                    <a href="<?= base_url('fpk') ?>" class="btn btn-sm btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Kembali">
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                             <div class="row">
@@ -237,22 +236,22 @@
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
                                             <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
-                                                <i class="ri ri-add-box-fill"></i> Add Item
+                                                <i class="ri ri-add-box-fill"></i> Add
                                             </button>
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped" id="table-detail">
+                                        <table class="table table-striped table-bordered" id="table-detail" style="table-layout: fixed;">
                                             <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
-                                                <tr>
+                                                <tr style="text-align: center !important;">
                                                     <th style="width: 5%;">No</th>
                                                     <th style="padding:0; margin:0; border:none; display: none;"></th>
-                                                    <th style="width: 5%;">
+                                                    <th style="width: 2%;">
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th style="width: 15%;">Nama Item</th>
-                                                    <th style="width: 15%;">Kode Item</th>
-                                                    <th style="width: 10%;">Jumlah</th>
+                                                    <th style="width: 22%;">Nama Item</th>
+                                                    <th style="width: 13%;">Kode Item</th>
+                                                    <th style="width: 8%;">Jumlah</th>
                                                     <th style="width: 10%;">Satuan</th>
                                                     <th style="width: 10%;">Harga Input</th>
                                                     <th style="width: 10%;">Harga</th>
@@ -261,7 +260,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $dataDetail = $this->db->query("SELECT pr_detail.*, item.ITEM_CODE FROM pr_detail JOIN item ON item.ITEM_ID = pr_detail.ITEM_ID WHERE pr_detail.PR_ID = {$data->PR_ID}");
+                                                <?php $dataDetail = $this->db->query("SELECT pr_detail.*, item.ITEM_CODE FROM pr_detail JOIN item ON item.ITEM_ID = pr_detail.ITEM_ID WHERE pr_detail.PR_ID = {$data->PR_ID} ORDER BY PR_DETAIL_ID ASC");
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
@@ -272,39 +271,23 @@
                                                             <td style="display: none;">
                                                                 <input type="hidden" name="detail[pr_detail][]" id="pr_detail" value="<?= $this->encrypt->encode($dd->PR_DETAIL_ID); ?>">
                                                             </td>
-                                                            <td style="width: 5%">
+                                                            <td style="width: 2%">
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
-                                                            <td style="width: 15%" class="ellipsis">
-
-                                                                <!-- <span class="ellipsis" data-toggle="tooltip"
-                                                                    data-placement="top"
-                                                                    title="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                    <?= mb_strlen($dd->ITEM_DESCRIPTION, 'UTF-8') > $limit ? mb_substr($dd->ITEM_DESCRIPTION, 0, $limit, 'UTF-8') . '...'
-                                                                        : $dd->ITEM_DESCRIPTION; ?>
-                                                                </span> -->
-
+                                                            <td style="width: 22%" class="ellipsis">
                                                                 <span class="ellipsis">
                                                                     <?= $dd->ITEM_DESCRIPTION; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                 <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
                                                             </td>
-                                                            <td style="width: 15%" class="ellipsis">
-
-                                                                <!-- <span class="ellipsis" data-toggle="tooltip"
-                                                                    data-placement="top"
-                                                                    title="<?= $dd->ITEM_CODE ?>">
-                                                                    <?= mb_strlen($dd->ITEM_CODE, 'UTF-8') > $limit ? mb_substr($dd->ITEM_CODE, 0, $limit, 'UTF-8') . '...'
-                                                                        : $dd->ITEM_CODE; ?>
-                                                                </span> -->
-
+                                                            <td style="width: 13%" class="ellipsis">
                                                                 <span class="ellipsis">
                                                                     <?= $dd->ITEM_CODE; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
                                                             </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
+                                                            <td style="width: 8%" class="ellipsis text-end">
                                                                 <span class="view-mode qty-view ellipsis"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
                                                                 <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= rtrim(rtrim($this->input->post('detail[qty][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
                                                             </td>
@@ -344,7 +327,9 @@
                                                                     <?php
                                                                     $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
                                                                     foreach ($data_uom_selected->result() as $dus): ?>
-                                                                        <option value="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>><?= $dus->UOM_CODE . " (" . $dus->TO_QTY . ")" ?></option>
+                                                                        <option value="<?= $dus->UOM_CODE ?>" data-code="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" data-label="<?= $dus->UOM_CODE ?> (<?= $dus->TO_QTY ?>)" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>>
+                                                                            <?= $dus->UOM_CODE ?>
+                                                                        </option>
                                                                     <?php endforeach; ?>
                                                                 </select>
                                                                 <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
@@ -458,26 +443,28 @@
             columnDefs: [{
                     targets: 0,
                     width: "5%",
+                    className: "text-center",
                 }, // no
                 {
                     targets: 2,
-                    width: "5%"
+                    width: "2%",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 3,
-                    width: "15%",
+                    width: "22%",
                     className: "ellipsis",
 
                 }, // nama item
                 {
                     targets: 4,
-                    width: "15%",
+                    width: "13%",
                     className: "ellipsis",
 
                 }, // code item
                 {
                     targets: 5,
-                    width: "10%",
+                    width: "8%",
                     className: "ellipsis text-end",
 
                 }, // jumlah
@@ -508,7 +495,7 @@
                 {
                     targets: 10,
                     width: "10%",
-                    className: "ellipsis text-end",
+                    className: "ellipsis",
 
                 }, // keterangan
             ],
@@ -555,7 +542,7 @@
                 {
                     targets: 4,
                     width: "15%",
-                    className: "ellipsis",
+                    className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 20;
@@ -1016,8 +1003,48 @@
         }
     });
 
+    let openedSelect = null;
+    let isOpening = false;
+
+    $(document).on('mousedown', '.uom-select', function() {
+        openedSelect = this;
+        isOpening = true;
+
+        $(this).find('option').each(function() {
+            $(this).text($(this).data('label'));
+        });
+    });
+
+    $(document).on('change', '.uom-select', function() {
+        let selected = $(this).find('option:selected');
+
+        $(this).closest('td')
+            .find('input[name="detail[to_qty][]"]')
+            .val(selected.data('to_qty') || '');
+    });
+
+    // dropdown ditutup
+    $(document).on('click', function() {
+        if (!openedSelect) return;
+
+        setTimeout(() => {
+            if (isOpening) {
+                isOpening = false;
+                return;
+            }
+
+            let $select = $(openedSelect);
+
+            $select.find('option').each(function() {
+                $(this).text($(this).data('code'));
+            });
+
+            openedSelect = null;
+        }, 0);
+    });
+
     function hitungTotal() {
-        let tableDetail = $('#table-detail').DataTable(); // ambil instance
+        let tableDetail = $('#table-detail').DataTable();
 
         let total = 0;
         tableDetail.rows().every(function() {
@@ -1057,7 +1084,7 @@
 
                 $.each(res.data, function(i, v) {
                     html += `
-                    <option value="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}">
+                    <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
                         ${v.UOM_CODE}
                     </option>
                 `;
@@ -1065,6 +1092,9 @@
 
                 uomSelect.html(html);
                 uomSelect.trigger('change');
+
+                let firstOption = uomSelect.find('option:first');
+                toQtyInput.val(firstOption.data('to_qty'));
             },
             error: function(xhr, status, error) {
                 console.error("Error load Uom:", error);

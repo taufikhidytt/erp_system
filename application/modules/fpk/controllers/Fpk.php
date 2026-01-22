@@ -61,14 +61,21 @@ class Fpk extends Back_Controller
     {
         try {
             $pr_id = $this->encrypt->decode($this->input->post('pr_id'));
-            $list = $this->fpk->get_detail_by_pr_id($pr_id);
+
+            $start = $this->input->post('start') ?? 0;
+            $length = $this->input->post('length') ?? 10;
+            $draw = $this->input->post('draw') ?? 1;
+
+            // Total data sebelum limit (untuk recordsTotal)
+            $totalRecords = $this->fpk->count_detail_by_pr_id($pr_id);
+
+            $list = $this->fpk->get_detail_by_pr_id($pr_id, $length, $start);
             $data = [];
-            $no = 0;
+            $no = $start + 1;
 
             foreach ($list->result() as $d) {
-                $no++;
                 $data[] = [
-                    "no"        => $no,
+                    "no"        => $no++,
                     "item"      => $d->Item_Name,
                     "item_code" => $d->ITEM_CODE,
                     "entered_uom" => $d->ENTERED_UOM,
@@ -78,11 +85,10 @@ class Fpk extends Back_Controller
                     "note"      => $d->NOTE,
                 ];
             }
-
             $output = [
-                "draw" => $_POST['draw'] ?? 1,
-                "recordsTotal" => count($data),
-                "recordsFiltered" => count($data),
+                "draw" => intval($draw),
+                "recordsTotal" => intval($totalRecords),
+                "recordsFiltered" => intval($totalRecords),
                 "data" => $data
             ];
 
@@ -273,6 +279,12 @@ class Fpk extends Back_Controller
                     ];
 
                     $this->db->insert('pr_detail', $dataDetail);
+                    $error = $this->db->error();
+                    if ($error['code'] != 0) {
+                        $this->db->trans_rollback();
+                        $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                        redirect('fpk');
+                    }
                 }
 
                 // ======================
@@ -303,6 +315,12 @@ class Fpk extends Back_Controller
                 ];
 
                 $this->db->insert('pr', $dataHeader);
+                $error = $this->db->error();
+                if ($error['code'] != 0) {
+                    $this->db->trans_rollback();
+                    $this->session->set_flashdata('warning', $error['message']);
+                    redirect('fpk');
+                }
 
                 // ======================
                 // TRANSACTION CHECK
@@ -314,7 +332,7 @@ class Fpk extends Back_Controller
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
-                    redirect('fpk');
+                    redirect('fpk/detail/' . base64url_encode($this->encrypt->encode($post['seq'])));
                 }
             }
         } catch (Exception $err) {
@@ -441,6 +459,13 @@ class Fpk extends Back_Controller
                         $dataDetail['CREATED_DATE'] = date('Y-m-d H:i:s');
 
                         $this->db->insert('pr_detail', $dataDetail);
+
+                        $error = $this->db->error();
+                        if ($error['code'] != 0) {
+                            $this->db->trans_rollback();
+                            $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                            redirect('fpk/detail/' . $id);
+                        }
                     }
                 }
 
@@ -471,6 +496,13 @@ class Fpk extends Back_Controller
                     'LAST_UPDATE_DATE' => date('Y-m-d H:i:s'),
                 ], ['PR_ID' => $prId]);
 
+                $error = $this->db->error();
+                if ($error['code'] != 0) {
+                    $this->db->trans_rollback();
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('fpk/detail/' . $id);
+                }
+
                 // ===============================
                 // COMMIT / ROLLBACK
                 // ===============================
@@ -481,7 +513,7 @@ class Fpk extends Back_Controller
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'FPK berhasil diperbarui!');
                 }
-                redirect('fpk');
+                redirect('fpk/detail/' . $id);
             }
         } catch (Exception $err) {
             $this->db->trans_rollback();

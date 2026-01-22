@@ -17,12 +17,19 @@
     /* class untuk text yang mau di-ellipsis */
     .ellipsis {
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .tr-height-30 td {
         padding-top: 4px !important;
         padding-bottom: 4px !important;
         line-height: 20px;
+    }
+
+    .table-bordered td,
+    .table-bordered th {
+        border: 1px solid #dee2e6 !important;
     }
 </style>
 
@@ -61,12 +68,9 @@
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
-                                        <i class="ri ri-eraser-fill"></i>
-                                    </button>
-                                    <a href="<?= base_url('fpk') ?>" class="btn btn-sm btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Kembali">
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                             <div class="row">
@@ -222,13 +226,13 @@
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
                                             <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
-                                                <i class="ri ri-add-box-fill"></i> Add Item
+                                                <i class="ri ri-add-box-fill"></i> Add
                                             </button>
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped" id="table-detail">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff">
+                                        <table class="table table-striped table-bordered" id="table-detail">
+                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
                                                 <tr>
                                                     <th>No</th>
                                                     <th>
@@ -328,27 +332,29 @@
             paging: false,
             columnDefs: [{
                     targets: 0,
-                    width: "5%"
+                    width: "2%",
+                    className: "text-center",
                 }, // no
                 {
                     targets: 1,
-                    width: "5%"
+                    width: "2%",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 2,
-                    width: "15%",
+                    width: "25%",
                     className: "ellipsis",
 
                 }, // nama item
                 {
                     targets: 3,
-                    width: "15%",
+                    width: "13%",
                     className: "ellipsis",
 
                 }, // code item
                 {
                     targets: 4,
-                    width: "10%",
+                    width: "8%",
                     className: "ellipsis text-end",
 
                 }, // jumlah
@@ -379,7 +385,7 @@
                 {
                     targets: 9,
                     width: "10%",
-                    className: "ellipsis text-end",
+                    className: "ellipsis",
 
                 }, // keterangan
             ],
@@ -841,6 +847,46 @@
         }
     });
 
+    let openedSelect = null;
+    let isOpening = false;
+
+    $(document).on('mousedown', '.uom-select', function() {
+        openedSelect = this;
+        isOpening = true;
+
+        $(this).find('option').each(function() {
+            $(this).text($(this).data('label'));
+        });
+    });
+
+    $(document).on('change', '.uom-select', function() {
+        let selected = $(this).find('option:selected');
+
+        $(this).closest('td')
+            .find('input[name="detail[to_qty][]"]')
+            .val(selected.data('to_qty') || '');
+    });
+
+    // dropdown ditutup
+    $(document).on('click', function() {
+        if (!openedSelect) return;
+
+        setTimeout(() => {
+            if (isOpening) {
+                isOpening = false;
+                return;
+            }
+
+            let $select = $(openedSelect);
+
+            $select.find('option').each(function() {
+                $(this).text($(this).data('code'));
+            });
+
+            openedSelect = null;
+        }, 0);
+    });
+
     function hitungTotal() {
         let total = 0;
 
@@ -883,13 +929,16 @@
 
                 $.each(res.data, function(i, v) {
                     html += `
-                    <option value="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}">
-                        ${v.UOM_CODE} (${v.TO_QTY})
+                    <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
+                        ${v.UOM_CODE}
                     </option>
                 `;
                 });
 
                 uomSelect.html(html);
+
+                let firstOption = uomSelect.find('option:first');
+                toQtyInput.val(firstOption.data('to_qty'));
             },
             error: function(xhr, status, error) {
                 console.error("Error load Uom:", error);

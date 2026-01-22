@@ -244,7 +244,8 @@
                             "data": "item_code"
                         },
                         {
-                            "data": "qty"
+                            "data": "qty",
+                            "className": "text-end",
                         },
                         {
                             "data": "entered_uom"

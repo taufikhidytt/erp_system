@@ -139,13 +139,25 @@ class Fpk_model extends CI_Model
         return $this->db->count_all_results();
     }
 
-    public function get_detail_by_pr_id($pr_id)
+    public function get_detail_by_pr_id($pr_id, $limit = null, $start = null)
     {
         $this->db->select("i.ITEM_DESCRIPTION Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL");
         $this->db->from("pr_detail d");
         $this->db->join("item i", "d.ITEM_ID = i.ITEM_ID");
         $this->db->where("d.PR_ID", $pr_id);
+        $this->db->order_by('d.PR_DETAIL_ID', 'ASC');
+
+        if ($limit !== null && $start !== null) {
+            $this->db->limit($limit, $start);
+        }
+
         return $this->db->get();
+    }
+
+    public function count_detail_by_pr_id($pr_id)
+    {
+        $this->db->where('PR_ID', $pr_id);
+        return $this->db->count_all_results('pr_detail');
     }
 
     public function getSupplier()
