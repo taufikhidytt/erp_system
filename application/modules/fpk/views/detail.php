@@ -38,6 +38,10 @@
     #table-detail td:nth-child(2) {
         display: none !important;
     }
+
+    .keterangan-view {
+        white-space: pre-line;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
@@ -354,7 +358,7 @@
                                                                 <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
                                                             <td style="width: 10%" class="ellipsis text-end">
-                                                                <input type="text" class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" value="<?= $this->input->post('detail[keterangan][]') ?? $dd->NOTE; ?>">
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -431,6 +435,34 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- / modal -->
+
+<!-- modal keterangan -->
+<div class="modal fade" id="modalKeterangan" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Keterangan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <textarea id="modalKeteranganText"
+                    class="form-control"
+                    rows="5"
+                    placeholder="Masukkan keterangan..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSaveKeterangan">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     let tableDetail;
@@ -793,7 +825,7 @@
                     `<span class="subtotal-text ellipsis">0.00</span>
                     <input type="hidden" name="detail[subtotal][]">`,
 
-                    `<input type="text" class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]">`
+                    `<textarea class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`
                 ]).draw(false).node();
 
                 $(rowNode).addClass('tr-height-30');
@@ -998,7 +1030,7 @@
         }
 
         if ($(this).hasClass('harga-edit')) {
-            $row.find('input[name="detail[keterangan][]"]').focus();
+            $row.find('textarea[name="detail[keterangan][]"]').focus();
             return;
         }
     });
@@ -1041,6 +1073,37 @@
 
             openedSelect = null;
         }, 0);
+    });
+
+    let activeKeteranganInput = null;
+
+    $('#table-detail tbody').on(
+        'click',
+        'textarea[name="detail[keterangan][]"]',
+        function() {
+
+            activeKeteranganInput = $(this);
+
+            // isi modal dengan nilai input saat ini
+            $('#modalKeteranganText').val($(this).val())
+
+            $('#modalKeterangan').modal('show');
+        }
+    );
+
+    $('#btnSaveKeterangan').on('click', function() {
+        if (!activeKeteranganInput) return;
+
+        activeKeteranganInput.val(
+            $('#modalKeteranganText').val()
+        );
+
+        $('#modalKeterangan').modal('hide');
+    });
+
+    $('#modalKeterangan').on('hidden.bs.modal', function() {
+        activeKeteranganInput = null;
+        $('#modalKeteranganText').val('');
     });
 
     function hitungTotal() {
