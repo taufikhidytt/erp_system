@@ -29,9 +29,9 @@
     }
 
     .tr-height-30 td {
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
-        line-height: 20px;
+        padding-top: 1px !important;
+        padding-bottom: 1px !important;
+        line-height: 25px;
     }
 
     #table-detail th:nth-child(2),
@@ -279,20 +279,20 @@
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
                                                             <td style="width: 22%" class="ellipsis">
-                                                                <span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                     <?= $dd->ITEM_DESCRIPTION; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                 <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
                                                             </td>
                                                             <td style="width: 13%" class="ellipsis">
-                                                                <span class="ellipsis">
+                                                                <span class="ellipsis align-middle">
                                                                     <?= $dd->ITEM_CODE; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
                                                             </td>
                                                             <td style="width: 8%" class="ellipsis text-end">
-                                                                <span class="view-mode qty-view ellipsis"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
+                                                                <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
                                                                 <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= rtrim(rtrim($this->input->post('detail[qty][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
                                                             </td>
                                                             <td style="width: 10%" class="ellipsis">
@@ -327,7 +327,7 @@
                                                                 ) AS unit_data
                                                                 ORDER BY URUT, TO_QTY"); ?>
 
-                                                                <select class="form-control form-control-sm uom-select auto-width border-0" name="detail[uom][]">
+                                                                <select class="form-control form-control-sm uom-select auto-width border-0" name="detail[uom][]" style="min-height: calc(1.5em + .5rem + 0px) !important;">
                                                                     <?php
                                                                     $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
                                                                     foreach ($data_uom_selected->result() as $dus): ?>

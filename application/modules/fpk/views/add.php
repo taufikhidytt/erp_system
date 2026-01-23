@@ -22,9 +22,9 @@
     }
 
     .tr-height-30 td {
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
-        line-height: 20px;
+        padding-top: 1px !important;
+        padding-bottom: 1px !important;
+        line-height: 25px;
     }
 
     .table-bordered td,
