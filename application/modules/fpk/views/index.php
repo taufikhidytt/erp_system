@@ -242,7 +242,10 @@
                             "data": "no"
                         },
                         {
-                            "data": "item"
+                            "data": "item",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
                             "data": "item_code",
@@ -253,17 +256,29 @@
                         {
                             "data": "qty",
                             "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
-                            "data": "entered_uom"
+                            "data": "entered_uom",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
                             "data": "price",
                             "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
                             "data": "total",
                             "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
                             "data": "note",
@@ -277,6 +292,9 @@
                                 </span>`;
                                 }
                                 return data;
+                            },
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
                             }
                         }
                     ],
