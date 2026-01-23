@@ -36,6 +36,10 @@
         width: 100%;
         box-sizing: border-box;
     }
+
+    .font-mono {
+        font-family: monospace !important;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
@@ -106,7 +110,7 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Tanggal Dibutuhkan</th>
+                                            <th>Dibutuhkan</th>
                                             <th>Supplier</th>
                                             <th>Gudang</th>
                                             <th>Total</th>
@@ -241,7 +245,10 @@
                             "data": "item"
                         },
                         {
-                            "data": "item_code"
+                            "data": "item_code",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
                             "data": "qty",
@@ -259,7 +266,18 @@
                             "className": "text-end",
                         },
                         {
-                            "data": "note"
+                            "data": "note",
+                            "render": function(data, type, row) {
+                                if (!data) return '';
+
+                                const limit = 30;
+                                if (data.length > limit) {
+                                    return `<span title="${data.replace(/"/g, '&quot;')}">
+                                    ${data.substring(0, limit)}...
+                                </span>`;
+                                }
+                                return data;
+                            }
                         }
                     ],
                     "paging": true,

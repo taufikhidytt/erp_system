@@ -373,20 +373,15 @@
                     targets: 2,
                     width: "25%",
                     className: "ellipsis",
-                    // render: function(data) {
-                    //     if (!data) return '-';
-                    //     let limit = 20;
-                    //     let text = data.length > limit ?
-                    //         data.substring(0, limit) + '...' :
-                    //         data;
-                    //     return `<span>${text}</span>`;
-                    // }
 
                 }, // nama item
                 {
                     targets: 3,
                     width: "13%",
                     className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // code item
                 {
@@ -462,6 +457,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // item code
                 {

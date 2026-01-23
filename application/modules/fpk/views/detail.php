@@ -492,6 +492,9 @@
                     targets: 4,
                     width: "13%",
                     className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // code item
                 {
@@ -569,6 +572,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // item code
                 {
