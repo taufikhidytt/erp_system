@@ -373,6 +373,14 @@
                     targets: 2,
                     width: "25%",
                     className: "ellipsis",
+                    // render: function(data) {
+                    //     if (!data) return '-';
+                    //     let limit = 20;
+                    //     let text = data.length > limit ?
+                    //         data.substring(0, limit) + '...' :
+                    //         data;
+                    //     return `<span>${text}</span>`;
+                    // }
 
                 }, // nama item
                 {
@@ -678,7 +686,9 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `${nama}
+                    `<span class="ellipsis" title="${nama}">
+                        ${ellipsis(nama)}
+                    </span>
                     <input type="hidden" name="detail[nama_item][]" value="${nama}">
                     <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
 
@@ -1055,5 +1065,12 @@
         $('#tableItem').find('.chkRow')
             .prop('checked', false)
             .prop('disabled', false);
+    }
+
+    function ellipsis(text, limit = 25) {
+        if (!text) return '-';
+        return text.length > limit ?
+            text.substring(0, limit) + '...' :
+            text;
     }
 </script>

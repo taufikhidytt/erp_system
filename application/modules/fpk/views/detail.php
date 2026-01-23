@@ -279,7 +279,7 @@
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
                                                             <td style="width: 22%" class="ellipsis">
-                                                                <span class="ellipsis">
+                                                                <span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                     <?= $dd->ITEM_DESCRIPTION; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
@@ -801,7 +801,7 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis">${nama}</span>
+                    `<span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="${nama}">${nama}</span>
                     <input type="hidden" name="detail[nama_item][]" value="${nama}">
                     <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
 
