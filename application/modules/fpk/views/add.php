@@ -363,6 +363,9 @@
                     targets: 0,
                     width: "2%",
                     className: "text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 }, // no
                 {
                     targets: 1,
@@ -373,6 +376,9 @@
                     targets: 2,
                     width: "25%",
                     className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // nama item
                 {
@@ -388,36 +394,54 @@
                     targets: 4,
                     width: "8%",
                     className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // jumlah
                 {
                     targets: 5,
                     width: "10%",
                     className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // satuan
                 {
                     targets: 6,
                     width: "10%",
                     className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // harga input
                 {
                     targets: 7,
                     width: "10%",
                     className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // harga
                 {
                     targets: 8,
                     width: "10%",
                     className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // subtotal
                 {
                     targets: 9,
                     width: "10%",
                     className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
 
                 }, // keterangan
             ],

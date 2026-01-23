@@ -239,7 +239,10 @@
                         }
                     },
                     "columns": [{
-                            "data": "no"
+                            "data": "no",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
                         },
                         {
                             "data": "item",
