@@ -70,9 +70,12 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <form action="" method="post">
+                        <form action="" method="post" id="myForm">
                             <div class="row mb-2">
-                                <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <span class="border border-1 border-dark p-2" id="statusPR"></span>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <a href="<?= base_url('fpk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
@@ -467,7 +470,36 @@
 <script>
     let tableDetail;
     let tableItem;
+
     $(document).ready(function() {
+        let pr_id = $('#pr_id').val();
+        $.ajax({
+            url: '<?= base_url() ?>fpk/getStatus',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                pr_id: pr_id,
+            },
+            success: function(response) {
+
+                $('#statusPR').text(response.data[0].DISPLAY_NAME);
+
+                if (response.data[0].ITEM_FLAG === 'N') {
+                    $('#myForm')
+                        .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
+                        .prop('disabled', true);
+
+                    $('#table-detail td').css('pointer-events', 'none');
+
+                    $('#submit').replaceWith(
+                        `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-save-3-fill"></i>
+                        </span>`
+                    );
+                }
+            }
+        });
+
         tableDetail = $('#table-detail').DataTable({
             ordering: false,
             autoWidth: false,

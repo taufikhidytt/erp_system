@@ -208,6 +208,24 @@ class Fpk extends Back_Controller
         }
     }
 
+    public function getStatus()
+    {
+        $pr_id = $this->encrypt->decode($this->input->post('pr_id'));
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM pr a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE a.PR_ID = {$pr_id}");
+        if ($data->num_rows() > 0) {
+            $result = array(
+                'status' => 'sukses',
+                'data' => $data->result_array(),
+            );
+        } else {
+            $result = array(
+                'status' => 'data tidak ditemukan',
+                'data' => 'data tidak ditemukan'
+            );
+        }
+        echo json_encode($result);
+    }
+
     public function add()
     {
         try {
