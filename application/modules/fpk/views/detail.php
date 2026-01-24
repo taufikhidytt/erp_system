@@ -74,6 +74,7 @@
                             <div class="row mb-2">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <span class="border border-1 border-dark p-2" id="statusPR"></span>
+                                    <span class="border border-1 border-warning p-2" id="readonlyPR"></span>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <a href="<?= base_url('fpk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
@@ -483,8 +484,11 @@
             success: function(response) {
 
                 $('#statusPR').text(response.data[0].DISPLAY_NAME);
+                $('#readonlyPR').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
+                    $('#readonlyPR').show();
+                    $('#readonlyPR').text('READONLY');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);

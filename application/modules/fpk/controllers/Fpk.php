@@ -211,7 +211,7 @@ class Fpk extends Back_Controller
     public function getStatus()
     {
         $pr_id = $this->encrypt->decode($this->input->post('pr_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM pr a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE a.PR_ID = {$pr_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM pr a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PR_ID = {$pr_id}");
         if ($data->num_rows() > 0) {
             $result = array(
                 'status' => 'sukses',
