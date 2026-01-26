@@ -212,7 +212,7 @@
                 var childTableId = 'child-' + prId;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
                             <thead>
-                                <tr class="align-middle" style="height: 55px">
+                                <tr class="align-middle" style="height: 45px">
                                     <th>No</th>
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
