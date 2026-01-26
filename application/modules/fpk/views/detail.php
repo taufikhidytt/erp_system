@@ -488,7 +488,7 @@
 
                 if (response.data[0].ITEM_FLAG === 'N') {
                     $('#readonlyPR').show();
-                    $('#readonlyPR').text('READONLY');
+                    $('#readonlyPR').text('READ ONLY');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
