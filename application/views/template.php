@@ -369,6 +369,10 @@
             $("a:not(.has-arrow):not(.page-link):not(.nav-link)").click(function() {
                 $('#loading').show();
             });
+
+            $("form").on("submit", function() {
+                $('#loading').show();
+            });
         });
     </script>
 
