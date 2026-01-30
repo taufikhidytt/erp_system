@@ -772,7 +772,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Warning',
-                    text: 'Supplier tidak terisi, Mohon isi supplier terlebih dahulu',
+                    text: 'Supplier tidak terisi, Mohon isi terlebih dahulu',
                 });
                 return;
             }
