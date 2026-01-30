@@ -195,4 +195,21 @@ class Grk_model extends CI_Model
         $this->db->where('po.PO_ID', $id);
         return $this->db->get();
     }
+
+    public function delete($id)
+    {
+        $this->db->where('PO_ID', $id);
+        $this->db->delete('po_detail');
+        return ($this->db->error()['code'] == 0);
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $params = array(
+            'STATUS_ID' => $status,
+        );
+        $this->db->where('PO_ID', $id);
+        $this->db->update('po', $params);
+        return ($this->db->error()['code'] == 0);
+    }
 }

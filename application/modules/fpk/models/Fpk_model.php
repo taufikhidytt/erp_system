@@ -183,4 +183,21 @@ class Fpk_model extends CI_Model
         $this->db->where('pr.PR_ID', $id);
         return $this->db->get();
     }
+
+    public function delete($id)
+    {
+        $this->db->where('PR_ID', $id);
+        $this->db->delete('pr_detail');
+        return ($this->db->error()['code'] == 0);
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $params = array(
+            'STATUS_ID' => $status,
+        );
+        $this->db->where('PR_ID', $id);
+        $this->db->update('pr', $params);
+        return ($this->db->error()['code'] == 0);
+    }
 }

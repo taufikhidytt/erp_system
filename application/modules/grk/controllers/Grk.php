@@ -174,6 +174,24 @@ class Grk extends Back_Controller
         }
     }
 
+    public function getStatus()
+    {
+        $po_id = $this->encrypt->decode($this->input->post('po_id'));
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM po a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PO_ID = {$po_id}");
+        if ($data->num_rows() > 0) {
+            $result = array(
+                'status' => 'sukses',
+                'data' => $data->result_array(),
+            );
+        } else {
+            $result = array(
+                'status' => 'data tidak ditemukan',
+                'data' => 'data tidak ditemukan'
+            );
+        }
+        echo json_encode($result);
+    }
+
     public function add()
     {
         try {
@@ -513,5 +531,37 @@ class Grk extends Back_Controller
             $this->db->trans_rollback();
             return sendError('Server Error', $err->getMessage());
         }
+    }
+
+    public function del()
+    {
+        $id = $this->encrypt->decode($this->input->post('id'));
+        $this->db->query("CALL SET_VAR()");
+        $this->db->close();
+        $this->db->initialize();
+        $del = $this->db->query("SELECT FN_GET_VAR_VALUE('DELETE') AS del")->row();
+        $status = $del->del;
+
+        $this->db->trans_start();
+
+        $del = $this->grk->delete($id);
+        $upd = $this->grk->updateStatus($id, $status);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $result = [
+                'status'    =>  false,
+                'message'   => 'Gagal menghapus GRK, transaksi dibatalkan!'
+            ];
+        } else {
+            $result = [
+                'status'    =>  true,
+                'message'   => 'GRK berhasil dihapus!',
+            ];
+        }
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($result));
     }
 }

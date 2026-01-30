@@ -83,6 +83,9 @@
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
+                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                                        <i class="ri ri-delete-bin-5-fill"></i>
+                                    </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
@@ -498,6 +501,12 @@
                     $('#submit').replaceWith(
                         `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-save-3-fill"></i>
+                        </span>`
+                    );
+
+                    $('#del-submit').replaceWith(
+                        `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
                     );
                 }
@@ -1194,6 +1203,63 @@
     $('#modalKeterangan').on('hidden.bs.modal', function() {
         activeKeteranganInput = null;
         $('#modalKeteranganText').val('');
+    });
+
+    $(document).on('click', '#del-submit', function() {
+        let id = $(this).data('id_del');
+
+        Swal.fire({
+            title: 'Yakin mau hapus?',
+            text: 'Data yang dihapus tidak bisa dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#70bcff',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url() ?>fpk/del',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function() {
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Data berhasil dihapus.',
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Warning!',
+                                text: 'Data gagal dihapus.',
+                                icon: 'warning'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal menghapus data!', 'error');
+                    }
+                });
+            }
+        });
     });
 
     function hitungTotal() {

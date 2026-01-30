@@ -70,14 +70,21 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <form action="" method="post">
+                        <form action="" method="post" id="myForm">
                             <div class="row mb-2">
-                                <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <span class="border border-1 border-dark p-2" id="statusPO"></span>
+                                    <span class="border border-1 border-warning p-2" id="readonlyPO"></span>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <a href="<?= base_url('grk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->PO_ID); ?>">
+                                        <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
@@ -205,24 +212,24 @@
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail" style="table-layout: fixed;">
+                                        <table class="table table-striped table-bordered" id="table-detail">
                                             <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
                                                 <tr style="text-align: center !important;">
-                                                    <th style="width: 5%;">No</th>
+                                                    <th>No</th>
                                                     <th style="padding:0; margin:0; border:none; display: none;"></th>
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
                                                     <th>No FPK</th>
-                                                    <th style="width: 22%;">Nama Item</th>
-                                                    <th style="width: 13%;">Kode Item</th>
-                                                    <th style="width: 8%;">Jumlah</th>
-                                                    <th style="width: 10%;">Satuan</th>
-                                                    <th style="width: 10%;">Harga Input</th>
-                                                    <th style="width: 10%;">Harga</th>
-                                                    <th style="width: 10%;">Subtotal</th>
+                                                    <th>Nama Item</th>
+                                                    <th>Kode Item</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Satuan</th>
+                                                    <th>Harga Input</th>
+                                                    <th>Harga</th>
+                                                    <th>Subtotal</th>
                                                     <th>Sales</th>
-                                                    <th style="width: 10%;">Keterangan</th>
+                                                    <th>Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -234,7 +241,7 @@
                                                     $no = 1;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <tr class="tr-height-30">
-                                                            <td style="width: 5%"><?= $no++ ?></td>
+                                                            <td><?= $no++ ?></td>
                                                             <td style="display: none;">
                                                                 <input type="hidden" name="detail[po_detail_id][]" id="po_detail_id" value="<?= $this->encrypt->encode($dd->PO_DETAIL_ID); ?>">
                                                                 <input type="hidden" name="detail[pr_detail_id][]" value="<?= $dd->PR_DETAIL_ID ?>">
@@ -245,65 +252,65 @@
                                                                 <input type="hidden" name="detail[lead_time][]" value="<?= $dd->ETA_LEADTIME ?>">
                                                                 <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
                                                             </td>
-                                                            <td style="width: 2%">
+                                                            <td>
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
-                                                            <td class="ellipsis" style="width: 10%;">
-                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
-                                                                    <?= $dd->DOCUMENT_NO; ?>
+                                                            <td class="ellipsis"">
+                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
+                                                                <?= $dd->DOCUMENT_NO; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[no_fpk][]" value="<?= $dd->DOCUMENT_NO ?>">
                                                             </td>
-                                                            <td class="ellipsis" style="width: 10%">
+                                                            <td class="ellipsis">
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                     <?= $dd->ITEM_DESCRIPTION; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
                                                             </td>
-                                                            <td class="ellipsis" style="width: 10%">
+                                                            <td class="ellipsis">
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
                                                                     <?= $dd->ITEM_CODE; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
                                                             </td>
-                                                            <td class="ellipsis text-end" style="width: 5%">
+                                                            <td class="ellipsis text-end">
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" data-balance="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>" value="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
                                                             </td>
-                                                            <td class="ellipsis" style="width: 10%" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
+                                                            <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
                                                                     <?= $dd->ENTERED_UOM ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
                                                             </td>
-                                                            <td class="ellipsis text-end" style="width: 10%">
+                                                            <td class="ellipsis text-end">
                                                                 <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
                                                                 <input type="number"
                                                                     class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
                                                                     name="detail[harga_input][]"
                                                                     value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
                                                             </td>
-                                                            <td class="ellipsis text-end" style="width: 10%">
+                                                            <td class="ellipsis text-end">
                                                                 <span class="harga-input-b ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
                                                                     <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                             </td>
-                                                            <td class="ellipsis text-end" style="width: 10%">
+                                                            <td class="ellipsis text-end">
                                                                 <span class="subtotal-text ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
                                                                     <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
-                                                            <td class="ellipsis" style="width: 5%;">
+                                                            <td class="ellipsis">
                                                                 <span class="sales ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->FIRST_NAME ?>">
                                                                     <?= $dd->FIRST_NAME ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[sales_id][]" value="<?= $this->input->post('sales_id') ?? $dd->KARYAWAN_ID; ?>">
                                                             </td>
-                                                            <td class="ellipsis" style="width: 10%">
+                                                            <td class="ellipsis">
                                                                 <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
@@ -421,13 +428,50 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
+        let po_id = $('#po_id').val();
+        $.ajax({
+            url: '<?= base_url() ?>grk/getStatus',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                po_id: po_id,
+            },
+            success: function(response) {
+                $('#statusPO').text(response.data[0].DISPLAY_NAME);
+                $('#readonlyPO').hide();
+
+                if (response.data[0].ITEM_FLAG === 'N') {
+                    $('#readonlyPO').show();
+                    $('#readonlyPO').text('READ ONLY');
+                    $('#myForm')
+                        .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
+                        .prop('disabled', true);
+
+                    $('#table-detail td').css('pointer-events', 'none');
+
+                    $('#submit').replaceWith(
+                        `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-save-3-fill"></i>
+                        </span>`
+                    );
+
+                    $('#del-submit').replaceWith(
+                        `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-delete-bin-5-fill"></i>
+                        </span>`
+                    );
+                }
+            }
+        });
+
         tableDetail = $('#table-detail').DataTable({
+            scrollX: true,
             ordering: false,
             autoWidth: false,
             paging: false,
             columnDefs: [{
                     targets: 0,
-                    width: "3%",
+                    width: "4%",
                     className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -436,19 +480,19 @@
                 {
                     targets: 2,
                     width: "2%",
-                    className: "text-start",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 3,
-                    width: "10%",
+                    width: "18%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // fpk
+                }, // no fpk
                 {
                     targets: 4,
-                    width: "10%",
+                    width: "13%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -456,7 +500,7 @@
                 }, // nama item
                 {
                     targets: 5,
-                    width: "10%",
+                    width: "8%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -464,7 +508,7 @@
                 }, // code item
                 {
                     targets: 6,
-                    width: "6%",
+                    width: "10%",
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -472,7 +516,7 @@
                 }, // jumlah
                 {
                     targets: 7,
-                    width: "7%",
+                    width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -504,7 +548,7 @@
                 }, // subtotal
                 {
                     targets: 11,
-                    width: "5%",
+                    width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -1335,6 +1379,63 @@
         updateSpan(balance);
         hitungRow(row);
     }, true);
+
+    $(document).on('click', '#del-submit', function() {
+        let id = $(this).data('id_del');
+
+        Swal.fire({
+            title: 'Yakin mau hapus?',
+            text: 'Data yang dihapus tidak bisa dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#70bcff',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url() ?>grk/del',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function() {
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Data berhasil dihapus.',
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Warning!',
+                                text: 'Data gagal dihapus.',
+                                icon: 'warning'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal menghapus data!', 'error');
+                    }
+                });
+            }
+        });
+    });
 
     function hitungRow(row) {
         let qty = parseFloat(row.find(".qty-edit").val()) || 0;

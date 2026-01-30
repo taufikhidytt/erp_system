@@ -349,8 +349,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // nama item
+                }, // no fpk
                 {
                     targets: 3,
                     width: "13%",
@@ -358,35 +357,31 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // code item
+                }, // nama item
                 {
                     targets: 4,
                     width: "8%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // kode item
+                {
+                    targets: 5,
+                    width: "10%",
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
                 }, // jumlah
                 {
-                    targets: 5,
+                    targets: 6,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
                 }, // satuan
-                {
-                    targets: 6,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // harga input
                 {
                     targets: 7,
                     width: "10%",
@@ -394,8 +389,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // harga
+                }, // harga input
                 {
                     targets: 8,
                     width: "10%",
@@ -403,16 +397,30 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // subtotal
+                }, // harga
                 {
                     targets: 9,
+                    width: "10%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // subtotal
+                {
+                    targets: 10,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
+                }, // sales
+                {
+                    targets: 11,
+                    width: "10%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 }, // keterangan
             ],
         });

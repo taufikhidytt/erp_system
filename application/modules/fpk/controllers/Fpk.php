@@ -539,4 +539,36 @@ class Fpk extends Back_Controller
             return sendError('Server Error', $err->getMessage());
         }
     }
+
+    public function del()
+    {
+        $id = $this->encrypt->decode($this->input->post('id'));
+        $this->db->query("CALL SET_VAR()");
+        $this->db->close();
+        $this->db->initialize();
+        $del = $this->db->query("SELECT FN_GET_VAR_VALUE('DELETE') AS del")->row();
+        $status = $del->del;
+
+        $this->db->trans_start();
+
+        $del = $this->fpk->delete($id);
+        $upd = $this->fpk->updateStatus($id, $status);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $result = [
+                'status'    =>  false,
+                'message'   => 'Gagal menghapus FPK, transaksi dibatalkan!'
+            ];
+        } else {
+            $result = [
+                'status'    =>  true,
+                'message'   => 'FPK berhasil dihapus!',
+            ];
+        }
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($result));
+    }
 }
