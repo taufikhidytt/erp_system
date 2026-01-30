@@ -839,15 +839,39 @@
                 });
                 return;
             }
-            rowsToRemove.each(function() {
-                tableDetail.row(this).remove();
+
+
+            Swal.fire({
+                title: 'Yakin mau hapus?',
+                text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6ebbff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    rowsToRemove.each(function() {
+                        tableDetail.row(this).remove();
+                    });
+                    tableDetail.draw(false);
+                    hitungTotal();
+
+                    $("#checkAllParent").prop("checked", false);
+
+                    toggleSupplierDisabled();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Item berhasil dihapus',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
             });
-            tableDetail.draw(false);
-            hitungTotal();
-
-            $("#checkAllParent").prop("checked", false);
-
-            toggleSupplierDisabled();
         });
 
         $(document).on('change', '.uom-select', function() {
