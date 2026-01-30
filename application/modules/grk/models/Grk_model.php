@@ -2,7 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Fpk_model extends CI_Model
+class Grk_model extends CI_Model
 {
     public function __construct()
     {
@@ -12,15 +12,18 @@ class Fpk_model extends CI_Model
     var $column_order = array(
         null,
         null,
+        "a.PO_ID",
         "b.DISPLAY_NAME",
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "a.NEED_DATE",
-        "CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' )",
-        "k.FIRST_NAME",
-        "w.WAREHOUSE_NAME",
-        "a.TOTAL_AMOUNT",
+        "CONCAT(
+            p . PERSON_NAME,
+            ' - [',
+            p . PERSON_CODE,
+            ']'
+        )",
+        "w.WAREHOUSE_NAME"
     );
 
     var $column_search = array(
@@ -29,37 +32,41 @@ class Fpk_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "a.NEED_DATE",
-        "CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' )",
-        "k.FIRST_NAME",
-        "w.WAREHOUSE_NAME",
-        "a.TOTAL_AMOUNT",
+        "CONCAT(
+            p . PERSON_NAME,
+            ' - [',
+            p . PERSON_CODE,
+            ']'
+        )",
+        "w.WAREHOUSE_NAME"
     );
 
-    var $order = array('a.PR_ID' => 'DESC');
+    var $order = array('a.DOCUMENT_DATE' => 'DESC');
 
     private function _get_datatables_query()
     {
-        $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON ( a.TABLE_NAME = b.TABLE_NAME ) WHERE b.PROMPT = '{$this->uri->segment(1)}'")->row_array();
+        $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
 
         $this->db->distinct();
         $this->db->select("
-            a.PR_ID,
-            b.DISPLAY_NAME Status,
-            a.DOCUMENT_NO No_Transaksi,
-            a.DOCUMENT_REFF_NO No_Referensi,
-            a.DOCUMENT_DATE Tanggal,
-            a.NEED_DATE Dibutuhkan,
-            a.TOTAL_AMOUNT Total,
-            CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) Supplier,
-            w.WAREHOUSE_NAME Gudang,
-            k.FIRST_NAME Sales
+            a.PO_ID,
+            b.DISPLAY_NAME `Status`,
+            a.DOCUMENT_NO `No_Transaksi`,
+            a.DOCUMENT_REFF_NO `No_Referensi`,
+            a.DOCUMENT_DATE `Tanggal`,
+            a.NEED_DATE `Dibutuhkan`,
+            CONCAT(
+                p.PERSON_NAME,
+                ' - [',
+                p.PERSON_CODE,
+                ']'
+            ) `Supplier`,
+            w.WAREHOUSE_NAME `Gudang`
         ");
-        $this->db->from('pr a');
+        $this->db->from('po a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
-        $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;
@@ -113,41 +120,51 @@ class Fpk_model extends CI_Model
 
     function count_all()
     {
-        $this->db->select('
-            i.ITEM_ID AS ID,
-            i.ITEM_CODE KODE_ITEM,
-            LEFT(i.ITEM_DESCRIPTION, 30) NAMA_ITEM,
-            i.PART_NUMBER PART_NUMBER,
-            i.UOM_CODE UOM,
-            a.DISPLAY_NAME JENIS,
-            b.DISPLAY_NAME KATEGORY,
-            c.DISPLAY_NAME MADE_IN,
-            d.DISPLAY_NAME KOMODITI,
-            e.DISPLAY_NAME BRAND,
-            f.DISPLAY_NAME TRADE,
-            i.PRICE_LAST_BUY,
-            i.PRICE_LAST_SELL,
-            i.LEAD_TIME,
-            i.ITEM_KMS KONSY,
-            i.APPROVE_FLAG APPROVED,
-            i.OBSOLETE_FLAG OBSOLETE');
-        $this->db->from('item i');
-        $this->db->join('erp_lookup_value a', 'i.JENIS_ID = a.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value b', 'i.GROUP_ID = b.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value c', 'i.MADE_IN_ID = c.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value d', 'i.TIPE_ID = d.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value e', 'i.MEREK_ID = e.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value f', 'i.TYPE_ID = f.ERP_LOOKUP_VALUE_ID', 'left');
+        $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
+        $this->db->select("
+            a.PO_ID,
+            b.DISPLAY_NAME `Status`,
+            a.DOCUMENT_NO `No_Transaksi`,
+            a.DOCUMENT_REFF_NO `No_Referensi`,
+            a.DOCUMENT_DATE `Tanggal`,
+            a.NEED_DATE `Dibutuhkan`,
+            CONCAT(
+                p.PERSON_NAME,
+                ' - [',
+                p.PERSON_CODE,
+                ']'
+            ) `Supplier`,
+            w.WAREHOUSE_NAME `Gudang`
+        ");
+        $this->db->from('po a');
+        $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
 
-    public function get_detail_by_pr_id($pr_id, $limit = null, $start = null)
+    public function get_detail_by_pr_id($po_id, $limit = null, $start = null)
     {
-        $this->db->select("i.ITEM_DESCRIPTION Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL");
-        $this->db->from("pr_detail d");
-        $this->db->join("item i", "d.ITEM_ID = i.ITEM_ID");
-        $this->db->where("d.PR_ID", $pr_id);
-        $this->db->order_by('d.PR_DETAIL_ID', 'ASC');
+        $this->db->select("
+            i.ITEM_DESCRIPTION Nama_Item,
+            i.ITEM_CODE Kode_Item,
+            pd.ENTERED_QTY Qty,
+            pd.ENTERED_UOM UoM,
+            pd.HARGA_INPUT Harga,
+            pd.SUBTOTAL Subtotal,
+            pr.DOCUMENT_NO No_FPK,
+            k.FIRST_NAME Sales,
+            pd.NOTE Note,
+            pd.PO_DETAIL_ID,
+            pd.PR_DETAIL_ID");
+        $this->db->from("po_detail pd");
+        $this->db->join("item i", "pd.ITEM_ID = i.ITEM_ID");
+        $this->db->join("pr_detail prd", "pd.PR_DETAIL_ID = prd.PR_DETAIL_ID");
+        $this->db->join("pr", "prd.PR_ID = pr.PR_ID");
+        $this->db->join("karyawan k", "pr.KARYAWAN_ID = k.KARYAWAN_ID");
+        $this->db->where("pd.PO_ID", $po_id);
+        $this->db->order_by('pd.PR_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);
@@ -156,10 +173,10 @@ class Fpk_model extends CI_Model
         return $this->db->get();
     }
 
-    public function count_detail_by_pr_id($pr_id)
+    public function count_detail_by_pr_id($po_id)
     {
-        $this->db->where('PR_ID', $pr_id);
-        return $this->db->count_all_results('pr_detail');
+        $this->db->where('PO_ID', $po_id);
+        return $this->db->count_all_results('po_detail');
     }
 
     public function getSupplier()
@@ -172,15 +189,10 @@ class Fpk_model extends CI_Model
         return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = {$this->session->userdata('id')} WHERE ACTIVE_FLAG = 'Y' GROUP BY a.WAREHOUSE_ID ORDER BY IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
     }
 
-    public function getSales()
+    public function getPoId($id)
     {
-        return $this->db->query("SELECT k.KARYAWAN_ID, k.FIRST_NAME, k.LAST_NAME, k.KATA_DEPAN, k.DESCRIPTION FROM karyawan k WHERE k.DEPT_ID = @SALES AND ( (k.END_DATE = 0) OR (k.END_DATE IS NULL) OR (k.END_DATE >= CURDATE()) ) AND k.ACTIVE_FLAG = 'Y' ORDER BY k.FIRST_NAME");
-    }
-
-    public function getPrId($id)
-    {
-        $this->db->from('pr');
-        $this->db->where('pr.PR_ID', $id);
+        $this->db->from('po');
+        $this->db->where('po.PO_ID', $id);
         return $this->db->get();
     }
 }

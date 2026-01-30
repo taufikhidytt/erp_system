@@ -91,19 +91,10 @@
                                                 <input type="date" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="date" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
                                         <tr class="align-content-center">
@@ -113,11 +104,8 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Dibutuhkan</th>
                                             <th>Supplier</th>
-                                            <th>Sales</th>
                                             <th>Gudang</th>
-                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -142,7 +130,7 @@
                 text: '<i class="ri ri-add-circle-fill"></i> Tambah',
                 className: 'btn btn-sm btn-primary',
                 action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('fpk/add') ?>";
+                    window.location.href = "<?= base_url('grk/add') ?>";
                 }
             }],
             "autoWidth": false,
@@ -152,7 +140,7 @@
             "ordering": true,
             "order": [],
             "ajax": {
-                "url": "<?= site_url('fpk/get_data'); ?>",
+                "url": "<?= site_url('grk/get_data'); ?>",
                 "type": "POST"
             },
             "columns": [{
@@ -179,9 +167,6 @@
                     "data": "tanggal"
                 },
                 {
-                    "data": "tanggal_dibutuhkan"
-                },
-                {
                     "data": "supplier",
                     "render": function(data) {
                         if (!data) return '-';
@@ -189,18 +174,7 @@
                     }
                 },
                 {
-                    "data": "sales",
-                    "render": function(data) {
-                        if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
-                    }
-                },
-                {
                     "data": "gudang"
-                },
-                {
-                    "data": "total",
-                    "className": "text-end",
                 }
             ]
         });
@@ -212,7 +186,7 @@
             var icon = $(this).find('i');
 
             var rowData = row.data();
-            var prId = rowData.pr_id;
+            var poId = rowData.po_id;
 
             if (row.child.isShown()) {
                 // Close row
@@ -220,10 +194,10 @@
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
             } else {
                 // Open row dengan child row datatable
-                var childTableId = 'child-' + prId;
+                var childTableId = 'child-' + poId;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
                             <thead>
-                                <tr class="align-middle" style="height: 45px">
+                                <tr class="align-middle" style="height: 45px;">
                                     <th>No</th>
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
@@ -231,7 +205,9 @@
                                     <th>Satuan</th>
                                     <th>Harga</th>
                                     <th>Subtotal</th>
-                                    <th>Keterangan</th>
+                                    <th>No FPK</th>
+                                    <th>Sales</th>
+                                    <th>Note</th>
                                 </tr>
                             </thead>
                         </table>`;
@@ -243,10 +219,10 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": "<?= site_url('fpk/get_detail'); ?>",
+                        "url": "<?= site_url('grk/get_detail'); ?>",
                         "type": "POST",
                         "data": {
-                            pr_id: prId
+                            po_id: poId
                         }
                     },
                     "columns": [{
@@ -275,20 +251,34 @@
                             }
                         },
                         {
-                            "data": "entered_uom",
+                            "data": "uom",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "price",
+                            "data": "harga",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "total",
+                            "data": "subtotal",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "no_fpk",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "sales",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

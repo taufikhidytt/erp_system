@@ -40,6 +40,7 @@ class Fpk extends Back_Controller
             $row['tanggal'] = $fpk->Tanggal ? date('Y-m-d H:i', strtotime($fpk->Tanggal)) : '-';
             $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('Y-m-d H:i', strtotime($fpk->Dibutuhkan)) : '-';
             $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
+            $row['sales'] = $fpk->Sales ? $fpk->Sales : '-';
             $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
             $row['total'] = $fpk->Total ? number_format($fpk->Total, 2, '.', ',') : '-';
 
