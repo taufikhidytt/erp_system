@@ -274,7 +274,7 @@ class Grk extends Back_Controller
                     $dataDetail = [
                         'PO_ID'             => $post['seq'],
                         'ITEM_ID'           => $detail['item_id'][$i],
-                        'ENTERED_QTY'       => $detail['balance'][$i],
+                        'ENTERED_QTY'       => $detail['jumlah'][$i],
                         'BASE_QTY'          => $detail['base_qty'][$i],
                         'UNIT_PRICE'        => $detail['harga'][$i],
                         'SUBTOTAL'          => $subtotal,
@@ -442,7 +442,7 @@ class Grk extends Back_Controller
 
                     $dataDetail = [
                         'ITEM_ID'           => $detail['item_id'][$i],
-                        'ENTERED_QTY'       => $detail['balance'][$i],
+                        'ENTERED_QTY'       => $detail['jumlah'][$i],
                         'BASE_QTY'          => $detail['base_qty'][$i],
                         'UNIT_PRICE'        => $detail['harga'][$i],
                         'SUBTOTAL'          => $subtotal,

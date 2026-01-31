@@ -685,7 +685,7 @@
                     let existingCodes = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[kode_item][]"]').val();
+                        let kode = $(node).find('input[name="detail[pr_detail_id][]"]').val();
                         if (kode) {
                             existingCodes.add(kode);
                         }
@@ -694,7 +694,7 @@
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            if (existingCodes.has(item.ITEM_CODE)) {
+                            if (existingCodes.has(item.PR_DETAIL_ID)) {
                                 return;
                             }
 

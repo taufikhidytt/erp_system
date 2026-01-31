@@ -837,7 +837,7 @@
                         let no = 1;
                         response.data.forEach(function(item) {
 
-                            if (existingCodes.has(item.ITEM_CODE)) {
+                            if (existingCodes.has(item.PR_DETAIL_ID)) {
                                 return;
                             }
 
