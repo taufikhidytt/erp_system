@@ -615,7 +615,10 @@
                 }, // checkbox
                 {
                     targets: 1,
-                    width: "5%"
+                    width: "5%",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 }, // no
                 {
                     targets: 2,
@@ -628,6 +631,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // item description
                 {
@@ -657,6 +663,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // stok
                 {
@@ -670,6 +679,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // uom
                 {
@@ -683,6 +695,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // tipe
             ],

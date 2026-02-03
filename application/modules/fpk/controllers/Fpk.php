@@ -255,7 +255,7 @@ class Fpk extends Back_Controller
                     redirect('fpk/add');
                 }
 
-                $id_menu = $this->db->query("SELECT erp_menu_id FROM erp_menu WHERE prompt = '{$this->uri->segment('1')}'")->row();
+                $id_menu = $this->db->query("SELECT erp_menu_id FROM erp_menu WHERE erp_menu_name = '{$this->uri->segment('1')}'")->row();
 
                 $erp_table_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_ID = {$id_menu->erp_menu_id}")->row();
 

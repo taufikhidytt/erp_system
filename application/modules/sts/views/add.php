@@ -46,7 +46,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('fpk') ?>" class="text-decoration-underline">FPK</a>
+                                <a href="<?= base_url('sts') ?>" class="text-decoration-underline">STS</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -87,6 +87,82 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="main_storage">Main Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($main_storage->result() as $ms) {
+                                                    if ($ms->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ms->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Main Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php foreach ($main_storage->result() as $ms): ?>
+                                                        <option
+                                                            value="<?= $ms->WAREHOUSE_ID ?>"
+                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('main_storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="site_storage">Site Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-2-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($site_storage->result() as $ss) {
+                                                    if ($ss->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ss->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Site Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php foreach ($site_storage->result() as $ss): ?>
+                                                        <option
+                                                            value="<?= $ss->WAREHOUSE_ID ?>"
+                                                            <?= set_value('main_storage') ==  $ss->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ss->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('site_storage') ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="tanggal">Tanggal:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
+                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? date('Y-m-d\TH:i') ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('tanggal') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <label for="no_referensi">No Referensi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -97,114 +173,12 @@
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="supplier">Supplier:</label>
-                                            <span class="text-danger">*</span>
+                                            <label for="keterangan">Keterangan:</label>
                                             <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
-                                                </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') ==  $sp->PERSON_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan'); ?></textarea>
                                             </div>
-                                            <div class="text-danger"><?= form_error('supplier') ?></div>
+                                            <div class="text-danger"><?= form_error('keterangan') ?></div>
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-12 col-sm-12">
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="tanggal">Tanggal:</label>
-                                                    <span class="text-danger">*</span>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-calendar-2-fill"></i>
-                                                        </span>
-                                                        <?php date_default_timezone_set('Asia/Jakarta'); ?>
-                                                        <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? date('Y-m-d\TH:i') ?>">
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('tanggal') ?></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="tanggal_dibutuhkan">Tanggal Dibutuhkan:</label>
-                                                    <span class="text-danger">*</span>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-calendar-event-fill"></i>
-                                                        </span>
-                                                        <input type="datetime-local" name="tanggal_dibutuhkan" id="tanggal_dibutuhkan" class="form-control <?= form_error('tanggal_dibutuhkan') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal Dibutuhkan" value="<?= $this->input->post('tanggal_dibutuhkan'); ?>">
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('tanggal_dibutuhkan') ?></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="gudang">Gudang:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-home-gear-fill"></i>
-                                                </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($gudang->result() as $gd) {
-                                                    if ($gd->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $gd->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Gudang --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($gudang->result() as $gd): ?>
-                                                        <option
-                                                            value="<?= $gd->WAREHOUSE_ID ?>"
-                                                            <?= set_value('gudang') ==  $gd->WAREHOUSE_ID ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($gd->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('gudang') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="sales">Sales:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-user-2-fill"></i>
-                                                </span>
-                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Sales --</option>
-                                                    <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= set_value('sales') ==  $sl->KARYAWAN_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sl->FIRST_NAME) . ' - [' . strtoupper($sl->LAST_NAME) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('sales') ?></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row form-xs">
-                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <div class="mb-3">
-                                        <label for="keterangan">Keterangan:</label>
-                                        <div class="input-group">
-                                            <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan'); ?></textarea>
-                                        </div>
-                                        <div class="text-danger"><?= form_error('keterangan') ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -225,7 +199,7 @@
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
-                                            <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
+                                            <button type="button" id="btn-modalGRK" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
                                         </div>
@@ -238,13 +212,11 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
+                                                    <th>No GRK</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
                                                     <th>Satuan</th>
-                                                    <th>Harga Input</th>
-                                                    <th>Harga</th>
-                                                    <th>Subtotal</th>
                                                     <th>Keterangan</th>
                                                 </tr>
                                             </thead>
@@ -255,24 +227,6 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="row justify-content-end">
-                                <div class="col-md-4">
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="font-weight:bold;">Total</td>
-                                                <td>:</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td class="text-right" style="text-align: right">
-                                                    <p id="total-text">0.00</p>
-                                                    <input type="hidden" name="total" id="total">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -285,7 +239,7 @@
 <!-- End Page-content -->
 
 <!-- modal -->
-<div id="modalItem" class="modal fade" style="font-size: 12px;">
+<div id="modalGRK" class="modal fade" style="font-size: 12px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -301,11 +255,15 @@
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
                                 </th>
                                 <th>No</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                                <th>No Transaksi</th>
+                                <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
-                                <th>Stock</th>
+                                <th>Jumlah</th>
+                                <th>Sisa</th>
                                 <th>Satuan</th>
-                                <th>Kelompok</th>
                             </tr>
                         </thead>
                     </table>
@@ -379,8 +337,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // nama item
+                }, // no grk
                 {
                     targets: 3,
                     width: "13%",
@@ -388,61 +345,38 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // code item
+                }, // nama item
                 {
                     targets: 4,
                     width: "8%",
-                    className: "ellipsis text-end",
+                    className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // jumlah
+                }, // kode item
                 {
                     targets: 5,
                     width: "10%",
-                    className: "ellipsis",
+                    className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // satuan
+                }, // jumlah
                 {
                     targets: 6,
                     width: "10%",
-                    className: "ellipsis text-end",
+                    className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // harga input
+                }, // satuan
                 {
                     targets: 7,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // harga
-                {
-                    targets: 8,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // subtotal
-                {
-                    targets: 9,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
                 }, // keterangan
             ],
         });
@@ -451,34 +385,15 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    width: "5%"
                 }, // checkbox
                 {
                     targets: 1,
-                    width: "5%",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
+                    }
                 }, // no
                 {
                     targets: 2,
-                    width: "20%",
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    },
-                }, // item description
-                {
-                    targets: 3,
-                    width: "20%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -491,10 +406,84 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // item code
+                }, // status
+                {
+                    targets: 3,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // tanggal
                 {
                     targets: 4,
-                    width: "15%",
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no transaksi
+                {
+                    targets: 5,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no refrensi
+                {
+                    targets: 6,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // nama item
+                {
+                    targets: 7,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 15;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // kode item
+                {
+                    targets: 8,
                     className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
@@ -506,11 +495,25 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // stok
+                    }
+                }, // jumlah
                 {
-                    targets: 5,
-                    width: "15%",
+                    targets: 9,
+                    className: "ellipsis text-end",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // sisa
+                {
+                    targets: 10,
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -523,23 +526,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     },
-                }, // uom
-                {
-                    targets: 6,
-                    width: "20%",
-                    className: "ellipsis text-center",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    },
-                }, // tipe
+                }, // satuan
             ],
             autoWidth: false,
             paging: true,
@@ -602,7 +589,7 @@
                     if (result.isConfirmed) {
                         tableDetail.clear().draw();
                         $(this).data("prev", current);
-                        toggleSupplierDisabled();
+                        toggleStorageDisabled();
                     } else {
                         $(this).val(prev).trigger('change.select2', {
                             skipEvent: true
@@ -615,27 +602,39 @@
         });
 
         // modal
-        $("#btn-modalItem").on("click", function() {
+        $("#btn-modalGRK").on("click", function() {
             resetModalItem();
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
-            var supplier = $('#supplier').val();
+            var main_storage = $('#main_storage').val();
+            var site_storage = $('#site_storage').val();
 
-            if (!supplier) {
+            if (!main_storage) {
                 $('#loading').hide();
                 Swal.fire({
                     icon: 'warning',
                     title: 'Warning',
-                    text: 'Supplier tidak terisi, Mohon isi terlebih dahulu',
+                    text: 'Main storage tidak terisi, Mohon isi terlebih dahulu',
                 });
                 return;
             }
+
+            if (!site_storage) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Site storage tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
+
             $.ajax({
                 type: "POST",
-                url: "<?= base_url() ?>fpk/getItemBySupplier",
+                url: "<?= base_url() ?>sts/getGrk",
                 data: {
-                    id_supplier: supplier,
+                    main_storage: main_storage,
                 },
                 dataType: "json",
                 success: function(response) {
@@ -645,7 +644,7 @@
                     let existingCodes = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[kode_item][]"]').val();
+                        let kode = $(node).find('input[name="detail[po_detail_id][]"]').val();
                         if (kode) {
                             existingCodes.add(kode);
                         }
@@ -654,34 +653,49 @@
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            if (existingCodes.has(item.ITEM_CODE)) {
+                            if (existingCodes.has(item.PO_DETAIL_ID)) {
                                 return;
                             }
 
-                            var stok = parseFloat(item.STOK).toFixed(2);
-
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
-                                data-id_item="${item.ITEM_ID}"
-                                data-name="${item.ITEM_DESCRIPTION}"
-                                data-code="${item.ITEM_CODE}"
-                                data-uom="${item.UOM}"
+                                data-po_detail_id="${item.PO_DETAIL_ID}"
+                                data-item_id="${item.ITEM_ID}"
+                                data-base_qty="${item.BASE_QTY}"
+                                data-unit_price="${item.UNIT_PRICE}"
+                                data-harga_input="${item.HARGA_INPUT}"
+                                data-note="${item.NOTE}"
+                                data-berat="${item.BERAT}"
+
+                                data-status="${item.STATUS_NAME}"
+                                data-tanggal="${item.DOCUMENT_DATE}"
+                                data-no_grk="${item.DOCUMENT_NO}"
+                                data-no_referensi="${item.DOCUMENT_REFF_NO}"
+                                data-nama_item="${item.ITEM_DESCRIPTION}"
+                                data-kode_item="${item.ITEM_CODE}"
+                                data-jumlah="${item.ENTERED_QTY}"
+                                data-sisa="${item.BALANCE}"
+                                data-satuan="${item.ENTERED_UOM}"
                             >
                             `;
                             tableItem.row.add([
                                 checkbox,
                                 i + 1,
+                                item.STATUS_NAME,
+                                item.DOCUMENT_DATE,
+                                item.DOCUMENT_NO,
+                                item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                stok,
-                                item.UOM,
-                                item.TIPE,
+                                parseFloat(item.ENTERED_QTY).toFixed(2),
+                                parseFloat(item.BALANCE).toFixed(2),
+                                item.ENTERED_UOM,
                             ]);
                         });
                         tableItem.draw();
                     }
-                    $('#modalTitleForm').text('Master Item');
-                    $('#modalItem').modal('show');
+                    $('#modalTitleForm').text('List GRK');
+                    $('#modalGRK').modal('show');
                 }
             });
         });
@@ -701,17 +715,28 @@
             let rowsAdded = false;
             let allRows = tableItem.rows().nodes();
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
-                let id_item = $(this).data("id_item");
-                let nama = $(this).data("name");
-                let kode = $(this).data("code");
-                let uom = $(this).data("uom");
+                let po_detail_id = $(this).data("po_detail_id");
+                let no_grk = $(this).data("no_grk");
+                let nama_item = $(this).data("nama_item");
+                let kode_item = $(this).data("kode_item");
+                let jumlah = $(this).data("jumlah");
+                let satuan = $(this).data("satuan");
+                let keterangan = $(this).data("keterangan") ?? '';
+
+                let item_id = $(this).data("item_id");
+                let base_qty = $(this).data("base_qty");
+                let unit_price = $(this).data("unit_price");
+                let harga_input = $(this).data("harga_input");
+                let note = $(this).data("note");
+                let berat = $(this).data("berat");
+                let balance = $(this).data("sisa");
 
                 // Cegah double di tableDetail
                 let exists = tableDetail
-                    .column(4) // kolom kode
+                    .column(2)
                     .data()
                     .toArray()
-                    .includes(kode);
+                    .includes(po_detail_id);
 
                 if (exists) {
                     $(this).prop('checked', false).prop('disabled', true);
@@ -723,47 +748,52 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${nama}">
-                        ${ellipsis(nama)}
+                    `<span class="ellipsis" title="${no_grk}">
+                        ${ellipsis(no_grk)}
                     </span>
-                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
-                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[note][]" value="${note}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">
+                    `,
 
-                    `${kode}
-                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
+                    `,
 
-                    `<span class="view-mode qty-view">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
+                    `<span class="ellipsis" title="${kode_item}">
+                        ${ellipsis(kode_item)}
+                    </span>`,
 
-                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
-                        <option value="">Loading...</option>
-                    </select>
-                    <input type="hidden" class="form-control form-control-sm" name="detail[to_qty][]">`,
+                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="1" data-balance="${Math.floor(Number(balance))}">`,
 
-                    `<span class="view-mode harga-view">0.00</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]">`,
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">
+                    `,
 
-                    `<span class="harga-input-b">0.00</span>
-                    <input type="hidden" name="detail[harga][]">`,
-
-                    `<span class="subtotal">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]">`,
-
-                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
                 ]).node();
 
                 $(rowNode).addClass('tr-height-30');
 
                 rowsAdded = true;
-                loadUom($(rowNode), id_item);
             });
 
 
             if (rowsAdded) {
                 tableDetail.draw(false);
-                toggleSupplierDisabled();
+                toggleStorageDisabled();
             }
-            $("#modalItem").modal("hide");
+            $("#modalGRK").modal("hide");
         });
 
         $(document).on("click", ".view-mode", function() {
@@ -788,35 +818,6 @@
 
             input.addClass("d-none");
             span.removeClass("d-none");
-        });
-
-        $(document).on("input", ".qty, .harga-input", function() {
-            let row = $(this).closest("tr");
-            let qty = parseFloat(row.find(".qty").val()) || 0;
-            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
-
-            let hargaInputDisplay = (harga_input === 0) ?
-                '0' :
-                harga_input.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-            let subtotal = qty * harga_input;
-
-            let subTotalDisplay = (subtotal === 0) ?
-                '0' :
-                subtotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
-            row.find(".subtotal").text(subTotalDisplay.toLocaleString("en-US"));
-
-            row.find('input[name="detail[harga][]"]').val(harga_input);
-            row.find('input[name="detail[subtotal][]"]').val(subtotal);
-            hitungTotal();
         });
 
         tableDetail.on("draw.dt", function() {
@@ -854,8 +855,6 @@
                 });
                 return;
             }
-
-
             Swal.fire({
                 title: 'Yakin mau hapus?',
                 text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
@@ -872,11 +871,10 @@
                         tableDetail.row(this).remove();
                     });
                     tableDetail.draw(false);
-                    hitungTotal();
 
                     $("#checkAllParent").prop("checked", false);
 
-                    toggleSupplierDisabled();
+                    toggleStorageDisabled();
 
                     Swal.fire({
                         icon: 'success',
@@ -899,7 +897,7 @@
                 .val(toQty);
         });
 
-        $(document).on('keydown', '.qty, .harga-input', function(e) {
+        $(document).on('keydown', '.jumlah, .harga-input', function(e) {
             if (
                 e.key === 'e' || e.key === 'E' ||
                 e.key === '+' || e.key === '-'
@@ -908,7 +906,7 @@
             }
         });
 
-        $(document).on('input change', '.qty, .harga-input', function() {
+        $(document).on('input change', '.jumlah, .harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1018,72 +1016,85 @@
         $('#modalKeteranganText').val('');
     });
 
-    function hitungTotal() {
-        let total = 0;
+    document.addEventListener('input', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
 
-        $("tr").each(function() {
-            let text = $(this).find(".subtotal").text();
-            let subtotal = Number(text.replace(/,/g, '')) || 0;
-            total += subtotal;
-        });
+        const input = e.target;
+        const balance = parseFloat(input.dataset.balance);
+        let value = parseFloat(input.value);
 
-        let totalDisplay = (total === 0) ?
-            '0' :
-            total.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+        const row = $(input).closest("tr");
 
-        $("#total-text").text(totalDisplay);
-        $("#total").val(total);
-    }
-
-    let uomLoadingCount = 0;
-
-    function loadUom(row, itemId) {
-
-        let uomSelect = row.find('.uom-select');
-        let toQtyInput = row.find('input[name="detail[to_qty][]"]');
-
-        uomLoadingCount++;
-        $('#loading').show();
-
-        $.ajax({
-            url: "<?= base_url() ?>fpk/get_uom",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                item_id: itemId
-            },
-            success: function(res) {
-                let html = '';
-
-                $.each(res.data, function(i, v) {
-                    html += `
-                    <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
-                        ${v.UOM_CODE}
-                    </option>
-                `;
-                });
-
-                uomSelect.html(html);
-
-                let firstOption = uomSelect.find('option:first');
-                toQtyInput.val(firstOption.data('to_qty'));
-            },
-            error: function(xhr, status, error) {
-                console.error("Error load Uom:", error);
-                uomSelect.html('<option value="">Error loading UOM</option>');
-            },
-            complete: function() {
-                uomLoadingCount--;
-
-                if (uomLoadingCount <= 0) {
-                    $('#loading').hide();
-                }
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
             }
-        });
-    }
+        }
+
+        // Tidak boleh minus atau nol
+        if (value <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jumlah tidak valid',
+                text: 'Jumlah harus lebih dari 0',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+
+        // Tidak boleh lebih dari balance
+        if (value > balance) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jumlah melebihi balance',
+                text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+
+        updateSpan(value);
+    });
+
+    // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = parseFloat(input.dataset.balance);
+
+        if (input.value === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Input kosong',
+                text: 'Jumlah tidak boleh kosong',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = input.dataset.balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+        updateSpan(balance);
+    }, true);
 
     function formatNumber(value, decimal = 2) {
         if (value === "" || isNaN(value)) return "0.00";
@@ -1093,28 +1104,42 @@
         });
     }
 
-    function toggleSupplierDisabled() {
+    function toggleStorageDisabled() {
         let hasDetail = tableDetail.rows().count() > 0;
-        let $supplier = $('#supplier');
+        let $main_storage = $('#main_storage');
+        let $site_storage = $('#site_storage');
 
         if (hasDetail) {
-            $supplier.prop('disabled', true).trigger('change.select2');
+            $main_storage.prop('disabled', true).trigger('change.select2');
+            $site_storage.prop('disabled', true).trigger('change.select2');
 
             // Buat hidden input agar value tetap dikirim ke server
-            if ($('#supplier-hidden').length === 0) {
+            if ($('#main_storage-hidden').length === 0) {
                 $('<input>').attr({
                     type: 'hidden',
-                    id: 'supplier-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
+                    id: 'main_storage-hidden',
+                    name: $main_storage.attr('name'),
+                    value: $main_storage.val()
                 }).appendTo('form');
             } else {
-                $('#supplier-hidden').val($supplier.val());
+                $('#main_storage-hidden').val($main_storage.val());
             }
 
+            if ($('#site_storage-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'site_storage-hidden',
+                    name: $site_storage.attr('name'),
+                    value: $site_storage.val()
+                }).appendTo('form');
+            } else {
+                $('#site_storage-hidden').val($site_storage.val());
+            }
         } else {
-            $supplier.prop('disabled', false).trigger('change.select2');
-            $('#supplier-hidden').remove();
+            $main_storage.prop('disabled', false).trigger('change.select2');
+            $site_storage.prop('disabled', false).trigger('change.select2');
+            $('#main_storage-hidden').remove();
+            $('#site_storage-hidden').remove();
         }
     }
 

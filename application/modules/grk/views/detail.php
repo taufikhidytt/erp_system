@@ -234,12 +234,15 @@
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $dataDetail = $this->db->query("SELECT po_detail.*, item.ITEM_CODE, pr.DOCUMENT_NO, karyawan.FIRST_NAME FROM po_detail JOIN item ON item.ITEM_ID = po_detail.ITEM_ID JOIN pr_detail ON pr_detail.PR_DETAIL_ID = po_detail.PR_DETAIL_ID JOIN pr ON pr.PR_ID = pr_detail.PR_ID JOIN karyawan ON karyawan.KARYAWAN_ID = pr.KARYAWAN_ID WHERE po_detail.PO_ID = {$data->PO_ID} ORDER BY PO_DETAIL_ID ASC");
+                                                $dataDetail = $this->db->query("SELECT po_detail.*, item.ITEM_CODE, pr.DOCUMENT_NO, karyawan.FIRST_NAME, pr_detail.ENTERED_QTY as pr_ENTERED_QTY, pr_detail.BASE_QTY as pr_BASE_QTY, pr_detail.RECEIVED_ENTERED_QTY as pr_RECEIVED_ENTERED_QTY  FROM po_detail JOIN item ON item.ITEM_ID = po_detail.ITEM_ID JOIN pr_detail ON pr_detail.PR_DETAIL_ID = po_detail.PR_DETAIL_ID JOIN pr ON pr.PR_ID = pr_detail.PR_ID JOIN karyawan ON karyawan.KARYAWAN_ID = pr.KARYAWAN_ID WHERE po_detail.PO_ID = {$data->PO_ID} ORDER BY PO_DETAIL_ID ASC");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
                                                     foreach ($dataDetail->result() as $dd): ?>
+                                                        <?php
+                                                        $l = $dd->pr_RECEIVED_ENTERED_QTY /  $dd->pr_BASE_QTY;
+                                                        $balance = $dd->pr_ENTERED_QTY - $l; ?>
                                                         <tr class="tr-height-30">
                                                             <td><?= $no++ ?></td>
                                                             <td style="display: none;">
@@ -277,7 +280,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" data-balance="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>" value="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" data-balance="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($balance, '0'), '.'), '0'), '.'); ?>" data-po_detail_id="<?= $this->encrypt->encode('PO_DETAIL_ID') ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -574,6 +577,9 @@
                 }, // checkbox
                 {
                     targets: 1,
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 }, // no
                 {
                     targets: 2,
@@ -585,6 +591,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // status
                 {
@@ -612,6 +621,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // no transaksi
                 {
@@ -624,6 +636,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // no refrensi
                 {
@@ -636,6 +651,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // sales
                 {
@@ -648,6 +666,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // nama item
                 {
@@ -660,6 +681,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // kode item
                 {
@@ -672,6 +696,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // jumlah
                 {
@@ -684,6 +711,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // sisa
                 {
@@ -696,6 +726,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // satuan
                 {
@@ -708,6 +741,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // harga
                 {
@@ -720,6 +756,9 @@
                             data.substring(0, limit) + '...' :
                             data;
                         return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 }, // total
             ],
@@ -1299,6 +1338,8 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
+        const po_detail_id = input.dataset.po_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
         const balance = parseFloat(input.dataset.balance);
         let value = parseFloat(input.value);
 
@@ -1328,21 +1369,41 @@
         }
 
         // Tidak boleh lebih dari balance
-        if (value > balance) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jumlah melebihi balance',
-                text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = balance;
-                input.focus();
-                updateSpan(balance);
-                hitungRow(row);
-            });
-            return;
-        }
+        if (po_detail_id) {
+            // UPDATE
+            const maxAllowed = balance + value_old;
 
+            if (value > maxAllowed) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                    hitungRow(row);
+                });
+                return;
+            }
+        } else {
+            // ADD
+            if (value > balance) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                    hitungRow(row);
+                });
+                return;
+            }
+        }
         updateSpan(value);
         hitungRow(row);
     });
