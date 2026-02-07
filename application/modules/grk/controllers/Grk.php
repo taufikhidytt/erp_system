@@ -77,6 +77,7 @@ class Grk extends Back_Controller
                     "item"      => $d->Nama_Item,
                     "item_code" => $d->Kode_Item,
                     "qty"       => number_format((float)$d->Qty, 2, '.', ''),
+                    "sisa"       => number_format((float)$d->Sisa, 2, '.', ''),
                     "uom"       => $d->UoM,
                     "harga"     => number_format($d->Harga, 2, '.', ','),
                     "subtotal"  => number_format($d->Subtotal, 2, '.', ','),
