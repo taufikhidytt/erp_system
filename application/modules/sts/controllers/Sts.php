@@ -77,6 +77,7 @@ class Sts extends Back_Controller
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
                     "qty"       => number_format((float)$d->Qty, 2, '.', ''),
+                    "sisa"       => number_format((float)$d->Sisa, 2, '.', ''),
                     "uom"       => $d->UoM,
                     "no_fpk"    => $d->No_FPK,
                     "note"      => $d->Note,

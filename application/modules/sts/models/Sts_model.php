@@ -134,6 +134,7 @@ class Sts_model extends CI_Model
             tkd.NOTE `Note`,
             tkd.TAG_KONSI_DETAIL_ID,
             tkd.PO_DETAIL_ID,
+            IF(tkd.ENTERED_UOM = i.UOM_CODE,(tkd.ENTERED_QTY * tkd.BASE_QTY - tkd.RECEIVED_ENTERED_QTY * tkd.RECEIVED_BASE_QTY),(tkd.ENTERED_QTY - (tkd.RECEIVED_ENTERED_QTY / tkd.BASE_QTY))) AS Sisa,
         ");
         $this->db->from("tag_konsi_detail tkd");
         $this->db->join("item i", "tkd.ITEM_ID = i.ITEM_ID");
@@ -191,7 +192,6 @@ class Sts_model extends CI_Model
         );
         $this->db->where('TAG_KONSI_ID', $id);
         $this->db->update('tag_konsi', $params);
-        // return ($this->db->error()['code'] == 0);
 
         if ($this->db->error()['code'] != 0) {
             return $this->db->error();
