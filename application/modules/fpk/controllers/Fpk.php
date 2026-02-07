@@ -247,6 +247,7 @@ class Fpk extends Back_Controller
                 $data['sales'] = $this->fpk->getSales();
                 $this->template->load('template', 'fpk/add', $data);
             } else {
+                date_default_timezone_set('Asia/Jakarta');
                 $post = $this->input->post();
                 $detail = isset($post['detail']) ? $post['detail'] : [];
 
@@ -387,6 +388,7 @@ class Fpk extends Back_Controller
                     redirect('fpk');
                 }
             } else {
+                date_default_timezone_set('Asia/Jakarta');
                 // ===============================
                 // AMBIL DATA POST
                 // ===============================

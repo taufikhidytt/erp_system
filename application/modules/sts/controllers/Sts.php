@@ -199,6 +199,7 @@ class Sts extends Back_Controller
                 $data['site_storage'] = $this->sts->get_site_storage();
                 $this->template->load('template', 'sts/add', $data);
             } else {
+                date_default_timezone_set('Asia/Jakarta');
                 $post = $this->input->post();
                 $detail = isset($post['detail']) ? $post['detail'] : [];
 
@@ -363,6 +364,7 @@ class Sts extends Back_Controller
                     redirect('sts');
                 }
             } else {
+                date_default_timezone_set('Asia/Jakarta');
                 // ===============================
                 // AMBIL DATA POST
                 // ===============================

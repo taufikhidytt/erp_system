@@ -1,21 +1,21 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Grk extends Back_Controller
+class Rcv extends Back_Controller
 {
     public function __construct()
     {
         parent::__construct();
         belum_login();
         rules();
-        $this->load->model('Grk_model', 'grk');
+        $this->load->model('Rcv_model', 'rcv');
     }
     public function index()
     {
         try {
-            $data['title'] = 'GRK';
-            $data['breadcrumb'] = 'GRK';
-            $this->template->load('template', 'grk/index', $data);
+            $data['title'] = 'RCV';
+            $data['breadcrumb'] = 'RCV';
+            $this->template->load('template', 'rcv/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
         }
@@ -23,32 +23,31 @@ class Grk extends Back_Controller
 
     public function get_data()
     {
-        $list = $this->grk->get_datatables();
+        $list = $this->rcv->get_datatables();
         $data = array();
         $no = $_POST['start'];
 
-        foreach ($list as $grk) {
+        foreach ($list as $sts) {
             $no++;
             $row = array();
             $row['no'] = $no . '.';
-            $row['status'] = $grk->Status ? $grk->Status : '-';
+            $row['status'] = $sts->STATUS ? $sts->STATUS : '-';
             $row['no_transaksi'] = '
-            <a href="' . base_url('grk/detail/' . base64url_encode($this->encrypt->encode($grk->PO_ID))) . '">
-                ' . ($grk->No_Transaksi ? $grk->No_Transaksi : '-') . '
+            <a href="' . base_url('rcv/detail/' . base64url_encode($this->encrypt->encode($sts->TAG_ID))) . '">
+                ' . ($sts->No_Transaksi ? $sts->No_Transaksi : '-') . '
             </a>';
-            $row['no_referensi'] = $grk->No_Referensi ? $grk->No_Referensi : '-';
-            $row['tanggal'] = $grk->Tanggal ? date('Y-m-d H:i', strtotime($grk->Tanggal)) : '-';
-            $row['supplier'] = $grk->Supplier ? $grk->Supplier : '-';
-            $row['gudang'] = $grk->Gudang ? $grk->Gudang : '-';
+            $row['no_referensi'] = $sts->No_Referensi ? $sts->No_Referensi : '-';
+            $row['tanggal'] = $sts->Tanggal ? date('Y-m-d H:i', strtotime($sts->Tanggal)) : '-';
+            $row['site'] = $sts->Site ? $sts->Site : '-';
 
-            $row['po_id'] = $this->encrypt->encode($grk->PO_ID);
+            $row['tag_id'] = $this->encrypt->encode($sts->TAG_ID);
             $data[] = $row;
         }
 
         $output = array(
             "draw" => $_POST['draw'],
-            "recordsTotal" => $this->grk->count_all(),
-            "recordsFiltered" => $this->grk->count_filtered(),
+            "recordsTotal" => $this->rcv->count_all(),
+            "recordsFiltered" => $this->rcv->count_filtered(),
             "data" => $data,
         );
 
@@ -58,30 +57,28 @@ class Grk extends Back_Controller
     public function get_detail()
     {
         try {
-            $po_id = $this->encrypt->decode($this->input->post('po_id'));
+            $tag_id = $this->encrypt->decode($this->input->post('tag_id'));
 
             $start = $this->input->post('start') ?? 0;
             $length = $this->input->post('length') ?? 10;
             $draw = $this->input->post('draw') ?? 1;
 
             // Total data sebelum limit (untuk recordsTotal)
-            $totalRecords = $this->grk->count_detail_by_pr_id($po_id);
+            $totalRecords = $this->rcv->count_detail_by_tag_id($tag_id);
 
-            $list = $this->grk->get_detail_by_pr_id($po_id, $length, $start);
+            $list = $this->rcv->get_detail_by_tag_id($tag_id, $length, $start);
             $data = [];
             $no = $start + 1;
 
             foreach ($list->result() as $d) {
                 $data[] = [
                     "no"        => $no++,
-                    "item"      => $d->Nama_Item,
-                    "item_code" => $d->Kode_Item,
-                    "qty"       => number_format((float)$d->Qty, 2, '.', ''),
-                    "uom"       => $d->UoM,
-                    "harga"     => number_format($d->Harga, 2, '.', ','),
-                    "subtotal"  => number_format($d->Subtotal, 2, '.', ','),
-                    "no_fpk"    => $d->No_FPK,
-                    "sales"     => $d->Sales,
+                    "nama_item" => $d->Nama_Item,
+                    "kode_item" => $d->Kode_Item,
+                    "jumlah"    => number_format((float)$d->Qty, 2, '.', ''),
+                    "satuan"    => $d->UoM,
+                    "no_sjs"    => $d->No_SJS,
+                    "loc_in"    => $d->S_Loc_In,
                     "note"      => $d->Note,
                 ];
             }
@@ -98,63 +95,53 @@ class Grk extends Back_Controller
         }
     }
 
-    public function getItemBySupplier()
+    public function getSjs()
     {
         try {
-            $supplier = $this->input->post('id_supplier');
+            $site_storage = $this->input->post('site_storage');
             $data = $this->db->query("SELECT
-                b.PR_DETAIL_ID,
-                b.PR_ID,
+                b.TAG_KONSI_DETAIL_ID,
+                b.TAG_KONSI_ID,
+                b.PO_DETAIL_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                FN_GET_VAR_NAME ( a.STATUS_ID ) STATUS_NAME,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.DOCUMENT_REFF_NO,
                 a.PERSON_ID,
                 a.WAREHOUSE_ID,
-                w.WAREHOUSE_NAME,
-                a.KARYAWAN_ID,
-                k.FIRST_NAME AS SALES,
+                a.TO_WH_ID,
+                wh.WAREHOUSE_NAME GUDANG_ASAL,
+                w.WAREHOUSE_NAME GUDANG_TUJUAN,
                 b.ITEM_ID,
                 i.ITEM_CODE,
                 i.ITEM_DESCRIPTION,
                 b.ENTERED_QTY,
                 b.BASE_QTY,
-                b.ENTERED_QTY - (
-                    b.RECEIVED_ENTERED_QTY / b.BASE_QTY
-                ) AS BALANCE,
+                b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ) AS BALANCE,
                 b.ENTERED_UOM,
                 b.UNIT_PRICE,
                 b.SUBTOTAL,
                 b.HARGA_INPUT,
-                i.LEAD_TIME,
                 i.BERAT,
-                b.NOTE
+                b.NOTE 
             FROM
-                pr a
-                JOIN pr_detail b
-                    ON a.PR_ID = b.PR_ID
-                JOIN karyawan k
-                    ON a.KARYAWAN_ID = k.KARYAWAN_ID
-                JOIN item i
-                    ON b.ITEM_ID = i.ITEM_ID
-                JOIN warehouse w
-                    ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
-            WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
-                AND (
-                    b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
-                ) < (b.ENTERED_QTY * b.BASE_QTY)
-                AND a.STATUS_ID IN (
-                    FN_GET_VAR_VALUE ('NEW'),
-                    FN_GET_VAR_VALUE ('PARTIAL')
-                )
-                AND a.DOCUMENT_TYPE_ID = 3
-                AND a.PERSON_ID = {$supplier}
-                -- AND a.DOCUMENT_NO = 'FPK/BKI/260100003'
-            ORDER BY a.DOCUMENT_DATE DESC
-                -- a.DOCUMENT_NO,
-                -- b.PR_DETAIL_ID;
+                tag_konsi a
+                JOIN tag_konsi_detail b ON a.TAG_KONSI_ID = b.TAG_KONSI_ID
+                JOIN item i ON b.ITEM_ID = i.ITEM_ID
+                JOIN warehouse w ON a.TO_WH_ID = w.WAREHOUSE_ID
+                JOIN warehouse wh ON a.WAREHOUSE_ID = wh.WAREHOUSE_ID 
+            WHERE
+                ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
+                AND ( b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
+                AND a.STATUS_ID IN ( FN_GET_VAR_VALUE ( 'NEW' ), FN_GET_VAR_VALUE ( 'PARTIAL' ) ) 
+                AND a.DOCUMENT_TYPE_ID = 3 
+                AND a.TO_WH_ID = $site_storage 
+            ORDER BY
+                a.DOCUMENT_DATE,
+                a.DOCUMENT_NO,
+                b.TAG_KONSI_DETAIL_ID;
             ");
 
             if ($data->num_rows() > 0) {
@@ -176,8 +163,8 @@ class Grk extends Back_Controller
 
     public function getStatus()
     {
-        $po_id = $this->encrypt->decode($this->input->post('po_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM po a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PO_ID = {$po_id}");
+        $tag_id = $this->encrypt->decode($this->input->post('tag_id'));
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM tag a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_ID = {$tag_id}");
         if ($data->num_rows() > 0) {
             $result = array(
                 'status' => 'sukses',
@@ -198,24 +185,22 @@ class Grk extends Back_Controller
             // untuk fungsi validation callback HMVC
             $this->form_validation->CI = &$this;
 
-            $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
+            $this->form_validation->set_rules('site_storage', 'site storage', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
-            $this->form_validation->set_rules('gudang', 'gudang', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah GRK';
-                $data['breadcrumb'] = 'Tambah GRK';
-                $data['supplier'] = $this->grk->getSupplier();
-                $data['gudang'] = $this->grk->getGudang();
-                $this->template->load('template', 'grk/add', $data);
+                $data['title'] = 'Tambah RCV';
+                $data['breadcrumb'] = 'Tambah RCV';
+                $data['site_storage'] = $this->rcv->get_site_storage();
+                $this->template->load('template', 'rcv/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
                 $post = $this->input->post();
                 $detail = isset($post['detail']) ? $post['detail'] : [];
 
                 if (empty($detail) || empty($detail['nama_item']) || count(array_filter($detail['nama_item'])) == 0) {
-                    $this->session->set_flashdata('warning', 'Detail item wajib diisi!');
-                    redirect('grk/add');
+                    $this->session->set_flashdata('warning', 'Detail GRK wajib diisi!');
+                    redirect('sts/add');
                 }
 
                 $id_menu = $this->db->query("SELECT erp_menu_id FROM erp_menu WHERE erp_menu_name = '{$this->uri->segment('1')}'")->row();
@@ -245,8 +230,8 @@ class Grk extends Back_Controller
                         $jumlah_raw === '' || $jumlah_raw === null || !is_numeric($jumlah_raw)
                     ) {
                         $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', 'Jumlah item "' . $detail['nama_item'][$i] . '" tidak boleh kosong');
-                        redirect('grk/add');
+                        $this->session->set_flashdata('warning', 'Jumlah SJS "' . $detail['nama_item'][$i] . '" tidak boleh kosong');
+                        redirect('rcv/add');
                     }
 
                     $jumlah  = (float) $jumlah_raw;
@@ -255,51 +240,50 @@ class Grk extends Back_Controller
                     // Tidak boleh <= 0
                     if ($jumlah <= 0) {
                         $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', 'Jumlah item "' . $detail['nama_item'][$i] . '" harus lebih dari 0');
-                        redirect('grk/add');
+                        $this->session->set_flashdata('warning', 'Jumlah SJS "' . $detail['nama_item'][$i] . '" harus lebih dari 0');
+                        redirect('rcv/add');
                     }
 
                     // Tidak boleh melebihi balance
                     if ($jumlah > $balance) {
                         $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', 'Jumlah item "' . $detail['nama_item'][$i] . '" tidak boleh lebih besar dari balance (' . $balance . ')');
-                        redirect('grk/add');
+                        $this->session->set_flashdata('warning', 'Jumlah SJS "' . $detail['nama_item'][$i] . '" tidak boleh lebih besar dari balance (' . $balance . ')');
+                        redirect('rcv/add');
                     }
 
                     $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga = (float) $detail['harga_input'][$i];
+                    $harga_input = (float) $detail['harga_input'][$i];
 
-                    $subtotal   = $jumlah * $harga;
+                    $subtotal   = $jumlah * $harga_input;
                     $total += $subtotal;
 
                     $dataDetail = [
-                        'PO_ID'             => $post['seq'],
-                        'ITEM_ID'           => $detail['item_id'][$i],
-                        'ENTERED_QTY'       => $detail['jumlah'][$i],
-                        'BASE_QTY'          => $detail['base_qty'][$i],
-                        'UNIT_PRICE'        => $detail['harga'][$i],
-                        'SUBTOTAL'          => $subtotal,
-                        'ENTERED_UOM'       => $detail['satuan'][$i],
-                        'GUDANG_ID'         => $detail['warehouse_id'][$i],
-                        'PR_DETAIL_ID'      => $detail['pr_detail_id'][$i],
-                        'KARYAWAN_ID'       => $detail['sales'][$i],
-                        'ETA_LEADTIME'      => $detail['lead_time'][$i],
-                        'HARGA_INPUT'       => $harga,
-                        'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],
-                        'NOTE'              => $detail['keterangan'][$i],
-                        'BERAT'             => $detail['berat'][$i],
-                        'CREATED_BY'        => $this->session->userdata('id'),
-                        'CREATED_DATE'      => date('Y-m-d H:i:s'),
-                        'LAST_UPDATE_BY'    => $this->session->userdata('id'),
-                        'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+                        'TAG_ID'                => $post['seq'],
+                        'ITEM_ID'               => $detail['item_id'][$i],
+                        'ENTERED_QTY'           => $jumlah,
+                        'BASE_QTY'              => $detail['base_qty'][$i],
+                        'UNIT_PRICE'            => $detail['unit_price'][$i],
+                        'SUBTOTAL'              => $subtotal,
+                        'ENTERED_UOM'           => $detail['satuan'][$i],
+                        'WAREHOUSE_ID'          => $detail['gudang_id'][$i],
+                        'TO_WH_ID'              => $detail['gudang_tujuan_id'][$i],
+                        'TAG_KONSI_DETAIL_ID'   => $detail['tag_konsi_detail_id'][$i],
+                        'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
+                        'HARGA_INPUT'           => $harga_input,
+                        'NOTE'                  => $detail['keterangan'][$i],
+                        'BERAT'                 => $detail['berat'][$i],
+                        'CREATED_BY'            => $this->session->userdata('id'),
+                        'CREATED_DATE'          => date('Y-m-d H:i:s'),
+                        'LAST_UPDATE_BY'        => $this->session->userdata('id'),
+                        'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
                     ];
 
-                    $this->db->insert('po_detail', $dataDetail);
+                    $this->db->insert('tag_detail', $dataDetail);
                     $error = $this->db->error();
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('grk');
+                        redirect('rcv');
                     }
                 }
 
@@ -307,32 +291,31 @@ class Grk extends Back_Controller
                 // INSERT PARENT / HEADER
                 // ======================
                 $dataHeader = [
-                    'PO_ID'                 => $post['seq'],
+                    'TAG_ID'                => $post['seq'],
                     'DOCUMENT_CLASS_CODE'   => $erp_table_id->PROMPT,
                     'DOCUMENT_TYPE_ID'      => $erp_table_id->TYPE_ID,
                     'STATUS_ID'             => $post['new'],
                     'STATUS_DOC_ID'         => $post['new'],
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'PERSON_ID'             => $post['supplier'],
-                    'TOTAL_AMOUNT'          => $post['total'],
-                    'WAREHOUSE_ID'          => $post['gudang'],
+                    'DEST_WH_ID'            => $post['site_storage'],
+                    'TO_WH_ID'              => $post['site_storage'],
                     'PPN_CODE'              => "NO PPN",
                     'PPH_CODE'              => "NO PPH",
                     'NOTE'                  => $post['keterangan'],
-                    'KONSINYASI'            => 1,
+                    'PERIOD_NAME'           => date('Ym', strtotime($post['tanggal'])),
                     'CREATED_BY'            => $this->session->userdata('id'),
                     'CREATED_DATE'          => date('Y-m-d H:i:s'),
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
                     'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
                 ];
 
-                $this->db->insert('po', $dataHeader);
+                $this->db->insert('tag', $dataHeader);
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', $error['message']);
-                    redirect('grk');
+                    redirect('rcv');
                 }
 
                 // ======================
@@ -341,11 +324,11 @@ class Grk extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('grk');
+                    redirect('rcv');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
-                    redirect('grk/detail/' . base64url_encode($this->encrypt->encode($post['seq'])));
+                    redirect('rcv/detail/' . base64url_encode($this->encrypt->encode($post['seq'])));
                 }
             }
         } catch (Exception $err) {
@@ -359,23 +342,21 @@ class Grk extends Back_Controller
             // untuk fungsi validation callback HMVC
             $this->form_validation->CI = &$this;
 
-            $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
+            $this->form_validation->set_rules('site_storage', 'site storage', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
-            $this->form_validation->set_rules('gudang', 'gudang', 'trim|required');
 
             if ($this->form_validation->run() == FALSE) {
                 $id = $this->encrypt->decode(base64url_decode($id));
-                $query = $this->grk->getPoId($id);
+                $query = $this->rcv->getTagId($id);
                 if ($query->num_rows() > 0) {
                     $data['title'] = 'Detail';
                     $data['breadcrumb'] = 'Detail';
-                    $data['supplier'] = $this->grk->getSupplier();
-                    $data['gudang'] = $this->grk->getGudang();
+                    $data['site_storage'] = $this->rcv->get_site_storage();
                     $data['data'] = $query->row();
-                    $this->template->load('template', 'grk/detail', $data);
+                    $this->template->load('template', 'rcv/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
-                    redirect('grk');
+                    redirect('sts');
                 }
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -383,32 +364,32 @@ class Grk extends Back_Controller
                 // AMBIL DATA POST
                 // ===============================
                 $post   = $this->input->post();
-                $poId   = $this->encrypt->decode($post['po_id']);
+                $tag_id   = $this->encrypt->decode($post['tag_id']);
                 $detail = $post['detail'] ?? [];
 
-                if (!$poId || empty($detail['nama_item'])) {
+                if (!$tag_id || empty($detail['nama_item'])) {
                     $this->session->set_flashdata('warning', 'Detail item tidak boleh kosong dan wajib diisi!');
-                    redirect('grk/detail/' . $id);
+                    redirect('rcv/detail/' . $id);
                 }
 
                 // ===============================
                 // AMBIL DETAIL DB
                 // ===============================
                 $dbDetails = $this->db
-                    ->select('PO_DETAIL_ID')
-                    ->from('po_detail')
-                    ->where('PO_ID', $poId)
+                    ->select('TAG_DETAIL_ID')
+                    ->from('tag_detail')
+                    ->where('TAG_ID', $tag_id)
                     ->get()
                     ->result_array();
 
-                $dbDetailIds = array_column($dbDetails, 'PO_DETAIL_ID');
+                $dbDetailIds = array_column($dbDetails, 'TAG_DETAIL_ID');
 
                 // ===============================
                 // AMBIL DETAIL POST
                 // ===============================
                 $postDetailIds = [];
-                if (!empty($detail['po_detail_id'])) {
-                    foreach ($detail['po_detail_id'] as $val) {
+                if (!empty($detail['tag_detail_id'])) {
+                    foreach ($detail['tag_detail_id'] as $val) {
                         if (!empty($val)) {
                             $postDetailIds[] = $this->encrypt->decode($val);
                         }
@@ -434,53 +415,52 @@ class Grk extends Back_Controller
                     if (empty($detail['nama_item'][$i])) continue;
 
                     $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga = (float) $detail['harga_input'][$i];
-                    $subtotal = $jumlah * $harga;
+                    $harga_input = (float) $detail['harga_input'][$i];
+                    $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
-                    $poDetailId = !empty($detail['po_detail_id'][$i])
-                        ? $this->encrypt->decode($detail['po_detail_id'][$i])
+                    $tagDetailId = !empty($detail['tag_detail_id'][$i])
+                        ? $this->encrypt->decode($detail['tag_detail_id'][$i])
                         : null;
 
                     $dataDetail = [
-                        'ITEM_ID'           => $detail['item_id'][$i],
-                        'ENTERED_QTY'       => $detail['jumlah'][$i],
-                        'BASE_QTY'          => $detail['base_qty'][$i],
-                        'UNIT_PRICE'        => $detail['harga'][$i],
-                        'SUBTOTAL'          => $subtotal,
-                        'ENTERED_UOM'       => $detail['satuan'][$i],
-                        'GUDANG_ID'         => $detail['warehouse_id'][$i],
-                        'PR_DETAIL_ID'      => $detail['pr_detail_id'][$i],
-                        'KARYAWAN_ID'       => $detail['sales_id'][$i],
-                        'ETA_LEADTIME'      => $detail['lead_time'][$i],
-                        'HARGA_INPUT'       => $harga,
-                        'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],
-                        'NOTE'              => $detail['keterangan'][$i],
-                        'BERAT'             => $detail['berat'][$i],
-                        'LAST_UPDATE_BY'    => $this->session->userdata('id'),
-                        'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+                        'ITEM_ID'               => $detail['item_id'][$i],
+                        'ENTERED_QTY'           => $jumlah,
+                        'BASE_QTY'              => $detail['base_qty'][$i],
+                        'UNIT_PRICE'            => $detail['unit_price'][$i],
+                        'SUBTOTAL'              => $subtotal,
+                        'ENTERED_UOM'           => $detail['satuan'][$i],
+                        'WAREHOUSE_ID'          => $detail['gudang_id'][$i],
+                        'TO_WH_ID'              => $detail['gudang_tujuan_id'][$i],
+                        'TAG_KONSI_DETAIL_ID'   => $detail['tag_konsi_detail_id'][$i],
+                        'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
+                        'HARGA_INPUT'           => $harga_input,
+                        'NOTE'                  => $detail['keterangan'][$i],
+                        'BERAT'                 => $detail['berat'][$i],
+                        'LAST_UPDATE_BY'        => $this->session->userdata('id'),
+                        'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
                     ];
 
-                    if ($poDetailId) {
+                    if ($tagDetailId) {
                         // UPDATE
                         $this->db->update(
-                            'po_detail',
+                            'tag_detail',
                             $dataDetail,
-                            ['PO_DETAIL_ID' => $poDetailId, 'PO_ID' => $poId]
+                            ['TAG_DETAIL_ID' => $tagDetailId, 'TAG_ID' => $tag_id]
                         );
                     } else {
                         // INSERT
-                        $dataDetail['PO_ID']        = $poId;
+                        $dataDetail['TAG_ID'] = $tag_id;
                         $dataDetail['CREATED_BY']   = $this->session->userdata('id');
                         $dataDetail['CREATED_DATE'] = date('Y-m-d H:i:s');
 
-                        $this->db->insert('po_detail', $dataDetail);
+                        $this->db->insert('tag_detail', $dataDetail);
 
                         $error = $this->db->error();
                         if ($error['code'] != 0) {
                             $this->db->trans_rollback();
                             $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                            redirect('grk/detail/' . $id);
+                            redirect('rcv/detail/' . $id);
                         }
                     }
                 }
@@ -490,31 +470,31 @@ class Grk extends Back_Controller
                 // ===============================
                 if (!empty($deleteIds)) {
                     $this->db
-                        ->where('PO_ID', $poId)
-                        ->where_in('PO_DETAIL_ID', $deleteIds)
-                        ->delete('po_detail');
+                        ->where('TAG_ID', $tag_id)
+                        ->where_in('TAG_DETAIL_ID', $deleteIds)
+                        ->delete('tag_detail');
                 }
 
                 // ===============================
                 // UPDATE HEADER
                 // ===============================
 
-                $this->db->update('po', [
+                $this->db->update('tag', [
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'PERSON_ID'             => $post['supplier'],
-                    'TOTAL_AMOUNT'          => $post['total'],
-                    'WAREHOUSE_ID'          => $post['gudang'],
+                    'DEST_WH_ID'            => $post['site_storage'],
+                    'TO_WH_ID'              => $post['site_storage'],
                     'NOTE'                  => $post['keterangan'],
+                    'PERIOD_NAME'           => date('Ym', strtotime($post['tanggal'])),
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
                     'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
-                ], ['PO_ID' => $poId]);
+                ], ['TAG_ID' => $tag_id]);
 
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                    redirect('grk/detail/' . $id);
+                    redirect('rcv/detail/' . $id);
                 }
 
                 // ===============================
@@ -522,12 +502,12 @@ class Grk extends Back_Controller
                 // ===============================
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', 'Gagal memperbarui GRK!');
+                    $this->session->set_flashdata('warning', 'Gagal memperbarui RCV!');
                 } else {
                     $this->db->trans_commit();
-                    $this->session->set_flashdata('success', 'GRK berhasil diperbarui!');
+                    $this->session->set_flashdata('success', 'RCV berhasil diperbarui!');
                 }
-                redirect('grk/detail/' . $id);
+                redirect('rcv/detail/' . $id);
             }
         } catch (Exception $err) {
             $this->db->trans_rollback();
@@ -538,32 +518,56 @@ class Grk extends Back_Controller
     public function del()
     {
         $id = $this->encrypt->decode($this->input->post('id'));
+
         $this->db->query("CALL SET_VAR()");
         $this->db->close();
         $this->db->initialize();
+
         $del = $this->db->query("SELECT FN_GET_VAR_VALUE('DELETE') AS del")->row();
         $status = $del->del;
 
-        $this->db->trans_start();
+        $this->db->trans_begin();
 
-        $del = $this->grk->delete($id);
-        $upd = $this->grk->updateStatus($id, $status);
+        $delResult = $this->sts->delete($id);
+        if ($delResult !== true) {
+            $this->db->trans_rollback();
+            $this->_jsonError($delResult);
+            return;
+        }
 
-        $this->db->trans_complete();
+        $updResult = $this->rcv->updateStatus($id, $status);
+        if ($updResult !== true) {
+            $this->db->trans_rollback();
+            $this->_jsonError($updResult);
+            return;
+        }
 
         if ($this->db->trans_status() === FALSE) {
-            $result = [
-                'status'    =>  false,
-                'message'   => 'Gagal menghapus GRK, transaksi dibatalkan!'
-            ];
-        } else {
-            $result = [
-                'status'    =>  true,
-                'message'   => 'GRK berhasil dihapus!',
-            ];
+            $this->db->trans_rollback();
+            $this->_jsonError($this->db->error());
+            return;
         }
+
+        $this->db->trans_commit();
+
         $this->output
             ->set_content_type('application/json')
-            ->set_output(json_encode($result));
+            ->set_output(json_encode([
+                'status'  => true,
+                'message' => 'STS berhasil dihapus!'
+            ]));
+    }
+
+
+    private function _jsonError($db_error)
+    {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status'  => false,
+                'message' => 'Gagal menghapus STS!',
+                'error'   => $db_error['message'],
+                'code'    => $db_error['code']
+            ]));
     }
 }

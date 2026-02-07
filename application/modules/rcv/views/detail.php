@@ -57,7 +57,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('grk') ?>" class="text-decoration-underline">GRK</a>
+                                <a href="<?= base_url('rcv') ?>" class="text-decoration-underline">RCV</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -73,17 +73,17 @@
                         <form action="" method="post" id="myForm">
                             <div class="row mb-2">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <span class="border border-1 border-dark p-2" id="statusPO"></span>
-                                    <span class="border border-1 border-warning p-2" id="readonlyPO"></span>
+                                    <span class="border border-1 border-dark p-2" id="statusTagId"></span>
+                                    <span class="border border-1 border-warning p-2" id="readonlyTagId"></span>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('grk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
+                                    <a href="<?= base_url('rcv/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->PO_ID); ?>">
+                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->TAG_ID); ?>">
                                         <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
@@ -95,7 +95,7 @@
                                 <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <input type="hidden" name="po_id" id="po_id" value="<?= $this->encrypt->encode($data->PO_ID); ?>">
+                                            <input type="hidden" name="tag_id" id="tag_id" value="<?= $this->encrypt->encode($data->TAG_ID); ?>">
                                             <label for="no_transaksi">No Transaksi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -106,33 +106,36 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="no_referensi">No Referensi:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
-                                                </span>
-                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi') ?? $data->DOCUMENT_REFF_NO; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="supplier">Supplier:</label>
+                                            <label for="site_storage">Site Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
+                                                    <i class="ri ri-building-2-fill"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php $params = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $params ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($site_storage->result() as $ss) {
+                                                    if ($ss->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ss->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Site Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php $param = $this->input->post('site_storage') ?? $data->DEST_WH_ID; ?>
+                                                    <?php foreach ($site_storage->result() as $ss): ?>
+                                                        <option
+                                                            value="<?= $ss->WAREHOUSE_ID ?>"
+                                                            <?= $ss->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ss->WAREHOUSE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
-                                            <div class="text-danger"><?= form_error('supplier') ?></div>
+                                            <div class="text-danger"><?= form_error('site_storage') ?></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
@@ -148,37 +151,19 @@
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="gudang">Gudang:</label>
-                                            <span class="text-danger">*</span>
+                                            <label for="no_referensi">No Referensi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
-                                                    <i class="ri ri-home-gear-fill"></i>
+                                                    <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($gudang->result() as $gd) {
-                                                    if ($gd->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $gd->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Gudang --</option>
-                                                    <?php endif; ?>
-                                                    <?php $param = $this->input->post('gudang') ?? $data->WAREHOUSE_ID; ?>
-                                                    <?php foreach ($gudang->result() as $gd): ?>
-                                                        <option
-                                                            value="<?= $gd->WAREHOUSE_ID ?>"
-                                                            <?= $gd->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($gd->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi') ?? $data->DOCUMENT_REFF_NO; ?>">
                                             </div>
-                                            <div class="text-danger"><?= form_error('gudang') ?></div>
+                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="roow form-xs">
+                                    <div class="col-12">
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
                                             <div class="input-group">
@@ -206,7 +191,7 @@
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
-                                            <button type="button" id="btn-modalFPK" class="btn btn-success btn-sm">
+                                            <button type="button" id="btn-modalSTS" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
                                         </div>
@@ -220,49 +205,49 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No FPK</th>
+                                                    <th>No SJS</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
                                                     <th>Satuan</th>
-                                                    <th>Harga Input</th>
-                                                    <th>Harga</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Sales</th>
                                                     <th>Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $dataDetail = $this->db->query("SELECT po_detail.*, item.ITEM_CODE, pr.DOCUMENT_NO, karyawan.FIRST_NAME, pr_detail.ENTERED_QTY as pr_ENTERED_QTY, pr_detail.BASE_QTY as pr_BASE_QTY, pr_detail.RECEIVED_ENTERED_QTY as pr_RECEIVED_ENTERED_QTY  FROM po_detail JOIN item ON item.ITEM_ID = po_detail.ITEM_ID JOIN pr_detail ON pr_detail.PR_DETAIL_ID = po_detail.PR_DETAIL_ID JOIN pr ON pr.PR_ID = pr_detail.PR_ID JOIN karyawan ON karyawan.KARYAWAN_ID = pr.KARYAWAN_ID WHERE po_detail.PO_ID = {$data->PO_ID} ORDER BY PO_DETAIL_ID ASC");
+                                                $dataDetail = $this->db->query("SELECT tag_detail.*, item.ITEM_CODE, item.ITEM_DESCRIPTION, tag_konsi.DOCUMENT_NO, tag_konsi_detail.ENTERED_QTY as konsi_ENTERED_QTY, tag_konsi_detail.BASE_QTY as konsi_BASE_QTY, tag_konsi_detail.RECEIVED_ENTERED_QTY as konsi_RECEIVED_ENTERED_QTY  FROM tag_detail JOIN item ON item.ITEM_ID = tag_detail.ITEM_ID JOIN tag_konsi_detail ON tag_konsi_detail.TAG_KONSI_DETAIL_ID = tag_detail.TAG_KONSI_DETAIL_ID JOIN tag_konsi ON tag_konsi.TAG_KONSI_ID = tag_konsi_detail.TAG_KONSI_ID WHERE tag_detail.TAG_ID = {$data->TAG_ID} ORDER BY TAG_DETAIL_ID ASC");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <?php
-                                                        $l = $dd->pr_RECEIVED_ENTERED_QTY /  $dd->pr_BASE_QTY;
-                                                        $balance = $dd->pr_ENTERED_QTY - $l; ?>
+                                                        $l = $dd->konsi_RECEIVED_ENTERED_QTY /  $dd->konsi_BASE_QTY;
+                                                        $balance = $dd->konsi_ENTERED_QTY - $l; ?>
                                                         <tr class="tr-height-30">
                                                             <td><?= $no++ ?></td>
                                                             <td style="display: none;">
-                                                                <input type="hidden" name="detail[po_detail_id][]" id="po_detail_id" value="<?= $this->encrypt->encode($dd->PO_DETAIL_ID); ?>">
-                                                                <input type="hidden" name="detail[pr_detail_id][]" value="<?= $dd->PR_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[tag_detail_id][]" id="tag_detail_id" value="<?= $this->encrypt->encode($dd->TAG_DETAIL_ID); ?>">
+                                                                <input type="hidden" name="detail[tag_konsi_detail_id][]" value="<?= $dd->TAG_KONSI_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[no_sjs][]" value="<?= $dd->no_sjs ?>">
+                                                                <input type="hidden" name="detail[po_detail_id][]" value="<?= $dd->PO_DETAIL_ID ?>">
                                                                 <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
-                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[warehouse_id][]" value="<?= $dd->GUDANG_ID ?>">
-                                                                <input type="hidden" name="detail[lead_time][]" value="<?= $dd->ETA_LEADTIME ?>">
+                                                                <input type="hidden" name="detail[unit_price][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[harga_input][]" value="<?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?>">
                                                                 <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[gudang_id][]" value="<?= $dd->WAREHOUSE_ID ?>">
+                                                                <input type="hidden" name="detail[gudang_tujuan_id][]" value="<?= $dd->TO_WH_ID ?>">
                                                             </td>
                                                             <td>
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
-                                                            <td class="ellipsis"">
+                                                            <td class="ellipsis">
                                                                 <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
-                                                                <?= $dd->DOCUMENT_NO; ?>
+                                                                    <?= $dd->DOCUMENT_NO; ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[no_fpk][]" value="<?= $dd->DOCUMENT_NO ?>">
+                                                                <input type="hidden" name="detail[no_sjs][]" value="<?= $dd->DOCUMENT_NO ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
@@ -280,38 +265,13 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" data-balance="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($balance, '0'), '.'), '0'), '.'); ?>" data-po_detail_id="<?= $this->encrypt->encode('PO_DETAIL_ID') ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" data-balance="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($balance, '0'), '.'), '0'), '.'); ?>" data-tag_detail_id="<?= $this->encrypt->encode('TAG_DETAIL_ID') ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
                                                                     <?= $dd->ENTERED_UOM ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number"
-                                                                    class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
-                                                                    name="detail[harga_input][]"
-                                                                    value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="harga-input-b ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
-                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="subtotal-text ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
-                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="sales ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->FIRST_NAME ?>">
-                                                                    <?= $dd->FIRST_NAME ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[sales_id][]" value="<?= $this->input->post('sales_id') ?? $dd->KARYAWAN_ID; ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
@@ -325,24 +285,6 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="row justify-content-end">
-                                <div class="col-md-4">
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="font-weight:bold;">Total</td>
-                                                <td>:</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td class="text-right" style="text-align: right">
-                                                    <p id="total-text">0.00</p>
-                                                    <input type="hidden" name="total" id="total" value="<?= $this->input->post('total') ?? number_format(rtrim(rtrim($data->TOTAL_AMOUNT, '0'), '.'), 2, '.', ','); ?>">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -355,7 +297,7 @@
 <!-- End Page-content -->
 
 <!-- modal -->
-<div id="modalFPK" class="modal fade" style="font-size: 12px;">
+<div id="modalSTS" class="modal fade" style="font-size: 12px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -375,14 +317,11 @@
                                 <th>Tanggal</th>
                                 <th>No Transaksi</th>
                                 <th>No Referensi</th>
-                                <th>Sales</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
                                 <th>Jumlah</th>
                                 <th>Sisa</th>
                                 <th>Satuan</th>
-                                <th>Harga</th>
-                                <th>Total</th>
                             </tr>
                         </thead>
                     </table>
@@ -431,21 +370,21 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
-        let po_id = $('#po_id').val();
+        let tag_id = $('#tag_id').val();
         $.ajax({
-            url: '<?= base_url() ?>grk/getStatus',
+            url: '<?= base_url() ?>rcv/getStatus',
             type: 'POST',
             dataType: 'json',
             data: {
-                po_id: po_id,
+                tag_id: tag_id,
             },
             success: function(response) {
-                $('#statusPO').text(response.data[0].DISPLAY_NAME);
-                $('#readonlyPO').hide();
+                $('#statusTagId').text(response.data[0].DISPLAY_NAME);
+                $('#readonlyTagId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
-                    $('#readonlyPO').show();
-                    $('#readonlyPO').text('READ ONLY');
+                    $('#readonlyTagId').show();
+                    $('#readonlyTagId').text('READ ONLY');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
@@ -463,18 +402,29 @@
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
                     );
+
+                    $('#removeRow').replaceWith(
+                        `<span type="button" id="removeRow" class="btn btn-danger btn-sm" disabled style="width: 55px; pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="fa fa-trash"></i> Del
+                        </span>`
+                    );
+
+                    $('#btn-modalSTS').replaceWith(
+                        `<span type="button" id="btn-modalSTS" class="btn btn-success btn-sm" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-add-box-fill"></i> Add
+                        </span>`
+                    );
                 }
             }
         });
 
         tableDetail = $('#table-detail').DataTable({
-            scrollX: true,
             ordering: false,
             autoWidth: false,
             paging: false,
             columnDefs: [{
                     targets: 0,
-                    width: "4%",
+                    width: "2%",
                     className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -487,12 +437,12 @@
                 }, // checkbox
                 {
                     targets: 3,
-                    width: "18%",
+                    width: "25%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // no fpk
+                }, // no grk
                 {
                     targets: 4,
                     width: "13%",
@@ -508,7 +458,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // code item
+                }, // kode item
                 {
                     targets: 6,
                     width: "10%",
@@ -528,38 +478,6 @@
                 {
                     targets: 8,
                     width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // harga input
-                {
-                    targets: 9,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // harga
-                {
-                    targets: 10,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // subtotal
-                {
-                    targets: 11,
-                    width: "10%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // sales
-                {
-                    targets: 12,
-                    width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -568,7 +486,7 @@
             ],
         });
 
-        toggleSupplierDisabled();
+        toggleStorageDisabled();
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
@@ -655,7 +573,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // sales
+                }, // nama item
                 {
                     targets: 7,
                     className: "ellipsis",
@@ -670,24 +588,9 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // nama item
-                {
-                    targets: 8,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
                 }, // kode item
                 {
-                    targets: 9,
+                    targets: 8,
                     className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
@@ -702,7 +605,7 @@
                     }
                 }, // jumlah
                 {
-                    targets: 10,
+                    targets: 9,
                     className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
@@ -717,7 +620,7 @@
                     }
                 }, // sisa
                 {
-                    targets: 11,
+                    targets: 10,
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -729,38 +632,8 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    }
+                    },
                 }, // satuan
-                {
-                    targets: 12,
-                    className: "ellipsis text-end",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // harga
-                {
-                    targets: 13,
-                    className: "ellipsis text-end",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // total
             ],
             autoWidth: false,
             paging: true,
@@ -804,17 +677,17 @@
             })
         }
 
-        $("#supplier").data("prev", $("#supplier").val());
+        $("#main_storage").data("prev", $("#main_storage").val());
 
-        $("#supplier").on("change", function(e, data) {
+        $("#main_storage").on("change", function(e, data) {
             let prev = $(this).data("prev");
             let current = $(this).val();
 
             if (prev && current !== prev && tableDetail.rows().count() > 0) {
 
                 Swal.fire({
-                    title: "Ganti Supplier?",
-                    text: "Data item yang sudah dipilih akan dihapus.",
+                    title: "Ganti Main Storage?",
+                    text: "Data SJS yang sudah dipilih akan dihapus.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Ya, ganti",
@@ -823,7 +696,7 @@
                     if (result.isConfirmed) {
                         tableDetail.clear().draw();
                         $(this).data("prev", current);
-                        toggleSupplierDisabled();
+                        toggleStorageDisabled();
                     } else {
                         $(this).val(prev).trigger('change.select2', {
                             skipEvent: true
@@ -836,27 +709,27 @@
         });
 
         // modal
-        $("#btn-modalFPK").on("click", function() {
-            resetModalFPK();
+        $("#btn-modalSTS").on("click", function() {
+            resetmodalSTS();
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
-            var supplier = $('#supplier').val();
+            var site_storage = $('#site_storage').val();
 
-            if (!supplier) {
+            if (!site_storage) {
                 $('#loading').hide();
                 Swal.fire({
                     icon: 'warning',
                     title: 'Warning',
-                    text: 'Supplier tidak terisi, Mohon isi terlebih dahulu',
+                    text: 'Site storage tidak terisi, Mohon isi terlebih dahulu',
                 });
                 return;
             }
             $.ajax({
                 type: "POST",
-                url: "<?= base_url() ?>grk/getItemBySupplier",
+                url: "<?= base_url() ?>rcv/getSjs",
                 data: {
-                    id_supplier: supplier,
+                    site_storage: site_storage,
                 },
                 dataType: "json",
                 success: function(response) {
@@ -866,7 +739,7 @@
                     let existingCodes = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[pr_detail_id][]"]').val();
+                        let kode = $(node).find('input[name="detail[tag_konsi_detail_id][]"]').val();
                         if (kode) {
                             existingCodes.add(kode);
                         }
@@ -876,29 +749,33 @@
                         let no = 1;
                         response.data.forEach(function(item) {
 
-                            if (existingCodes.has(item.PR_DETAIL_ID)) {
+                            if (existingCodes.has(item.TAG_KONSI_DETAIL_ID)) {
                                 return;
                             }
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
-                                data-pr_detail_id="${item.PR_DETAIL_ID}"
-                                data-no_fpk="${item.DOCUMENT_NO}"
+                                data-tag_konsi_detail_id="${item.TAG_KONSI_DETAIL_ID}"
+                                data-item_id="${item.ITEM_ID}"
+                                data-base_qty="${item.BASE_QTY}"
+                                data-unit_price="${item.UNIT_PRICE}"
+                                data-harga_input="${item.HARGA_INPUT}"
+                                data-note="${item.NOTE}"
+                                data-berat="${item.BERAT}"
+                                data-gudang_id="${item.WAREHOUSE_ID}"
+                                data-gudang_tujuan_id="${item.TO_WH_ID}"
+                                data-po_detail_id="${item.PO_DETAIL_ID}"
+
+                                data-status="${item.STATUS_NAME}"
+                                data-tanggal="${item.DOCUMENT_DATE}"
+                                data-no_sjs="${item.DOCUMENT_NO}"
+                                data-no_referensi="${item.DOCUMENT_REFF_NO}"
                                 data-nama_item="${item.ITEM_DESCRIPTION}"
                                 data-kode_item="${item.ITEM_CODE}"
+                                data-jumlah="${item.ENTERED_QTY}"
+                                data-sisa="${item.BALANCE}"
                                 data-satuan="${item.ENTERED_UOM}"
-                                data-harga_input="${item.HARGA_INPUT}"
-                                data-unit_price="${item.UNIT_PRICE}"
-                                data-sales="${item.SALES}"
-                                data-keterangan="${item.NOTE}"
-
-                                data-item_id="${item.ITEM_ID}"
-                                data-balance="${item.BALANCE}"
-                                data-base_qty="${item.BASE_QTY}"
-                                data-warehouse_id="${item.WAREHOUSE_ID}"
-                                data-sales_id="${item.KARYAWAN_ID}"
-                                data-lead_time="${item.LEAD_TIME}"
-                                data-berat="${item.BERAT}"
+                                data-gudang_asal="${item.GUDANG_ASAL}"
                             >
                             `;
 
@@ -909,20 +786,18 @@
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
-                                item.SALES,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
                                 parseFloat(item.ENTERED_QTY).toFixed(2),
                                 parseFloat(item.BALANCE).toFixed(2),
                                 item.ENTERED_UOM,
-                                formatNumber(item.UNIT_PRICE),
-                                formatNumber(item.SUBTOTAL),
+                                item.GUDANG_ASAL,
                             ]);
                         });
                         tableItem.draw();
                     }
-                    $('#modalTitleForm').text('List FPK');
-                    $('#modalFPK').modal('show');
+                    $('#modalTitleForm').text('List SJS');
+                    $('#modalSTS').modal('show');
                 }
             });
         });
@@ -952,49 +827,52 @@
             let nodesToDraw = [];
 
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
-                let pr_detail_id = $(this).data("pr_detail_id");
-                let no_fpk = $(this).data("no_fpk");
+                let tag_konsi_detail_id = $(this).data("tag_konsi_detail_id");
+                let item_id = $(this).data("item_id");
+                let base_qty = $(this).data("base_qty");
+                let unit_price = $(this).data("unit_price");
+                let harga_input = $(this).data("harga_input");
+                let keterangan = $(this).data("note") ?? '';
+                let berat = $(this).data("berat");
+                let gudang_id = $(this).data("gudang_id");
+                let gudang_tujuan_id = $(this).data("gudang_tujuan_id");
+                let po_detail_id = $(this).data("po_detail_id");
+                let balance = $(this).data("sisa");
+
+                let no_sjs = $(this).data("no_sjs");
                 let nama_item = $(this).data("nama_item");
                 let kode_item = $(this).data("kode_item");
+                let jumlah = $(this).data("jumlah");
                 let satuan = $(this).data("satuan");
-                let harga_input = $(this).data("harga_input");
-                let unit_price = $(this).data("unit_price");
-                let sales = $(this).data("sales");
-                let keterangan = $(this).data("keterangan") ?? '';
 
-                let item_id = $(this).data("item_id");
-                let balance = $(this).data("balance");
-                let base_qty = $(this).data("base_qty");
-                let warehouse_id = $(this).data("warehouse_id");
-                let sales_id = $(this).data("sales_id");
-                let lead_time = $(this).data("lead_time");
-                let berat = $(this).data("berat");
-
-                if (existingCodes.has(kode_item)) {
+                if (existingCodes.has(tag_konsi_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                existingCodes.add(kode_item);
+                existingCodes.add(tag_konsi_detail_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
 
-                    `<input type="hidden" name="detail[po_detail_id][]" value="">
-                    <input type="hidden" name="detail[pr_detail_id][]" value="${pr_detail_id}">
-                    <input type="hidden" name="detail[no_fpk][]" value="${no_fpk}">
+                    `<input type="hidden" name="detail[tag_detail_id][]" value="">
+                    <input type="hidden" name="detail[tag_konsi_detail_id][]" value="${tag_konsi_detail_id}">
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[no_sjs][]" value="${no_sjs}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[balance][]" value="${Math.floor(Number(balance))}">
-                    <input type="hidden" name="detail[base_qty][]" value="${Math.floor(Number(base_qty))}">
-                    <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
-                    <input type="hidden" name="detail[lead_time][]" value="${lead_time}">
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
+                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
-                    `,
+                    <input type="hidden" name="detail[balance][]" value="${balance}">
+                    <input type="hidden" name="detail[gudang_id][]" value="${gudang_id}">
+                    <input type="hidden" name="detail[gudang_tujuan_id][]" value="${gudang_tujuan_id}">`,
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${no_fpk}">
-                        ${ellipsis(no_fpk)}
+                    `<span class="ellipsis" title="${no_sjs}">
+                        ${ellipsis(no_sjs)}
                     </span>`,
 
                     `<span class="ellipsis" title="${nama_item}">
@@ -1004,32 +882,17 @@
 
                     `<span class="ellipsis" title="${kode_item}">
                         ${ellipsis(kode_item)}
-                    </span>
-                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
+                    </span>`,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Math.floor(Number(balance))}" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="1" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="1" data-balance="${Math.floor(Number(balance))}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
                     </span>
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
-                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}">`,
-
-                    `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${unit_price}">`,
-
-                    `<span class="subtotal-text ellipsis">${formatNumber(balance * harga_input)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}">`,
-
-                    `<span class="ellipsis" title="${sales}">
-                        ${ellipsis(sales)}
-                    </span>
-                    <input type="hidden" name="detail[sales_id][]" value="${sales_id}">`,
-
-                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="${keterangan}">${keterangan}</textarea>`,
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
                 ]).draw(false).node();
 
                 $(rowNode).addClass('tr-height-30');
@@ -1043,11 +906,10 @@
                 if (rowsAdded) {
                     tableDetail.draw(false);
                     tableDetail.columns.adjust().draw(false); // refresh layout
-                    toggleSupplierDisabled();
+                    toggleStorageDisabled();
                 }
 
-                $("#modalFPK").modal("hide");
-                hitungTotal();
+                $("#modalSTS").modal("hide");
             });
         });
 
@@ -1075,8 +937,6 @@
             span.removeClass("d-none");
         });
 
-        hitungTotal();
-
         $(document).on("input", ".qty, .harga-input", function() {
             let row = $(this).closest("tr");
             let qty = parseFloat(row.find(".qty").val()) || 0;
@@ -1103,7 +963,6 @@
 
             row.find('input[name="detail[harga][]"]').val(harga_input);
             row.find('input[name="detail[subtotal][]"]').val(subtotal);
-            hitungTotal();
         });
 
         tableDetail.on("draw.dt", function() {
@@ -1159,18 +1018,17 @@
                         tableDetail.row(this).remove();
                     });
                     tableDetail.draw(false);
-                    hitungTotal();
 
                     $("#checkAllParent").prop("checked", false);
 
-                    toggleSupplierDisabled();
+                    toggleStorageDisabled();
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
+                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                        // timer: 2500,
+                        showConfirmButton: true
                     });
                 }
             });
@@ -1338,7 +1196,7 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
-        const po_detail_id = input.dataset.po_detail_id;
+        const tag_detail_id = input.dataset.tag_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
         const balance = parseFloat(input.dataset.balance);
         let value = parseFloat(input.value);
@@ -1363,13 +1221,12 @@
                 input.value = balance;
                 input.focus();
                 updateSpan(balance);
-                hitungRow(row);
             });
             return;
         }
 
         // Tidak boleh lebih dari balance
-        if (po_detail_id) {
+        if (tag_detail_id) {
             // UPDATE
             const maxAllowed = balance + value_old;
 
@@ -1383,7 +1240,6 @@
                     input.value = value_old;
                     input.focus();
                     updateSpan(value_old);
-                    hitungRow(row);
                 });
                 return;
             }
@@ -1399,13 +1255,12 @@
                     input.value = balance;
                     input.focus();
                     updateSpan(balance);
-                    hitungRow(row);
                 });
                 return;
             }
         }
+
         updateSpan(value);
-        hitungRow(row);
     });
 
     // // jika jumlah kosong
@@ -1433,12 +1288,10 @@
                 input.value = input.dataset.balance;
                 input.focus();
                 updateSpan(balance);
-                hitungRow(row);
             });
             return;
         }
         updateSpan(balance);
-        hitungRow(row);
     }, true);
 
     $(document).on('click', '#del-submit', function() {
@@ -1456,7 +1309,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '<?= base_url() ?>grk/del',
+                    url: '<?= base_url() ?>rcv/del',
                     type: 'POST',
                     dataType: 'json',
                     data: {
@@ -1475,7 +1328,7 @@
                         if (res.status) {
                             Swal.fire({
                                 title: 'Berhasil!',
-                                text: 'Data berhasil dihapus.',
+                                text: res.message,
                                 icon: 'success'
                             }).then(() => {
                                 location.reload();
@@ -1483,7 +1336,7 @@
                         } else {
                             Swal.fire({
                                 title: 'Warning!',
-                                text: 'Data gagal dihapus.',
+                                text: res.error,
                                 icon: 'warning'
                             }).then(() => {
                                 location.reload();
@@ -1498,49 +1351,6 @@
         });
     });
 
-    function hitungRow(row) {
-        let qty = parseFloat(row.find(".qty-edit").val()) || 0;
-        let harga = parseFloat(row.find(".harga-input").val()) || 0;
-
-        let subtotal = qty * harga;
-
-        row.find(".harga-input-b").text(
-            harga.toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            })
-        );
-
-        row.find(".subtotal-text").text(
-            subtotal.toLocaleString('en-US', {
-                minimumFractionDigits: 2
-            })
-        );
-
-        row.find('input[name="detail[harga][]"]').val(harga);
-        row.find('input[name="detail[subtotal][]"]').val(subtotal);
-
-        hitungTotal();
-    }
-
-    function hitungTotal() {
-        let tableDetail = $('#table-detail').DataTable();
-
-        let total = 0;
-        tableDetail.rows().every(function() {
-            let subtotalText = $(this.node()).find(".subtotal-text").text();
-            let subtotal = Number(subtotalText.replace(/,/g, '')) || 0;
-            total += subtotal;
-        });
-
-        $("#total-text").text(
-            total.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })
-        );
-        $("#total").val(total);
-    }
-
     function resizeInput(el) {
         el.style.width = (el.value.length + 1) + 'ch';
     }
@@ -1553,34 +1363,51 @@
         });
     }
 
-    function toggleSupplierDisabled() {
+    function toggleStorageDisabled() {
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $supplier = $('#supplier');
+        let $main_storage = $('#main_storage');
+        let $site_storage = $('#site_storage');
 
         if (hasDetail) {
-            $supplier.prop('disabled', true); // blok UI
-            // buat hidden input agar value dikirim ke server
-            if ($('#supplier-hidden').length === 0) {
+            $main_storage.prop('disabled', true).trigger('change.select2');
+            $site_storage.prop('disabled', true).trigger('change.select2');
+
+            // Buat hidden input agar value tetap dikirim ke server
+            if ($('#main_storage-hidden').length === 0) {
                 $('<input>').attr({
                     type: 'hidden',
-                    id: 'supplier-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
+                    id: 'main_storage-hidden',
+                    name: $main_storage.attr('name'),
+                    value: $main_storage.val()
                 }).appendTo('form');
             } else {
-                $('#supplier-hidden').val($supplier.val());
+                $('#main_storage-hidden').val($main_storage.val());
+            }
+
+            if ($('#site_storage-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'site_storage-hidden',
+                    name: $site_storage.attr('name'),
+                    value: $site_storage.val()
+                }).appendTo('form');
+            } else {
+                $('#site_storage-hidden').val($site_storage.val());
             }
         } else {
-            $supplier.prop('disabled', false);
-            $('#supplier-hidden').remove();
+            $main_storage.prop('disabled', false).trigger('change.select2');
+            $site_storage.prop('disabled', false).trigger('change.select2');
+            $('#main_storage-hidden').remove();
+            $('#site_storage-hidden').remove();
         }
 
-        $supplier.trigger('change.select2');
+        $main_storage.trigger('change.select2');
+        $site_storage.trigger('change.select2');
     }
 
-    function resetModalFPK() {
+    function resetmodalSTS() {
         tableItem.search('').columns().search('').draw();
 
         $('#checkAll').prop('checked', false);
