@@ -272,14 +272,12 @@
                         },
                         {
                             "data": "no_fpk",
-                            "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
                             "data": "sales",
-                            "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
