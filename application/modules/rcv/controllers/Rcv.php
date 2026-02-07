@@ -76,6 +76,7 @@ class Rcv extends Back_Controller
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
                     "jumlah"    => number_format((float)$d->Qty, 2, '.', ''),
+                    "sisa"    => number_format((float)$d->Sisa, 2, '.', ''),
                     "satuan"    => $d->UoM,
                     "no_sjs"    => $d->No_SJS,
                     "loc_in"    => $d->S_Loc_In,

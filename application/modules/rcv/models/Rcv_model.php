@@ -131,6 +131,7 @@ class Rcv_model extends CI_Model
             td.NOTE Note,
             td.TAG_DETAIL_ID,
             td.TAG_KONSI_DETAIL_ID,
+            IF(td.ENTERED_UOM = i.UOM_CODE,(td.ENTERED_QTY * td.BASE_QTY - td.DELIVERED_ENTERED_QTY * td.DELIVERED_BASE_QTY),(td.ENTERED_QTY - (td.DELIVERED_ENTERED_QTY / td.BASE_QTY))) AS Sisa
         ");
         $this->db->from("tag_detail td");
         $this->db->join("item i", "td.ITEM_ID = i.ITEM_ID");
