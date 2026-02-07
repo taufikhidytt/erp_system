@@ -143,7 +143,7 @@ class Fpk_model extends CI_Model
 
     public function get_detail_by_pr_id($pr_id, $limit = null, $start = null)
     {
-        $this->db->select("i.ITEM_DESCRIPTION Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL");
+        $this->db->select("i.ITEM_DESCRIPTION Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL, IF(d.ENTERED_UOM = i.UOM_CODE,(d.ENTERED_QTY * d.BASE_QTY - d.RECEIVED_ENTERED_QTY * d.RECEIVED_BASE_QTY),(d.ENTERED_QTY - (d.RECEIVED_ENTERED_QTY / d.BASE_QTY))) AS Sisa");
         $this->db->from("pr_detail d");
         $this->db->join("item i", "d.ITEM_ID = i.ITEM_ID");
         $this->db->where("d.PR_ID", $pr_id);

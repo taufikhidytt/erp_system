@@ -228,6 +228,7 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>Sisa</th>
                                     <th>Satuan</th>
                                     <th>Harga</th>
                                     <th>Subtotal</th>
@@ -269,6 +270,13 @@
                         },
                         {
                             "data": "qty",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "sisa",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

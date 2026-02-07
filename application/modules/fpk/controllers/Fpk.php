@@ -81,6 +81,7 @@ class Fpk extends Back_Controller
                     "item_code" => $d->ITEM_CODE,
                     "entered_uom" => $d->ENTERED_UOM,
                     "qty"       => number_format((float)$d->QTY, 2, '.', ''),
+                    "sisa"       => number_format((float)$d->Sisa, 2, '.', ''),
                     "price"     => number_format($d->PRICE, 2, '.', ','),
                     "total"     => number_format($d->TOTAL, 2, '.', ','),
                     "note"      => $d->NOTE,
