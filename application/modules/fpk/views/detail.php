@@ -424,9 +424,11 @@
                                 <th>No</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
-                                <th>Stock</th>
+                                <th>Assy Code</th>
+                                <th>Kategori</th>
                                 <th>Satuan</th>
-                                <th>Kelompok</th>
+                                <th>Stock</th>
+                                <th>Brand</th>
                             </tr>
                         </thead>
                     </table>
@@ -654,7 +656,55 @@
                 }, // item code
                 {
                     targets: 4,
-                    width: "15%",
+                    width: "10%",
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    },
+                }, // assy code
+                {
+                    targets: 5,
+                    width: "10%",
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    },
+                }, // kategori
+                {
+                    targets: 6,
+                    width: "10%",
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    },
+                }, // uom
+                {
+                    targets: 7,
+                    width: "10%",
                     className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
@@ -666,11 +716,11 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    }
+                    },
                 }, // stok
                 {
-                    targets: 5,
-                    width: "15%",
+                    targets: 8,
+                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -682,24 +732,8 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    }
-                }, // uom
-                {
-                    targets: 6,
-                    width: "20%",
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
                     },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // tipe
+                }, // brand
             ],
             autoWidth: false,
             paging: true,
@@ -834,9 +868,11 @@
                                 no++,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                stok,
+                                item.ASSY_CODE,
+                                item.CATEGORY,
                                 item.UOM,
-                                item.TIPE,
+                                stok,
+                                item.BRAND,
                             ]);
                         });
                         tableItem.draw();

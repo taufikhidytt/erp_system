@@ -203,7 +203,7 @@
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
                                     <th>Satuan</th>
-                                    <th>No FPK</th>
+                                    <th>No GRK</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>
