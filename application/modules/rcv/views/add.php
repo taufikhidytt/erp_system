@@ -46,7 +46,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('sts') ?>" class="text-decoration-underline">STS</a>
+                                <a href="<?= base_url('rcv') ?>" class="text-decoration-underline">RCV</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -743,7 +743,7 @@
                     </span>`,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="1" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1003,21 +1003,6 @@
             }
         }
 
-        // Tidak boleh minus atau nol
-        if (value <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jumlah tidak valid',
-                text: 'Jumlah harus lebih dari 0',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = balance;
-                input.focus();
-                updateSpan(balance);
-            });
-            return;
-        }
-
         // Tidak boleh lebih dari balance
         if (value > balance) {
             Swal.fire({
@@ -1050,6 +1035,21 @@
         }
 
         const balance = parseFloat(input.dataset.balance);
+
+        // Tidak boleh minus atau nol
+        if (input.value <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jumlah tidak valid',
+                text: 'Jumlah harus lebih dari 0',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = input.dataset.balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
 
         if (input.value === '') {
             Swal.fire({

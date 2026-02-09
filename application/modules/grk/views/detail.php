@@ -280,7 +280,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" data-balance="<?= rtrim(rtrim($this->input->post('detail[jumlah][]') ?? rtrim(rtrim($balance, '0'), '.'), '0'), '.'); ?>" data-po_detail_id="<?= $this->encrypt->encode('PO_DETAIL_ID') ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode('PO_DETAIL_ID') ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -1008,7 +1008,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Math.floor(Number(balance))}" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="1" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Math.floor(Number(balance))}" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1195,7 +1195,7 @@
             }
         });
 
-        $(document).on('input change', '.qty, .harga-input', function() {
+        $(document).on('input change', '.harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1352,22 +1352,6 @@
             }
         }
 
-        // Tidak boleh minus atau nol
-        if (value <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jumlah tidak valid',
-                text: 'Jumlah harus lebih dari 0',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = balance;
-                input.focus();
-                updateSpan(balance);
-                hitungRow(row);
-            });
-            return;
-        }
-
         // Tidak boleh lebih dari balance
         if (po_detail_id) {
             // UPDATE
@@ -1413,6 +1397,8 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
+        const po_detail_id = input.dataset.po_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
         const row = $(input).closest("tr");
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
@@ -1423,22 +1409,80 @@
 
         const balance = parseFloat(input.dataset.balance);
 
-        if (input.value === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Input kosong',
-                text: 'Jumlah tidak boleh kosong',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = input.dataset.balance;
-                input.focus();
-                updateSpan(balance);
-                hitungRow(row);
-            });
-            return;
+        if (po_detail_id) {
+            // UPDATE
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                    hitungRow(row);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                    hitungRow(row);
+                });
+                return;
+            }
+            updateSpan(balance);
+            hitungRow(row);
+        } else {
+            // ADD
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                    hitungRow(row);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                    hitungRow(row);
+                });
+                return;
+            }
+            updateSpan(balance);
+            hitungRow(row);
         }
-        updateSpan(balance);
-        hitungRow(row);
+
     }, true);
 
     $(document).on('click', '#del-submit', function() {

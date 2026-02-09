@@ -854,7 +854,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="1" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1158,22 +1158,6 @@
             }
         }
 
-        // Tidak boleh minus atau nol
-        if (value <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jumlah tidak valid',
-                text: 'Jumlah harus lebih dari 0',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = balance;
-                input.focus();
-                updateSpan(balance);
-                hitungRow(row);
-            });
-            return;
-        }
-
         // Tidak boleh lebih dari balance
         if (value > balance) {
             Swal.fire({
@@ -1208,6 +1192,22 @@
         }
 
         const balance = parseFloat(input.dataset.balance);
+
+        // Tidak boleh minus atau nol
+        if (input.value <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jumlah tidak valid',
+                text: 'Jumlah harus lebih dari 0',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = input.dataset.balance;
+                input.focus();
+                updateSpan(balance);
+                hitungRow(row);
+            });
+            return;
+        }
 
         if (input.value === '') {
             Swal.fire({
