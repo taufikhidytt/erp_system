@@ -65,9 +65,9 @@ class Rho extends Back_Controller
             $draw = $this->input->post('draw') ?? 1;
 
             // Total data sebelum limit (untuk recordsTotal)
-            $totalRecords = $this->rcv->count_detail_by_request_qty_id($request_qty_id);
+            $totalRecords = $this->rho->count_detail_by_request_qty_id($request_qty_id);
 
-            $list = $this->rcv->get_detail_by_request_qty_id($request_qty_id, $length, $start);
+            $list = $this->rho->get_detail_by_request_qty_id($request_qty_id, $length, $start);
             $data = [];
             $no = $start + 1;
 

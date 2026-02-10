@@ -158,7 +158,7 @@ class Rho_model extends CI_Model
         return $this->db->get();
     }
 
-    public function count_detail_by_tag_id($request_qty_id)
+    public function count_detail_by_request_qty_id($request_qty_id)
     {
         $this->db->where('REQUEST_QTY_ID', $request_qty_id);
         return $this->db->count_all_results('request_qty_detail');
