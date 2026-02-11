@@ -101,7 +101,7 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Site</th>
+                                            <th>Site Storage</th>
                                         </tr>
                                     </thead>
                                     <tbody>

@@ -104,8 +104,8 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Main Storage</th>
                                             <th>Site Storage</th>
+                                            <th>Main Storage</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -173,7 +173,7 @@
                     "width": "10%",
                 },
                 {
-                    "data": "main_storage",
+                    "data": "site_storage",
                     "width": "15%",
                     "render": function(data) {
                         if (!data) return '-';
@@ -181,7 +181,7 @@
                     }
                 },
                 {
-                    "data": "site_storage",
+                    "data": "main_storage",
                     "width": "15%",
                     "render": function(data) {
                         if (!data) return '-';
@@ -216,8 +216,7 @@
                                     <th>Jumlah</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No SJS</th>
-                                    <th>S.Loc-In</th>
+                                    <th>No RCV</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>
@@ -275,13 +274,7 @@
                             }
                         },
                         {
-                            "data": "no_sjs",
-                            createdCell: function(td) {
-                                td.style.fontFamily = 'monospace';
-                            }
-                        },
-                        {
-                            "data": "loc_in",
+                            "data": "no_rcv",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

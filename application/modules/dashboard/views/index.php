@@ -55,7 +55,7 @@
                             <div class="col-12">
                                 <div class="page-title-box d-sm-flex align-items-center justify-content-center">
                                     <span>
-                                        <h3 class="text-center fw-bold fst-italic">Data hebat dimulai dari nol. Saatnya buat karya yang bermanfaat.</h4>
+                                        <h3 class="text-center fw-bold fst-italic">Data hebat dimulai dari nol. <br><br> Konsisten lebih penting daripada sempurna.</h4>
                                             <div id="calendar"></div>
                                     </span>
                                 </div>
