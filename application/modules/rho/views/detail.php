@@ -125,7 +125,7 @@
                                                     <?php if (!$defaultValue): ?>
                                                         <option value="">-- Selected Site Storage --</option>
                                                     <?php endif; ?>
-                                                    <?php $param = $this->input->post('site_storage') ?? $data->TO_WH_ID; ?>
+                                                    <?php $param = $this->input->post('site_storage') ?? $data->WAREHOUSE_ID; ?>
                                                     <?php foreach ($site_storage->result() as $ss): ?>
                                                         <option
                                                             value="<?= $ss->WAREHOUSE_ID ?>"
@@ -157,7 +157,7 @@
                                                     <?php if (!$defaultValue): ?>
                                                         <option value="">-- Selected Main Storage --</option>
                                                     <?php endif; ?>
-                                                    <?php $param = $this->input->post('main_storage') ?? $data->WAREHOUSE_ID; ?>
+                                                    <?php $param = $this->input->post('main_storage') ?? $data->TO_WH_ID; ?>
                                                     <?php foreach ($main_storage->result() as $ms): ?>
                                                         <option
                                                             value="<?= $ms->WAREHOUSE_ID ?>"
@@ -292,7 +292,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-request_qty_detail_id="<?= $this->encrypt->encode('REQUEST_QTY_DETAIL_ID') ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-request_qty_detail_id="<?= $this->encrypt->encode($dd->REQUEST_QTY_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">

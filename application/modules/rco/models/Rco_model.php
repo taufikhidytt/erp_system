@@ -2,7 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Grk_model extends CI_Model
+class Rco_model extends CI_Model
 {
     public function __construct()
     {
@@ -12,18 +12,11 @@ class Grk_model extends CI_Model
     var $column_order = array(
         null,
         null,
-        "a.PO_ID",
         "b.DISPLAY_NAME",
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "CONCAT(
-            p . PERSON_NAME,
-            ' - [',
-            p . PERSON_CODE,
-            ']'
-        )",
-        "w.WAREHOUSE_NAME"
+        "wh.WAREHOUSE_NAME",
     );
 
     var $column_search = array(
@@ -32,13 +25,7 @@ class Grk_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "CONCAT(
-            p . PERSON_NAME,
-            ' - [',
-            p . PERSON_CODE,
-            ']'
-        )",
-        "w.WAREHOUSE_NAME"
+        "wh.WAREHOUSE_NAME",
     );
 
     var $order = array('a.DOCUMENT_DATE' => 'DESC');
@@ -49,24 +36,17 @@ class Grk_model extends CI_Model
 
         $this->db->distinct();
         $this->db->select("
-            a.PO_ID,
-            b.DISPLAY_NAME `Status`,
-            a.DOCUMENT_NO `No_Transaksi`,
-            a.DOCUMENT_REFF_NO `No_Referensi`,
-            a.DOCUMENT_DATE `Tanggal`,
-            a.NEED_DATE `Dibutuhkan`,
-            CONCAT(
-                p.PERSON_NAME,
-                ' - [',
-                p.PERSON_CODE,
-                ']'
-            ) `Supplier`,
-            w.WAREHOUSE_NAME `Gudang`
+            a.TAG_ID,
+            b.DISPLAY_NAME STATUS,
+            a.DOCUMENT_NO No_Transaksi,
+            a.DOCUMENT_REFF_NO No_Referensi,
+            a.DOCUMENT_DATE Tanggal,
+            wh.WAREHOUSE_NAME Site
         ");
-        $this->db->from('po a');
+        $this->db->from('tag a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
-        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('warehouse wh', 'a.DEST_WH_ID = wh.WAREHOUSE_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;
@@ -121,52 +101,44 @@ class Grk_model extends CI_Model
     function count_all()
     {
         $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
+
+        $this->db->distinct();
         $this->db->select("
-            a.PO_ID,
-            b.DISPLAY_NAME `Status`,
-            a.DOCUMENT_NO `No_Transaksi`,
-            a.DOCUMENT_REFF_NO `No_Referensi`,
-            a.DOCUMENT_DATE `Tanggal`,
-            a.NEED_DATE `Dibutuhkan`,
-            CONCAT(
-                p.PERSON_NAME,
-                ' - [',
-                p.PERSON_CODE,
-                ']'
-            ) `Supplier`,
-            w.WAREHOUSE_NAME `Gudang`
+            a.TAG_ID,
+            b.DISPLAY_NAME STATUS,
+            a.DOCUMENT_NO No_Transaksi,
+            a.DOCUMENT_REFF_NO No_Referensi,
+            a.DOCUMENT_DATE Tanggal,
+            wh.WAREHOUSE_NAME Site
         ");
-        $this->db->from('po a');
+        $this->db->from('tag a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
-        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('warehouse wh', 'a.DEST_WH_ID = wh.WAREHOUSE_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
 
-    public function get_detail_by_pr_id($po_id, $limit = null, $start = null)
+    public function get_detail_by_tag_id($tag_id, $limit = null, $start = null)
     {
         $this->db->select("
             i.ITEM_DESCRIPTION Nama_Item,
             i.ITEM_CODE Kode_Item,
-            pd.ENTERED_QTY Qty,
-            pd.ENTERED_UOM UoM,
-            pd.HARGA_INPUT Harga,
-            pd.SUBTOTAL Subtotal,
-            pr.DOCUMENT_NO No_FPK,
-            k.FIRST_NAME Sales,
-            pd.NOTE Note,
-            pd.PO_DETAIL_ID,
-            pd.PR_DETAIL_ID,
-            IF(pd.ENTERED_UOM = i.UOM_CODE,(pd.ENTERED_QTY * pd.BASE_QTY - pd.RECEIVED_ENTERED_QTY * pd.RECEIVED_BASE_QTY),(pd.ENTERED_QTY - (pd.RECEIVED_ENTERED_QTY / pd.BASE_QTY))) AS Sisa
+            td.ENTERED_QTY Qty,
+            td.ENTERED_UOM UoM,
+            tk.DOCUMENT_NO No_RHO,
+            wh.WAREHOUSE_NAME S_loc_in,
+            td.NOTE Note,
+            td.TAG_DETAIL_ID,
+            td.REQUEST_QTY_DETAIL_ID,
         ");
-        $this->db->from("po_detail pd");
-        $this->db->join("item i", "pd.ITEM_ID = i.ITEM_ID");
-        $this->db->join("pr_detail prd", "pd.PR_DETAIL_ID = prd.PR_DETAIL_ID");
-        $this->db->join("pr", "prd.PR_ID = pr.PR_ID");
-        $this->db->join("karyawan k", "pr.KARYAWAN_ID = k.KARYAWAN_ID");
-        $this->db->where("pd.PO_ID", $po_id);
-        $this->db->order_by('pd.PR_DETAIL_ID', 'ASC');
+        $this->db->from("tag_detail td");
+        $this->db->join("item i", "td.ITEM_ID = i.ITEM_ID");
+        $this->db->join("request_qty_detail tkd", "td.REQUEST_QTY_DETAIL_ID = tkd.REQUEST_QTY_DETAIL_ID");
+        $this->db->join("request_qty tk", "tkd.REQUEST_QTY_ID = tk.REQUEST_QTY_ID");
+        $this->db->join("warehouse wh", "tk.WAREHOUSE_ID = wh.WAREHOUSE_ID");
+        $this->db->where("td.TAG_ID", $tag_id);
+        $this->db->order_by('td.REQUEST_QTY_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);
@@ -175,34 +147,33 @@ class Grk_model extends CI_Model
         return $this->db->get();
     }
 
-    public function count_detail_by_pr_id($po_id)
+    public function count_detail_by_tag_id($tag_id)
     {
-        $this->db->where('PO_ID', $po_id);
-        return $this->db->count_all_results('po_detail');
+        $this->db->where('TAG_ID', $tag_id);
+        return $this->db->count_all_results('tag_detail');
     }
 
-    public function getSupplier()
+    public function get_main_storage()
     {
-        return $this->db->query("SELECT a.PERSON_ID, a.PERSON_NAME Supplier, a.PERSON_CODE Kode FROM person a JOIN person_site b ON (a.PERSON_ID = b.PERSON_ID) WHERE a.FLAG_SUPP = 1 AND a.ACTIVE_FLAG = 'Y' GROUP BY a.PERSON_ID ORDER BY a.PERSON_NAME");
+        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = {$this->session->userdata('id')} WHERE ACTIVE_FLAG = 'Y' AND a.JENIS_ID != FN_GET_VAR_VALUE ('KNY') GROUP BY a.WAREHOUSE_ID ORDER BY COALESCE(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
     }
 
-    public function getGudang()
+    public function getTagId($id)
     {
-        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = {$this->session->userdata('id')} WHERE ACTIVE_FLAG = 'Y' AND a.JENIS_ID != FN_GET_VAR_VALUE ('KNY') GROUP BY a.WAREHOUSE_ID ORDER BY IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
-    }
-
-    public function getPoId($id)
-    {
-        $this->db->from('po');
-        $this->db->where('po.PO_ID', $id);
+        $this->db->from('tag');
+        $this->db->where('tag.TAG_ID', $id);
         return $this->db->get();
     }
 
     public function delete($id)
     {
-        $this->db->where('PO_ID', $id);
-        $this->db->delete('po_detail');
-        return ($this->db->error()['code'] == 0);
+        $this->db->where('TAG_ID', $id);
+        $this->db->delete('tag_detail');
+
+        if ($this->db->error()['code'] != 0) {
+            return $this->db->error();
+        }
+        return true;
     }
 
     public function updateStatus($id, $status)
@@ -210,8 +181,12 @@ class Grk_model extends CI_Model
         $params = array(
             'STATUS_ID' => $status,
         );
-        $this->db->where('PO_ID', $id);
-        $this->db->update('po', $params);
-        return ($this->db->error()['code'] == 0);
+        $this->db->where('TAG_ID', $id);
+        $this->db->update('tag', $params);
+
+        if ($this->db->error()['code'] != 0) {
+            return $this->db->error();
+        }
+        return true;
     }
 }

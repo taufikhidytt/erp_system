@@ -178,7 +178,8 @@ class Item extends Back_Controller
                             $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
                             redirect('item/detail/' . $this->encrypt->encode($idItem));
                         } else {
-                            $this->session->set_flashdata('warning', 'Gagal menyimpan data detail!');
+                            $error = $this->db->error();
+                            $this->session->set_flashdata('warning', "Error DB: " . $error['code'] . " ~ " . $error['message']);
                             redirect('item/detail/' . $this->encrypt->encode($idItem));
                         }
                     } else {
@@ -186,7 +187,8 @@ class Item extends Back_Controller
                         redirect('item/detail/' . $this->encrypt->encode($idItem));
                     }
                 } else {
-                    $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
+                    $error = $this->db->error();
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['code'] . " ~ " . $error['message']);
                     redirect('item');
                 }
             }

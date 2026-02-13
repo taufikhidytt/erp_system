@@ -280,7 +280,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode('PO_DETAIL_ID') ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode($dd->PO_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">

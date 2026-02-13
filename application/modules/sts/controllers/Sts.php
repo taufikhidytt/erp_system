@@ -99,6 +99,8 @@ class Sts extends Back_Controller
     public function getGrk()
     {
         try {
+            $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
+
             $main_storage = $this->input->post('main_storage');
             $data = $this->db->query("SELECT
                     b.PO_DETAIL_ID,
@@ -141,7 +143,7 @@ class Sts extends Back_Controller
                         FN_GET_VAR_VALUE ('NEW'),
                         FN_GET_VAR_VALUE ('PARTIAL')
                     )
-                    AND a.DOCUMENT_TYPE_ID = 3
+                    AND a.DOCUMENT_TYPE_ID = '{$tipe_id['TYPE_ID']}'
                     AND a.WAREHOUSE_ID = {$main_storage}
                 ORDER BY a.DOCUMENT_DATE,
                     a.DOCUMENT_NO,
