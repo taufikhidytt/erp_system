@@ -372,6 +372,7 @@
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer'
                     }
                 }, // jumlah
                 {
@@ -388,6 +389,7 @@
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer'
                     }
                 }, // harga input
                 {
@@ -892,12 +894,20 @@
             hitungTotal();
         });
 
-        $(document).on("click", ".view-mode", function() {
-            let span = $(this);
-            let input = span.next(".edit-mode");
+        $(document).on("click", "#table-detail tbody td", function(e) {
 
-            span.addClass("d-none");
-            input.removeClass("d-none").focus();
+            // kalau yang diklik memang input, biarkan normal
+            if ($(e.target).is("input, select, textarea")) return;
+
+            let td = $(this);
+            let span = td.find(".view-mode");
+            let input = td.find(".edit-mode");
+
+            // hanya jalan kalau memang ada view/edit mode
+            if (span.length && input.length) {
+                span.addClass("d-none");
+                input.removeClass("d-none").focus().select();
+            }
         });
 
         // keluar input
