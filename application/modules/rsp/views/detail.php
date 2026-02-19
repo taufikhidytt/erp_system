@@ -57,7 +57,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('fpk') ?>" class="text-decoration-underline">FPK</a>
+                                <a href="<?= base_url('rsp') ?>" class="text-decoration-underline">RSP</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -73,17 +73,17 @@
                         <form action="" method="post" id="myForm">
                             <div class="row mb-2">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <span class="border border-1 border-dark p-2" id="statusPR"></span>
-                                    <span class="border border-1 border-warning p-2" id="readonlyPR"></span>
+                                    <span class="border border-1 border-dark p-2" id="statusRcoId"></span>
+                                    <span class="border border-1 border-warning p-2" id="readonlyRcoId"></span>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('fpk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
+                                    <a href="<?= base_url('rsp/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->TAG_PINJAM_ID); ?>">
                                         <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
@@ -95,7 +95,7 @@
                                 <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <input type="hidden" name="pr_id" id="pr_id" value="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                                            <input type="hidden" name="tag_pinjam_id" id="tag_pinjam_id" value="<?= $this->encrypt->encode($data->TAG_PINJAM_ID); ?>">
                                             <label for="no_transaksi">No Transaksi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -104,6 +104,70 @@
                                                 <input type="text" name="no_transaksi" id="no_transaksi" class="form-control <?= form_error('no_transaksi') ? 'is-invalid' : null; ?>" placeholder="Auto Generate" value="<?= $this->input->post('no_transaksi') ?? $data->DOCUMENT_NO; ?>" disabled readonly>
                                             </div>
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="supplier">Supplier:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-pantone-line"></i>
+                                                </span>
+                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Supplier --</option>
+                                                    <?php $param = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
+                                                    <?php foreach ($supplier->result() as $sp): ?>
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $param ? 'selected' : null ?>>
+                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('supplier') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="main_storage">Main Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($main_storage->result() as $ms) {
+                                                    if ($ms->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ms->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Main Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php $param = $this->input->post('main_storage') ?? $data->DEST_WH_ID; ?>
+                                                    <?php foreach ($main_storage->result() as $ms): ?>
+                                                        <option
+                                                            value="<?= $ms->WAREHOUSE_ID ?>"
+                                                            <?= $ms->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('main_storage') ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="tanggal">Tanggal:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? $data->DOCUMENT_DATE; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="no_referensi">No Referensi:</label>
@@ -115,117 +179,17 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="supplier">Supplier:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
-                                                </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php $params = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $params ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('supplier') ?></div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-12 col-sm-12">
-                                        <div class="row">
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="tanggal">Tanggal:</label>
-                                                    <span class="text-danger">*</span>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-calendar-2-fill"></i>
-                                                        </span>
-                                                        <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? $data->DOCUMENT_DATE; ?>">
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('tanggal') ?></div>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="tanggal_dibutuhkan">Tanggal Dibutuhkan:</label>
-                                                    <span class="text-danger">*</span>
-                                                    <div class="input-group">
-                                                        <span class="input-group-text">
-                                                            <i class="ri ri-calendar-event-fill"></i>
-                                                        </span>
-                                                        <input type="datetime-local" name="tanggal_dibutuhkan" id="tanggal_dibutuhkan" class="form-control <?= form_error('tanggal_dibutuhkan') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal Dibutuhkan" value="<?= $this->input->post('tanggal_dibutuhkan') ?? $data->NEED_DATE; ?>">
-                                                    </div>
-                                                    <div class="text-danger"><?= form_error('tanggal_dibutuhkan') ?></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="gudang">Gudang:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-home-gear-fill"></i>
-                                                </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($gudang->result() as $gd) {
-                                                    if ($gd->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $gd->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Gudang --</option>
-                                                    <?php endif; ?>
-                                                    <?php $param = $this->input->post('gudang') ?? $data->WAREHOUSE_ID; ?>
-                                                    <?php foreach ($gudang->result() as $gd): ?>
-                                                        <option
-                                                            value="<?= $gd->WAREHOUSE_ID ?>"
-                                                            <?= $gd->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($gd->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('gudang') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="sales">Sales:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-user-2-fill"></i>
-                                                </span>
-                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Sales --</option>
-                                                    <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
-                                                    <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $sl->KARYAWAN_ID == $param ? 'selected' : null ?>>
-                                                            <?= strtoupper($sl->FIRST_NAME) . ' - [' . strtoupper($sl->LAST_NAME) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('sales') ?></div>
-                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row form-xs">
-                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <div class="mb-3">
-                                        <label for="keterangan">Keterangan:</label>
-                                        <div class="input-group">
-                                            <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan') ?? $data->NOTE; ?></textarea>
+                                <div class="row form-xs">
+                                    <div class="col-12">
+                                        <div class="mb-3">
+                                            <label for="keterangan">Keterangan:</label>
+                                            <div class="input-group">
+                                                <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan') ?? $data->NOTE; ?></textarea>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('keterangan') ?></div>
                                         </div>
-                                        <div class="text-danger"><?= form_error('keterangan') ?></div>
                                     </div>
                                 </div>
                             </div>
@@ -246,126 +210,121 @@
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
-                                            <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
+                                            <button type="button" id="btn-modalRSP" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail" style="table-layout: fixed;">
+                                        <table class="table table-striped table-bordered" id="table-detail">
                                             <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
                                                 <tr style="text-align: center !important;">
-                                                    <th style="width: 5%;">No</th>
+                                                    <th>No</th>
                                                     <th style="padding:0; margin:0; border:none; display: none;"></th>
-                                                    <th style="width: 2%;">
+                                                    <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th style="width: 22%;">Nama Item</th>
-                                                    <th style="width: 13%;">Kode Item</th>
-                                                    <th style="width: 8%;">Jumlah</th>
-                                                    <th style="width: 10%;">Satuan</th>
-                                                    <th style="width: 10%;">Harga Input</th>
-                                                    <th style="width: 10%;">Harga</th>
-                                                    <th style="width: 10%;">Subtotal</th>
-                                                    <th style="width: 10%;">Keterangan</th>
+                                                    <th>No Trx 1</th>
+                                                    <th>No Trx 2</th>
+                                                    <th>Nama Item</th>
+                                                    <th>Kode Item</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Satuan</th>
+                                                    <th>Keterangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <?php $dataDetail = $this->db->query("SELECT pr_detail.*, item.ITEM_CODE FROM pr_detail JOIN item ON item.ITEM_ID = pr_detail.ITEM_ID WHERE pr_detail.PR_ID = {$data->PR_ID} ORDER BY PR_DETAIL_ID ASC");
+                                                <?php
+                                                $dataDetail = $this->db->query("SELECT COALESCE
+                                                    (
+                                                    IF
+                                                        (
+                                                            a.PO_DETAIL_ID IS NOT NULL,
+                                                            b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ),
+                                                            c.ENTERED_QTY - ( c.DELIVERED_ENTERED_QTY / c.BASE_QTY ) 
+                                                        ),
+                                                        0 
+                                                    ) BALANCE,
+                                                    a.*,
+                                                    i.ITEM_CODE,
+                                                    i.ITEM_DESCRIPTION,
+                                                    IF(a.PO_DETAIL_ID IS NOT NULL, pr.DOCUMENT_NO, pra.DOCUMENT_NO ) No_Reff_1,
+                                                    IF(a.PO_DETAIL_ID IS NOT NULL, po.DOCUMENT_NO, tg.DOCUMENT_NO) No_Reff_2 
+                                                FROM
+                                                    tag_pinjam_detail a
+                                                    LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
+                                                    LEFT JOIN pr_detail pd ON b.PR_DETAIL_ID = pd.PR_DETAIL_ID
+                                                    LEFT JOIN pr pr ON pd.PR_ID = pr.PR_ID
+                                                    LEFT JOIN po ON b.PO_ID = po.PO_ID
+                                                    LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
+                                                    LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID
+                                                    LEFT JOIN po_detail pod ON c.PO_DETAIL_ID = pod.PO_DETAIL_ID
+                                                    LEFT JOIN pr_detail prd ON pod.PR_DETAIL_ID = prd.PR_DETAIL_ID
+                                                    LEFT JOIN pr pra ON prd.PR_ID = pra.PR_ID
+                                                    JOIN item i ON a.ITEM_ID = i.ITEM_ID 
+                                                WHERE
+                                                    a.TAG_PINJAM_ID = '{$data->TAG_PINJAM_ID}'");
+
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
-                                                    $limit = 20;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <tr class="tr-height-30">
-                                                            <td style="width: 5%"><?= $no++ ?></td>
+                                                            <td><?= $no++ ?></td>
                                                             <td style="display: none;">
-                                                                <input type="hidden" name="detail[pr_detail][]" id="pr_detail" value="<?= $this->encrypt->encode($dd->PR_DETAIL_ID); ?>">
+                                                                <input type="hidden" name="detail[tag_pinjam_detail_id][]" id="tag_pinjam_detail_id" value="<?= $this->encrypt->encode($dd->TAG_PINJAM_DETAIL_ID); ?>">
+                                                                <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
+                                                                <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[unit_price][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[warehouse_id][]" value="<?= $dd->WAREHOUSE_ID ?>">
+                                                                <input type="hidden" name="detail[po_detail_id][]" value="<?= $dd->PO_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[tag_detail_id][]" value="<?= $dd->TAG_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[harga_input][]" value="<?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                             </td>
-                                                            <td style="width: 2%">
+                                                            <td>
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
-                                                            <td style="width: 22%" class="ellipsis">
+                                                            <td class="ellipsis">
+                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->No_Reff_1 ?>">
+                                                                    <?= $dd->No_Reff_1; ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[no_reff_1][]" value="<?= $dd->No_Reff_1 ?>">
+                                                            </td>
+                                                            <td class="ellipsis">
+                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->No_Reff_2 ?>">
+                                                                    <?= $dd->No_Reff_2; ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[no_reff_2][]" value="<?= $dd->No_Reff_2 ?>">
+                                                            </td>
+                                                            <td class="ellipsis">
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                     <?= $dd->ITEM_DESCRIPTION; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
                                                             </td>
-                                                            <td style="width: 13%" class="ellipsis">
-                                                                <span class="ellipsis align-middle">
+                                                            <td class="ellipsis">
+                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
                                                                     <?= $dd->ITEM_CODE; ?>
                                                                 </span>
                                                                 <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
                                                             </td>
-                                                            <td style="width: 8%" class="ellipsis text-end">
-                                                                <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= rtrim(rtrim($this->input->post('detail[qty][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis">
-                                                                <?php $data_uom_selected = $this->db->query("SELECT
-                                                                    *
-                                                                FROM (
-                                                                    -- Unit dasar (default)
-                                                                    SELECT
-                                                                        0 AS URUT,
-                                                                        i.ITEM_ID,
-                                                                        i.UOM_CODE,
-                                                                        1 AS TO_QTY,
-                                                                        CONCAT('1.00 ', i.UOM_CODE) AS KONVERSI
-                                                                    FROM item i
-                                                                    WHERE i.ITEM_ID = {$dd->ITEM_ID}
-                                                                    UNION ALL
-                                                                    -- Unit alternatif (konversi)
-                                                                    SELECT
-                                                                        1 AS URUT,
-                                                                        iu.ITEM_ID,
-                                                                        iu.UOM_CODE,
-                                                                        COALESCE(iu.TO_QTY, 1) AS TO_QTY,
-                                                                        CONCAT(
-                                                                            ROUND(COALESCE(iu.TO_QTY, 1) * 1, 2),
-                                                                            ' ',
-                                                                            i.UOM_CODE
-                                                                        ) AS KONVERSI
-                                                                    FROM item_uom iu
-                                                                    INNER JOIN item i 
-                                                                        ON iu.ITEM_ID = i.ITEM_ID
-                                                                    WHERE iu.ITEM_ID = {$dd->ITEM_ID}
-                                                                ) AS unit_data
-                                                                ORDER BY URUT, TO_QTY"); ?>
-
-                                                                <select class="form-control form-control-sm uom-select auto-width border-0" name="detail[uom][]" style="min-height: calc(1.5em + .5rem + 0px) !important;">
-                                                                    <?php
-                                                                    $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
-                                                                    foreach ($data_uom_selected->result() as $dus): ?>
-                                                                        <option value="<?= $dus->UOM_CODE ?>" data-code="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" data-label="<?= $dus->UOM_CODE ?> (<?= $dus->TO_QTY ?>)" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>>
-                                                                            <?= $dus->UOM_CODE ?>
-                                                                        </option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                                <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number"
-                                                                    class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
-                                                                    name="detail[harga_input][]" min="0" step="any"
-                                                                    value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <span class="harga-input-b ellipsis">
-                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
+                                                            <td class="ellipsis text-end">
+                                                                <span class="view-mode qty-view ellipsis align-middle">
+                                                                    <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-tag_pinjam_detail_id="<?= $this->encrypt->encode($dd->TAG_PINJAM_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <span class="subtotal-text ellipsis">
-                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
+                                                            <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
+                                                                <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
+                                                                    <?= $dd->ENTERED_UOM ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
                                                             </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
+                                                            <td class="ellipsis">
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -376,24 +335,6 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="row justify-content-end">
-                                <div class="col-md-4">
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="font-weight:bold;">Total</td>
-                                                <td>:</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td class="text-right" style="text-align: right">
-                                                    <p id="total-text">0.00</p>
-                                                    <input type="hidden" name="total" id="total" value="<?= $this->input->post('total') ?? number_format(rtrim(rtrim($data->TOTAL_AMOUNT, '0'), '.'), 2, '.', ','); ?>">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -406,7 +347,7 @@
 <!-- End Page-content -->
 
 <!-- modal -->
-<div id="modalItem" class="modal fade" style="font-size: 12px;">
+<div id="modalRSP" class="modal fade" style="font-size: 12px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -422,13 +363,15 @@
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
                                 </th>
                                 <th>No</th>
+                                <th>Status</th>
+                                <th>No Ref Trx 1</th>
+                                <th>No Ref Trx 2</th>
+                                <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
-                                <th>Assy Code</th>
-                                <th>Kategori</th>
+                                <th>Jumlah</th>
+                                <th>Sisa</th>
                                 <th>Satuan</th>
-                                <th>Stock</th>
-                                <th>Brand</th>
                             </tr>
                         </thead>
                     </table>
@@ -476,24 +419,22 @@
 <script>
     let tableDetail;
     let tableItem;
-
     $(document).ready(function() {
-        let pr_id = $('#pr_id').val();
+        let tag_pinjam_id = $('#tag_pinjam_id').val();
         $.ajax({
-            url: '<?= base_url() ?>fpk/getStatus',
+            url: '<?= base_url() ?>rsp/getStatus',
             type: 'POST',
             dataType: 'json',
             data: {
-                pr_id: pr_id,
+                tag_pinjam_id: tag_pinjam_id,
             },
             success: function(response) {
-
-                $('#statusPR').text(response.data[0].DISPLAY_NAME);
-                $('#readonlyPR').hide();
+                $('#statusRcoId').text(response.data[0].DISPLAY_NAME);
+                $('#readonlyRcoId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
-                    $('#readonlyPR').show();
-                    $('#readonlyPR').text('READ ONLY');
+                    $('#readonlyRcoId').show();
+                    $('#readonlyRcoId').text('READ ONLY');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
@@ -511,6 +452,18 @@
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
                     );
+
+                    $('#removeRow').replaceWith(
+                        `<span type="button" id="removeRow" class="btn btn-danger btn-sm" disabled style="width: 55px; pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="fa fa-trash"></i> Del
+                        </span>`
+                    );
+
+                    $('#btn-modalRSP').replaceWith(
+                        `<span type="button" id="btn-modalRSP" class="btn btn-success btn-sm" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-add-box-fill"></i> Add
+                        </span>`
+                    );
                 }
             }
         });
@@ -521,7 +474,7 @@
             paging: false,
             columnDefs: [{
                     targets: 0,
-                    width: "5%",
+                    width: "2%",
                     className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -530,45 +483,40 @@
                 {
                     targets: 2,
                     width: "2%",
-                    className: "text-center",
+                    className: "text-right",
                 }, // checkbox
                 {
                     targets: 3,
-                    width: "22%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // nama item
-                {
-                    targets: 4,
-                    width: "13%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // code item
-                {
-                    targets: 5,
-                    width: "8%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer'
-                    }
-
-                }, // jumlah
-                {
-                    targets: 6,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // satuan
+                }, // no trx 1
+                {
+                    targets: 4,
+                    width: "10%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no trx 2
+                {
+                    targets: 5,
+                    width: "13%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // nama item
+                {
+                    targets: 6,
+                    width: "8%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // kode item
                 {
                     targets: 7,
                     width: "10%",
@@ -577,56 +525,41 @@
                         td.style.fontFamily = 'monospace';
                         td.style.cursor = 'pointer'
                     }
-
-                }, // harga input
+                }, // jumlah
                 {
                     targets: 8,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // harga
-                {
-                    targets: 9,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // subtotal
-                {
-                    targets: 10,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
+                }, // satuan
+                {
+                    targets: 9,
+                    width: "10%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 }, // keterangan
             ],
         });
 
-        toggleSupplierDisabled();
+        toggleStorageDisabled();
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    width: "5%"
                 }, // checkbox
                 {
                     targets: 1,
-                    width: "5%",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // no
                 {
                     targets: 2,
-                    width: "20%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -639,10 +572,9 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // item description
+                }, // status
                 {
                     targets: 3,
-                    width: "20%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -655,10 +587,9 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // item code
+                }, // tanggal
                 {
                     targets: 4,
-                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -670,11 +601,10 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // assy code
+                    }
+                }, // no transaksi
                 {
                     targets: 5,
-                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -686,11 +616,10 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // kategori
+                    }
+                }, // no refrensi
                 {
                     targets: 6,
-                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -702,11 +631,25 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // uom
+                    }
+                }, // nama item
                 {
                     targets: 7,
-                    width: "10%",
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 15;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // kode item
+                {
+                    targets: 8,
                     className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
@@ -718,11 +661,25 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // stok
+                    }
+                }, // jumlah
                 {
-                    targets: 8,
-                    width: "10%",
+                    targets: 9,
+                    className: "ellipsis text-end",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // sisa
+                {
+                    targets: 10,
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -735,7 +692,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     },
-                }, // brand
+                }, // satuan
             ],
             autoWidth: false,
             paging: true,
@@ -779,17 +736,17 @@
             })
         }
 
-        $("#supplier").data("prev", $("#supplier").val());
+        $("#main_storage").data("prev", $("#main_storage").val());
 
-        $("#supplier").on("change", function(e, data) {
+        $("#main_storage").on("change", function(e, data) {
             let prev = $(this).data("prev");
             let current = $(this).val();
 
             if (prev && current !== prev && tableDetail.rows().count() > 0) {
 
                 Swal.fire({
-                    title: "Ganti Supplier?",
-                    text: "Data item yang sudah dipilih akan dihapus.",
+                    title: "Ganti Main Storage?",
+                    text: "Data yang sudah dipilih akan dihapus.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Ya, ganti",
@@ -798,7 +755,7 @@
                     if (result.isConfirmed) {
                         tableDetail.clear().draw();
                         $(this).data("prev", current);
-                        toggleSupplierDisabled();
+                        toggleStorageDisabled();
                     } else {
                         $(this).val(prev).trigger('change.select2', {
                             skipEvent: true
@@ -811,12 +768,23 @@
         });
 
         // modal
-        $("#btn-modalItem").on("click", function() {
-            resetModalItem();
+        $("#btn-modalRSP").on("click", function() {
+            resetmodalRSP();
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
             var supplier = $('#supplier').val();
+            var main_storage = $('#main_storage').val();
+
+            if (!main_storage) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Main storage tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
 
             if (!supplier) {
                 $('#loading').hide();
@@ -827,60 +795,84 @@
                 });
                 return;
             }
+
             $.ajax({
                 type: "POST",
-                url: "<?= base_url() ?>fpk/getItemBySupplier",
+                url: "<?= base_url() ?>rsp/getRsp",
                 data: {
-                    id_supplier: supplier,
+                    supplier: supplier,
+                    main_storage: main_storage,
                 },
                 dataType: "json",
                 success: function(response) {
                     $('#loading').hide();
                     tableItem.clear().draw();
 
-                    let existingCodes = new Set();
+                    let existingPO = new Set();
+                    let existingTAG = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[kode_item][]"]').val();
-                        if (kode) {
-                            existingCodes.add(kode);
-                        }
+                        let poId = $(node).find('input[name="detail[po_detail_id][]"]').val();
+                        let tagId = $(node).find('input[name="detail[tag_detail_id][]"]').val();
+                        if (poId) existingPO.add(poId);
+                        if (tagId) existingTAG.add(tagId);
                     });
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         let no = 1;
                         response.data.forEach(function(item) {
 
-                            if (existingCodes.has(item.ITEM_CODE)) {
+                            if (existingPO.has(item.PO_DETAIL_ID)) {
                                 return;
                             }
 
-                            var stok = parseFloat(item.STOK).toFixed(2);
+                            if (existingTAG.has(item.TAG_DETAIL_ID)) {
+                                return;
+                            }
 
                             var checkbox = `
-                                <input type="checkbox" class="chkRow"
-                                    data-id_item="${item.ITEM_ID}"
-                                    data-name="${item.ITEM_DESCRIPTION}"
-                                    data-code="${item.ITEM_CODE}"
-                                    data-uom="${item.UOM}">
+                            <input type="checkbox" class="chkRow"
+                                data-item_id="${item.ITEM_ID}"
+                                data-po_detail_id="${item.PO_DETAIL_ID}"
+                                data-tag_detail_id="${item.TAG_DETAIL_ID}"
+                                data-base_qty="${item.BASE_QTY}"
+                                data-unit_price="${item.UNIT_PRICE}"
+                                data-subtotal="${item.SUBTOTAL}"
+                                data-warehouse_id="${item.WAREHOUSE_ID}"
+                                data-harga_input="${item.HARGA_INPUT}"
+                                data-note="${item.NOTE}"
+                                data-berat="${item.BERAT}"
+
+                                data-status="${item.STATUS_NAME}"
+                                data-no_reff_1="${item.No_Reff_1}"
+                                data-no_reff_2="${item.No_Reff_2}"
+                                data-no_referensi="${item.DOCUMENT_REFF_NO}"
+                                data-nama_item="${item.ITEM_DESCRIPTION.replace(/"/g, '&quot;')}"
+                                data-kode_item="${item.ITEM_CODE}"
+                                data-jumlah="${item.ENTERED_QTY}"
+                                data-sisa="${item.BALANCE}"
+                                data-satuan="${item.ENTERED_UOM}"
+                            >
                             `;
 
                             tableItem.row.add([
                                 checkbox,
                                 no++,
+                                item.STATUS_NAME,
+                                item.No_Reff_1,
+                                item.No_Reff_2,
+                                item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                item.ASSY_CODE,
-                                item.CATEGORY,
-                                item.UOM,
-                                stok,
-                                item.BRAND,
+                                parseFloat(item.ENTERED_QTY).toFixed(2),
+                                parseFloat(item.BALANCE).toFixed(2),
+                                item.ENTERED_UOM,
                             ]);
                         });
                         tableItem.draw();
                     }
-                    $('#modalTitleForm').text('Master Item');
-                    $('#modalItem').modal('show');
+                    $('#modalTitleForm').text('List Data');
+                    $('#modalRSP').modal('show');
                 }
             });
         });
@@ -899,61 +891,102 @@
             e.preventDefault();
             let rowsAdded = false;
 
-            let existingCodes = new Set();
+            let existingPO = new Set();
+            let existingTAG = new Set();
             tableDetail.rows().every(function() {
                 let node = this.node();
-                let kodeText = $(node).find('td:eq(4) span').text().trim();
-                existingCodes.add(kodeText);
+                let poId = $(node).find('input[name="detail[po_detail_id][]"]').val();
+                let tagId = $(node).find('input[name="detail[tag_detail_id][]"]').val();
+
+                if (poId) existingPO.add(poId);
+                if (tagId) existingTAG.add(tagId);
             });
 
             let allRows = tableItem.rows().nodes();
             let nodesToDraw = [];
 
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
-                let id_item = $(this).data("id_item");
-                let nama = $(this).data("name");
-                let kode = $(this).data("code");
-                let uom = $(this).data("uom");
+                let item_id = $(this).data("item_id");
+                let po_detail_id = $(this).data("po_detail_id");
+                let tag_detail_id = $(this).data("tag_detail_id");
+                let base_qty = $(this).data("base_qty");
+                let unit_price = $(this).data("unit_price");
+                let subtotal = $(this).data("subtotal");
+                let warehouse_id = $(this).data("warehouse_id");
+                let harga_input = $(this).data("harga_input");
+                let keterangan = $(this).data("note") ?? '';
+                let berat = $(this).data("berat");
+                let balance = $(this).data("sisa");
 
-                if (existingCodes.has(kode)) {
+                let status = $(this).data("status");
+                let no_reff_1 = $(this).data("no_reff_1");
+                let no_reff_2 = $(this).data("no_reff_2");
+                let no_referensi = $(this).data("no_referensi");
+                let nama_item = $(this).data("nama_item");
+                let kode_item = $(this).data("kode_item");
+                let jumlah = $(this).data("jumlah");
+                let sisa = $(this).data("sisa");
+                let satuan = $(this).data("satuan");
+
+                if (existingPO.has(po_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                existingCodes.add(kode);
+                if (existingTAG.has(tag_detail_id)) {
+                    $(this).prop('checked', false).prop('disabled', true);
+                    return;
+                }
+
+                existingPO.add(po_detail_id);
+                existingTAG.add(tag_detail_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
 
-                    `<input type="hidden" name="detail[pr_detail][]" value="">`,
+                    `<input type="hidden" name="detail[tag_pinjam_detail_id][]" value="">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
+                    <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
+                    <input type="hidden" name="detail[no_reff_1][]" value="${no_reff_1}">
+                    <input type="hidden" name="detail[no_reff_2][]" value="${no_reff_2}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">`,
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="${nama}">${nama}</span>
-                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
-                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+                    `<span class="ellipsis" title="${no_reff_1}">
+                        ${ellipsis(no_reff_1)}
+                    </span>`,
 
-                    `<span class="ellipsis">${kode}</span>
-                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+                    `<span class="ellipsis" title="${no_reff_2}">
+                        ${ellipsis(no_reff_2)}
+                    </span>`,
 
-                    `<span class="view-mode qty-view ellipsis">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
 
-                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
-                        <option value="">Loading...</option>
-                    </select>
-                    <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]">`,
+                    `<span class="ellipsis" title="${kode_item}">
+                        ${ellipsis(kode_item)}
+                    </span>`,
 
-                    `<span class="view-mode harga-view ellipsis">0.00</span>
-                    <input type="number" class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]">`,
+                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
 
-                    `<span class="harga-input-b ellipsis">0.00</span>
-                    <input type="hidden" name="detail[harga][]">`,
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
-                    `<span class="subtotal-text ellipsis">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]">`,
-
-                    `<textarea class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`,
                 ]).draw(false).node();
 
                 $(rowNode).addClass('tr-height-30');
@@ -963,15 +996,14 @@
                 $(this).prop('checked', false).prop('disabled', true);
 
                 rowsAdded = true;
-                loadUom($(rowNode), id_item);
 
                 if (rowsAdded) {
                     tableDetail.draw(false);
                     tableDetail.columns.adjust().draw(false); // refresh layout
-                    toggleSupplierDisabled();
+                    toggleStorageDisabled();
                 }
 
-                $("#modalItem").modal("hide");
+                $("#modalRSP").modal("hide");
             });
         });
 
@@ -1007,8 +1039,6 @@
             span.removeClass("d-none");
         });
 
-        hitungTotal();
-
         $(document).on("input", ".qty, .harga-input", function() {
             let row = $(this).closest("tr");
             let qty = parseFloat(row.find(".qty").val()) || 0;
@@ -1035,7 +1065,6 @@
 
             row.find('input[name="detail[harga][]"]').val(harga_input);
             row.find('input[name="detail[subtotal][]"]').val(subtotal);
-            hitungTotal();
         });
 
         tableDetail.on("draw.dt", function() {
@@ -1091,18 +1120,17 @@
                         tableDetail.row(this).remove();
                     });
                     tableDetail.draw(false);
-                    hitungTotal();
 
                     $("#checkAllParent").prop("checked", false);
 
-                    toggleSupplierDisabled();
+                    toggleStorageDisabled();
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
+                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                        // timer: 2500,
+                        showConfirmButton: true
                     });
                 }
             });
@@ -1127,7 +1155,7 @@
             }
         });
 
-        $(document).on('input change', '.qty, .harga-input', function() {
+        $(document).on('input change', '.harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1266,6 +1294,148 @@
         $('#modalKeteranganText').val('');
     });
 
+    document.addEventListener('input', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const tag_pinjam_detail_id = input.dataset.tag_pinjam_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const balance = parseFloat(input.dataset.balance);
+        let value = parseFloat(input.value);
+
+        const row = $(input).closest("tr");
+
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        // Tidak boleh lebih dari balance
+        if (tag_pinjam_detail_id) {
+            // UPDATE
+            const maxAllowed = balance + value_old;
+
+            if (value > maxAllowed) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+        } else {
+            // ADD
+            if (value > balance) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+        }
+
+        updateSpan(value);
+    });
+
+    // // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const tag_pinjam_detail_id = input.dataset.tag_pinjam_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = parseFloat(input.dataset.balance);
+
+        if (tag_pinjam_detail_id) {
+            // UPDATE
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+            updateSpan(balance);
+        } else {
+            // ADD
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+            updateSpan(balance);
+        }
+    }, true);
+
     $(document).on('click', '#del-submit', function() {
         let id = $(this).data('id_del');
 
@@ -1281,7 +1451,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '<?= base_url() ?>fpk/del',
+                    url: '<?= base_url() ?>rsp/del',
                     type: 'POST',
                     dataType: 'json',
                     data: {
@@ -1300,7 +1470,7 @@
                         if (res.status) {
                             Swal.fire({
                                 title: 'Berhasil!',
-                                text: 'Data berhasil dihapus.',
+                                text: res.message,
                                 icon: 'success'
                             }).then(() => {
                                 location.reload();
@@ -1308,7 +1478,7 @@
                         } else {
                             Swal.fire({
                                 title: 'Warning!',
-                                text: 'Data gagal dihapus.',
+                                text: res.error,
                                 icon: 'warning'
                             }).then(() => {
                                 location.reload();
@@ -1323,73 +1493,6 @@
         });
     });
 
-    function hitungTotal() {
-        let tableDetail = $('#table-detail').DataTable();
-
-        let total = 0;
-        tableDetail.rows().every(function() {
-            let subtotalText = $(this.node()).find(".subtotal-text").text();
-            let subtotal = Number(subtotalText.replace(/,/g, '')) || 0;
-            total += subtotal;
-        });
-
-        $("#total-text").text(
-            total.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })
-        );
-        $("#total").val(total);
-    }
-
-    let uomLoadingCount = 0;
-
-    function loadUom(row, itemId) {
-
-        let uomSelect = row.find('.uom-select');
-        let toQtyInput = row.find('input[name="detail[to_qty][]"]');
-
-        uomLoadingCount++;
-        $('#loading').show();
-
-        $.ajax({
-            url: "<?= base_url() ?>fpk/get_uom",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                item_id: itemId
-            },
-            success: function(res) {
-                let html = '';
-
-                $.each(res.data, function(i, v) {
-                    html += `
-                    <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
-                        ${v.UOM_CODE}
-                    </option>
-                `;
-                });
-
-                uomSelect.html(html);
-                uomSelect.trigger('change');
-
-                let firstOption = uomSelect.find('option:first');
-                toQtyInput.val(firstOption.data('to_qty'));
-            },
-            error: function(xhr, status, error) {
-                console.error("Error load Uom:", error);
-                uomSelect.html('<option value="">Error loading UOM</option>');
-            },
-            complete: function() {
-                uomLoadingCount--;
-
-                if (uomLoadingCount <= 0) {
-                    $('#loading').hide();
-                }
-            }
-        });
-    }
-
     function resizeInput(el) {
         el.style.width = (el.value.length + 1) + 'ch';
     }
@@ -1402,19 +1505,33 @@
         });
     }
 
-    function toggleSupplierDisabled() {
+    function toggleStorageDisabled() {
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
+        let $main_storage = $('#main_storage');
         let $supplier = $('#supplier');
 
         if (hasDetail) {
-            $supplier.prop('disabled', true); // blok UI
-            // buat hidden input agar value dikirim ke server
+            $main_storage.prop('disabled', true).trigger('change.select2');
+            $supplier.prop('disabled', true).trigger('change.select2');
+
+            // Buat hidden input agar value tetap dikirim ke server
+            if ($('#main_storage-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'main_storage-hidden',
+                    name: $main_storage.attr('name'),
+                    value: $main_storage.val()
+                }).appendTo('form');
+            } else {
+                $('#main_storage-hidden').val($main_storage.val());
+            }
+
             if ($('#supplier-hidden').length === 0) {
                 $('<input>').attr({
                     type: 'hidden',
-                    id: 'supplier-hidden',
+                    id: 'site_storage-hidden',
                     name: $supplier.attr('name'),
                     value: $supplier.val()
                 }).appendTo('form');
@@ -1422,14 +1539,17 @@
                 $('#supplier-hidden').val($supplier.val());
             }
         } else {
-            $supplier.prop('disabled', false);
+            $main_storage.prop('disabled', false).trigger('change.select2');
+            $supplier.prop('disabled', false).trigger('change.select2');
+            $('#main_storage-hidden').remove();
             $('#supplier-hidden').remove();
         }
 
+        $main_storage.trigger('change.select2');
         $supplier.trigger('change.select2');
     }
 
-    function resetModalItem() {
+    function resetmodalRSP() {
         tableItem.search('').columns().search('').draw();
 
         $('#checkAll').prop('checked', false);
@@ -1437,5 +1557,12 @@
         $('#tableItem').find('.chkRow')
             .prop('checked', false)
             .prop('disabled', false);
+    }
+
+    function ellipsis(text, limit = 25) {
+        if (!text) return '-';
+        return text.length > limit ?
+            text.substring(0, limit) + '...' :
+            text;
     }
 </script>

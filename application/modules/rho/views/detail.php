@@ -1232,7 +1232,7 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
-        const tag_detail_id = input.dataset.tag_detail_id;
+        const request_qty_detail_id = input.dataset.request_qty_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
         const balance = parseFloat(input.dataset.balance);
         let value = parseFloat(input.value);
@@ -1247,7 +1247,7 @@
         }
 
         // Tidak boleh lebih dari balance
-        if (tag_detail_id) {
+        if (request_qty_detail_id) {
             // UPDATE
             const maxAllowed = balance + value_old;
 
@@ -1289,7 +1289,7 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
-        const tag_detail_id = input.dataset.tag_detail_id;
+        const request_qty_detail_id = input.dataset.request_qty_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
         const row = $(input).closest("tr");
         const updateSpan = (val) => {
@@ -1301,7 +1301,7 @@
 
         const balance = parseFloat(input.dataset.balance);
 
-        if (tag_detail_id) {
+        if (request_qty_detail_id) {
             // UPDATE
 
             // Tidak boleh minus atau nol

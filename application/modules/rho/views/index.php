@@ -173,7 +173,7 @@
                     "width": "10%",
                 },
                 {
-                    "data": "site_storage",
+                    "data": "main_storage",
                     "width": "15%",
                     "render": function(data) {
                         if (!data) return '-';
@@ -181,7 +181,7 @@
                     }
                 },
                 {
-                    "data": "main_storage",
+                    "data": "site_storage",
                     "width": "15%",
                     "render": function(data) {
                         if (!data) return '-';

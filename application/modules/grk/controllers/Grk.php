@@ -269,10 +269,9 @@ class Grk extends Back_Controller
                         redirect('grk/add');
                     }
 
-                    $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga = (float) $detail['harga_input'][$i];
-
-                    $subtotal   = $jumlah * $harga;
+                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
+                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
+                    $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
                     $dataDetail = [
@@ -280,14 +279,14 @@ class Grk extends Back_Controller
                         'ITEM_ID'           => $detail['item_id'][$i],
                         'ENTERED_QTY'       => $detail['jumlah'][$i],
                         'BASE_QTY'          => $detail['base_qty'][$i],
-                        'UNIT_PRICE'        => $detail['harga'][$i],
+                        'UNIT_PRICE'        => str_replace([','], '', $detail['harga'][$i]),
                         'SUBTOTAL'          => $subtotal,
                         'ENTERED_UOM'       => $detail['satuan'][$i],
                         'GUDANG_ID'         => $detail['warehouse_id'][$i],
                         'PR_DETAIL_ID'      => $detail['pr_detail_id'][$i],
                         'KARYAWAN_ID'       => $detail['sales'][$i],
                         'ETA_LEADTIME'      => $detail['lead_time'][$i],
-                        'HARGA_INPUT'       => $harga,
+                        'HARGA_INPUT'       => $harga_input,
                         'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],
                         'NOTE'              => $detail['keterangan'][$i],
                         'BERAT'             => $detail['berat'][$i],
@@ -436,9 +435,9 @@ class Grk extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga = (float) $detail['harga_input'][$i];
-                    $subtotal = $jumlah * $harga;
+                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
+                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
+                    $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
                     $poDetailId = !empty($detail['po_detail_id'][$i])
@@ -449,14 +448,14 @@ class Grk extends Back_Controller
                         'ITEM_ID'           => $detail['item_id'][$i],
                         'ENTERED_QTY'       => $detail['jumlah'][$i],
                         'BASE_QTY'          => $detail['base_qty'][$i],
-                        'UNIT_PRICE'        => $detail['harga'][$i],
+                        'UNIT_PRICE'        => str_replace([','], '', $detail['harga'][$i]),
                         'SUBTOTAL'          => $subtotal,
                         'ENTERED_UOM'       => $detail['satuan'][$i],
                         'GUDANG_ID'         => $detail['warehouse_id'][$i],
                         'PR_DETAIL_ID'      => $detail['pr_detail_id'][$i],
                         'KARYAWAN_ID'       => $detail['sales_id'][$i],
                         'ETA_LEADTIME'      => $detail['lead_time'][$i],
-                        'HARGA_INPUT'       => $harga,
+                        'HARGA_INPUT'       => $harga_input,
                         'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],
                         'NOTE'              => $detail['keterangan'][$i],
                         'BERAT'             => $detail['berat'][$i],

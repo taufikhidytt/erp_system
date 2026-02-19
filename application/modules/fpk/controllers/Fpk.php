@@ -277,10 +277,9 @@ class Fpk extends Back_Controller
                 // ======================
                 foreach ($detail['nama_item'] as $i => $val) {
 
-                    $qty   = (float) $detail['qty'][$i];
-                    $harga = (float) $detail['harga_input'][$i];
-
-                    $subtotal   = $qty * $harga;
+                    $qty = str_replace([','], '', $detail['qty'][$i]);
+                    $harga = str_replace([','], '', $detail['harga_input'][$i]);
+                    $subtotal = $qty * $harga;
                     $total += $subtotal;
 
                     $dataDetail = [
@@ -288,7 +287,7 @@ class Fpk extends Back_Controller
                         'ITEM_ID'           => $detail['id_item'][$i],
                         'ENTERED_QTY'       => $qty,
                         'BASE_QTY'          => $detail['to_qty'][$i],
-                        'UNIT_PRICE'        => $detail['harga'][$i],
+                        'UNIT_PRICE'        => str_replace([','], '', $detail['harga'][$i]),
                         'HARGA_INPUT'       => $harga,
                         'SUBTOTAL'          => $subtotal,
                         'NOTE'              => $detail['keterangan'][$i],
@@ -444,8 +443,8 @@ class Fpk extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    $qty   = (float) $detail['qty'][$i];
-                    $harga = (float) $detail['harga_input'][$i];
+                    $qty = str_replace([','], '', $detail['qty'][$i]);
+                    $harga = str_replace([','], '', $detail['harga_input'][$i]);
                     $subtotal = $qty * $harga;
                     $total += $subtotal;
 
@@ -457,7 +456,7 @@ class Fpk extends Back_Controller
                         'ITEM_ID'          => $detail['id_item'][$i],
                         'ENTERED_QTY'      => $qty,
                         'BASE_QTY'         => $detail['to_qty'][$i],
-                        'UNIT_PRICE'       => $detail['harga'][$i] ?? $harga,
+                        'UNIT_PRICE'       => str_replace([','], '', $detail['harga'][$i]) ?? $harga,
                         'HARGA_INPUT'      => $harga,
                         'SUBTOTAL'         => $subtotal,
                         'NOTE'             => $detail['keterangan'][$i],

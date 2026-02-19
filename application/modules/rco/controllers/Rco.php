@@ -252,10 +252,9 @@ class Rco extends Back_Controller
                         redirect('rco/add');
                     }
 
-                    $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga_input = (float) $detail['harga_input'][$i];
-
-                    $subtotal   = $jumlah * $harga_input;
+                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
+                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
+                    $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
                     $dataDetail = [
@@ -263,7 +262,7 @@ class Rco extends Back_Controller
                         'ITEM_ID'               => $detail['item_id'][$i],
                         'ENTERED_QTY'           => $jumlah,
                         'BASE_QTY'              => $detail['base_qty'][$i],
-                        'UNIT_PRICE'            => $detail['unit_price'][$i],
+                        'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
                         'WAREHOUSE_ID'          => $detail['gudang_asal_id'][$i],
@@ -414,8 +413,8 @@ class Rco extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga_input = (float) $detail['harga_input'][$i];
+                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
+                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
                     $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
@@ -427,7 +426,7 @@ class Rco extends Back_Controller
                         'ITEM_ID'               => $detail['item_id'][$i],
                         'ENTERED_QTY'           => $jumlah,
                         'BASE_QTY'              => $detail['base_qty'][$i],
-                        'UNIT_PRICE'            => $detail['unit_price'][$i],
+                        'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
                         'WAREHOUSE_ID'          => $detail['gudang_asal_id'][$i],

@@ -126,7 +126,7 @@
                 text: '<i class="ri ri-add-circle-fill"></i> Tambah',
                 className: 'btn btn-sm btn-primary',
                 action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('rco/add') ?>";
+                    window.location.href = "<?= base_url('rsp/add') ?>";
                 }
             }],
             "autoWidth": false,
@@ -136,7 +136,7 @@
             "ordering": true,
             "order": [],
             "ajax": {
-                "url": "<?= site_url('rco/get_data'); ?>",
+                "url": "<?= site_url('rsp/get_data'); ?>",
                 "type": "POST"
             },
             "columns": [{
@@ -169,7 +169,7 @@
                     "width": "10%",
                 },
                 {
-                    "data": "site_storage",
+                    "data": "main_storage",
                     "width": "15%",
                     "render": function(data) {
                         if (!data) return '-';
@@ -186,7 +186,7 @@
             var icon = $(this).find('i');
 
             var rowData = row.data();
-            var tag_id = rowData.tag_id;
+            var tag_pinjam_id = rowData.tag_pinjam_id;
 
             if (row.child.isShown()) {
                 // Close row
@@ -194,7 +194,7 @@
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
             } else {
                 // Open row dengan child row datatable
-                var childTableId = 'child-' + tag_id;
+                var childTableId = 'child-' + tag_pinjam_id;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
                             <thead>
                                 <tr class="align-middle" style="height: 45px;">
@@ -203,8 +203,8 @@
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
                                     <th>Satuan</th>
-                                    <th>No RHO</th>
-                                    <th>S.Loc-In</th>
+                                    <th>No Reff 1</th>
+                                    <th>No Reff 2</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>
@@ -217,10 +217,10 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": "<?= site_url('rco/get_detail'); ?>",
+                        "url": "<?= site_url('rsp/get_detail'); ?>",
                         "type": "POST",
                         "data": {
-                            tag_id: tag_id
+                            tag_pinjam_id: tag_pinjam_id
                         }
                     },
                     "columns": [{
@@ -255,13 +255,13 @@
                             }
                         },
                         {
-                            "data": "no_rho",
+                            "data": "no_reff_1",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "s_loc_in",
+                            "data": "no_reff_2",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

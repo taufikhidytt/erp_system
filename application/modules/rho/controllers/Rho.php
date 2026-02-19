@@ -1,4 +1,7 @@
 <?php
+
+use FontLib\Table\Type\post;
+
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Rho extends Back_Controller
@@ -253,10 +256,9 @@ class Rho extends Back_Controller
                         redirect('rho/add');
                     }
 
-                    $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga_input = (float) $detail['harga_input'][$i];
-
-                    $subtotal   = $jumlah * $harga_input;
+                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
+                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
+                    $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
                     $dataDetail = [
@@ -264,7 +266,7 @@ class Rho extends Back_Controller
                         'ITEM_ID'               => $detail['item_id'][$i],
                         'ENTERED_QTY'           => $jumlah,
                         'BASE_QTY'              => $detail['base_qty'][$i],
-                        'UNIT_PRICE'            => $detail['unit_price'][$i],
+                        'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
                         'TAG_DETAIL_ID'         => $detail['tag_detail_id'][$i],
@@ -417,8 +419,8 @@ class Rho extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    $jumlah   = (float) $detail['jumlah'][$i];
-                    $harga_input = (float) $detail['harga_input'][$i];
+                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
+                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
                     $subtotal = $jumlah * $harga_input;
                     $total += $subtotal;
 
@@ -430,7 +432,7 @@ class Rho extends Back_Controller
                         'ITEM_ID'               => $detail['item_id'][$i],
                         'ENTERED_QTY'           => $jumlah,
                         'BASE_QTY'              => $detail['base_qty'][$i],
-                        'UNIT_PRICE'            => $detail['unit_price'][$i],
+                        'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
                         'TAG_DETAIL_ID'         => $detail['tag_detail_id'][$i],
@@ -485,8 +487,8 @@ class Rho extends Back_Controller
                 $this->db->update('request_qty', [
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'WAREHOUSE_ID'          => $post['main_storage'],
-                    'TO_WH_ID'              => $post['site_storage'],
+                    'WAREHOUSE_ID'          => $post['site_storage'],
+                    'TO_WH_ID'              => $post['main_storage'],
                     'NOTE'                  => $post['keterangan'],
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
                     'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
