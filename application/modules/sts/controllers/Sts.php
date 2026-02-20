@@ -102,53 +102,104 @@ class Sts extends Back_Controller
             $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
 
             $main_storage = $this->input->post('main_storage');
+
             $data = $this->db->query("SELECT
-                    b.PO_DETAIL_ID,
-                    b.PO_ID,
-                    a.DOCUMENT_TYPE_ID,
-                    a.STATUS_ID,
-                    FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
-                    a.DOCUMENT_DATE,
-                    a.DOCUMENT_NO,
-                    a.DOCUMENT_REFF_NO,
-                    a.PERSON_ID,
-                    a.WAREHOUSE_ID,
-                    b.ITEM_ID,
-                    i.ITEM_CODE,
-                    i.ITEM_DESCRIPTION,
-                    b.ENTERED_QTY,
-                    b.BASE_QTY,
-                    b.ENTERED_QTY - (
-                        b.RECEIVED_ENTERED_QTY / b.BASE_QTY
-                    ) AS BALANCE,
-                    b.ENTERED_UOM,
-                    b.UNIT_PRICE,
-                    b.SUBTOTAL,
-                    b.HARGA_INPUT,
-                    i.BERAT,
-                    b.NOTE
-                FROM
-                    po a
-                    JOIN po_detail b
-                        ON a.PO_ID = b.PO_ID
-                    JOIN item i
-                        ON b.ITEM_ID = i.ITEM_ID
-                    JOIN warehouse w
-                        ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
-                WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
-                    AND (
-                        b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
-                    ) < (b.ENTERED_QTY * b.BASE_QTY)
-                    AND a.STATUS_ID IN (
-                        FN_GET_VAR_VALUE ('NEW'),
-                        FN_GET_VAR_VALUE ('PARTIAL')
-                    )
-                    AND a.DOCUMENT_TYPE_ID = '{$tipe_id['TYPE_ID']}'
-                    AND a.WAREHOUSE_ID = {$main_storage}
-                ORDER BY a.DOCUMENT_DATE,
-                    a.DOCUMENT_NO,
-                    b.PO_DETAIL_ID;
-            ");
+                        tmp.*
+                    FROM
+                        (SELECT
+                            b.PO_DETAIL_ID,
+                            NULL TAG_DETAIL_ID,
+                            a.DOCUMENT_TYPE_ID,
+                            a.STATUS_ID,
+                            FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                            a.DOCUMENT_DATE,
+                            a.DOCUMENT_NO,
+                            a.DOCUMENT_REFF_NO,
+                            a.PERSON_ID,
+                            a.WAREHOUSE_ID,
+                            w.WAREHOUSE_NAME,
+                            b.ITEM_ID,
+                            i.ITEM_CODE,
+                            i.ITEM_DESCRIPTION,
+                            b.ENTERED_QTY,
+                            b.BASE_QTY,
+                            b.ENTERED_QTY - (
+                                b.RECEIVED_ENTERED_QTY / b.BASE_QTY
+                            ) AS BALANCE,
+                            b.ENTERED_UOM,
+                            b.UNIT_PRICE,
+                            b.SUBTOTAL,
+                            b.HARGA_INPUT,
+                            i.BERAT,
+                            b.NOTE
+                        FROM
+                            po a
+                            JOIN po_detail b
+                                ON a.PO_ID = b.PO_ID
+                            JOIN item i
+                                ON b.ITEM_ID = i.ITEM_ID
+                            JOIN warehouse w
+                                ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                        WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
+                            AND (
+                                b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
+                            ) < (b.ENTERED_QTY * b.BASE_QTY)
+                            AND a.STATUS_ID IN (
+                                FN_GET_VAR_VALUE ('NEW'),
+                                FN_GET_VAR_VALUE ('PARTIAL')
+                            )
+                            AND a.DOCUMENT_TYPE_ID = 3
+                            AND a.WAREHOUSE_ID = '{$main_storage}'
+                        GROUP BY b.PO_DETAIL_ID
+                        UNION
+                        ALL
+                        SELECT
+                            NULL PO_DETAIL_ID,
+                            b.TAG_DETAIL_ID,
+                            a.DOCUMENT_TYPE_ID,
+                            a.STATUS_ID,
+                            FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                            a.DOCUMENT_DATE,
+                            a.DOCUMENT_NO,
+                            a.DOCUMENT_REFF_NO,
+                            a.PERSON_ID,
+                            b.TO_WH_ID,
+                            w.WAREHOUSE_NAME,
+                            b.ITEM_ID,
+                            i.ITEM_CODE,
+                            i.ITEM_DESCRIPTION,
+                            b.ENTERED_QTY,
+                            b.BASE_QTY,
+                            b.ENTERED_QTY - (
+                                b.DELIVERED_ENTERED_QTY / b.BASE_QTY
+                            ) AS BALANCE,
+                            b.ENTERED_UOM,
+                            b.UNIT_PRICE,
+                            b.SUBTOTAL,
+                            b.HARGA_INPUT,
+                            i.BERAT,
+                            b.NOTE
+                        FROM
+                            tag a
+                            JOIN tag_detail b
+                                ON a.TAG_ID = b.TAG_ID
+                            JOIN item i
+                                ON b.ITEM_ID = i.ITEM_ID
+                            JOIN warehouse w
+                                ON b.TO_WH_ID = w.WAREHOUSE_ID
+                        WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
+                            AND (
+                                b.DELIVERED_ENTERED_QTY * b.DELIVERED_BASE_QTY
+                            ) < (b.ENTERED_QTY * b.BASE_QTY)
+                            AND a.STATUS_ID IN (
+                                FN_GET_VAR_VALUE ('NEW'),
+                                FN_GET_VAR_VALUE ('PARTIAL')
+                            )
+                            AND a.DOCUMENT_TYPE_ID = 5
+                            AND b.TO_WH_ID = '{$main_storage}'
+                        GROUP BY b.TAG_DETAIL_ID) AS tmp
+                    ORDER BY tmp.PO_DETAIL_ID;
+                ");
 
             if ($data->num_rows() > 0) {
                 $result = array(
@@ -273,6 +324,7 @@ class Sts extends Back_Controller
                         'SUBTOTAL'          => $subtotal,
                         'ENTERED_UOM'       => $detail['satuan'][$i],
                         'PO_DETAIL_ID'      => $detail['po_detail_id'][$i],
+                        'TAG_DETAIL_ID'      => $detail['tag_detail_id'][$i],
                         'HARGA_INPUT'       => $harga_input,
                         'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],
                         'NOTE'              => $detail['keterangan'][$i],
@@ -438,6 +490,7 @@ class Sts extends Back_Controller
                         'SUBTOTAL'          => $subtotal,
                         'ENTERED_UOM'       => $detail['satuan'][$i],
                         'PO_DETAIL_ID'      => $detail['po_detail_id'][$i],
+                        'TAG_DETAIL_ID'      => $detail['tag_detail_id'][$i],
                         'HARGA_INPUT'       => $harga_input,
                         'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],
                         'NOTE'              => $detail['keterangan'][$i],

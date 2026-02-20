@@ -233,7 +233,7 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No GRK</th>
+                                                    <th>No Transaksi</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -243,21 +243,48 @@
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $dataDetail = $this->db->query("SELECT tag_konsi_detail.*, item.ITEM_CODE, po.DOCUMENT_NO, po_detail.ENTERED_QTY as po_ENTERED_QTY, po_detail.BASE_QTY as po_BASE_QTY, po_detail.RECEIVED_ENTERED_QTY as po_RECEIVED_ENTERED_QTY  FROM tag_konsi_detail JOIN item ON item.ITEM_ID = tag_konsi_detail.ITEM_ID JOIN po_detail ON po_detail.PO_DETAIL_ID = tag_konsi_detail.PO_DETAIL_ID JOIN po ON po.PO_ID = po_detail.PO_ID WHERE tag_konsi_detail.TAG_KONSI_ID = {$data->TAG_KONSI_ID} ORDER BY TAG_KONSI_DETAIL_ID ASC");
-                                                // debuging($dataDetail->result());
+                                                // $dataDetail = $this->db->query("SELECT tag_konsi_detail.*, item.ITEM_CODE, po.DOCUMENT_NO, po_detail.ENTERED_QTY as po_ENTERED_QTY, po_detail.BASE_QTY as po_BASE_QTY, po_detail.RECEIVED_ENTERED_QTY as po_RECEIVED_ENTERED_QTY  FROM tag_konsi_detail JOIN item ON item.ITEM_ID = tag_konsi_detail.ITEM_ID JOIN po_detail ON po_detail.PO_DETAIL_ID = tag_konsi_detail.PO_DETAIL_ID JOIN po ON po.PO_ID = po_detail.PO_ID WHERE tag_konsi_detail.TAG_KONSI_ID = {$data->TAG_KONSI_ID} ORDER BY TAG_KONSI_DETAIL_ID ASC");
+
+                                                $dataDetail = $this->db->query("SELECT COALESCE
+                                                                (
+                                                                IF
+                                                                    (
+                                                                        a.PO_DETAIL_ID IS NOT NULL,
+                                                                        b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ),
+                                                                        c.ENTERED_QTY - ( c.DELIVERED_ENTERED_QTY / c.BASE_QTY ) 
+                                                                    ),
+                                                                    0 
+                                                                ) BALANCE,
+                                                                a.*,
+                                                                i.ITEM_CODE,
+                                                                i.ITEM_DESCRIPTION,
+                                                            IF
+                                                                ( a.PO_DETAIL_ID IS NOT NULL, po.DOCUMENT_NO, tg.DOCUMENT_NO ) DOCUMENT_NO 
+                                                            FROM
+                                                                tag_konsi_detail a
+                                                                LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
+                                                                LEFT JOIN pr_detail pd ON b.PR_DETAIL_ID = pd.PR_DETAIL_ID
+                                                                LEFT JOIN pr pr ON pd.PR_ID = pr.PR_ID
+                                                                LEFT JOIN po ON b.PO_ID = po.PO_ID
+                                                                LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
+                                                                LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID
+                                                                LEFT JOIN po_detail pod ON c.PO_DETAIL_ID = pod.PO_DETAIL_ID
+                                                                LEFT JOIN pr_detail prd ON pod.PR_DETAIL_ID = prd.PR_DETAIL_ID
+                                                                LEFT JOIN pr pra ON prd.PR_ID = pra.PR_ID
+                                                                JOIN item i ON a.ITEM_ID = i.ITEM_ID 
+                                                            WHERE
+                                                                a.TAG_KONSI_ID = '{$data->TAG_KONSI_ID}'");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
                                                     foreach ($dataDetail->result() as $dd): ?>
-                                                        <?php
-                                                        $l = $dd->po_RECEIVED_ENTERED_QTY /  $dd->po_BASE_QTY;
-                                                        $balance = $dd->po_ENTERED_QTY - $l; ?>
                                                         <tr class="tr-height-30">
                                                             <td><?= $no++ ?></td>
                                                             <td style="display: none;">
                                                                 <input type="hidden" name="detail[tag_konsi_detail_id][]" id="tag_konsi_detail_id" value="<?= $this->encrypt->encode($dd->TAG_KONSI_DETAIL_ID); ?>">
                                                                 <input type="hidden" name="detail[po_detail_id][]" value="<?= $dd->PO_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[tag_detail_id][]" value="<?= $dd->TAG_DETAIL_ID ?>">
                                                                 <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
                                                                 <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[unit_price][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
@@ -291,7 +318,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-tag_konsi_detail_id="<?= $this->encrypt->encode($dd->TAG_KONSI_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-tag_konsi_detail_id="<?= $this->encrypt->encode($dd->TAG_KONSI_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -468,7 +495,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // no grk
+                }, // no transaksi
                 {
                     targets: 4,
                     width: "13%",
@@ -774,26 +801,32 @@
                     $('#loading').hide();
                     tableItem.clear().draw();
 
-                    let existingCodes = new Set();
+                    let existingPO = new Set();
+                    let existingTAG = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[po_detail_id][]"]').val();
-                        if (kode) {
-                            existingCodes.add(kode);
-                        }
+                        let poId = $(node).find('input[name="detail[po_detail_id][]"]').val();
+                        let tagId = $(node).find('input[name="detail[tag_detail_id][]"]').val();
+                        if (poId) existingPO.add(poId);
+                        if (tagId) existingTAG.add(tagId);
                     });
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         let no = 1;
                         response.data.forEach(function(item) {
 
-                            if (existingCodes.has(item.PO_DETAIL_ID)) {
+                            if (existingPO.has(item.PO_DETAIL_ID)) {
+                                return;
+                            }
+
+                            if (existingTAG.has(item.TAG_DETAIL_ID)) {
                                 return;
                             }
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
                                 data-po_detail_id="${item.PO_DETAIL_ID}"
+                                data-tag_detail_id="${item.TAG_DETAIL_ID}"
                                 data-item_id="${item.ITEM_ID}"
                                 data-base_qty="${item.BASE_QTY}"
                                 data-unit_price="${item.UNIT_PRICE}"
@@ -849,11 +882,15 @@
             e.preventDefault();
             let rowsAdded = false;
 
-            let existingCodes = new Set();
+            let existingPO = new Set();
+            let existingTAG = new Set();
             tableDetail.rows().every(function() {
                 let node = this.node();
-                let kodeText = $(node).find('td:eq(4) span').text().trim();
-                existingCodes.add(kodeText);
+                let poId = $(node).find('input[name="detail[po_detail_id][]"]').val();
+                let tagId = $(node).find('input[name="detail[tag_detail_id][]"]').val();
+
+                if (poId) existingPO.add(poId);
+                if (tagId) existingTAG.add(tagId);
             });
 
             let allRows = tableItem.rows().nodes();
@@ -861,6 +898,7 @@
 
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
                 let po_detail_id = $(this).data("po_detail_id");
+                let tag_detail_id = $(this).data("tag_detail_id");
                 let no_grk = $(this).data("no_grk");
                 let nama_item = $(this).data("nama_item");
                 let kode_item = $(this).data("kode_item");
@@ -876,19 +914,27 @@
                 let berat = $(this).data("berat");
                 let balance = $(this).data("sisa");
 
-                if (existingCodes.has(po_detail_id)) {
+                if (existingPO.has(po_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                existingCodes.add(po_detail_id);
+                if (existingTAG.has(tag_detail_id)) {
+                    $(this).prop('checked', false).prop('disabled', true);
+                    return;
+                }
+
+                existingPO.add(po_detail_id);
+                existingTAG.add(tag_detail_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
 
                     `<input type="hidden" name="detail[tag_konsi_detail_id][]" value="">
                     <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[no_grk][]" value="${no_grk}">
                     <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
                     <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
                     <input type="hidden" name="detail[harga_input][]" value="${harga_input}">

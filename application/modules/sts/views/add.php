@@ -212,7 +212,7 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No GRK</th>
+                                                    <th>No Transaksi</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -642,25 +642,31 @@
                     $('#loading').hide();
                     tableItem.clear().draw();
 
-                    let existingCodes = new Set();
+                    let existingPO = new Set();
+                    let existingTAG = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[po_detail_id][]"]').val();
-                        if (kode) {
-                            existingCodes.add(kode);
-                        }
+                        let poId = $(node).find('input[name="detail[po_detail_id][]"]').val();
+                        let tagId = $(node).find('input[name="detail[tag_detail_id][]"]').val();
+                        if (poId) existingPO.add(poId);
+                        if (tagId) existingTAG.add(tagId);
                     });
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            if (existingCodes.has(item.PO_DETAIL_ID)) {
+                            if (existingPO.has(item.PO_DETAIL_ID)) {
+                                return;
+                            }
+
+                            if (existingTAG.has(item.TAG_DETAIL_ID)) {
                                 return;
                             }
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
                                 data-po_detail_id="${item.PO_DETAIL_ID}"
+                                data-tag_detail_id="${item.TAG_DETAIL_ID}"
                                 data-item_id="${item.ITEM_ID}"
                                 data-base_qty="${item.BASE_QTY}"
                                 data-unit_price="${item.UNIT_PRICE}"
@@ -672,7 +678,7 @@
                                 data-tanggal="${item.DOCUMENT_DATE}"
                                 data-no_grk="${item.DOCUMENT_NO}"
                                 data-no_referensi="${item.DOCUMENT_REFF_NO}"
-                                data-nama_item="${item.ITEM_DESCRIPTION}"
+                                data-nama_item="${item.ITEM_DESCRIPTION.replace(/"/g, '&quot;')}"
                                 data-kode_item="${item.ITEM_CODE}"
                                 data-jumlah="${item.ENTERED_QTY}"
                                 data-sisa="${item.BALANCE}"
@@ -695,7 +701,7 @@
                         });
                         tableItem.draw();
                     }
-                    $('#modalTitleForm').text('List GRK');
+                    $('#modalTitleForm').text('List Data');
                     $('#modalGRK').modal('show');
                 }
             });
@@ -717,6 +723,7 @@
             let allRows = tableItem.rows().nodes();
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
                 let po_detail_id = $(this).data("po_detail_id");
+                let tag_detail_id = $(this).data("tag_detail_id");
                 let no_grk = $(this).data("no_grk");
                 let nama_item = $(this).data("nama_item");
                 let kode_item = $(this).data("kode_item");
@@ -753,6 +760,7 @@
                         ${ellipsis(no_grk)}
                     </span>
                     <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
                     <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
