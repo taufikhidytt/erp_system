@@ -95,12 +95,12 @@
                         <div class="tab-content p-3 text-muted">
                             <div class="tab-pane active" id="stok" role="tabpanel">
                                 <div class="row g-3 align-items-center">
-                                    <label for="gudang" class="col-lg-1 col-md-6 col-sm-12 col-form-label">Gudang</label>
+                                    <label for="gudang" class="col-lg-1 col-md-2 col-sm-12 col-form-label">Gudang</label>
                                     <div class="col-lg-2 col-md-2 col-sm-2">
                                         <input type="checkbox" name="check_gudang" id="check_gudang">
                                         <label for="check_gudang">All</label>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12 mb-3 mb-sm-3">
+                                    <div class="col-lg-6 col-md-8 col-sm-12 mb-3 mb-sm-3">
                                         <?php
                                         $defaultValue = null;
                                         foreach ($gudang->result() as $gd) {
@@ -123,6 +123,9 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
+                                </div>
+                                <div class="d-flex mb-2">
+                                    <button id="export_excel_stok" class="btn btn-primary btn-sm">Export Excel Stok</button>
                                 </div>
                                 <div class="row">
                                     <div class="table-responsive">
@@ -154,6 +157,9 @@
                                 </div>
                             </div>
                             <div class="tab-pane" id="summary-stok" role="tabpanel">
+                                <div class="d-flex justify-content-end mb-2">
+                                    <button id="export_excel_summary_stok" class="btn btn-primary btn-sm">Export Summary Stok</button>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-striped text-center w-100 text-nowrap" id="table-summary">
                                         <thead>
@@ -246,11 +252,11 @@
                                 </div>
                                 <div class="row g-3 align-items-center">
                                     <label for="gudang_kartu_stok" class="col-lg-1 col-md-4 col-sm-12 col-form-label">Gudang</label>
-                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                    <div class="col-lg-1 col-md-1 col-sm-2">
                                         <input type="checkbox" name="check_gudang_kartu_stok" id="check_gudang_kartu_stok">
                                         <label for="check_gudang_kartu_stok">All</label>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-10 mb-3 mb-sm-3">
+                                    <div class="col-lg-6 col-md-4 col-sm-6 mb-3 mb-sm-3">
                                         <?php
                                         $defaultValue = null;
                                         foreach ($gudang->result() as $gd) {
@@ -272,6 +278,11 @@
                                                 </option>
                                             <?php endforeach; ?>
                                         </select>
+                                    </div>
+                                    <div class="col-lg-4 col-md-3 col-sm-4">
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button id="export_excel_kartu_stok" class="btn btn-primary btn-sm" style="display:none;">Export Kartu Stok</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -370,6 +381,14 @@
             $("#gudang").prop("disabled", this.checked);
         });
 
+        $('#export_excel_stok').on('click', function() {
+            var params = $.param({
+                gudang: $('#gudang').val(),
+                check_gudang: $('#check_gudang').is(':checked'),
+            });
+            window.location.href = "<?= site_url('stk_kny/export_excel_stok') ?>?" + params;
+        });
+
         // ===============================================================
 
         // Tab summary stok
@@ -393,13 +412,19 @@
             tableSummary.column(index).search(this.value).draw();
         });
 
+        $('#export_excel_summary_stok').on('click', function() {
+            window.location.href = "<?= site_url('stk_kny/export_excel_summary_stok') ?>";
+        });
+
         // ================================================================
 
         // Tab kartu stok
         var tableKartuStok = null;
-        $('#item').on('change', function() {
-            var item_id = $(this).val();
-            if (item_id) {
+        $('#item, #period').on('change', function() {
+            var item_id = $('#item').val();
+            var period = $('#period').val();
+            if (item_id && period) {
+                $('#export_excel_kartu_stok').show();
                 if (!$.fn.DataTable.isDataTable('#table-kartu-stok')) {
                     tableKartuStok = $('#table-kartu-stok').DataTable({
                         processing: true,
@@ -410,8 +435,8 @@
                             url: "<?= site_url('stk_kny/get_data_kartu_stok'); ?>",
                             type: "POST",
                             data: function(d) {
-                                d.item = $('#item').val();
-                                d.period = $('#period').val();
+                                d.item = item_id;
+                                d.period = period;
                                 d.gudang_kartu_stok = $('#gudang_kartu_stok').val();
                                 d.check_gudang_kartu_stok = $('#check_gudang_kartu_stok').is(':checked');
                             }
@@ -428,7 +453,7 @@
                         },
                         columnDefs: [{
                             className: 'text-end',
-                            targets: [3, 5, 6],
+                            targets: [6, 7, 8],
                         }]
                     });
                     $('#table-kartu-stok thead').on('keyup change', '.column_search', function() {
@@ -439,6 +464,7 @@
                     $('#table-kartu-stok').DataTable().ajax.reload();
                 }
             } else {
+                $('#export_excel_kartu_stok').hide();
                 if ($.fn.DataTable.isDataTable('#table-kartu-stok')) {
                     $('#table-kartu-stok').DataTable().clear().destroy();
                 }
@@ -458,6 +484,16 @@
 
         $("#check_gudang_kartu_stok").change(function() {
             $("#gudang_kartu_stok").prop("disabled", this.checked);
+        });
+
+        $('#export_excel_kartu_stok').on('click', function() {
+            var params = $.param({
+                item: $('#item').val(),
+                period: $('#period').val(),
+                gudang_kartu_stok: $('#gudang_kartu_stok').val(),
+                check_gudang_kartu_stok: $('#check_gudang_kartu_stok').is(':checked'),
+            });
+            window.location.href = "<?= site_url('stk_kny/export_excel_kartu_stok') ?>?" + params;
         });
 
         //Initialize Select2 Elements
