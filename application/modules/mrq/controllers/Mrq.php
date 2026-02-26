@@ -62,7 +62,6 @@ class Mrq extends Back_Controller
     {
         try {
             $build_id = $this->encrypt->decode($this->input->post('build_id'));
-            debuging($build_id);
 
             $start = $this->input->post('start') ?? 0;
             $length = $this->input->post('length') ?? 10;

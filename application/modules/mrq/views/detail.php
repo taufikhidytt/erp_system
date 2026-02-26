@@ -374,7 +374,7 @@
                                                         <tr class="tr-height-30">
                                                             <td><?= $no++ ?></td>
                                                             <td style="display: none;">
-                                                                <input type="hidden" name="detail[build_detail_id][]" id="build_detail_id" value="<?= $this->encrypt->encode($dd->BUILD_ID); ?>">
+                                                                <input type="hidden" name="detail[build_detail_id][]" id="build_detail_id" value="<?= $this->encrypt->encode($dd->BUILD_DETAIL_ID); ?>">
                                                                 <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
                                                                 <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[unit_price][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
