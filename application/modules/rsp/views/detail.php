@@ -928,18 +928,18 @@
                 let sisa = $(this).data("sisa");
                 let satuan = $(this).data("satuan");
 
-                if (existingPO.has(po_detail_id)) {
+                if (po_detail_id && existingPO.has(po_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                if (existingTAG.has(tag_detail_id)) {
+                if (tag_detail_id && existingTAG.has(tag_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                existingPO.add(po_detail_id);
-                existingTAG.add(tag_detail_id);
+                if (po_detail_id) existingPO.add(po_detail_id);
+                if (tag_detail_id) existingTAG.add(tag_detail_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
@@ -996,15 +996,15 @@
                 $(this).prop('checked', false).prop('disabled', true);
 
                 rowsAdded = true;
-
-                if (rowsAdded) {
-                    tableDetail.draw(false);
-                    tableDetail.columns.adjust().draw(false); // refresh layout
-                    toggleStorageDisabled();
-                }
-
-                $("#modalRSP").modal("hide");
             });
+
+            if (rowsAdded) {
+                tableDetail.draw(false);
+                tableDetail.columns.adjust();
+                toggleStorageDisabled();
+            }
+
+            $("#modalRSP").modal("hide");
         });
 
         $(document).on("click", "#table-detail tbody td", function(e) {

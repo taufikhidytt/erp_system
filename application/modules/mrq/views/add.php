@@ -46,7 +46,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('rsp') ?>" class="text-decoration-underline">RSP</a>
+                                <a href="<?= base_url('mrq') ?>" class="text-decoration-underline">MRQ</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -87,25 +87,41 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="supplier">Supplier:</label>
+                                            <label for="ship_to">Ship To:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') ==  $sp->PERSON_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
+                                                <select name="ship_to" id="ship_to" class="form-control <?= form_error('ship_to') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Ship To --</option>
+                                                    <?php foreach ($ship_to->result() as $st): ?>
+                                                        <option value="<?= $st->PERSON_ID ?>" <?= set_value('ship_to') ==  $st->PERSON_ID ? 'selected' : null ?> data-person_site_id="<?= $st->PERSON_SITE_ID ?>">
+                                                            <?= strtoupper($st->PERSON_NAME) . ' - [' . strtoupper($st->PERSON_CODE) . '] - ' . strtoupper($st->SITE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
-                                            <div class="text-danger"><?= form_error('supplier') ?></div>
+                                            <div class="text-danger"><?= form_error('ship_to') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="main_storage">Main Storage:</label>
+                                            <label for="location">Location:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-map-2-fill"></i>
+                                                </span>
+                                                <select name="location" id="location" class="form-control select2 <?= form_error('location') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Location --</option>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('location') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <textarea name="address" id="address" class="form-control" disabled></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="storage">Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -113,30 +129,87 @@
                                                 </span>
                                                 <?php
                                                 $defaultValue = null;
-                                                foreach ($main_storage->result() as $ms) {
-                                                    if ($ms->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ms->WAREHOUSE_ID;
+                                                foreach ($storage->result() as $st) {
+                                                    if ($st->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $st->WAREHOUSE_ID;
                                                         break;
                                                     }
                                                 }
                                                 ?>
-                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
+                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
                                                     <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Main Storage --</option>
+                                                        <option value="">-- Selected Storage --</option>
                                                     <?php endif; ?>
-                                                    <?php foreach ($main_storage->result() as $ms): ?>
+                                                    <?php foreach ($storage->result() as $ms): ?>
                                                         <option
                                                             value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= set_value('storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
                                                             <?= strtoupper($ms->WAREHOUSE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
-                                            <div class="text-danger"><?= form_error('main_storage') ?></div>
+                                            <div class="text-danger"><?= form_error('storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="item_finish_goods">Item Finish Goods:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-stack-fill"></i>
+                                                </span>
+                                                <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Item Finish Goods --</option>
+                                                    <?php foreach ($item_finish_goods->result() as $ifg): ?>
+                                                        <option
+                                                            value="<?= $ifg->ITEM_ID ?>"
+                                                            data-description="<?= htmlspecialchars($ifg->ITEM_DESCRIPTION) ?>"
+                                                            <?= set_value('item_finish_goods') ==  $ifg->ITEM_ID ? 'selected' :  '' ?>>
+                                                            <?= strtoupper($ifg->ITEM_DESCRIPTION . " ~ " . $ifg->ITEM_CODE) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <input type="hidden" name="item_description" id="item_description" value="">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('item_finish_goods') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="jumlah">Jumlah:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-numbers-fill"></i>
+                                                </span>
+                                                <input type="number" name="jumlah" id="jumlah" class="form-control jumlah <?= form_error('jumlah') ? 'is-invalid' : null; ?>" min="1" placeholder="Enter Jumlah" value="<?= $this->input->post('jumlah') ?? '1' ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('jumlah') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="satuan">Satuan:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-paint-fill"></i>
+                                                </span>
+                                                <select name="satuan" id="satuan" class="form-control select2 <?= form_error('satuan') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Satuan --</option>
+                                                </select>
+                                                <input type="hidden" name="base_qty" id="base_qty">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('satuan') ?></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="hour_minutes">Hour Minutes:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-map-pin-time-fill"></i>
+                                                </span>
+                                                <input type="text" name="hour_minutes" id="hour_minutes" class="form-control <?= form_error('hour_minutes') ? 'is-invalid' : null; ?>" placeholder="Enter Hour Minutes" value="<?= $this->input->post('hour_minutes'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('hour_minutes') ?></div>
+                                        </div>
                                         <div class="mb-3">
                                             <label for="tanggal">Tanggal:</label>
                                             <span class="text-danger">*</span>
@@ -150,14 +223,56 @@
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="no_referensi">No Referensi:</label>
+                                            <label for="ship_date">Ship Date:</label>
+                                            <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
+                                                    <i class="ri ri-calendar-2-fill"></i>
                                                 </span>
-                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi'); ?>">
+                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
+                                                <input type="datetime-local" name="ship_date" id="ship_date" class="form-control <?= form_error('ship_date') ? 'is-invalid' : null; ?>" placeholder="Enter Ship Date" value="<?= $this->input->post('ship_date') ?>">
                                             </div>
-                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
+                                            <div class="text-danger"><?= form_error('ship_date') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="reff_cust">Reff Cust (MO):</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-price-tag-3-fill"></i>
+                                                </span>
+                                                <input type="text" name="reff_cust" id="reff_cust" class="form-control <?= form_error('reff_cust') ? 'is-invalid' : null; ?>" placeholder="Enter Reff Cust" value="<?= $this->input->post('reff_cust'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('reff_cust') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="reff_pr">Reff PR:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-price-tag-3-fill"></i>
+                                                </span>
+                                                <input type="text" name="reff_pr" id="reff_pr" class="form-control <?= form_error('reff_pr') ? 'is-invalid' : null; ?>" placeholder="Enter Reff PR" value="<?= $this->input->post('reff_pr'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('reff_pr') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="unit">Unit:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-price-tag-3-fill"></i>
+                                                </span>
+                                                <input type="text" name="unit" id="unit" class="form-control <?= form_error('unit') ? 'is-invalid' : null; ?>" placeholder="Enter Unit" value="<?= $this->input->post('unit'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('unit') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="code">Code:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-barcode-line"></i>
+                                                </span>
+                                                <input type="text" name="code" id="code" class="form-control <?= form_error('code') ? 'is-invalid' : null; ?>" placeholder="Enter Code" value="<?= $this->input->post('code'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('code') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
@@ -186,7 +301,7 @@
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
-                                            <button type="button" id="btn-modalRSP" class="btn btn-success btn-sm">
+                                            <button type="button" id="btn-modalMrq" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
                                         </div>
@@ -199,8 +314,6 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No Trx 1</th>
-                                                    <th>No Trx 2</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -227,7 +340,7 @@
 <!-- End Page-content -->
 
 <!-- modal -->
-<div id="modalRSP" class="modal fade" style="font-size: 12px;">
+<div id="modalMrq" class="modal fade" style="font-size: 12px;">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -244,8 +357,8 @@
                                 </th>
                                 <th>No</th>
                                 <th>Status</th>
-                                <th>No Ref Trx 1</th>
-                                <th>No Ref Trx 2</th>
+                                <th>Tanggal</th>
+                                <th>No Transaksi</th>
                                 <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
@@ -324,7 +437,7 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // no trx 1
+                }, // nama item
                 {
                     targets: 3,
                     width: "10%",
@@ -332,25 +445,9 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // no trx 2
-                {
-                    targets: 4,
-                    width: "13%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // nama item
-                {
-                    targets: 5,
-                    width: "8%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
                 }, // kode item
                 {
-                    targets: 6,
+                    targets: 4,
                     width: "10%",
                     className: "ellipsis text-end",
                     createdCell: function(td) {
@@ -359,7 +456,7 @@
                     }
                 }, // jumlah
                 {
-                    targets: 7,
+                    targets: 5,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
@@ -367,7 +464,7 @@
                     }
                 }, // satuan
                 {
-                    targets: 8,
+                    targets: 6,
                     width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
@@ -566,17 +663,52 @@
             })
         }
 
-        $("#main_storage").data("prev", $("#main_storage").val());
+        $('#location').prop('disabled', true);
 
-        $("#main_storage").on("change", function(e, data) {
+        $('#location').on('select2:opening', function(e) {
+            e.preventDefault();
+        });
+
+        let initialShipTo = $('#ship_to option:selected').data('person_site_id');
+
+        let oldLocation = "<?= set_value('location') ?>";
+
+        if (initialShipTo) {
+            loadLocation(initialShipTo, oldLocation);
+        }
+
+        $('#ship_to').on('change', function() {
+            let initialShipTo = $(this).find(':selected').data('person_site_id');
+            console.log(initialShipTo);
+            loadLocation(initialShipTo);
+        });
+
+        $('#item_finish_goods').on('change', function() {
+            let description = $(this).find(':selected').data('description');
+            $('#item_description').val(description);
+        });
+
+        $('#satuan').prop('disabled', true);
+
+        let initialItem = $('#item_finish_goods').val();
+        let oldSatuan = "<?= set_value('satuan') ?>";
+
+        if (initialItem) {
+            loadSatuan(initialItem, oldSatuan);
+        }
+        $('#item_finish_goods').on('change', function() {
+            let itemId = $(this).val();
+            loadSatuan(itemId);
+        });
+
+        $("#storage").data("prev", $("#storage").val());
+        $("#storage").on("change", function(e, data) {
             let prev = $(this).data("prev");
             let current = $(this).val();
-
             if (prev && current !== prev && tableDetail.rows().count() > 0) {
-
                 Swal.fire({
-                    title: "Ganti Main Storage?",
-                    text: "Data RCO yang sudah dipilih akan dihapus.",
+                    title: "Ganti Storage?",
+                    text: "Data yang sudah dipilih akan dihapus.",
                     icon: "warning",
                     showCancelButton: true,
                     confirmButtonText: "Ya, ganti",
@@ -598,40 +730,27 @@
         });
 
         // modal
-        $("#btn-modalRSP").on("click", function() {
+        $("#btn-modalMrq").on("click", function() {
             resetModalItem();
-
             $("#checkAll").prop('checked', false);
             $('#loading').show();
-            var supplier = $('#supplier').val();
-            var main_storage = $('#main_storage').val();
+            var storage = $('#storage').val();
 
-            if (!main_storage) {
+            if (!storage) {
                 $('#loading').hide();
                 Swal.fire({
                     icon: 'warning',
                     title: 'Warning',
-                    text: 'Main storage tidak terisi, Mohon isi terlebih dahulu',
-                });
-                return;
-            }
-
-            if (!supplier) {
-                $('#loading').hide();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Warning',
-                    text: 'Supplier tidak terisi, Mohon isi terlebih dahulu',
+                    text: 'Storage tidak terisi, Mohon isi terlebih dahulu',
                 });
                 return;
             }
 
             $.ajax({
                 type: "POST",
-                url: "<?= base_url() ?>rsp/getRsp",
+                url: "<?= base_url() ?>mrq/getMrq",
                 data: {
-                    supplier: supplier,
-                    main_storage: main_storage,
+                    storage: storage,
                 },
                 dataType: "json",
                 success: function(response) {
@@ -673,8 +792,8 @@
                                 data-berat="${item.BERAT}"
 
                                 data-status="${item.STATUS_NAME}"
-                                data-no_reff_1="${item.No_Reff_1}"
-                                data-no_reff_2="${item.No_Reff_2}"
+                                data-tanggal="${item.DOCUMENT_DATE}"
+                                data-no_transaksi="${item.DOCUMENT_NO}"
                                 data-no_referensi="${item.DOCUMENT_REFF_NO}"
                                 data-nama_item="${item.ITEM_DESCRIPTION.replace(/"/g, '&quot;')}"
                                 data-kode_item="${item.ITEM_CODE}"
@@ -687,8 +806,8 @@
                                 checkbox,
                                 i + 1,
                                 item.STATUS_NAME,
-                                item.No_Reff_1,
-                                item.No_Reff_2,
+                                item.DOCUMENT_DATE,
+                                item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
@@ -700,7 +819,7 @@
                         tableItem.draw();
                     }
                     $('#modalTitleForm').text('List Data');
-                    $('#modalRSP').modal('show');
+                    $('#modalMrq').modal('show');
                 }
             });
         });
@@ -752,8 +871,8 @@
                 let balance = $(this).data("sisa");
 
                 let status = $(this).data("status");
-                let no_reff_1 = $(this).data("no_reff_1");
-                let no_reff_2 = $(this).data("no_reff_2");
+                let tanggal = $(this).data("tanggal");
+                let no_transaksi = $(this).data("no_transaksi");
                 let no_referensi = $(this).data("no_referensi");
                 let nama_item = $(this).data("nama_item");
                 let kode_item = $(this).data("kode_item");
@@ -761,26 +880,35 @@
                 let sisa = $(this).data("sisa");
                 let satuan = $(this).data("satuan");
 
-                // Cegah double di tableDetail
-                let exists = tableDetail
-                    .column(2)
-                    .data()
-                    .toArray()
-                    .includes(po_detail_id);
-
-                if (exists) {
-                    $(this).prop('checked', false).prop('disabled', true);
+                // ==========================================
+                // Cegah duplicate PO
+                // ==========================================
+                if (po_detail_id && existingPO.has(po_detail_id)) {
+                    checkbox.prop("checked", false).prop("disabled", true);
                     return;
                 }
+
+                // ==========================================
+                // Cegah duplicate TAG
+                // ==========================================
+                if (tag_detail_id && existingTAG.has(tag_detail_id)) {
+                    checkbox.prop("checked", false).prop("disabled", true);
+                    return;
+                }
+
+                // Simpan supaya tidak double dalam 1x submit
+                if (po_detail_id) existingPO.add(po_detail_id);
+                if (tag_detail_id) existingTAG.add(tag_detail_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${no_reff_1}">
-                        ${ellipsis(no_reff_1)}
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
                     </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
@@ -791,16 +919,6 @@
                     <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
                     <input type="hidden" name="detail[balance][]" value="${balance}">
-                    `,
-
-                    `<span class="ellipsis" title="${no_reff_2}">
-                        ${ellipsis(no_reff_2)}
-                    </span>`,
-
-                    `<span class="ellipsis" title="${nama_item}">
-                        ${ellipsis(nama_item)}
-                    </span>
-                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
                     `,
 
                     `<span class="ellipsis" title="${kode_item}">
@@ -827,9 +945,10 @@
 
             if (rowsAdded) {
                 tableDetail.draw(false);
+                tableDetail.columns.adjust();
                 toggleStorageDisabled();
             }
-            $("#modalRSP").modal("hide");
+            $("#modalMrq").modal("hide");
         });
 
         $(document).on("click", "#table-detail tbody td", function(e) {
@@ -1152,44 +1271,27 @@
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $main_storage = $('#main_storage');
-        let $supplier = $('#supplier');
+        let $storage = $('#storage');
 
         if (hasDetail) {
-            $main_storage.prop('disabled', true).trigger('change.select2');
-            $supplier.prop('disabled', true).trigger('change.select2');
+            $storage.prop('disabled', true).trigger('change.select2');
 
             // Buat hidden input agar value tetap dikirim ke server
-            if ($('#main_storage-hidden').length === 0) {
+            if ($('#storage-hidden').length === 0) {
                 $('<input>').attr({
                     type: 'hidden',
-                    id: 'main_storage-hidden',
-                    name: $main_storage.attr('name'),
-                    value: $main_storage.val()
+                    id: 'storage-hidden',
+                    name: $storage.attr('name'),
+                    value: $storage.val()
                 }).appendTo('form');
             } else {
-                $('#main_storage-hidden').val($main_storage.val());
-            }
-
-            if ($('#supplier-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'site_storage-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
-                }).appendTo('form');
-            } else {
-                $('#supplier-hidden').val($supplier.val());
+                $('#storage-hidden').val($storage.val());
             }
         } else {
-            $main_storage.prop('disabled', false).trigger('change.select2');
-            $supplier.prop('disabled', false).trigger('change.select2');
-            $('#main_storage-hidden').remove();
-            $('#supplier-hidden').remove();
+            $storage.prop('disabled', false).trigger('change.select2');
+            $('#storage-hidden').remove();
         }
-
-        $main_storage.trigger('change.select2');
-        $supplier.trigger('change.select2');
+        $storage.trigger('change.select2');
     }
 
     function resetModalItem() {
@@ -1207,5 +1309,97 @@
         return text.length > limit ?
             text.substring(0, limit) + '...' :
             text;
+    }
+
+    function loadLocation(shipTo, selectedLocation = null) {
+        $('#location')
+            .empty()
+            .prop('disabled', true)
+            .trigger('change');
+        if (!shipTo) return;
+
+        $.ajax({
+            url: "<?= base_url('mrq/get_location_by_shipto') ?>",
+            type: "POST",
+            data: {
+                ship_to: shipTo
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.status === 'success') {
+                    let locations = response.data;
+                    $.each(locations, function(i, item) {
+                        // let address = `${item.SITE_NAME ?? ''} ${item.ADDRESS1 ?? ''} ${item.CITY ?? ''}`;
+                        let selected = "";
+
+                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) {
+                            selected = "selected";
+                        } else if (!selectedLocation && item.PRIMARY_SHIP === "Y") {
+                            selected = "selected";
+                        }
+
+                        $('#location').append(
+                            `<option value="${item.PERSON_SITE_ID}" ${selected}>
+                                ${item.SITE_NAME}
+                            </option>`
+                        );
+
+                        $('#address').val((item.ADDRESS1 ?? '') + '\n' + (item.CITY ?? ''));
+                    });
+
+                    $('#location')
+                        .prop('disabled', false)
+                        .trigger('change');
+                }
+            }
+        });
+    }
+
+    function loadSatuan(item, selectedSatuan = null) {
+        $('#satuan')
+            .empty()
+            .prop('disabled', true)
+            .trigger('change');
+        if (!item) return;
+
+        if (item) {
+            $.ajax({
+                url: "<?= base_url('mrq/get_item_uom') ?>",
+                type: "POST",
+                data: {
+                    item_id: item
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === "success") {
+
+                        let units = response.data;
+
+                        $.each(units, function(i, unit) {
+
+                            let selected = "";
+
+                            if (selectedSatuan && selectedSatuan === unit.UOM_CODE) {
+                                selected = "selected";
+                            } else if (!selectedSatuan && unit.URUT == 0) {
+                                selected = "selected";
+                            }
+
+                            $('#satuan').append(
+                                `<option value="${unit.UOM_CODE}" ${selected}>
+                                    ${unit.UOM_CODE} (${unit.TO_QTY})
+                                </option>`
+                            );
+
+                            $('#base_qty').val(unit.TO_QTY);
+                        });
+
+                        $('#satuan')
+                            .prop('disabled', false)
+                            .trigger('change');
+                    }
+                }
+            });
+        }
     }
 </script>
