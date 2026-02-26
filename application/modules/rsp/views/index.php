@@ -93,6 +93,9 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
                                         </tr>
                                         <tr class="align-content-center">
                                             <th></th>
@@ -101,6 +104,7 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
+                                            <th>Supplier</th>
                                             <th>Main Storage</th>
                                         </tr>
                                     </thead>
@@ -154,7 +158,7 @@
                 },
                 {
                     "data": "status",
-                    "width": "13%",
+                    "width": "8%",
                 },
                 {
                     "data": "no_transaksi",
@@ -166,7 +170,15 @@
                 },
                 {
                     "data": "tanggal",
-                    "width": "10%",
+                    "width": "15%",
+                },
+                {
+                    "data": "supplier",
+                    "width": "15%",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
                 },
                 {
                     "data": "main_storage",

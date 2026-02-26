@@ -39,6 +39,7 @@ class Rsp extends Back_Controller
             </a>';
             $row['no_referensi'] = $rsp->No_Referensi ? $rsp->No_Referensi : '-';
             $row['tanggal'] = $rsp->Tanggal ? date('Y-m-d H:i', strtotime($rsp->Tanggal)) : '-';
+            $row['supplier'] = $rsp->Supplier ? $rsp->Supplier : '-';
             $row['main_storage'] = $rsp->Main_Storage ? $rsp->Main_Storage : '-';
 
             $row['tag_pinjam_id'] = $this->encrypt->encode($rsp->TAG_PINJAM_ID);

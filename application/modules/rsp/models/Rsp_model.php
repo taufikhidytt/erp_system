@@ -16,6 +16,7 @@ class Rsp_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
+        "CONCAT(p . PERSON_NAME, ' - [', p . PERSON_CODE, ']')",
         "w.WAREHOUSE_NAME",
     );
 
@@ -25,6 +26,7 @@ class Rsp_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
+        "CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' )",
         "w.WAREHOUSE_NAME",
     );
 
@@ -41,11 +43,13 @@ class Rsp_model extends CI_Model
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,
+            CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) Supplier,
             w.WAREHOUSE_NAME Main_Storage
         ");
         $this->db->from('tag_pinjam a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;
@@ -108,11 +112,13 @@ class Rsp_model extends CI_Model
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,
+            CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) Supplier,
             w.WAREHOUSE_NAME Main_Storage
         ");
         $this->db->from('tag_pinjam a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
