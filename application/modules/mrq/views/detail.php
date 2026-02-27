@@ -368,44 +368,32 @@
                                                 // WHERE
                                                 //     a.BUILD_ID = '{$data->BUILD_ID}'");
 
-                                                $dataDetail = $this->db->query("SELECT
-                                                    tmp.*,
-                                                CASE
-                                                        
-                                                        WHEN BASE_QTY = 0 THEN
-                                                        ENTERED_QTY ELSE ENTERED_QTY - ( RECEIVED_ENTERED_QTY / NULLIF( BASE_QTY, 0 ) ) 
-                                                    END AS BALANCE
+                                                $dataDetail = $this->db->query("SELECT COALESCE
+                                                    (
+                                                    CASE
+                                                            
+                                                            WHEN a.PO_DETAIL_ID IS NOT NULL THEN
+                                                            b.ENTERED_QTY - COALESCE ( b.RECEIVED_ENTERED_QTY / NULLIF( b.BASE_QTY, 0 ), 0 ) 
+                                                            WHEN a.TAG_DETAIL_ID IS NOT NULL THEN
+                                                            c.ENTERED_QTY - COALESCE ( c.DELIVERED_ENTERED_QTY / NULLIF( c.BASE_QTY, 0 ), 0 ) 
+                                                        END,
+                                                        0 
+                                                    ) AS BALANCE,
+                                                    a.*,
+                                                    i.ITEM_CODE,
+                                                    i.ITEM_DESCRIPTION,
+                                                    COALESCE ( po.DOCUMENT_NO, tg.DOCUMENT_NO ) AS DOCUMENT_NO 
                                                 FROM
-                                                    (-- Query untuk PO
-                                                    SELECT
-                                                        a.*,
-                                                        i.ITEM_CODE,
-                                                        po.DOCUMENT_NO
-                                                    FROM
-                                                        build_detail a
-                                                        JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
-                                                        JOIN po ON po.PO_ID = b.PO_ID
-                                                        JOIN item i ON a.ITEM_ID = i.ITEM_ID
-                                                    WHERE
-                                                        ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
-                                                        AND ( b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
-                                                        AND a.BUILD_ID = '{$data->BUILD_ID}' UNION ALL
-                                                    SELECT
-                                                        a.*,
-                                                        i.ITEM_CODE,
-                                                        tag.DOCUMENT_NO
-                                                    FROM
-                                                        build_detail a
-                                                        JOIN tag_detail b ON a.TAG_DETAIL_ID = b.TAG_DETAIL_ID
-                                                        JOIN tag ON tag.TAG_ID = b.TAG_ID
-                                                        JOIN item i ON b.ITEM_ID = i.ITEM_ID
-                                                    WHERE
-                                                        ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
-                                                        AND ( b.DELIVERED_ENTERED_QTY * b.DELIVERED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
-                                                        AND a.BUILD_ID = '{$data->BUILD_ID}'
-                                                    ) tmp 
+                                                    build_detail a
+                                                    JOIN item i ON a.ITEM_ID = i.ITEM_ID
+                                                    LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
+                                                    LEFT JOIN po ON b.PO_ID = po.PO_ID
+                                                    LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
+                                                    LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID 
+                                                WHERE
+                                                    a.BUILD_ID = '{$data->BUILD_ID}' 
                                                 ORDER BY
-                                                    BUILD_DETAIL_ID ASC;");
+                                                    a.BUILD_DETAIL_ID ASC ;");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
