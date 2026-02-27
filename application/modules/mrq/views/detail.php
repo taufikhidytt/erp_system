@@ -336,6 +336,7 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
+                                                    <th>No Transaksi</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -345,27 +346,66 @@
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $dataDetail = $this->db->query("SELECT COALESCE
-                                                    (
-                                                    IF
-                                                        (
-                                                            a.PO_DETAIL_ID IS NOT NULL,
-                                                            b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ),
-                                                            c.ENTERED_QTY - ( c.DELIVERED_ENTERED_QTY / c.BASE_QTY ) 
-                                                        ),
-                                                        0 
-                                                    ) BALANCE,
-                                                    a.*,
-                                                    i.ITEM_CODE,
-                                                    i.ITEM_DESCRIPTION
+                                                // $dataDetail = $this->db->query("SELECT COALESCE
+                                                //     (
+                                                //     IF
+                                                //         (
+                                                //             a.PO_DETAIL_ID IS NOT NULL,
+                                                //             b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ),
+                                                //             c.ENTERED_QTY - ( c.DELIVERED_ENTERED_QTY / c.BASE_QTY ) 
+                                                //         ),
+                                                //         0 
+                                                //     ) BALANCE,
+                                                //     a.*,
+                                                //     i.ITEM_CODE,
+                                                //     i.ITEM_DESCRIPTION
+                                                // FROM
+                                                //     build_detail a
+                                                //     LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
+                                                //     LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
+                                                //     LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID
+                                                //     JOIN item i ON a.ITEM_ID = i.ITEM_ID 
+                                                // WHERE
+                                                //     a.BUILD_ID = '{$data->BUILD_ID}'");
+
+                                                $dataDetail = $this->db->query("SELECT
+                                                    tmp.*,
+                                                CASE
+                                                        
+                                                        WHEN BASE_QTY = 0 THEN
+                                                        ENTERED_QTY ELSE ENTERED_QTY - ( RECEIVED_ENTERED_QTY / NULLIF( BASE_QTY, 0 ) ) 
+                                                    END AS BALANCE
                                                 FROM
-                                                    build_detail a
-                                                    LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
-                                                    LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
-                                                    LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID
-                                                    JOIN item i ON a.ITEM_ID = i.ITEM_ID 
-                                                WHERE
-                                                    a.BUILD_ID = '{$data->BUILD_ID}'");
+                                                    (-- Query untuk PO
+                                                    SELECT
+                                                        a.*,
+                                                        i.ITEM_CODE,
+                                                        po.DOCUMENT_NO
+                                                    FROM
+                                                        build_detail a
+                                                        JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
+                                                        JOIN po ON po.PO_ID = b.PO_ID
+                                                        JOIN item i ON a.ITEM_ID = i.ITEM_ID
+                                                    WHERE
+                                                        ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
+                                                        AND ( b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
+                                                        AND a.BUILD_ID = '{$data->BUILD_ID}' UNION ALL
+                                                    SELECT
+                                                        a.*,
+                                                        i.ITEM_CODE,
+                                                        tag.DOCUMENT_NO
+                                                    FROM
+                                                        build_detail a
+                                                        JOIN tag_detail b ON a.TAG_DETAIL_ID = b.TAG_DETAIL_ID
+                                                        JOIN tag ON tag.TAG_ID = b.TAG_ID
+                                                        JOIN item i ON b.ITEM_ID = i.ITEM_ID
+                                                    WHERE
+                                                        ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
+                                                        AND ( b.DELIVERED_ENTERED_QTY * b.DELIVERED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
+                                                        AND a.BUILD_ID = '{$data->BUILD_ID}'
+                                                    ) tmp 
+                                                ORDER BY
+                                                    BUILD_DETAIL_ID ASC;");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
@@ -389,6 +429,12 @@
                                                             <td>
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
+                                                            <td class="ellipsis">
+                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
+                                                                    <?= $dd->DOCUMENT_NO; ?>
+                                                                </span>
+                                                            </td>
+
                                                             <td class="ellipsis">
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
                                                                     <?= $dd->ITEM_DESCRIPTION; ?>
@@ -578,23 +624,31 @@
                 }, // checkbox
                 {
                     targets: 3,
-                    width: "10%",
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no transaksi
+                {
+                    targets: 4,
+                    width: "20%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // nama item
                 {
-                    targets: 4,
-                    width: "10%",
+                    targets: 5,
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // kode item
                 {
-                    targets: 5,
-                    width: "10%",
+                    targets: 6,
+                    width: "15%",
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -602,20 +656,19 @@
                     }
                 }, // jumlah
                 {
-                    targets: 6,
-                    width: "10%",
+                    targets: 7,
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // satuan
                 {
-                    targets: 7,
-                    width: "10%",
+                    targets: 8,
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer'
                     }
                 }, // keterangan
             ],
@@ -1060,6 +1113,10 @@
                     <input type="hidden" name="detail[balance][]" value="${balance}">`,
 
                     `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_transaksi}">
+                    ${ellipsis(no_transaksi)}
+                    </span>`,
 
                     `<span class="ellipsis" title="${nama_item}">
                     ${ellipsis(nama_item)}

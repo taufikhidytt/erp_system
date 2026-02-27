@@ -93,7 +93,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="ship_to" id="ship_to" class="form-control <?= form_error('ship_to') ? 'is-invalid' : null; ?>">
+                                                <select name="ship_to" id="ship_to" class="form-control select2 <?= form_error('ship_to') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Ship To --</option>
                                                     <?php foreach ($ship_to->result() as $st): ?>
                                                         <option value="<?= $st->PERSON_ID ?>" <?= set_value('ship_to') ==  $st->PERSON_ID ? 'selected' : null ?> data-person_site_id="<?= $st->PERSON_SITE_ID ?>">
@@ -314,6 +314,7 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
+                                                    <th>No Transaksi</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -432,40 +433,48 @@
                 }, // checkbox
                 {
                     targets: 2,
-                    width: "10%",
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no transaksi
+                {
+                    targets: 3,
+                    width: "20%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // nama item
                 {
-                    targets: 3,
-                    width: "10%",
+                    targets: 4,
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // kode item
                 {
-                    targets: 4,
-                    width: "10%",
+                    targets: 5,
+                    width: "15%",
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer'
+                        td.style.cursor = 'pointer';
                     }
                 }, // jumlah
                 {
-                    targets: 5,
-                    width: "10%",
+                    targets: 6,
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // satuan
                 {
-                    targets: 6,
-                    width: "10%",
+                    targets: 7,
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -905,10 +914,9 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${nama_item}">
-                        ${ellipsis(nama_item)}
+                    `<span class="ellipsis" title="${no_transaksi}">
+                        ${ellipsis(no_transaksi)}
                     </span>
-                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
@@ -920,6 +928,11 @@
                     <input type="hidden" name="detail[berat][]" value="${berat}">
                     <input type="hidden" name="detail[balance][]" value="${balance}">
                     `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
 
                     `<span class="ellipsis" title="${kode_item}">
                         ${ellipsis(kode_item)}
