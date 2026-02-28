@@ -96,11 +96,11 @@
                             <div class="tab-pane active" id="stok" role="tabpanel">
                                 <div class="row g-3 align-items-center">
                                     <label for="gudang" class="col-lg-1 col-md-2 col-sm-12 col-form-label">Gudang</label>
-                                    <div class="col-lg-2 col-md-2 col-sm-2">
+                                    <div class="col-lg-1 col-md-2 col-sm-2">
                                         <input type="checkbox" name="check_gudang" id="check_gudang">
                                         <label for="check_gudang">All</label>
                                     </div>
-                                    <div class="col-lg-6 col-md-8 col-sm-12 mb-3 mb-sm-3">
+                                    <div class="col-lg-8 col-md-4 col-sm-12 mb-3 mb-sm-3">
                                         <?php
                                         $defaultValue = null;
                                         foreach ($gudang->result() as $gd) {
@@ -123,9 +123,11 @@
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="d-flex mb-2">
-                                    <button id="export_excel_stok" class="btn btn-primary btn-sm">Export Excel Stok</button>
+                                    <div class="col-lg-2 col-md-4 col-sm-12">
+                                        <div class="d-flex mb-2">
+                                            <button id="export_excel_stok" class="btn btn-primary btn-sm">Export Excel Stok</button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="table-responsive">
