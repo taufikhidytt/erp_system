@@ -914,18 +914,18 @@
                 let berat = $(this).data("berat");
                 let balance = $(this).data("sisa");
 
-                if (existingPO.has(po_detail_id)) {
+                if (po_detail_id && existingPO.has(po_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                if (existingTAG.has(tag_detail_id)) {
+                if (tag_detail_id && existingTAG.has(tag_detail_id)) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
                 }
 
-                existingPO.add(po_detail_id);
-                existingTAG.add(tag_detail_id);
+                if (po_detail_id) existingPO.add(po_detail_id);
+                if (tag_detail_id) existingTAG.add(tag_detail_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
