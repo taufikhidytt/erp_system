@@ -106,37 +106,6 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="main_storage">Main Storage:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-building-2-fill"></i>
-                                                </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($main_storage->result() as $ms) {
-                                                    if ($ms->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ms->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Main Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($main_storage->result() as $ms): ?>
-                                                        <option
-                                                            value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('main_storage') ?></div>
-                                        </div>
-                                        <div class="mb-3">
                                             <label for="site_storage">Site Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -167,6 +136,37 @@
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('site_storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="main_storage">Main Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-2-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($main_storage->result() as $ms) {
+                                                    if ($ms->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ms->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Main Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php foreach ($main_storage->result() as $ms): ?>
+                                                        <option
+                                                            value="<?= $ms->WAREHOUSE_ID ?>"
+                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('main_storage') ?></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
