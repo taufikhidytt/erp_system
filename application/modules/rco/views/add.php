@@ -87,6 +87,37 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="site_storage">Site Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($site_storage->result() as $ss) {
+                                                    if ($ss->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ss->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Site Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php foreach ($site_storage->result() as $ss): ?>
+                                                        <option
+                                                            value="<?= $ss->WAREHOUSE_ID ?>"
+                                                            <?= set_value('site_storage') ==  $ss->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ss->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('site_storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <label for="main_storage">Main Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -141,10 +172,6 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row form-xs">
-                                    <div class="col-12">
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
                                             <div class="input-group">
@@ -582,6 +609,7 @@
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
+            var site_storage = $('#site_storage').val();
             var main_storage = $('#main_storage').val();
 
             if (!main_storage) {
@@ -594,10 +622,21 @@
                 return;
             }
 
+            if (!site_storage) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Site storage tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
+
             $.ajax({
                 type: "POST",
                 url: "<?= base_url() ?>rco/getRco",
                 data: {
+                    site_storage: site_storage,
                     main_storage: main_storage,
                 },
                 dataType: "json",

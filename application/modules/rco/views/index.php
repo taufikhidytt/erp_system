@@ -93,6 +93,9 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
                                         </tr>
                                         <tr class="align-content-center">
                                             <th></th>
@@ -102,6 +105,7 @@
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
                                             <th>Main Storage</th>
+                                            <th>Site Storage</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -158,15 +162,23 @@
                 },
                 {
                     "data": "no_transaksi",
-                    "width": "20%",
+                    "width": "15%",
                 },
                 {
                     "data": "no_referensi",
-                    "width": "20%",
+                    "width": "15%",
                 },
                 {
                     "data": "tanggal",
                     "width": "10%",
+                },
+                {
+                    "data": "main_storage",
+                    "width": "15%",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
                 },
                 {
                     "data": "site_storage",
@@ -202,9 +214,9 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>Sisa</th>
                                     <th>Satuan</th>
                                     <th>No RHO</th>
-                                    <th>S.Loc-In</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>
@@ -249,6 +261,13 @@
                             }
                         },
                         {
+                            "data": "sisa",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
                             "data": "satuan",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
@@ -256,12 +275,6 @@
                         },
                         {
                             "data": "no_rho",
-                            createdCell: function(td) {
-                                td.style.fontFamily = 'monospace';
-                            }
-                        },
-                        {
-                            "data": "s_loc_in",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

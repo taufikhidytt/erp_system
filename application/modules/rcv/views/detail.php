@@ -125,7 +125,7 @@
                                                     <?php if (!$defaultValue): ?>
                                                         <option value="">-- Selected Site Storage --</option>
                                                     <?php endif; ?>
-                                                    <?php $param = $this->input->post('site_storage') ?? $data->DEST_WH_ID; ?>
+                                                    <?php $param = $this->input->post('site_storage') ?? $data->TO_WH_ID; ?>
                                                     <?php foreach ($site_storage->result() as $ss): ?>
                                                         <option
                                                             value="<?= $ss->WAREHOUSE_ID ?>"
@@ -157,10 +157,11 @@
                                                     <?php if (!$defaultValue): ?>
                                                         <option value="">-- Selected Main Storage --</option>
                                                     <?php endif; ?>
+                                                    <?php $param = $this->input->post('site_storage') ?? $data->WAREHOUSE_ID; ?>
                                                     <?php foreach ($main_storage->result() as $ms): ?>
                                                         <option
                                                             value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= $ms->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
                                                             <?= strtoupper($ms->WAREHOUSE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>

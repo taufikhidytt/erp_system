@@ -17,6 +17,7 @@ class Rco_model extends CI_Model
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
         "wh.WAREHOUSE_NAME",
+        "w.WAREHOUSE_NAME"
     );
 
     var $column_search = array(
@@ -26,6 +27,7 @@ class Rco_model extends CI_Model
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
         "wh.WAREHOUSE_NAME",
+        "w.WAREHOUSE_NAME"
     );
 
     var $order = array('a.DOCUMENT_DATE' => 'DESC');
@@ -41,12 +43,13 @@ class Rco_model extends CI_Model
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,
-            wh.WAREHOUSE_NAME Site
+            wh.WAREHOUSE_NAME Main_Storage,
+            w.WAREHOUSE_NAME Site_Storage
         ");
         $this->db->from('tag a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
-        $this->db->join('warehouse wh', 'a.DEST_WH_ID = wh.WAREHOUSE_ID');
+        $this->db->join('warehouse wh', 'a.TO_WH_ID = wh.WAREHOUSE_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;
@@ -109,12 +112,13 @@ class Rco_model extends CI_Model
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,
-            wh.WAREHOUSE_NAME Site
+            wh.WAREHOUSE_NAME Main_Storage,
+            w.WAREHOUSE_NAME Site_Storage
         ");
         $this->db->from('tag a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
-        $this->db->join('warehouse wh', 'a.DEST_WH_ID = wh.WAREHOUSE_ID');
+        $this->db->join('warehouse wh', 'a.TO_WH_ID = wh.WAREHOUSE_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
@@ -125,12 +129,22 @@ class Rco_model extends CI_Model
             i.ITEM_DESCRIPTION Nama_Item,
             i.ITEM_CODE Kode_Item,
             td.ENTERED_QTY Qty,
+            IF(
+                td.ENTERED_UOM = i.UOM_CODE,
+                (
+                    td.ENTERED_QTY * td.BASE_QTY - td.DELIVERED_ENTERED_QTY * td.DELIVERED_BASE_QTY
+                ),
+                (
+                    td.ENTERED_QTY - (
+                        td.DELIVERED_ENTERED_QTY / td.BASE_QTY
+                    )
+                )
+            ) Sisa,
             td.ENTERED_UOM UoM,
             tk.DOCUMENT_NO No_RHO,
-            wh.WAREHOUSE_NAME S_loc_in,
             td.NOTE Note,
             td.TAG_DETAIL_ID,
-            td.REQUEST_QTY_DETAIL_ID,
+            td.REQUEST_QTY_DETAIL_ID
         ");
         $this->db->from("tag_detail td");
         $this->db->join("item i", "td.ITEM_ID = i.ITEM_ID");
@@ -156,6 +170,11 @@ class Rco_model extends CI_Model
     public function get_main_storage()
     {
         return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = {$this->session->userdata('id')} WHERE ACTIVE_FLAG = 'Y' AND a.JENIS_ID != FN_GET_VAR_VALUE ('KNY') GROUP BY a.WAREHOUSE_ID ORDER BY COALESCE(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
+    }
+
+    public function get_site_storage()
+    {
+        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = '{$this->session->userdata('id')}' WHERE ACTIVE_FLAG = 'Y' AND a.JENIS_ID = FN_GET_VAR_VALUE ('KNY') GROUP BY a.WAREHOUSE_ID ORDER BY COALESCE(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
     }
 
     public function getTagId($id)

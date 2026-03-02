@@ -39,7 +39,8 @@ class Rco extends Back_Controller
             </a>';
             $row['no_referensi'] = $rco->No_Referensi ? $rco->No_Referensi : '-';
             $row['tanggal'] = $rco->Tanggal ? date('Y-m-d H:i', strtotime($rco->Tanggal)) : '-';
-            $row['site_storage'] = $rco->Site ? $rco->Site : '-';
+            $row['main_storage'] = $rco->Main_Storage ? $rco->Main_Storage : '-';
+            $row['site_storage'] = $rco->Site_Storage ? $rco->Site_Storage : '-';
 
             $row['tag_id'] = $this->encrypt->encode($rco->TAG_ID);
             $data[] = $row;
@@ -77,9 +78,9 @@ class Rco extends Back_Controller
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
                     "jumlah"    => number_format((float)$d->Qty, 2, '.', ''),
+                    "sisa"      => number_format((float)$d->Sisa, 2, '.', ''),
                     "satuan"    => $d->UoM,
                     "no_rho"    => $d->No_RHO,
-                    "s_loc_in"    => $d->S_loc_in,
                     "note"      => $d->Note,
                 ];
             }
@@ -99,7 +100,10 @@ class Rco extends Back_Controller
     public function getRco()
     {
         try {
+            $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
+
             $main_storage = $this->input->post('main_storage');
+            $site_storage = $this->input->post('site_storage');
 
             $data = $this->db->query("SELECT
                 b.REQUEST_QTY_DETAIL_ID,
@@ -107,7 +111,7 @@ class Rco extends Back_Controller
                 b.PO_DETAIL_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME ( a.STATUS_ID ) STATUS_NAME,
+                FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.DOCUMENT_REFF_NO,
@@ -120,27 +124,37 @@ class Rco extends Back_Controller
                 i.ITEM_DESCRIPTION,
                 b.ENTERED_QTY,
                 b.BASE_QTY,
-                b.ENTERED_QTY - ( b.DELIVER_QTY / b.BASE_QTY ) AS BALANCE,
+                b.ENTERED_QTY - (
+                    b.DELIVER_QTY / b.BASE_QTY
+                ) AS BALANCE,
                 b.ENTERED_UOM,
                 b.UNIT_PRICE,
                 b.SUBTOTAL,
                 b.HARGA_INPUT,
                 i.BERAT,
-                b.NOTE 
+                b.NOTE
             FROM
                 request_qty a
-                JOIN request_qty_detail b ON a.request_qty_ID = b.request_qty_ID
-                JOIN item i ON b.ITEM_ID = i.ITEM_ID
-                JOIN warehouse w ON a.TO_WH_ID = w.WAREHOUSE_ID
-                JOIN warehouse wh ON a.WAREHOUSE_ID = wh.WAREHOUSE_ID 
-            WHERE
-                ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
-                AND ( b.DELIVER_QTY * b.DELIVER_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
-                AND a.STATUS_ID IN ( FN_GET_VAR_VALUE ( 'NEW' ), FN_GET_VAR_VALUE ( 'PARTIAL' ) ) 
+                JOIN request_qty_detail b
+                    ON a.request_qty_ID = b.request_qty_ID
+                JOIN item i
+                    ON b.ITEM_ID = i.ITEM_ID
+                JOIN warehouse w
+                    ON a.TO_WH_ID = w.WAREHOUSE_ID
+                JOIN warehouse wh
+                    ON a.WAREHOUSE_ID = wh.WAREHOUSE_ID
+            WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
+                AND (
+                    b.DELIVER_QTY * b.DELIVER_BASE_QTY
+                ) < (b.ENTERED_QTY * b.BASE_QTY)
+                AND a.STATUS_ID IN (
+                    FN_GET_VAR_VALUE ('NEW'),
+                    FN_GET_VAR_VALUE ('PARTIAL')
+                )
                 AND a.DOCUMENT_TYPE_ID = '3'
-                AND a.TO_WH_ID = {$main_storage}
-            ORDER BY
-                a.DOCUMENT_DATE,
+                AND a.TO_WH_ID = '{$main_storage}'
+                AND a.WAREHOUSE_ID = '{$site_storage}'
+            ORDER BY a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 b.REQUEST_QTY_DETAIL_ID;
             ");
@@ -186,6 +200,7 @@ class Rco extends Back_Controller
             // untuk fungsi validation callback HMVC
             $this->form_validation->CI = &$this;
 
+            $this->form_validation->set_rules('site_storage', 'site storage', 'trim|required');
             $this->form_validation->set_rules('main_storage', 'main storage', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
@@ -193,6 +208,7 @@ class Rco extends Back_Controller
                 $data['title'] = 'Tambah RCO';
                 $data['breadcrumb'] = 'Tambah RCO';
                 $data['main_storage'] = $this->rco->get_main_storage();
+                $data['site_storage'] = $this->rco->get_site_storage();
                 $this->template->load('template', 'rco/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -265,8 +281,8 @@ class Rco extends Back_Controller
                         'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
-                        'WAREHOUSE_ID'          => $detail['gudang_asal_id'][$i],
-                        'TO_WH_ID'              => $detail['gudang_tujuan_id'][$i],
+                        'WAREHOUSE_ID'          => $post['site_storage'],
+                        'TO_WH_ID'              => $post['main_storage'],
                         'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
                         'REQUEST_QTY_DETAIL_ID' => $detail['request_qty_detail_id'][$i],
                         'HARGA_INPUT'           => $harga_input,
@@ -298,7 +314,8 @@ class Rco extends Back_Controller
                     'STATUS_DOC_ID'         => $post['new'],
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'DEST_WH_ID'            => $post['main_storage'],
+                    'WAREHOUSE_ID'          => $post['site_storage'],
+                    'TO_WH_ID'              => $post['main_storage'],
                     'KONSINYASI_FLAG'       => "Y",
                     'PPN_CODE'              => "NO PPN",
                     'PPH_CODE'              => "NO PPH",
@@ -341,6 +358,7 @@ class Rco extends Back_Controller
             // untuk fungsi validation callback HMVC
             $this->form_validation->CI = &$this;
 
+            $this->form_validation->set_rules('site_storage', 'site storage', 'trim|required');
             $this->form_validation->set_rules('main_storage', 'main storage', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
@@ -351,6 +369,7 @@ class Rco extends Back_Controller
                     $data['title'] = 'Detail';
                     $data['breadcrumb'] = 'Detail';
                     $data['main_storage'] = $this->rco->get_main_storage();
+                    $data['site_storage'] = $this->rco->get_site_storage();
                     $data['data'] = $query->row();
                     $this->template->load('template', 'rco/detail', $data);
                 } else {
@@ -429,8 +448,8 @@ class Rco extends Back_Controller
                         'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
-                        'WAREHOUSE_ID'          => $detail['gudang_asal_id'][$i],
-                        'TO_WH_ID'              => $detail['gudang_tujuan_id'][$i],
+                        'WAREHOUSE_ID'          => $post['site_storage'],
+                        'TO_WH_ID'              => $post['main_storage'],
                         'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
                         'REQUEST_QTY_DETAIL_ID' => $detail['request_qty_detail_id'][$i],
                         'HARGA_INPUT'           => $harga_input,
@@ -481,7 +500,8 @@ class Rco extends Back_Controller
                 $this->db->update('tag', [
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'DEST_WH_ID'            => $post['main_storage'],
+                    'WAREHOUSE_ID'          => $post['site_storage'],
+                    'TO_WH_ID'              => $post['main_storage'],
                     'NOTE'                  => $post['keterangan'],
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
                     'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),

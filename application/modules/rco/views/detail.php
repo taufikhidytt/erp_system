@@ -106,6 +106,38 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="site_storage">Site Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($site_storage->result() as $ss) {
+                                                    if ($ss->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ss->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Site Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php $param = $this->input->post('site_storage') ?? $data->WAREHOUSE_ID; ?>
+                                                    <?php foreach ($site_storage->result() as $ss): ?>
+                                                        <option
+                                                            value="<?= $ss->WAREHOUSE_ID ?>"
+                                                            <?= $ss->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ss->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('site_storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <label for="main_storage">Main Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -125,7 +157,7 @@
                                                     <?php if (!$defaultValue): ?>
                                                         <option value="">-- Selected Main Storage --</option>
                                                     <?php endif; ?>
-                                                    <?php $param = $this->input->post('main_storage') ?? $data->DEST_WH_ID; ?>
+                                                    <?php $param = $this->input->post('main_storage') ?? $data->TO_WH_ID; ?>
                                                     <?php foreach ($main_storage->result() as $ms): ?>
                                                         <option
                                                             value="<?= $ms->WAREHOUSE_ID ?>"
@@ -160,10 +192,6 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row form-xs">
-                                    <div class="col-12">
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
                                             <div class="input-group">
