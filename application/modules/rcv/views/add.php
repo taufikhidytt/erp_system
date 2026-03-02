@@ -87,6 +87,37 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
+                                            <label for="main_storage">Main Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-2-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($main_storage->result() as $ms) {
+                                                    if ($ms->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $ms->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Main Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php foreach ($main_storage->result() as $ms): ?>
+                                                        <option
+                                                            value="<?= $ms->WAREHOUSE_ID ?>"
+                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('main_storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
                                             <label for="site_storage">Site Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -141,10 +172,6 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="row form-xs">
-                                    <div class="col-12">
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
                                             <div class="input-group">
@@ -581,6 +608,7 @@
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
+            var main_storage = $('#main_storage').val();
             var site_storage = $('#site_storage').val();
 
             if (!site_storage) {
@@ -593,11 +621,22 @@
                 return;
             }
 
+            if (!main_storage) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Main storage tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
+
             $.ajax({
                 type: "POST",
                 url: "<?= base_url() ?>rcv/getSjs",
                 data: {
                     site_storage: site_storage,
+                    main_storage: main_storage,
                 },
                 dataType: "json",
                 success: function(response) {

@@ -27,20 +27,21 @@ class Rcv extends Back_Controller
         $data = array();
         $no = $_POST['start'];
 
-        foreach ($list as $sts) {
+        foreach ($list as $rcv) {
             $no++;
             $row = array();
             $row['no'] = $no . '.';
-            $row['status'] = $sts->STATUS ? $sts->STATUS : '-';
+            $row['status'] = $rcv->STATUS ? $rcv->STATUS : '-';
             $row['no_transaksi'] = '
-            <a href="' . base_url('rcv/detail/' . base64url_encode($this->encrypt->encode($sts->TAG_ID))) . '">
-                ' . ($sts->No_Transaksi ? $sts->No_Transaksi : '-') . '
+            <a href="' . base_url('rcv/detail/' . base64url_encode($this->encrypt->encode($rcv->TAG_ID))) . '">
+                ' . ($rcv->No_Transaksi ? $rcv->No_Transaksi : '-') . '
             </a>';
-            $row['no_referensi'] = $sts->No_Referensi ? $sts->No_Referensi : '-';
-            $row['tanggal'] = $sts->Tanggal ? date('Y-m-d H:i', strtotime($sts->Tanggal)) : '-';
-            $row['site'] = $sts->Site ? $sts->Site : '-';
+            $row['no_referensi'] = $rcv->No_Referensi ? $rcv->No_Referensi : '-';
+            $row['tanggal'] = $rcv->Tanggal ? date('Y-m-d H:i', strtotime($rcv->Tanggal)) : '-';
+            $row['site'] = $rcv->Site_Storage ? $rcv->Site_Storage : '-';
+            $row['main'] = $rcv->Main_Storage ? $rcv->Main_Storage : '-';
 
-            $row['tag_id'] = $this->encrypt->encode($sts->TAG_ID);
+            $row['tag_id'] = $this->encrypt->encode($rcv->TAG_ID);
             $data[] = $row;
         }
 
@@ -79,7 +80,6 @@ class Rcv extends Back_Controller
                     "sisa"    => number_format((float)$d->Sisa, 2, '.', ''),
                     "satuan"    => $d->UoM,
                     "no_sjs"    => $d->No_SJS,
-                    "loc_in"    => $d->S_Loc_In,
                     "note"      => $d->Note,
                 ];
             }
@@ -102,13 +102,15 @@ class Rcv extends Back_Controller
             $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
 
             $site_storage = $this->input->post('site_storage');
+            $main_storage = $this->input->post('main_storage');
+
             $data = $this->db->query("SELECT
                 b.TAG_KONSI_DETAIL_ID,
                 b.TAG_KONSI_ID,
                 b.PO_DETAIL_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME ( a.STATUS_ID ) STATUS_NAME,
+                FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.DOCUMENT_REFF_NO,
@@ -122,27 +124,38 @@ class Rcv extends Back_Controller
                 i.ITEM_DESCRIPTION,
                 b.ENTERED_QTY,
                 b.BASE_QTY,
-                b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ) AS BALANCE,
+                b.ENTERED_QTY - (
+                    b.RECEIVED_ENTERED_QTY / b.BASE_QTY
+                ) AS BALANCE,
                 b.ENTERED_UOM,
                 b.UNIT_PRICE,
                 b.SUBTOTAL,
                 b.HARGA_INPUT,
                 i.BERAT,
-                b.NOTE 
+                b.NOTE
             FROM
                 tag_konsi a
-                JOIN tag_konsi_detail b ON a.TAG_KONSI_ID = b.TAG_KONSI_ID
-                JOIN item i ON b.ITEM_ID = i.ITEM_ID
-                JOIN warehouse w ON a.TO_WH_ID = w.WAREHOUSE_ID
-                JOIN warehouse wh ON a.WAREHOUSE_ID = wh.WAREHOUSE_ID 
-            WHERE
-                ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
-                AND ( b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
-                AND a.STATUS_ID IN ( FN_GET_VAR_VALUE ( 'NEW' ), FN_GET_VAR_VALUE ( 'PARTIAL' ) ) 
+                JOIN tag_konsi_detail b
+                    ON a.TAG_KONSI_ID = b.TAG_KONSI_ID
+                JOIN item i
+                    ON b.ITEM_ID = i.ITEM_ID
+                JOIN warehouse w
+                    ON a.TO_WH_ID = w.WAREHOUSE_ID
+                JOIN warehouse wh
+                    ON a.WAREHOUSE_ID = wh.WAREHOUSE_ID
+            WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
+                AND (
+                    b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
+                ) < (b.ENTERED_QTY * b.BASE_QTY)
+                AND a.STATUS_ID IN (
+                    FN_GET_VAR_VALUE ('NEW'),
+                    FN_GET_VAR_VALUE ('PARTIAL')
+                )
                 AND a.DOCUMENT_TYPE_ID = '{$tipe_id['TYPE_ID']}'
-                AND a.TO_WH_ID = $site_storage 
-            ORDER BY
-                a.DOCUMENT_DATE,
+
+            AND a.TO_WH_ID = '{$site_storage}'
+                AND a.WAREHOUSE_ID = '{$main_storage}'
+            ORDER BY a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 b.TAG_KONSI_DETAIL_ID;
             ");
@@ -189,12 +202,14 @@ class Rcv extends Back_Controller
             $this->form_validation->CI = &$this;
 
             $this->form_validation->set_rules('site_storage', 'site storage', 'trim|required');
+            $this->form_validation->set_rules('main_storage', 'main storage', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
             if ($this->form_validation->run() == false) {
                 $data['title'] = 'Tambah RCV';
                 $data['breadcrumb'] = 'Tambah RCV';
                 $data['site_storage'] = $this->rcv->get_site_storage();
+                $data['main_storage'] = $this->rcv->get_main_storage();
                 $this->template->load('template', 'rcv/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -203,7 +218,7 @@ class Rcv extends Back_Controller
 
                 if (empty($detail) || empty($detail['nama_item']) || count(array_filter($detail['nama_item'])) == 0) {
                     $this->session->set_flashdata('warning', 'Detail GRK wajib diisi!');
-                    redirect('sts/add');
+                    redirect('rcv/add');
                 }
 
                 $id_menu = $this->db->query("SELECT erp_menu_id FROM erp_menu WHERE erp_menu_name = '{$this->uri->segment('1')}'")->row();
@@ -267,8 +282,8 @@ class Rcv extends Back_Controller
                         'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
-                        'WAREHOUSE_ID'          => $detail['gudang_id'][$i],
-                        'TO_WH_ID'              => $detail['gudang_tujuan_id'][$i],
+                        'WAREHOUSE_ID'          => $post['main_storage'],
+                        'TO_WH_ID'              => $post['site_storage'],
                         'TAG_KONSI_DETAIL_ID'   => $detail['tag_konsi_detail_id'][$i],
                         'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
                         'HARGA_INPUT'           => $harga_input,
@@ -300,7 +315,7 @@ class Rcv extends Back_Controller
                     'STATUS_DOC_ID'         => $post['new'],
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'DEST_WH_ID'            => $post['site_storage'],
+                    'WAREHOUSE_ID'          => $post['main_storage'],
                     'TO_WH_ID'              => $post['site_storage'],
                     'KONSINYASI_FLAG'       => "Y",
                     'PPN_CODE'              => "NO PPN",
@@ -346,6 +361,7 @@ class Rcv extends Back_Controller
             $this->form_validation->CI = &$this;
 
             $this->form_validation->set_rules('site_storage', 'site storage', 'trim|required');
+            $this->form_validation->set_rules('main_storage', 'main storage', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
             if ($this->form_validation->run() == FALSE) {
@@ -355,11 +371,12 @@ class Rcv extends Back_Controller
                     $data['title'] = 'Detail';
                     $data['breadcrumb'] = 'Detail';
                     $data['site_storage'] = $this->rcv->get_site_storage();
+                    $data['main_storage'] = $this->rcv->get_main_storage();
                     $data['data'] = $query->row();
                     $this->template->load('template', 'rcv/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
-                    redirect('sts');
+                    redirect('rcv');
                 }
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -433,8 +450,8 @@ class Rcv extends Back_Controller
                         'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
-                        'WAREHOUSE_ID'          => $detail['gudang_id'][$i],
-                        'TO_WH_ID'              => $detail['gudang_tujuan_id'][$i],
+                        'WAREHOUSE_ID'          => $post['main_storage'],
+                        'TO_WH_ID'              => $post['site_storage'],
                         'TAG_KONSI_DETAIL_ID'   => $detail['tag_konsi_detail_id'][$i],
                         'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
                         'HARGA_INPUT'           => $harga_input,
@@ -485,7 +502,7 @@ class Rcv extends Back_Controller
                 $this->db->update('tag', [
                     'DOCUMENT_DATE'         => $post['tanggal'],
                     'DOCUMENT_REFF_NO'      => $post['no_referensi'],
-                    'DEST_WH_ID'            => $post['site_storage'],
+                    'WAREHOUSE_ID'          => $post['main_storage'],
                     'TO_WH_ID'              => $post['site_storage'],
                     'NOTE'                  => $post['keterangan'],
                     'PERIOD_NAME'           => date('Ym', strtotime($post['tanggal'])),
@@ -531,7 +548,7 @@ class Rcv extends Back_Controller
 
         $this->db->trans_begin();
 
-        $delResult = $this->sts->delete($id);
+        $delResult = $this->rcv->delete($id);
         if ($delResult !== true) {
             $this->db->trans_rollback();
             $this->_jsonError($delResult);
@@ -557,7 +574,7 @@ class Rcv extends Back_Controller
             ->set_content_type('application/json')
             ->set_output(json_encode([
                 'status'  => true,
-                'message' => 'STS berhasil dihapus!'
+                'message' => 'Data berhasil dihapus!'
             ]));
     }
 
@@ -568,7 +585,7 @@ class Rcv extends Back_Controller
             ->set_content_type('application/json')
             ->set_output(json_encode([
                 'status'  => false,
-                'message' => 'Gagal menghapus STS!',
+                'message' => 'Gagal menghapus data!',
                 'error'   => $db_error['message'],
                 'code'    => $db_error['code']
             ]));

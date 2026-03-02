@@ -93,6 +93,9 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
                                         </tr>
                                         <tr class="align-content-center">
                                             <th></th>
@@ -102,6 +105,7 @@
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
                                             <th>Site Storage</th>
+                                            <th>Main Storage</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -162,7 +166,7 @@
                 },
                 {
                     "data": "no_referensi",
-                    "width": "20%",
+                    "width": "10%",
                 },
                 {
                     "data": "tanggal",
@@ -170,7 +174,15 @@
                 },
                 {
                     "data": "site",
-                    "width": "20%",
+                    "width": "15%",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                {
+                    "data": "main",
+                    "width": "15%",
                     "render": function(data) {
                         if (!data) return '-';
                         return `<span title="${data}">${data}</span>`;
@@ -205,7 +217,6 @@
                                     <th>Sisa</th>
                                     <th>Satuan</th>
                                     <th>No SJS</th>
-                                    <th>S.Loc-In</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>
@@ -264,12 +275,6 @@
                         },
                         {
                             "data": "no_sjs",
-                            createdCell: function(td) {
-                                td.style.fontFamily = 'monospace';
-                            }
-                        },
-                        {
-                            "data": "loc_in",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
