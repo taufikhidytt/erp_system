@@ -31,7 +31,7 @@
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-check-double-fill"></i>
+                                        <i class="ri ri-save-3-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Hapus">
                                         <i class="fa fa-trash"></i>
@@ -49,7 +49,7 @@
                                     <input type="hidden" name="id" id="id" value="<?= $this->encrypt->encode($data->ITEM_ID); ?>">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <label for="code_item">Code Item:</label>
+                                            <label for="code_item">Kode Item:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-barcode-box-fill"></i>

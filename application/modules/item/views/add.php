@@ -31,7 +31,7 @@
                                         <i class="ri ri-add-box-fill"></i>
                                     </button>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-check-double-fill"></i>
+                                        <i class="ri ri-save-3-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
                                         <i class="ri ri-eraser-fill"></i>
@@ -45,7 +45,7 @@
                                 <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <label for="code_item">Code Item:</label>
+                                            <label for="code_item">Kode Item:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-barcode-box-fill"></i>
