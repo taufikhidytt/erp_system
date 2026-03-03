@@ -34,14 +34,11 @@
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Hapus">
-                                        <i class="fa fa-trash"></i>
+                                        <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Undo">
-                                        <i class="ri ri-eraser-fill"></i>
-                                    </button>
-                                    <a href="<?= base_url('item') ?>" class="btn btn-sm btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Kembali">
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                             <div class="row">
