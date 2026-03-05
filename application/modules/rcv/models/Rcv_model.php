@@ -49,7 +49,7 @@ class Rcv_model extends CI_Model
         $this->db->from('tag a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
-        $this->db->join('warehouse wh', 'a.DEST_WH_ID = wh.WAREHOUSE_ID');
+        $this->db->join('warehouse wh', 'a.TO_WH_ID = wh.WAREHOUSE_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;

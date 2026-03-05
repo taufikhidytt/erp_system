@@ -372,6 +372,7 @@ class Mrq extends Back_Controller
                 $data['ship_to'] = $this->mrq->get_ship_to();
                 $data['storage'] = $this->mrq->get_storage();
                 $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'mrq/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -549,6 +550,7 @@ class Mrq extends Back_Controller
                     $data['storage'] = $this->mrq->get_storage();
                     $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'mrq/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');

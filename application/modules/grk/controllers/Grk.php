@@ -210,6 +210,7 @@ class Grk extends Back_Controller
                 $data['breadcrumb'] = 'Tambah GRK';
                 $data['supplier'] = $this->grk->getSupplier();
                 $data['gudang'] = $this->grk->getGudang();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'grk/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -374,6 +375,7 @@ class Grk extends Back_Controller
                     $data['supplier'] = $this->grk->getSupplier();
                     $data['gudang'] = $this->grk->getGudang();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'grk/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -453,7 +455,7 @@ class Grk extends Back_Controller
                         'ENTERED_UOM'       => $detail['satuan'][$i],
                         'GUDANG_ID'         => $detail['warehouse_id'][$i],
                         'PR_DETAIL_ID'      => $detail['pr_detail_id'][$i],
-                        'KARYAWAN_ID'       => $detail['sales_id'][$i],
+                        'KARYAWAN_ID'       => $detail['sales'][$i],
                         'ETA_LEADTIME'      => $detail['lead_time'][$i],
                         'HARGA_INPUT'       => $harga_input,
                         'ITEM_DESCRIPTION'  => $detail['nama_item'][$i],

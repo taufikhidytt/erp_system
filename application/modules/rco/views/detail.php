@@ -265,6 +265,8 @@
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
+                                                    $postDetail = $this->input->post('detail');
+                                                    $i = 0;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <?php
                                                         $l = $dd->request_qty_detail_ENTERED_QTY /  $dd->request_qty_detail_BASE_QTY;
@@ -320,7 +322,7 @@
                                                                 <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
                                                             </td>
                                                             <td class="ellipsis">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -689,6 +691,88 @@
             ordering: false,
         });
 
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+
+                let tag_detail_id = oldDetail.tag_detail_id[i] ?? '';
+
+                if (tag_detail_id !== '') {
+                    return;
+                }
+
+                let nomor = tableDetail.rows().count() + 1;
+
+                let item_id = oldDetail.item_id[i] ?? '';
+                let po_detail_id = oldDetail.po_detail_id[i] ?? '';
+                let base_qty = oldDetail.base_qty[i] ?? 0;
+                let unit_price = oldDetail.unit_price[i] ?? 0;
+                let subtotal = oldDetail.subtotal[i] ?? 0;
+                let gudang_asal_id = oldDetail.gudang_asal_id[i] ?? '';
+                let gudang_tujuan_id = oldDetail.gudang_tujuan_id[i] ?? '';
+                let request_qty_detail_id = oldDetail.request_qty_detail_id[i] ?? '';
+                let harga_input = oldDetail.harga_input[i] ?? 0;
+                let keterangan = oldDetail.keterangan[i] ?? '';
+                let berat = oldDetail.berat[i] ?? 0;
+                let balance = oldDetail.balance[i] ?? 0;
+
+                let no_rho = oldDetail.no_rho[i] ?? '';
+                let nama_item = oldDetail.nama_item[i] ?? '';
+                let jumlah = oldDetail.jumlah[i] ?? 0;
+                let satuan = oldDetail.satuan[i] ?? '';
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `<input type="hidden" name="detail[tag_detail_id][]" value="">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
+                    <input type="hidden" name="detail[gudang_asal_id][]" value="${gudang_asal_id}">
+                    <input type="hidden" name="detail[gudang_tujuan_id][]" value="${gudang_tujuan_id}">
+                    <input type="hidden" name="detail[request_qty_detail_id][]" value="${request_qty_detail_id}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">`,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_rho}">
+                        ${ellipsis(no_rho)}
+                    </span>
+                    <input type="hidden" name="detail[no_rho][]" value="${no_rho}">
+                    `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
+
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">
+                    `,
+
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
+                ]).node();
+                $(rowNode).addClass('tr-height-30');
+            });
+            toggleStorageDisabled();
+            tableDetail.draw(false);
+        }
+
         //Initialize Select2 Elements
         $('.select2').each(function() {
             $(this).select2({
@@ -762,6 +846,7 @@
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
+            var site_storage = $('#site_storage').val();
             var main_storage = $('#main_storage').val();
 
             if (!main_storage) {
@@ -773,10 +858,22 @@
                 });
                 return;
             }
+
+            if (!site_storage) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Site storage tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
+
             $.ajax({
                 type: "POST",
                 url: "<?= base_url() ?>rco/getRco",
                 data: {
+                    site_storage: site_storage,
                     main_storage: main_storage,
                 },
                 dataType: "json",
@@ -918,8 +1015,6 @@
                     <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
                     <input type="hidden" name="detail[gudang_asal_id][]" value="${gudang_asal_id}">
                     <input type="hidden" name="detail[gudang_tujuan_id][]" value="${gudang_tujuan_id}">
-                    <input type="hidden" name="detail[no_rho][]" value="${no_rho}">
-                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
                     <input type="hidden" name="detail[request_qty_detail_id][]" value="${request_qty_detail_id}">
                     <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -929,7 +1024,9 @@
 
                     `<span class="ellipsis" title="${no_rho}">
                         ${ellipsis(no_rho)}
-                    </span>`,
+                    </span>
+                    <input type="hidden" name="detail[no_rho][]" value="${no_rho}">
+                    `,
 
                     `<span class="ellipsis" title="${nama_item}">
                         ${ellipsis(nama_item)}
@@ -938,7 +1035,9 @@
 
                     `<span class="ellipsis" title="${kode_item}">
                         ${ellipsis(kode_item)}
-                    </span>`,
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
+                    `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
                     <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,

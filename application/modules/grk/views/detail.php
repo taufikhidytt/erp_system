@@ -239,6 +239,8 @@
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
+                                                    $postDetail = $this->input->post('detail');
+                                                    $i = 0;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <?php
                                                         $l = $dd->pr_RECEIVED_ENTERED_QTY /  $dd->pr_BASE_QTY;
@@ -280,7 +282,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode($dd->PO_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= rtrim(rtrim(($this->input->post('detail[jumlah][]') ?? $dd->ENTERED_QTY), '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode($dd->PO_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -299,22 +301,23 @@
                                                                 <span class="harga-input-b ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
                                                                     <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                             </td>
                                                             <td class="ellipsis text-end">
                                                                 <span class="subtotal-text ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
                                                                     <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="sales ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->FIRST_NAME ?>">
                                                                     <?= $dd->FIRST_NAME ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[sales_id][]" value="<?= $this->input->post('sales_id') ?? $dd->KARYAWAN_ID; ?>">
+                                                                <input type="hidden" name="detail[nama_sales][]" value="<?= $dd->FIRST_NAME ?>">
+                                                                <input type="hidden" name="detail[sales][]" value="<?= $postDetail['sales_id'][$i] ?? $dd->KARYAWAN_ID; ?>">
                                                             </td>
                                                             <td class="ellipsis">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -770,6 +773,105 @@
             ordering: false,
         });
 
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+                let nomor = tableDetail.rows().count() + 1;
+
+                let po_detail_id = oldDetail.po_detail_id[i] ?? '';
+
+                if (po_detail_id !== '') {
+                    return;
+                }
+
+                let pr_detail_id = oldDetail.pr_detail_id[i] ?? '';
+                let no_fpk = oldDetail.no_fpk[i] ?? '';
+                let nama_item = oldDetail.nama_item[i] ?? '';
+                let satuan = oldDetail.satuan[i] ?? '';
+                let harga_input = oldDetail.harga_input[i] ?? 0;
+                let unit_price = oldDetail.harga[i] ?? 0;
+                let nama_sales = oldDetail.nama_sales[i] ?? '';
+                let keterangan = oldDetail.keterangan[i] ?? '';
+
+                let item_id = oldDetail.item_id[i] ?? '';
+                let jumlah = oldDetail.jumlah[i] ?? 0;
+                let balance = oldDetail.balance[i] ?? 0;
+                let base_qty = oldDetail.base_qty[i] ?? 0;
+                let warehouse_id = oldDetail.warehouse_id[i] ?? '';
+                let sales_id = oldDetail.sales[i] ?? '';
+                let lead_time = oldDetail.lead_time[i] ?? '';
+                let berat = oldDetail.berat[i] ?? 0;
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `<input type="hidden" name="detail[po_detail_id][]" value="">
+                    <input type="hidden" name="detail[pr_detail_id][]" value="${pr_detail_id}">
+                    <input type="hidden" name="detail[no_fpk][]" value="${no_fpk}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[balance][]" value="${Math.floor(Number(balance))}">
+                    <input type="hidden" name="detail[base_qty][]" value="${Math.floor(Number(base_qty))}">
+                    <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
+                    <input type="hidden" name="detail[lead_time][]" value="${lead_time}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    `,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_fpk}">
+                        ${ellipsis(no_fpk)}
+                    </span>`,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
+
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Math.floor(Number(balance))}" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+
+                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}">`,
+
+                    `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${unit_price}">`,
+
+                    `<span class="subtotal-text ellipsis">${formatNumber(balance * harga_input)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}">`,
+
+                    `<span class="ellipsis" title="${nama_sales}">
+                        ${ellipsis(nama_sales)}
+                    </span>
+                    <input type="hidden" name="detail[nama_sales][]" value="${nama_sales}">
+                    <input type="hidden" name="detail[sales][]" value="${sales_id}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="${keterangan}">${keterangan}</textarea>`,
+                ]).node();
+
+                $(rowNode).addClass('tr-height-30');
+
+                rowsAdded = true;
+            });
+
+            if (rowsAdded) {
+                toggleSupplierDisabled();
+                tableDetail.draw(false);
+            }
+
+            hitungTotal();
+        }
+
         //Initialize Select2 Elements
         $('.select2').each(function() {
             $(this).select2({
@@ -1029,7 +1131,8 @@
                     `<span class="ellipsis" title="${sales}">
                         ${ellipsis(sales)}
                     </span>
-                    <input type="hidden" name="detail[sales_id][]" value="${sales_id}">`,
+                    <input type="hidden" name="detail[nama_sales][]" value="${sales}">
+                    <input type="hidden" name="detail[sales][]" value="${sales_id}">`,
 
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="${keterangan}">${keterangan}</textarea>`,
                 ]).draw(false).node();

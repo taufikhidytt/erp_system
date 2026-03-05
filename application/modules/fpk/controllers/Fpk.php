@@ -246,6 +246,7 @@ class Fpk extends Back_Controller
                 $data['supplier'] = $this->fpk->getSupplier();
                 $data['gudang'] = $this->fpk->getGudang();
                 $data['sales'] = $this->fpk->getSales();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'fpk/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -382,6 +383,7 @@ class Fpk extends Back_Controller
                     $data['gudang'] = $this->fpk->getGudang();
                     $data['sales'] = $this->fpk->getSales();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'fpk/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');

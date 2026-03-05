@@ -346,28 +346,6 @@
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                // $dataDetail = $this->db->query("SELECT COALESCE
-                                                //     (
-                                                //     IF
-                                                //         (
-                                                //             a.PO_DETAIL_ID IS NOT NULL,
-                                                //             b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ),
-                                                //             c.ENTERED_QTY - ( c.DELIVERED_ENTERED_QTY / c.BASE_QTY ) 
-                                                //         ),
-                                                //         0 
-                                                //     ) BALANCE,
-                                                //     a.*,
-                                                //     i.ITEM_CODE,
-                                                //     i.ITEM_DESCRIPTION
-                                                // FROM
-                                                //     build_detail a
-                                                //     LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
-                                                //     LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
-                                                //     LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID
-                                                //     JOIN item i ON a.ITEM_ID = i.ITEM_ID 
-                                                // WHERE
-                                                //     a.BUILD_ID = '{$data->BUILD_ID}'");
-
                                                 $dataDetail = $this->db->query("SELECT COALESCE
                                                     (
                                                     CASE
@@ -398,6 +376,8 @@
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
                                                     $no = 1;
+                                                    $postDetail = $this->input->post('detail');
+                                                    $i = 0;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <tr class="tr-height-30">
                                                             <td><?= $no++ ?></td>
@@ -421,6 +401,7 @@
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
                                                                     <?= $dd->DOCUMENT_NO; ?>
                                                                 </span>
+                                                                <input type="hidden" name="detail[no_transaksi][]" value="<?= $dd->DOCUMENT_NO ?>">
                                                             </td>
 
                                                             <td class="ellipsis">
@@ -449,7 +430,7 @@
                                                                 <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
                                                             </td>
                                                             <td class="ellipsis">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -817,6 +798,88 @@
             ordering: false,
         });
 
+
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+
+                let build_detail_id = oldDetail.build_detail_id[i] ?? '';
+
+                if (build_detail_id !== '') {
+                    return;
+                }
+
+                let nomor = tableDetail.rows().count() + 1;
+
+                let item_id = oldDetail.item_id[i] ?? '';
+                let po_detail_id = oldDetail.po_detail_id[i] ?? '';
+                let tag_detail_id = oldDetail.tag_detail_id[i] ?? '';
+                let base_qty = oldDetail.base_qty[i] ?? 0;
+                let unit_price = oldDetail.unit_price[i] ?? 0;
+                let subtotal = oldDetail.subtotal[i] ?? 0;
+                let warehouse_id = oldDetail.warehouse_id[i] ?? '';
+                let harga_input = oldDetail.harga_input[i] ?? 0;
+                let keterangan = oldDetail.keterangan[i] ?? '';
+                let berat = oldDetail.berat[i] ?? 0;
+                let balance = oldDetail.balance[i] ?? 0;
+
+                let no_transaksi = oldDetail.no_transaksi[i] ?? '';
+                let nama_item = oldDetail.nama_item[i] ?? '';
+                let jumlah = oldDetail.jumlah[i] ?? 0;
+                let satuan = oldDetail.satuan[i] ?? '';
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `
+                    <input type="hidden" name="detail[build_detail_id][]" value="">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
+                    <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">`,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_transaksi}">
+                    ${ellipsis(no_transaksi)}
+                    </span>
+                    <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
+                    `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                    ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
+
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
+                ]).node();
+                $(rowNode).addClass('tr-height-30');
+            });
+            toggleStorageDisabled();
+            tableDetail.draw(false);
+        }
+
+
         //Initialize Select2 Elements
         $('.select2').each(function() {
             $(this).select2({
@@ -1104,7 +1167,9 @@
 
                     `<span class="ellipsis" title="${no_transaksi}">
                     ${ellipsis(no_transaksi)}
-                    </span>`,
+                    </span>
+                    <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
+                    `,
 
                     `<span class="ellipsis" title="${nama_item}">
                     ${ellipsis(nama_item)}

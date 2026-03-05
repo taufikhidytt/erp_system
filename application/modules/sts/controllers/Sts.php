@@ -251,6 +251,7 @@ class Sts extends Back_Controller
                 $data['breadcrumb'] = 'Tambah STS';
                 $data['main_storage'] = $this->sts->get_main_storage();
                 $data['site_storage'] = $this->sts->get_site_storage();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'sts/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -412,6 +413,7 @@ class Sts extends Back_Controller
                     $data['main_storage'] = $this->sts->get_main_storage();
                     $data['site_storage'] = $this->sts->get_site_storage();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'sts/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');

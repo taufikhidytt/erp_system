@@ -154,6 +154,13 @@
                                             </thead>
                                             <tbody>
                                             </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="3" style="text-align:right">Total Stok :</th>
+                                                    <th id="total_stok"></th>
+                                                    <th colspan="3"></th>
+                                                </tr>
+                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
@@ -220,6 +227,29 @@
                                         </thead>
                                         <tbody>
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="4" style="text-align:right">Total :</th>
+                                                <th id="total_pusat"></th>
+                                                <th id="total_pinjam"></th>
+                                                <th id="total_uncomplete"></th>
+                                                <th id="total_booked"></th>
+                                                <th id="total_kons_jia"></th>
+                                                <th id="total_kons_bbi"></th>
+                                                <th id="total_kons_bki"></th>
+                                                <th id="total_kons_hss"></th>
+                                                <th id="total_kons_thc"></th>
+                                                <th id="total_kons_gd_hydraulic"></th>
+                                                <th id="total_kons_tfp"></th>
+                                                <th id="total_teknikal"></th>
+                                                <th id="total_kons_gun"></th>
+                                                <th id="total_kons_hs"></th>
+                                                <th id="total_kons_nhc"></th>
+                                                <th id="total_kons_sampit"></th>
+                                                <th id="total_neglasari"></th>
+                                                <th id="total_total_stok"></th>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
@@ -313,7 +343,7 @@
                                                     <th>Transaksi</th>
                                                     <th>Masuk</th>
                                                     <th>Keluar</th>
-                                                    <th>Stok</th>
+                                                    <th>Saldo</th>
                                                     <th>Gudang</th>
                                                     <th>Note</th>
                                                 </tr>
@@ -333,7 +363,7 @@
                                         <input type="text" id="total_keluar" class="form-control" readonly>
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Stok Akhir</label>
+                                        <label>Saldo Akhir</label>
                                         <input type="text" id="stok_akhir" class="form-control" readonly>
                                     </div>
                                 </div>
@@ -362,6 +392,12 @@
                 data: function(d) {
                     d.gudang = $('#gudang').val();
                     d.check_gudang = $('#check_gudang').is(':checked');
+                }
+            },
+            drawCallback: function(settings) {
+                var json = settings.json;
+                if (json && json.summary) {
+                    $('#total_stok').text(json.summary.total_stok);
                 }
             },
             columnDefs: [{
@@ -402,6 +438,29 @@
             ajax: {
                 url: "<?= site_url('stk_kny/get_data_summary'); ?>",
                 type: "POST",
+            },
+            drawCallback: function(settings) {
+                var json = settings.json;
+                if (json && json.summary) {
+                    $('#total_pusat').text(json.summary.total_pusat);
+                    $('#total_pinjam').text(json.summary.total_pinjam);
+                    $('#total_uncomplete').text(json.summary.total_uncomplete);
+                    $('#total_booked').text(json.summary.total_booked);
+                    $('#total_kons_jia').text(json.summary.total_kons_jia);
+                    $('#total_kons_bbi').text(json.summary.total_kons_bbi);
+                    $('#total_kons_bki').text(json.summary.total_kons_bki);
+                    $('#total_kons_hss').text(json.summary.total_kons_hss);
+                    $('#total_kons_thc').text(json.summary.total_kons_thc);
+                    $('#total_kons_gd_hydraulic').text(json.summary.total_kons_gd_hydraulic);
+                    $('#total_kons_tfp').text(json.summary.total_kons_tfp);
+                    $('#total_teknikal').text(json.summary.total_teknikal);
+                    $('#total_kons_gun').text(json.summary.total_kons_gun);
+                    $('#total_kons_hs').text(json.summary.total_kons_hs);
+                    $('#total_kons_nhc').text(json.summary.total_kons_nhc);
+                    $('#total_kons_sampit').text(json.summary.total_kons_sampit);
+                    $('#total_neglasari').text(json.summary.total_neglasari);
+                    $('#total_total_stok').text(json.summary.total_total_stok);
+                }
             },
             columnDefs: [{
                 className: 'text-end',

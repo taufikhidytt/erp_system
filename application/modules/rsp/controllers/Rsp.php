@@ -269,6 +269,7 @@ class Rsp extends Back_Controller
                 $data['breadcrumb'] = 'Tambah RSP';
                 $data['main_storage'] = $this->rsp->get_main_storage();
                 $data['supplier'] = $this->rsp->get_supplier();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'rsp/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -431,6 +432,7 @@ class Rsp extends Back_Controller
                     $data['main_storage'] = $this->rsp->get_main_storage();
                     $data['supplier'] = $this->rsp->get_supplier();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'rsp/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');

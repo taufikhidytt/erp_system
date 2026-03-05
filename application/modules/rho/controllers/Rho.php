@@ -197,6 +197,7 @@ class Rho extends Back_Controller
                 $data['breadcrumb'] = 'Tambah RHO';
                 $data['site_storage'] = $this->rho->get_site_storage();
                 $data['main_storage'] = $this->rho->get_main_storage();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'rho/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -358,6 +359,7 @@ class Rho extends Back_Controller
                     $data['site_storage'] = $this->rho->get_site_storage();
                     $data['main_storage'] = $this->rho->get_main_storage();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'rho/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');

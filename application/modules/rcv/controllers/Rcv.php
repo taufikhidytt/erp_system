@@ -210,6 +210,7 @@ class Rcv extends Back_Controller
                 $data['breadcrumb'] = 'Tambah RCV';
                 $data['site_storage'] = $this->rcv->get_site_storage();
                 $data['main_storage'] = $this->rcv->get_main_storage();
+                $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'rcv/add', $data);
             } else {
                 date_default_timezone_set('Asia/Jakarta');
@@ -373,6 +374,7 @@ class Rcv extends Back_Controller
                     $data['site_storage'] = $this->rcv->get_site_storage();
                     $data['main_storage'] = $this->rcv->get_main_storage();
                     $data['data'] = $query->row();
+                    $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'rcv/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');

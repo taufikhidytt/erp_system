@@ -276,6 +276,8 @@
                                                     <?php
                                                     $no = 1;
                                                     $limit = 20;
+                                                    $postDetail = $this->input->post('detail');
+                                                    $i = 0;
                                                     foreach ($dataDetail->result() as $dd): ?>
                                                         <tr class="tr-height-30">
                                                             <td style="width: 5%"><?= $no++ ?></td>
@@ -300,7 +302,7 @@
                                                             </td>
                                                             <td style="width: 8%" class="ellipsis text-end">
                                                                 <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= rtrim(rtrim($this->input->post('detail[qty][]') ?? rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), '0'), '.'); ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td style="width: 10%" class="ellipsis">
                                                                 <?php $data_uom_selected = $this->db->query("SELECT
@@ -350,22 +352,22 @@
                                                                 <input type="number"
                                                                     class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
                                                                     name="detail[harga_input][]" min="0" step="any"
-                                                                    value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
+                                                                    value="<?= $postDetail['harga_input'][$i] ?? rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
                                                             </td>
                                                             <td style="width: 10%" class="ellipsis text-end">
                                                                 <span class="harga-input-b ellipsis">
                                                                     <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= $this->input->post('harga') ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                             </td>
                                                             <td style="width: 10%" class="ellipsis text-end">
                                                                 <span class="subtotal-text ellipsis">
                                                                     <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $this->input->post('subtotal') ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
                                                             <td style="width: 10%" class="ellipsis text-end">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $this->input->post('detail[keterangan]') ?? $dd->NOTE; ?></textarea>
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>
@@ -742,6 +744,75 @@
             searching: true,
             ordering: false,
         });
+
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+
+                let pr_detail = oldDetail.pr_detail[i] ?? '';
+
+                if (pr_detail !== '') {
+                    return;
+                }
+
+                let nomor = tableDetail.rows().count() + 1;
+
+                let nama = oldDetail.nama_item[i] ?? '';
+                let id_item = oldDetail.id_item[i] ?? '';
+                let qty = oldDetail.qty[i] ?? 1;
+                let uom = oldDetail.uom[i] ?? '';
+                let to_qty = oldDetail.to_qty[i] ?? 1;
+                let hargaInput = oldDetail.harga_input[i] ?? 0;
+                let harga = oldDetail.harga[i] ?? 0;
+                let subtotal = oldDetail.subtotal[i] ?? 0;
+                let keterangan = oldDetail.keterangan[i] ?? '';
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `<input type="hidden" name="detail[pr_detail][]" value="">`,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="${nama}">${nama}</span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
+                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+
+                    `<span class="ellipsis">${kode}</span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<span class="view-mode qty-view ellipsis">${formatNumber(qty)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}">`,
+
+                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
+                        <option value="${uom}" selected>${uom}</option>
+                    </select>
+                    <input type="hidden" name="detail[to_qty][]" value="${to_qty}">`,
+
+                    `<span class="view-mode harga-view ellipsis">${formatNumber(hargaInput)}</span>
+                    <input type="number" class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${hargaInput}">`,
+
+                    `<span class="harga-input-b ellipsis">${formatNumber(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
+
+                    `<span class="subtotal-text ellipsis">${formatNumber(subtotal)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
+
+                    `<textarea class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`
+                ]).node();
+
+                $(rowNode).addClass('tr-height-30');
+
+                loadUom($(rowNode), id_item, uom);
+
+            });
+
+            tableDetail.draw(false);
+            toggleSupplierDisabled();
+
+            hitungTotal();
+        }
 
         //Initialize Select2 Elements
         $('.select2').each(function() {

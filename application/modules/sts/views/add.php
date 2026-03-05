@@ -140,7 +140,7 @@
                                                     <?php foreach ($site_storage->result() as $ss): ?>
                                                         <option
                                                             value="<?= $ss->WAREHOUSE_ID ?>"
-                                                            <?= set_value('main_storage') ==  $ss->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= set_value('site_storage') ==  $ss->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
                                                             <?= strtoupper($ss->WAREHOUSE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -535,6 +535,85 @@
             ordering: false,
         });
 
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+                let nomor = tableDetail.rows().count() + 1;
+
+                let po_detail_id = oldDetail.po_detail_id[i] ?? '';
+                let tag_detail_id = oldDetail.tag_detail_id[i] ?? '';
+                let no_grk = oldDetail.no_grk[i] ?? '';
+                let nama_item = oldDetail.nama_item[i] ?? '';
+                let jumlah = oldDetail.jumlah[i] ?? 1;
+                let satuan = oldDetail.satuan[i] ?? '';
+                let keterangan = oldDetail.keterangan[i] ?? '';
+
+                let item_id = oldDetail.item_id[i] ?? '';
+                let base_qty = oldDetail.base_qty[i] ?? 0;
+                let unit_price = oldDetail.unit_price[i] ?? 0;
+                let harga_input = oldDetail.harga_input[i] ?? 0;
+                let note = oldDetail.note[i] ?? '';
+                let berat = oldDetail.berat[i] ?? 0;
+                let balance = oldDetail.balance[i] ?? 0;
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_grk}">
+                        ${ellipsis(no_grk)}
+                    </span>
+                    <input type="hidden" name="detail[no_grk][]" value="${no_grk}">
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[note][]" value="${note}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">
+                    `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
+                    `,
+
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">
+                    `,
+
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">
+                    `,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
+                ]).node();
+
+                $(rowNode).addClass('tr-height-30');
+
+                rowsAdded = true;
+
+            });
+
+            if (rowsAdded) {
+                tableDetail.draw(false);
+                toggleStorageDisabled();
+            }
+
+        }
+
         //Initialize Select2 Elements
         $('.select2').each(function() {
             $(this).select2({
@@ -759,6 +838,7 @@
                     `<span class="ellipsis" title="${no_grk}">
                         ${ellipsis(no_grk)}
                     </span>
+                    <input type="hidden" name="detail[no_grk][]" value="${no_grk}">
                     <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
                     <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
@@ -778,7 +858,9 @@
 
                     `<span class="ellipsis" title="${kode_item}">
                         ${ellipsis(kode_item)}
-                    </span>`,
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
+                    `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
                     <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,

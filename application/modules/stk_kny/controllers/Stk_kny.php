@@ -101,6 +101,17 @@ class Stk_kny extends Back_Controller
         // ==========================
         $paged_data = array_slice($filtered_data, $start, $length);
 
+
+        // ==========================
+        // HITUNG TOTAL
+        // ==========================
+
+        $total_stok = 0;
+
+        foreach ($filtered_data as $row) {
+            $total_stok  += (float) $row->STOK;
+        }
+
         // ==========================
         // FORMAT UNTUK DATATABLE
         // ==========================
@@ -126,7 +137,10 @@ class Stk_kny extends Back_Controller
             "draw" => intval($draw),
             "recordsTotal" => count($all_data),
             "recordsFiltered" => count($filtered_data),
-            "data" => $data
+            "data" => $data,
+            "summary" => [
+                "total_stok" => number_format($total_stok, 2, '.', ','),
+            ]
         ]);
     }
 
@@ -212,6 +226,52 @@ class Stk_kny extends Back_Controller
         // ==========================
         $paged_data = array_slice($filtered_data, $start, $length);
 
+
+        // ==========================
+        // HITUNG TOTAL
+        // ==========================
+
+        $total_pusat = 0;
+        $total_pinjam = 0;
+        $total_uncomplete = 0;
+        $total_booked = 0;
+        $total_kons_jia = 0;
+        $total_kons_bbi = 0;
+        $total_kons_bki = 0;
+        $total_kons_hss = 0;
+        $total_kons_thc = 0;
+        $total_kons_gd_hydraulic = 0;
+        $total_kons_tfp = 0;
+        $total_teknikal = 0;
+        $total_kons_gun = 0;
+        $total_kons_hs = 0;
+        $total_kons_nhc = 0;
+        $total_kons_sampit = 0;
+        $total_neglasari = 0;
+        $total_total_stok = 0;
+
+        foreach ($filtered_data as $row) {
+            $total_pusat += (float) $row->PUSAT;
+            $total_pinjam += (float) $row->PINJAM;
+            $total_uncomplete += (float) $row->UNCOMPLETE;
+            $total_booked += (float) $row->BOOKED;
+            $total_kons_jia += (float) $row->KONS_JIA;
+            $total_kons_bbi += (float) $row->KONS_BBI;
+            $total_kons_bki += (float) $row->KONS_BKI;
+            $total_kons_hss += (float) $row->KONS_HSS;
+            $total_kons_thc += (float) $row->KONS_THC;
+            $total_kons_gd_hydraulic += (float) $row->KONS_GD_HYDRAULIC;
+            $total_kons_tfp += (float) $row->KONS_TFP;
+            $total_teknikal += (float) $row->TEKNIKAL;
+            $total_kons_gun += (float) $row->KONS_GUN;
+            $total_kons_hs += (float) $row->KONS_HS;
+            $total_kons_nhc += (float) $row->KONS_NHC;
+            $total_kons_sampit += (float) $row->KONS_SAMPIT;
+            $total_neglasari += (float) $row->NEGLASARI;
+            $total_total_stok += (float) $row->TOTAL_STOK;
+        }
+
+
         // ==========================
         // FORMAT UNTUK DATATABLE
         // ==========================
@@ -254,7 +314,27 @@ class Stk_kny extends Back_Controller
             "draw" => intval($draw),
             "recordsTotal" => count($all_data),
             "recordsFiltered" => count($filtered_data),
-            "data" => $data
+            "data" => $data,
+            "summary" => [
+                "total_pusat" => number_format($total_pusat, 2, '.', ','),
+                "total_pinjam" => number_format($total_pinjam, 2, '.', ','),
+                "total_uncomplete" => number_format($total_uncomplete, 2, '.', ','),
+                "total_booked" => number_format($total_booked, 2, '.', ','),
+                "total_kons_jia" => number_format($total_kons_jia, 2, '.', ','),
+                "total_kons_bbi" => number_format($total_kons_bbi, 2, '.', ','),
+                "total_kons_bki" => number_format($total_kons_bki, 2, '.', ','),
+                "total_kons_hss" => number_format($total_kons_hss, 2, '.', ','),
+                "total_kons_thc" => number_format($total_kons_thc, 2, '.', ','),
+                "total_kons_gd_hydraulic" => number_format($total_kons_gd_hydraulic, 2, '.', ','),
+                "total_kons_tfp" => number_format($total_kons_tfp, 2, '.', ','),
+                "total_teknikal" => number_format($total_teknikal, 2, '.', ','),
+                "total_kons_gun" => number_format($total_kons_gun, 2, '.', ','),
+                "total_kons_hs" => number_format($total_kons_hs, 2, '.', ','),
+                "total_kons_nhc" => number_format($total_kons_nhc, 2, '.', ','),
+                "total_kons_sampit" => number_format($total_kons_sampit, 2, '.', ','),
+                "total_neglasari" => number_format($total_neglasari, 2, '.', ','),
+                "total_total_stok" => number_format($total_total_stok, 2, '.', ','),
+            ]
         ]);
     }
 
@@ -340,6 +420,10 @@ class Stk_kny extends Back_Controller
         // ==========================
         $paged_data = array_slice($filtered_data, $start, $length);
 
+
+        // ==========================
+        // HITUNG TOTAL
+        // ==========================
         $total_masuk = 0;
         $total_keluar = 0;
 

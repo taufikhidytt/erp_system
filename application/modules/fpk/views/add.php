@@ -583,6 +583,68 @@
             ordering: false,
         });
 
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+                let nomor = tableDetail.rows().count() + 1;
+
+                let nama = oldDetail.nama_item[i] ?? '';
+                let id_item = oldDetail.id_item[i] ?? '';
+                let qty = oldDetail.qty[i] ?? 1;
+                let uom = oldDetail.uom[i] ?? '';
+                let to_qty = oldDetail.to_qty[i] ?? 1;
+                let hargaInput = oldDetail.harga_input[i] ?? 0;
+                let harga = oldDetail.harga[i] ?? 0;
+                let subtotal = oldDetail.subtotal[i] ?? 0;
+                let keterangan = oldDetail.keterangan[i] ?? '';
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${nama}">
+                        ${ellipsis(nama)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
+                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+
+                    `${kode}
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<span class="view-mode qty-view">${formatNumber(qty)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}">`,
+
+                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
+                        <option value="${uom}" selected>${uom}</option>
+                    </select>
+                    <input type="hidden" name="detail[to_qty][]" value="${to_qty}">`,
+
+                    `<span class="view-mode harga-view">${formatNumber(hargaInput)}</span>
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${hargaInput}">`,
+
+                    `<span class="harga-input-b">${formatNumber(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
+
+                    `<span class="subtotal">${formatNumber(subtotal)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`
+                ]).node();
+
+                $(rowNode).addClass('tr-height-30');
+
+                loadUom($(rowNode), id_item, uom);
+
+            });
+
+            tableDetail.draw(false);
+            toggleSupplierDisabled();
+
+            hitungTotal();
+        }
+
         //Initialize Select2 Elements
         $('.select2').each(function() {
             $(this).select2({

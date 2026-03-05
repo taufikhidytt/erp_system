@@ -625,6 +625,97 @@
             ordering: false,
         });
 
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+                let nomor = tableDetail.rows().count() + 1;
+
+                let pr_detail_id = oldDetail.pr_detail_id[i] ?? '';
+                let no_fpk = oldDetail.no_fpk[i] ?? '';
+                let nama_item = oldDetail.nama_item[i] ?? '';
+                let satuan = oldDetail.satuan[i] ?? '';
+                let harga_input = oldDetail.harga_input[i] ?? 0;
+                let unit_price = oldDetail.harga[i] ?? 0;
+                let nama_sales = oldDetail.nama_sales[i] ?? '';
+                let keterangan = oldDetail.keterangan[i] ?? '';
+
+                let item_id = oldDetail.item_id[i] ?? '';
+                let jumlah = oldDetail.jumlah[i] ?? 0;
+                let balance = oldDetail.balance[i] ?? 0;
+                let base_qty = oldDetail.base_qty[i] ?? 0;
+                let warehouse_id = oldDetail.warehouse_id[i] ?? '';
+                let sales_id = oldDetail.sales[i] ?? '';
+                let lead_time = oldDetail.lead_time[i] ?? '';
+                let berat = oldDetail.berat[i] ?? 0;
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_fpk}">
+                        ${ellipsis(no_fpk)}
+                    </span>
+                    <input type="hidden" name="detail[pr_detail_id][]" value="${pr_detail_id}">
+                    <input type="hidden" name="detail[no_fpk][]" value="${no_fpk}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">
+                    <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
+                    <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
+                    <input type="hidden" name="detail[lead_time][]" value="${lead_time}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
+
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${formatNumber(jumlah)}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+
+                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}">`,
+
+                    `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${unit_price}">`,
+
+                    `<span class="subtotal ellipsis">${formatNumber(balance * harga_input)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}">`,
+
+                    `<span class="ellipsis" title="${nama_sales}">
+                        ${ellipsis(nama_sales)}
+                    </span>
+                    <input type="hidden" name="detail[nama_sales][]" value="${nama_sales}">
+                    <input type="hidden" name="detail[sales][]" value="${sales_id}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
+                ]).node();
+
+                $(rowNode).addClass('tr-height-30');
+
+                rowsAdded = true;
+            });
+
+            if (rowsAdded) {
+                toggleSupplierDisabled();
+                tableDetail.draw(false);
+            }
+
+            hitungTotal();
+        }
+
         //Initialize Select2 Elements
         $('.select2').each(function() {
             $(this).select2({
@@ -875,6 +966,7 @@
                     `<span class="ellipsis" title="${sales}">
                         ${ellipsis(sales)}
                     </span>
+                    <input type="hidden" name="detail[nama_sales][]" value="${sales}">
                     <input type="hidden" name="detail[sales][]" value="${sales_id}">`,
 
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
