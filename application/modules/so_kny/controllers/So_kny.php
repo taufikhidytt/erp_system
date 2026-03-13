@@ -32,18 +32,18 @@ class So_kny extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no . '.';
-            $row['status'] = $so_kny->Status ? $so_kny->Status : '-';
+            $row['status'] = $so_kny->STATUS ? $so_kny->STATUS : '-';
             $row['no_transaksi'] = '
-            <a href="' . base_url('so_kny/detail/' . base64url_encode($this->encrypt->encode($so_kny->BUILD_ID))) . '">
+            <a href="' . base_url('so_kny/detail/' . base64url_encode($this->encrypt->encode($so_kny->SO_ID))) . '">
                 ' . ($so_kny->No_Transaksi ? $so_kny->No_Transaksi : '-') . '
             </a>';
             $row['po_customer'] = $so_kny->PO_Customer ? $so_kny->PO_Customer : '-';
             $row['tanggal'] = $so_kny->Tanggal ? date('Y-m-d H:i', strtotime($so_kny->Tanggal)) : '-';
             $row['customer'] = $so_kny->Customer ? $so_kny->Customer : '-';
             $row['sales'] = $so_kny->Sales ? $so_kny->Sales : '-';
-            $row['s_loc'] = $so_kny->S_loc ? $so_kny->S_loc : '-';
+            $row['s_loc'] = $so_kny->S_Loc ? $so_kny->S_Loc : '-';
             $row['terms'] = $so_kny->Terms ? $so_kny->Terms : '-';
-            $row['total'] = $so_kny->Total ? $so_kny->Total : '-';
+            $row['total'] = $so_kny->Total ? number_format($so_kny->Total, 2, '.', ',') : '-';
 
             $row['so_id'] = $this->encrypt->encode($so_kny->SO_ID);
             $data[] = $row;
