@@ -158,7 +158,7 @@
                                                                 <option
                                                                     value="<?= $pt->PAYMENT_TERM_ID ?>"
                                                                     <?= set_value('payment_term') ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultValue == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
-                                                                    <?= strtoupper($pt->PAYMENT_TERM_NAME) ?>
+                                                                    <?= $pt->PAYMENT_TERM_NAME ?>
                                                                 </option>
                                                             <?php endforeach; ?>
                                                         </select>
