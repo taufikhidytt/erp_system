@@ -330,7 +330,8 @@
                                                         <td colspan="3" class="text-left">
                                                             <?php
                                                             $defaultValue = null;
-                                                            foreach ($ppn_code->result() as $pc) {
+                                                            $ppn_data = $ppn_code->result();
+                                                            foreach ($ppn_data as $pc) {
                                                                 if ($pc->PRIMARY_FLAG == 'Y') {
                                                                     $defaultValue = $pc->PPN_CODE;
                                                                     break;
@@ -341,9 +342,11 @@
                                                                 <?php if (!$defaultValue): ?>
                                                                     <option value="">-- Selected PPN Code --</option>
                                                                 <?php endif; ?>
-                                                                <?php foreach ($ppn_code->result() as $pc): ?>
+                                                                <?php foreach ($ppn_data as $pc): ?>
                                                                     <option
-                                                                        value="<?= $pc->PERCENTAGE ?>" data-code="<?= $pc->PPN_CODE ?>"
+                                                                        value="<?= $pc->PERCENTAGE ?>"
+                                                                        data-code="<?= $pc->PPN_CODE ?>"
+                                                                        data-percentage="<?= $pc->PERCENTAGE ?>"
                                                                         <?= set_value('ppn_code_selected') == $pc->PPN_CODE ? 'selected' : ($defaultValue == $pc->PPN_CODE ? 'selected' : '') ?>>
                                                                         <?= strtoupper($pc->PPN_CODE) ?>
                                                                     </option>

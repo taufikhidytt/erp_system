@@ -257,9 +257,9 @@ class So_kny extends Back_Controller
 
     public function getStatus()
     {
-        $build_id = $this->encrypt->decode($this->input->post('build_id'));
+        $so_id = $this->encrypt->decode($this->input->post('so_id'));
 
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM build a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.BUILD_ID = {$build_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM so a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.SO_ID = {$so_id}");
 
         if ($data->num_rows() > 0) {
             $result = array(
@@ -360,7 +360,7 @@ class So_kny extends Back_Controller
                     if (stripos($post['PPN_CODE'], 'INCL') !== false) {
                         $diskon_price = $detail['diskon_harga'][$i] / (1 + ($detail['diskon_persentase'][$i] / 100));
                     } else {
-                        $diskon_price = $post['diskon_harga'][$i];
+                        $diskon_price = $detail['diskon_harga'][$i];
                     }
 
                     $dataDetail = [
@@ -505,33 +505,32 @@ class So_kny extends Back_Controller
                 // AMBIL DATA POST
                 // ===============================
                 $post   = $this->input->post();
-                $build_id   = $this->encrypt->decode($post['build_id']);
+                $so_id   = $this->encrypt->decode($post['so_id']);
                 $detail = $post['detail'] ?? [];
-                debuging($post);
 
-                if (!$build_id || empty($detail['nama_item'])) {
+                if (!$so_id || empty($detail['nama_item'])) {
                     $this->session->set_flashdata('warning', 'Detail tidak boleh kosong dan wajib diisi!');
-                    redirect('mrq/detail/' . $id);
+                    redirect('so_kny/detail/' . $id);
                 }
 
                 // ===============================
                 // AMBIL DETAIL DB
                 // ===============================
                 $dbDetails = $this->db
-                    ->select('BUILD_DETAIL_ID')
-                    ->from('build_detail')
-                    ->where('BUILD_ID', $build_id)
+                    ->select('SO_DETAIL_ID')
+                    ->from('so_detail')
+                    ->where('SO_ID', $so_id)
                     ->get()
                     ->result_array();
 
-                $dbDetailIds = array_column($dbDetails, 'BUILD_DETAIL_ID');
+                $dbDetailIds = array_column($dbDetails, 'SO_DETAIL_ID');
 
                 // ===============================
                 // AMBIL DETAIL POST
                 // ===============================
                 $postDetailIds = [];
-                if (!empty($detail['build_detail_id'])) {
-                    foreach ($detail['build_detail_id'] as $val) {
+                if (!empty($detail['so_detail_id'])) {
+                    foreach ($detail['so_detail_id'] as $val) {
                         if (!empty($val)) {
                             $postDetailIds[] = $this->encrypt->decode($val);
                         }
@@ -556,53 +555,58 @@ class So_kny extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    $jumlah = str_replace([','], '', $detail['jumlah'][$i]);
-                    $harga_input = str_replace([','], '', $detail['harga_input'][$i]);
-                    $subtotal = $jumlah * $harga_input;
-                    $total += $subtotal;
+                    if (stripos($post['PPN_CODE'], 'INCL') !== false) {
+                        $diskon_price = $detail['diskon_harga'][$i] / (1 + ($detail['diskon_persentase'][$i] / 100));
+                    } else {
+                        $diskon_price = $detail['diskon_harga'][$i];
+                    }
 
-                    $build_detail_id = !empty($detail['build_detail_id'][$i])
-                        ? $this->encrypt->decode($detail['build_detail_id'][$i])
+                    $so_detail_id = !empty($detail['so_detail_id'][$i])
+                        ? $this->encrypt->decode($detail['so_detail_id'][$i])
                         : null;
 
                     $dataDetail = [
-                        'ITEM_ID'               => $detail['item_id'][$i],
-                        'ENTERED_QTY'           => $jumlah,
-                        'BASE_QTY'              => $detail['base_qty'][$i],
-                        'UNIT_PRICE'            => str_replace([','], '', $detail['unit_price'][$i]),
-                        'SUBTOTAL'              => $subtotal,
-                        'ENTERED_UOM'           => $detail['satuan'][$i],
-                        'WAREHOUSE_ID'          => $detail['warehouse_id'][$i],
-                        'TAG_DETAIL_ID'         => $detail['tag_detail_id'][$i],
-                        'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
-                        'HARGA_INPUT'           => $harga_input,
-                        'ITEM_DESCRIPTION'      => $detail['nama_item'][$i],
-                        'NOTE'                  => $detail['keterangan'][$i],
-                        'BERAT'                 => $detail['berat'][$i],
-                        'LAST_UPDATE_BY'        => $this->session->userdata('id'),
-                        'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
+                        'ITEM_ID'            => $detail['item_id'][$i],
+                        'ENTERED_QTY'        => $detail['jumlah'][$i],
+                        'BASE_QTY'           => $detail['base_qty'][$i],
+                        'UNIT_PRICE'         => str_replace([','], '', $detail['harga'][$i]),
+                        'DISCOUNT_PRICE'     => $diskon_price,
+                        'SUBTOTAL'           => $detail['subtotal'][[$i]],
+                        'ENTERED_UOM'        => $detail['satuan'][$i],
+                        'GUDANG_ID'          => $post['storage'],
+                        'KARYAWAN_ID'        => $post['sales'],
+                        'BUILD_ID'           => $detail['build_id'][$i],
+                        'DISCOUNT_PERCEN'    => $detail['diskon_persentase'][$i],
+                        'HARGA_INPUT'        => str_replace([','], '', $detail['harga_input'][$i]),
+                        'DISKON_INPUT'       => $detail['diskon_harga'][$i],
+                        'ITEM_DESCRIPTION'   => $detail['nama_item'][$i],
+                        'DESKRIPSI'          => $detail['memo'][$i],
+                        'NOTE'               => $detail['keterangan'][$i],
+                        'BERAT'              => $detail['berat'][$i],
+                        'LAST_UPDATE_BY'     => $this->session->userdata('id'),
+                        'LAST_UPDATE_DATE'   => date('Y-m-d H:i:s'),
                     ];
 
-                    if ($build_detail_id) {
+                    if ($so_detail_id) {
                         // UPDATE
                         $this->db->update(
-                            'build_detail',
+                            'so_detail',
                             $dataDetail,
-                            ['BUILD_DETAIL_ID' => $build_detail_id, 'BUILD_ID' => $build_id]
+                            ['SO_DETAIL_ID' => $so_detail_id, 'SO_ID' => $so_id]
                         );
                     } else {
                         // INSERT
-                        $dataDetail['BUILD_ID']         = $build_id;
+                        $dataDetail['SO_ID']            = $so_id;
                         $dataDetail['CREATED_BY']       = $this->session->userdata('id');
                         $dataDetail['CREATED_DATE']     = date('Y-m-d H:i:s');
 
-                        $this->db->insert('build_detail', $dataDetail);
+                        $this->db->insert('so_detail', $dataDetail);
 
                         $error = $this->db->error();
                         if ($error['code'] != 0) {
                             $this->db->trans_rollback();
                             $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                            redirect('mrq/detail/' . $id);
+                            redirect('so_kny/detail/' . $id);
                         }
                     }
                 }
@@ -612,36 +616,47 @@ class So_kny extends Back_Controller
                 // ===============================
                 if (!empty($deleteIds)) {
                     $this->db
-                        ->where('BUILD_ID', $build_id)
-                        ->where_in('BUILD_DETAIL_ID', $deleteIds)
-                        ->delete('build_detail');
+                        ->where('SO_ID', $so_id)
+                        ->where_in('SO_DETAIL_ID', $deleteIds)
+                        ->delete('so_detail');
+                }
+
+                if (stripos($post['PPN_CODE'], 'INCL') !== false) {
+                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'] / (1 + ($post['PPN_PERCEN'] / 100));
+                } else {
+                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'];
                 }
 
                 // ===============================
                 // UPDATE HEADER
                 // ===============================
 
-                $this->db->update('build', [
+                $this->db->update('so', [
                     'DOCUMENT_DATE'         => $post['tanggal'],
-                    'SHIP_DATE'             => $post['ship_date'],
-                    'DOCUMENT_REFF_NO'      => $post['reff_cust'],
+                    'DOCUMENT_REFF_NO'      => $post['no_reff'],
+                    'PO_NO'                 => $post['po_customer'],
+                    'PERSON_ID'             => $post['customer'],
+                    'PERSON_SITE_ID'        => $post['person_site_id'],
                     'WAREHOUSE_ID'          => $post['storage'],
-                    'PERSON_ID'             => $post['ship_to'],
-                    'PERSON_SITE_ID'        => $post['location'],
-                    'ITEM_ID'               => $post['item_finish_goods'],
-                    'ENTERED_QTY'           => $post['jumlah'],
-                    'BASE_QTY'              => $post['base_qty'],
-                    'ITEM_DESCRIPTION'      => $post['item_description'],
-                    'ENTERED_UOM'           => $post['satuan'],
-                    'KONSINYASI_FLAG'       => 'Y',
+                    'PAYMENT_TERM_ID'       => $post['payment_term'],
+                    'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
+                    'KARYAWAN_ID'           => $post['sales'],
+                    'PPN_CODE'              => $post['PPN_CODE'],
+                    'PPN_PERCEN'            => $post['PPN_PERCEN'],
+                    'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
+                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT'],
+
+                    'TOTAL_DISCOUNT'        => $total_diskon_header,
+
+                    'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
+                    'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
+                    'TOTAL_NET'             => $post['TOTAL_NET'],
                     'NOTE'                  => $post['keterangan'],
-                    'REFF_PR'               => $post['reff_pr'],
-                    'HOUR_MINUTES'          => $post['hour_minutes'],
-                    'UNIT'                  => $post['unit'],
-                    'LOKASI'                => $post['code'],
+                    'CABANG_FLAG'           => 'Y',
+                    'KONSINYASI_FLAG'       => 'Y',
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
                     'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
-                ], ['BUILD_ID' => $build_id]);
+                ], ['SO_ID' => $so_id]);
 
                 // ===============================
                 // COMMIT / ROLLBACK
@@ -654,7 +669,7 @@ class So_kny extends Back_Controller
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Data berhasil diperbarui!');
                 }
-                redirect('mrq/detail/' . $id);
+                redirect('so_kny/detail/' . $id);
             }
         } catch (Exception $err) {
             $this->db->trans_rollback();
@@ -675,14 +690,14 @@ class So_kny extends Back_Controller
 
         $this->db->trans_begin();
 
-        $delResult = $this->mrq->delete($id);
+        $delResult = $this->so_kny->delete($id);
         if ($delResult !== true) {
             $this->db->trans_rollback();
             $this->_jsonError($delResult);
             return;
         }
 
-        $updResult = $this->mrq->updateStatus($id, $status);
+        $updResult = $this->so_kny->updateStatus($id, $status);
         if ($updResult !== true) {
             $this->db->trans_rollback();
             $this->_jsonError($updResult);

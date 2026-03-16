@@ -332,8 +332,8 @@ class So_kny_model extends CI_Model
 
     public function delete($id)
     {
-        $this->db->where('BUILD_ID', $id);
-        $this->db->delete('build_detail');
+        $this->db->where('SO_ID', $id);
+        $this->db->delete('so_detail');
 
         if ($this->db->error()['code'] != 0) {
             return $this->db->error();
@@ -346,8 +346,8 @@ class So_kny_model extends CI_Model
         $params = array(
             'STATUS_ID' => $status,
         );
-        $this->db->where('BUILD_ID', $id);
-        $this->db->update('build', $params);
+        $this->db->where('SO_ID', $id);
+        $this->db->update('so', $params);
 
         if ($this->db->error()['code'] != 0) {
             return $this->db->error();
