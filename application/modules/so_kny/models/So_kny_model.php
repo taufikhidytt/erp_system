@@ -345,6 +345,7 @@ class So_kny_model extends CI_Model
     {
         $params = array(
             'STATUS_ID' => $status,
+            'PO_NO' => '',
         );
         $this->db->where('SO_ID', $id);
         $this->db->update('so', $params);

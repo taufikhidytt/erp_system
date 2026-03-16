@@ -287,7 +287,8 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('payment_term', 'payment term', 'trim|required');
             $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
-            $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required');
+            $this->form_validation->set_rules('sales', 'sales', 'trim|required');
+            $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
 
             if ($this->form_validation->run() == false) {
                 $data['title'] = 'Tambah SO KNY';
@@ -479,7 +480,8 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('payment_term', 'payment term', 'trim|required');
             $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
-            $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required');
+            $this->form_validation->set_rules('sales', 'sales', 'trim|required');
+            $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
 
             if ($this->form_validation->run() == FALSE) {
                 $id = $this->encrypt->decode(base64url_decode($id));
@@ -730,5 +732,30 @@ class So_kny extends Back_Controller
                 'error'   => $db_error['message'],
                 'code'    => $db_error['code']
             ]));
+    }
+
+    function check_po_customer()
+    {
+        $post = $this->input->post(null, true);
+        // update
+        if (isset($post['so_id']) && $post['so_id']) {
+            $so_id = $this->encrypt->decode($post['so_id']);
+            $query = $this->db->query("SELECT * FROM so WHERE PO_NO = '$post[po_customer]' AND SO_ID != '$so_id'");
+            if ($query->num_rows() > 0) {
+                $this->form_validation->set_message('check_po_customer', '{field} sudah terdaftar, silahkan cari po customer baru!');
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            // add
+            $query = $this->db->query("SELECT * FROM so WHERE PO_NO = '$post[po_customer]'");
+            if ($query->num_rows() > 0) {
+                $this->form_validation->set_message('check_po_customer', '{field} sudah terdaftar, silahkan cari po customer baru!');
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 }

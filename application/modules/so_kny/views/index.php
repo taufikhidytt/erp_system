@@ -234,7 +234,7 @@
             var icon = $(this).find('i');
 
             var rowData = row.data();
-            var build_id = rowData.build_id;
+            var so_id = rowData.so_id;
 
             if (row.child.isShown()) {
                 // Close row
@@ -242,7 +242,7 @@
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
             } else {
                 // Open row dengan child row datatable
-                var childTableId = 'child-' + build_id;
+                var childTableId = 'child-' + so_id;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
                             <thead>
                                 <tr class="align-middle" style="height: 45px;">

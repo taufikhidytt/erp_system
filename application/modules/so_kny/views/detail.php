@@ -235,11 +235,12 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="sales">Sales:</label>
+                                            <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-user-2-fill"></i>
                                                 </span>
-                                                <select name="sales" id="sales" class="form-control select2">
+                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Sales --</option>
                                                     <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
                                                     <?php foreach ($sales->result() as $sl): ?>
