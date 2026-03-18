@@ -362,7 +362,9 @@ class Mrq extends Back_Controller
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
             // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
-            $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
+            if (!empty($this->input->post('item_finish_goods'))) {
+                $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
+            }
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('ship_date', 'ship date', 'trim|required');
 
@@ -536,7 +538,9 @@ class Mrq extends Back_Controller
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
             // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
-            $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
+            if (!empty($this->input->post('item_finish_goods'))) {
+                $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
+            }
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('ship_date', 'ship date', 'trim|required');
 

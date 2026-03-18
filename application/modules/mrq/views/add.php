@@ -185,8 +185,8 @@
                                             <div class="text-danger"><?= form_error('jumlah') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="satuan">Satuan:</label>
-                                            <span class="text-danger">*</span>
+                                            <label for="satuan" id="label_satuan">Satuan:</label>
+                                            <!-- <span class="text-danger">*</span> -->
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-paint-fill"></i>
@@ -763,11 +763,6 @@
             loadLocation(initialShipTo);
         });
 
-        $('#item_finish_goods').on('change', function() {
-            let description = $(this).find(':selected').data('description');
-            $('#item_description').val(description);
-        });
-
         $('#satuan').prop('disabled', true);
 
         let initialItem = $('#item_finish_goods').val();
@@ -777,7 +772,19 @@
             loadSatuan(initialItem, oldSatuan);
         }
         $('#item_finish_goods').on('change', function() {
+            let description = $(this).find(':selected').data('description');
+            $('#item_description').val(description);
+
             let itemId = $(this).val();
+            var label = $('#label_satuan');
+
+            // hapus dulu *
+            label.find('span.text-danger').remove();
+
+            // jika ada value, tambahkan *
+            if (itemId) {
+                label.append(' <span class="text-danger">*</span>');
+            }
             loadSatuan(itemId);
         });
 
