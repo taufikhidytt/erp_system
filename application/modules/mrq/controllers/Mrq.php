@@ -360,8 +360,8 @@ class Mrq extends Back_Controller
             $this->form_validation->set_rules('ship_to', 'ship to', 'trim|required');
             $this->form_validation->set_rules('location', 'location', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
-            $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
-            $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
+            // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
+            // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
             $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('ship_date', 'ship date', 'trim|required');
@@ -534,8 +534,8 @@ class Mrq extends Back_Controller
             $this->form_validation->set_rules('ship_to', 'ship to', 'trim|required');
             $this->form_validation->set_rules('location', 'location', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
-            $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
-            $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
+            // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
+            // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
             $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('ship_date', 'ship date', 'trim|required');

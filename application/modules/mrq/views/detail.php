@@ -174,7 +174,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="item_finish_goods">Item Finish Goods:</label>
-                                            <span class="text-danger">*</span>
+                                            <!-- <span class="text-danger">*</span> -->
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-stack-fill"></i>
@@ -197,7 +197,7 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="jumlah">Jumlah:</label>
-                                            <span class="text-danger">*</span>
+                                            <!-- <span class="text-danger">*</span> -->
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-numbers-fill"></i>
