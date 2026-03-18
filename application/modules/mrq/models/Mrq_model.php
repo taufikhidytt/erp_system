@@ -60,7 +60,7 @@ class Mrq_model extends CI_Model
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
-        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID');
+        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID', 'left');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;
@@ -134,6 +134,7 @@ class Mrq_model extends CI_Model
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID', 'left');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
