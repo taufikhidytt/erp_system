@@ -358,7 +358,6 @@ class Mrq extends Back_Controller
             $this->form_validation->CI = &$this;
 
             $this->form_validation->set_rules('ship_to', 'ship to', 'trim|required');
-            $this->form_validation->set_rules('location', 'location', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
             // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
@@ -448,8 +447,8 @@ class Mrq extends Back_Controller
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
                         'WAREHOUSE_ID'          => $detail['warehouse_id'][$i],
-                        'TAG_DETAIL_ID'         => $detail['tag_detail_id'][$i],
-                        'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
+                        'TAG_DETAIL_ID'         => !empty($detail['tag_detail_id'][$i]) ? $detail['tag_detail_id'][$i] : null,
+                        'PO_DETAIL_ID'          => !empty($detail['po_detail_id'][$i]) ? $detail['po_detail_id'][$i] : null,
                         'HARGA_INPUT'           => $harga_input,
                         'ITEM_DESCRIPTION'      => $detail['nama_item'][$i],
                         'NOTE'                  => $detail['keterangan'][$i],
@@ -484,9 +483,13 @@ class Mrq extends Back_Controller
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PERSON_ID'             => $post['ship_to'],
                     'PERSON_SITE_ID'        => $post['location'],
-                    'ITEM_ID'               => $post['item_finish_goods'],
+                    // 'ITEM_ID'               => $post['item_finish_goods'],
+                    // 'BASE_QTY'              => $post['base_qty'],
+                    'ITEM_ID'               => isset($post['item_finish_goods']) && trim($post['item_finish_goods']) !== ''
+                        ? $post['item_finish_goods']
+                        : null,
+                    'BASE_QTY'              => !empty($detail['base_qty'][$i]) ? $detail['base_qty'][$i] : 0,
                     'ENTERED_QTY'           => $post['jumlah'],
-                    'BASE_QTY'              => $post['base_qty'],
                     // 'ITEM_DESCRIPTION'      => $post['item_description'],
                     'ENTERED_UOM'           => $post['satuan'],
                     'KONSINYASI_FLAG'       => 'Y',
@@ -534,7 +537,6 @@ class Mrq extends Back_Controller
             $this->form_validation->CI = &$this;
 
             $this->form_validation->set_rules('ship_to', 'ship to', 'trim|required');
-            $this->form_validation->set_rules('location', 'location', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
             // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
@@ -633,8 +635,8 @@ class Mrq extends Back_Controller
                         'SUBTOTAL'              => $subtotal,
                         'ENTERED_UOM'           => $detail['satuan'][$i],
                         'WAREHOUSE_ID'          => $detail['warehouse_id'][$i],
-                        'TAG_DETAIL_ID'         => $detail['tag_detail_id'][$i],
-                        'PO_DETAIL_ID'          => $detail['po_detail_id'][$i],
+                        'TAG_DETAIL_ID'         => !empty($detail['tag_detail_id'][$i]) ? $detail['tag_detail_id'][$i] : null,
+                        'PO_DETAIL_ID'          => !empty($detail['po_detail_id'][$i]) ? $detail['po_detail_id'][$i] : null,
                         'HARGA_INPUT'           => $harga_input,
                         'ITEM_DESCRIPTION'      => $detail['nama_item'][$i],
                         'NOTE'                  => $detail['keterangan'][$i],
@@ -688,9 +690,13 @@ class Mrq extends Back_Controller
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PERSON_ID'             => $post['ship_to'],
                     'PERSON_SITE_ID'        => $post['location'],
-                    'ITEM_ID'               => $post['item_finish_goods'],
+                    // 'ITEM_ID'               => $post['item_finish_goods'],
+                    // 'BASE_QTY'              => $post['base_qty'],
+                    'ITEM_ID'               => isset($post['item_finish_goods']) && trim($post['item_finish_goods']) !== ''
+                        ? $post['item_finish_goods']
+                        : null,
+                    'BASE_QTY'              => !empty($post['base_qty']) ? $post['base_qty'] : 0,
                     'ENTERED_QTY'           => $post['jumlah'],
-                    'BASE_QTY'              => $post['base_qty'],
                     // 'ITEM_DESCRIPTION'      => $post['item_description'],
                     'ENTERED_UOM'           => $post['satuan'],
                     'KONSINYASI_FLAG'       => 'Y',

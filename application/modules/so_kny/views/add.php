@@ -1591,26 +1591,88 @@
     // Timer untuk debounce AJAX diskon
     let diskonHeaderTimer = null;
 
-    // Update diskon persentase
+    // Saat diskon persen diubah
     $('#cal_diskon_percen').on('input blur', function() {
-        let val = $(this).val().trim();
-        if (val === '') {
+        let persenVal = $(this).val().trim();
+        let priceVal = $('#cal_diskon_price').val().trim();
+
+        if (persenVal === '') {
+            // reset jika kosong
             $('#hid_diskon_percen').val('');
             $('#cal_diskon_price').val('');
             $('#hid_diskon_input').val('');
-        } else {
-            // Validasi input (hanya angka dan +)
-            val = val.replace(/[^\d+]/g, '');
-            $(this).val(val);
-            $('#hid_diskon_percen').val(val);
+            return;
+        }
 
-            // Clear timer sebelumnya
-            if (diskonHeaderTimer) {
-                clearTimeout(diskonHeaderTimer);
+        // validasi angka saja
+        persenVal = persenVal.replace(/[^\d+]/g, '');
+        $(this).val(persenVal);
+        $('#hid_diskon_percen').val(persenVal);
+
+        // Debounce 500ms untuk input persen
+        if (diskonHeaderTimer) clearTimeout(diskonHeaderTimer);
+        diskonHeaderTimer = setTimeout(function() {
+            let totalAmount = 0;
+            $('input[name="detail[subtotal][]"]').each(function() {
+                totalAmount += parseFloat($(this).val()) || 0;
+            });
+
+            // Kondisi 1: hanya persen terisi
+            if (persenVal !== '' && priceVal === '') {
+                $.ajax({
+                    type: "POST",
+                    url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat_header') ?>",
+                    data: {
+                        total_amount: totalAmount,
+                        persen: persenVal
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        let diskonHasil = parseFloat(response.data[0].harga) || 0;
+                        $('#cal_diskon_price').val(diskonHasil.toFixed(2));
+                        $('#hid_diskon_input').val(diskonHasil.toFixed(2));
+                        calculateGrandTotal();
+                    }
+                });
             }
 
-            // Debounce 500ms agar tidak spam server
-            diskonHeaderTimer = setTimeout(function() {
+            // Kondisi 2: persen dan price terisi
+            if (persenVal !== '' && priceVal !== '') {
+                $.ajax({
+                    type: "POST",
+                    url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat_header') ?>",
+                    data: {
+                        total_amount: totalAmount,
+                        persen: persenVal,
+                        price: priceVal
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        let diskonHasil = parseFloat(response.data[0].harga) || 0;
+                        $('#cal_diskon_price').val(diskonHasil.toFixed(2));
+                        $('#hid_diskon_input').val(diskonHasil.toFixed(2));
+                        calculateGrandTotal();
+                    }
+                });
+            }
+
+        }, 500);
+    });
+
+    // Jika diskon price diubah
+    let diskonPriceTimer;
+
+    $('#cal_diskon_price').on('input blur', function() {
+        let persenVal = $('#cal_diskon_percen').val().trim();
+        let priceVal = $(this).val().trim();
+
+        // hapus timer sebelumnya
+        if (diskonPriceTimer) clearTimeout(diskonPriceTimer);
+
+        // jalankan debounce 500ms
+        diskonPriceTimer = setTimeout(function() {
+            // Kondisi 2: kedua field terisi
+            if (persenVal !== '' && priceVal !== '') {
                 let totalAmount = 0;
                 $('input[name="detail[subtotal][]"]').each(function() {
                     totalAmount += parseFloat($(this).val()) || 0;
@@ -1621,7 +1683,8 @@
                     url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat_header') ?>",
                     data: {
                         total_amount: totalAmount,
-                        persen: val
+                        persen: persenVal,
+                        price: priceVal
                     },
                     dataType: "json",
                     success: function(response) {
@@ -1634,17 +1697,8 @@
                         console.error("Error hitung diskon bertingkat:", err);
                     }
                 });
-            }, 500);
-        }
-        let ppn = $('#cal_ppn_code').val();
-        let ppn_code = $('#cal_ppn_code option:selected').text().trim();
-        if (ppn !== '' && ppn_code) {
-            $('#table-detail tbody tr').each(function() {
-                let row = $(this);
-                hitungSubTotal(row, ppn_code, ppn);
-            });
-            calculateGrandTotal();
-        }
+            }
+        }, 500); // debounce 500ms
     });
 
     // Update diskon nominal
@@ -1683,7 +1737,6 @@
         $('#hid_ppn').val(ppn);
         $('#hid_ppn_code').val(ppn_code);
 
-        // ✅ TRIGGER UPDATE SEMUA BARIS DI TABEL DETAIL
         $('#table-detail tbody tr').each(function() {
             let row = $(this);
             hitungSubTotal(row, ppn_code, parseFloat(ppn));
@@ -1929,101 +1982,6 @@
         return parseFloat(ppnAmount.toFixed(2));
     }
 
-    // --- HITUNG GRAND TOTAL LENGKAP ---
-    // function calculateGrandTotal() {
-    //     // 1. Hitung total subtotal dari semua baris
-    //     let totalAmount = 0;
-    //     $('input[name="detail[subtotal][]"]').each(function() {
-    //         totalAmount += parseFloat($(this).val()) || 0;
-    //     });
-
-    //     $('#hid_total_amount').val(totalAmount);
-    //     $('#v_total_amount').text(formatNumber(totalAmount));
-
-
-    //     // 2. Ambil PPN
-    //     let ppnRate = parseFloat($('#cal_ppn_code').val()) || 0;
-    //     let ppnCode = $('#cal_ppn_code option:selected').text().trim();
-
-    //     $('#hid_ppn').val(ppnRate);
-    //     $('#hid_ppn_code').val(ppnCode);
-
-    //     let isIncl = ppnCode.toUpperCase().includes('INCL') && ppnRate > 0;
-
-
-    //     // 3. Ambil diskon header
-    //     let diskonPersenInput = ($('#cal_diskon_percen').val() || '').trim();
-    //     let diskonRpInput = ($('#cal_diskon_price').val() || '').replace(/,/g, '');
-
-    //     let diskonPersenParsed = {
-    //         value: 0
-    //     };
-    //     let diskonRpParsed = 0;
-
-    //     if (diskonPersenInput !== '') {
-
-    //         // Diskon persen
-    //         diskonPersenParsed = parseDiscountFormula(diskonPersenInput);
-
-    //         // diskon rp
-    //         diskonRpParsed = calculateDiscountHeader(totalAmount, diskonPersenInput);
-    //         console.log(diskonRpParsed);
-
-    //     } else {
-
-    //         // Diskon rupiah
-    //         let diskonRp = parseFloat(diskonRpInput) || 0;
-
-    //         diskonRpParsed = isIncl ?
-    //             diskonRp / (1 + (ppnRate / 100)) :
-    //             diskonRp;
-
-    //         // konversi ke persen agar tetap konsisten
-    //         if (totalAmount > 0) {
-    //             diskonPersenParsed.value = (diskonRpParsed / totalAmount) * 100;
-    //         }
-
-    //     }
-
-
-    //     // 4. Update hidden & tampilan diskon
-    //     $('#hid_diskon_percen').val(diskonPersenParsed.value);
-    //     $('#hid_diskon_input').val(diskonRpParsed);
-    //     $('#hid_diskon_price').val(diskonRpParsed);
-
-    //     $('#v_diskon').text(formatNumber(diskonRpParsed));
-
-    //     if (diskonPersenInput !== '') {
-    //         $('#cal_diskon_price').val(formatNumber(diskonRpParsed));
-    //     }
-
-    //     // $('#cal_diskon_price').val(formatNumber(diskonRpInput));
-
-
-    //     // 5. Hitung PPN
-    //     let ppnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, {
-    //         PEMBULATAN_PPN: 0
-    //     });
-
-    //     $('#hid_ppn_amount').val(ppnAmount);
-    //     $('#v_ppn_amount').text(formatNumber(ppnAmount));
-
-
-    //     // 6. Hitung Grand Total
-    //     let grandTotal = totalAmount - diskonRpParsed + ppnAmount;
-
-    //     $('#hid_total_net').val(grandTotal);
-    //     $('#v_total_net').text(formatNumber(grandTotal));
-
-
-    //     // 7. Hidden field untuk submit
-    //     $('input[name="TOTAL_AMOUNT"]').val(totalAmount);
-    //     $('input[name="TOTAL_DISKON_INPUT_HIDDEN"]').val(diskonRpParsed);
-    //     $('input[name="PPN_AMOUNT"]').val(ppnAmount);
-    //     $('input[name="TOTAL_NET"]').val(grandTotal);
-
-    // }
-
     function calculateGrandTotal() {
         // 1. Hitung total subtotal
         let totalAmount = 0;
@@ -2070,8 +2028,10 @@
         $('#hid_diskon_price').val(diskonRpParsed);
         $('#v_diskon').text(formatNumber(diskonRpParsed));
 
-        // JANGAN UBAH INPUT USER
-        $('#cal_diskon_price').val(diskonRpInput);
+        // Update input user dengan format (jangan ubah jika user sedang edit)
+        if (diskonRpInput && !$('#cal_diskon_price').is(':focus')) {
+            $('#cal_diskon_price').val(formatNumber(diskonRpInput));
+        }
 
         // 5. Hitung PPN
         let ppnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, {
@@ -2261,7 +2221,17 @@
         $('#jatuh_tempo').val(formatted);
     }
 
-    function totalDiskonInput(harga, diskon_persentase) {
-
-    }
+    // Auto format diskon price input
+    $('#cal_diskon_price').on('blur', function() {
+        let value = $(this).val().replace(/,/g, '');
+        if (value && !isNaN(value)) {
+            $(this).val(formatNumber(value));
+        }
+    }).on('focus', function() {
+        // Saat fokus, hapus format agar user bisa edit dengan mudah
+        let value = $(this).val().replace(/,/g, '');
+        if (value && !isNaN(value)) {
+            $(this).val(value);
+        }
+    });
 </script>

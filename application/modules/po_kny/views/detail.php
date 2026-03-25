@@ -51,7 +51,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('so_kny') ?>" class="text-decoration-underline">SO KNY</a>
+                                <a href="<?= base_url('po_kny') ?>" class="text-decoration-underline">PO KNY</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -67,17 +67,17 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <span class="border border-1 border-dark p-2" id="statusSoId"></span>
-                                    <span class="border border-1 border-warning p-2" id="readonlySoId"></span>
+                                    <span class="border border-1 border-dark p-2" id="statusPoId"></span>
+                                    <span class="border border-1 border-warning p-2" id="readonlyPoId"></span>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('so_kny/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
+                                    <a href="<?= base_url('po_kny/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->SO_ID); ?>">
+                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->INVOICE_ID); ?>">
                                         <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
@@ -89,7 +89,7 @@
                                 <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <input type="hidden" name="so_id" id="so_id" value="<?= $this->encrypt->encode($data->SO_ID); ?>">
+                                            <input type="hidden" name="invoice_id" id="invoice_id" value="<?= $this->encrypt->encode($data->INVOICE_ID); ?>">
                                             <label for="no_transaksi">No Transaksi:</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -100,27 +100,37 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="customer">Customer:</label>
+                                            <label for="no_reff">No Reff:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-price-tag-3-fill"></i>
+                                                </span>
+                                                <input type="text" name="no_reff" id="no_reff" class="form-control <?= form_error('no_reff') ? 'is-invalid' : null; ?>" placeholder="Enter No Reff" value="<?= $this->input->post('no_reff') ?? $data->DOCUMENT_REFF_NO; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('no_reff') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="supplier">Supplier:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-user-2-fill"></i>
                                                 </span>
-                                                <select name="customer" id="customer" class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Customer --</option>
+                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Supplier --</option>
                                                     <?php
-                                                    $selected_customer = $this->input->post('customer') ?? ($data->PERSON_ID ?? '');
+                                                    $selected_supplier = $this->input->post('supplier') ?? ($data->PERSON_ID ?? '');
                                                     $selected_person_site_id = $this->input->post('person_site_id') ?? ($data->PERSON_SITE_ID ?? '');
                                                     ?>
-                                                    <?php foreach ($customer->result() as $cs): ?>
-                                                        <option value="<?= $cs->PERSON_ID ?>" <?= ($selected_customer == $cs->PERSON_ID && $selected_person_site_id == $cs->PERSON_SITE_ID) ? 'selected' : '' ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>">
-                                                            <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
+                                                    <?php foreach ($supplier->result() as $sp): ?>
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= ($selected_supplier == $sp->PERSON_ID && $selected_person_site_id == $sp->PERSON_SITE_ID) ? 'selected' : '' ?> data-person_site_id="<?= $sp->PERSON_SITE_ID ?>">
+                                                            <?= strtoupper($sp->PERSON_NAME) . ' - [' . strtoupper($sp->PERSON_CODE) . '] - ' . strtoupper($sp->SITE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
                                                 <input type="hidden" name="person_site_id" id="person_site_id" value="<?= $selected_person_site_id ?>">
                                             </div>
-                                            <div class="text-danger"><?= form_error('customer') ?></div>
+                                            <div class="text-danger"><?= form_error('supplier') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="location">Location:</label>
@@ -137,6 +147,8 @@
                                         <div class="mb-3">
                                             <textarea name="address" id="address" class="form-control" disabled></textarea>
                                         </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
                                             <label for="tanggal">Tanggal:</label>
                                             <span class="text-danger">*</span>
@@ -199,8 +211,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
                                             <label for="storage">Storage:</label>
                                             <span class="text-danger">*</span>
@@ -232,44 +242,6 @@
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('storage') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="sales">Sales:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-user-2-fill"></i>
-                                                </span>
-                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Sales --</option>
-                                                    <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
-                                                    <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $param == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " " . $sl->LAST_NAME ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('sales') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="po_customer">PO Customer:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-profile-fill"></i>
-                                                </span>
-                                                <input type="text" name="po_customer" id="po_customer" class="form-control <?= form_error('po_customer') ? 'is-invalid' : null; ?>" placeholder="Enter PO Customer" value="<?= $this->input->post('po_customer') ?? $data->PO_NO; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('po_customer') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="no_reff">No Reff:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-price-tag-3-fill"></i>
-                                                </span>
-                                                <input type="text" name="no_reff" id="no_reff" class="form-control <?= form_error('no_reff') ? 'is-invalid' : null; ?>" placeholder="Enter No Reff" value="<?= $this->input->post('no_reff') ?? $data->DOCUMENT_REFF_NO; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('no_reff') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
@@ -328,20 +300,21 @@
                                             </thead>
                                             <tbody>
                                                 <?php $dataDetail = $this->db->query("SELECT
-                                                so_detail.*,
-                                                so.DOCUMENT_NO,
-                                                a.DOCUMENT_NO no_mrq,
+                                                invoice_detail.*,
+                                                bl.DOCUMENT_NO no_transaksi,
                                                 i.ITEM_CODE,
                                                 CASE
-                                                    WHEN a.BASE_QTY IS NULL 
-                                                    OR a.BASE_QTY = 0 THEN
-                                                        a.ENTERED_QTY ELSE a.ENTERED_QTY - ( COALESCE ( a.RECEIVED_ENTERED_QTY, 0 ) / a.BASE_QTY ) 
-                                                        END AS BALANCE
-                                                FROM so_detail
-                                                JOIN so ON so.SO_ID = so_detail.SO_ID 
-                                                JOIN build a ON a.BUILD_ID = so_detail.BUILD_ID
-                                                JOIN item i ON so_detail.ITEM_ID = i.ITEM_ID
-                                                WHERE so_detail.SO_ID = '{$data->SO_ID}'");
+                                                    WHEN invoice_detail.BASE_QTY = 0 
+                                                OR invoice_detail.BASE_QTY IS NULL THEN
+                                                    invoice_detail.ENTERED_QTY ELSE invoice_detail.ENTERED_QTY - ( inventory_in_detail.INVOICE_ENTERED_QTY / invoice_detail.BASE_QTY ) 
+                                                    END AS BALANCE
+                                                FROM invoice_detail
+                                                JOIN invoice ON invoice.INVOICE_ID = invoice_detail.INVOICE_ID 
+                                                JOIN inventory_in_detail ON invoice_detail.INVENTORY_IN_DETAIL_ID = inventory_in_detail.INVENTORY_IN_DETAIL_ID 
+                                                JOIN item i ON invoice_detail.ITEM_ID = i.ITEM_ID
+                                                JOIN build_detail pd ON inventory_in_detail.BUILD_DETAIL_ID = pd.BUILD_DETAIL_ID
+                                                JOIN build bl ON pd.BUILD_ID = bl.BUILD_ID
+                                                WHERE invoice_detail.INVOICE_ID = '{$data->INVOICE_ID}'");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php
@@ -352,9 +325,11 @@
                                                         <tr class="tr-height-30">
                                                             <td><?= $no++ ?></td>
                                                             <td style="display: none;">
-                                                                <input type="hidden" name="detail[so_detail_id][]" id="so_detail_id" value="<?= $this->encrypt->encode($dd->SO_DETAIL_ID); ?>">
-                                                                <input type="hidden" name="detail[build_id][]" value="<?= $dd->BUILD_ID ?>">
-                                                                <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
+                                                                <input type="hidden" name="detail[invoice_detail_id][]" value="<?= $this->encrypt->encode($dd->INVOICE_DETAIL_ID); ?>">
+                                                                <input type="hidden" name="detail[inventory_in_detail_id][]" value="<?= $dd->INVENTORY_IN_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[inventory_in_id][]" value="<?= $dd->INVENTORY_IN_ID ?>">
+                                                                <input type="hidden" name="detail[coa_suspend_id][]" value="<?= $dd->COA_ID ?>">
+                                                                <input type=" hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
                                                                 <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->BALANCE, '0'), '.'), 0, '.', ',') ?>">
@@ -363,10 +338,10 @@
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
                                                             <td class="ellipsis">
-                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->no_mrq ?>">
-                                                                    <?= $dd->no_mrq; ?>
+                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->no_transaksi ?>">
+                                                                    <?= $dd->no_transaksi; ?>
                                                                 </span>
-                                                                <input type="hidden" name="detail[no_mrq][]" value="<?= $dd->no_mrq ?>">
+                                                                <input type="hidden" name="detail[no_mrq][]" value="<?= $dd->no_transaksi ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
@@ -381,13 +356,13 @@
                                                                 <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
                                                             </td>
                                                             <td>
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly><?= $dd->DESKRIPSI ?></textarea>
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $postDetail['memo'][$i] ?? $dd->KET; ?>"><?= $postDetail['memo'][$i] ?? $dd->KET; ?></textarea>
                                                             </td>
                                                             <td class="ellipsis text-end">
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-so_detail_id="<?= $this->encrypt->encode($dd->SO_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-invoice_detail_id="<?= $this->encrypt->encode($dd->INVOICE_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
@@ -439,7 +414,7 @@
                                                         <?php $total_diskon = number_format($data->TOTAL_DISKON_INPUT, 2, '.', ',');
                                                         ?>
                                                         <td class="text-right">
-                                                            <input type="text" id="cal_diskon_price" name="TOTAL_DISKON_INPUT" class="form-control form-control-sm input-container" placeholder="Rupiah" value="<?= $total_diskon; ?>">
+                                                            <input type="text" id="cal_diskon_price" name="TOTAL_DISKON_INPUT" class="form-control form-control-sm input-container" placeholder="Rupiah" value="<?= $total_diskon ?>">
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -665,21 +640,22 @@
             }
         }, 100);
 
-        let so_id = $('#so_id').val();
+        let invoice_id = $('#invoice_id').val();
+
         $.ajax({
-            url: '<?= base_url() ?>so_kny/getStatus',
+            url: '<?= base_url() ?>po_kny/getStatus',
             type: 'POST',
             dataType: 'json',
             data: {
-                so_id: so_id,
+                invoice_id: invoice_id,
             },
             success: function(response) {
-                $('#statusSoId').text(response.data[0].DISPLAY_NAME);
-                $('#readonlySoId').hide();
+                $('#statusPoId').text(response.data[0].DISPLAY_NAME);
+                $('#readonlyPoId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
-                    $('#readonlySoId').show();
-                    $('#readonlySoId').text('READ ONLY');
+                    $('#readonlyPoId').show();
+                    $('#readonlyPoId').text('READ ONLY');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
@@ -991,39 +967,39 @@
 
         if (oldDetail && oldDetail.kode_item) {
             oldDetail.kode_item.forEach(function(kode, i) {
-                let so_detail_id = oldDetail.so_detail_id[i] ?? '';
+                let invoice_detail_id = oldDetail.invoice_detail_id[i] ?? '';
 
-                if (so_detail_id !== '') {
+                if (invoice_detail_id !== '') {
                     return;
                 }
 
                 let nomor = tableDetail.rows().count() + 1;
 
-                let build_id = oldDetail.build_id[i] ?? '';
+                let inventory_in_detail_id = oldDetail.inventory_in_detail_id[i] ?? '';
+                let inventory_in_id = oldDetail.inventory_in_id[i] ?? '';
+                let coa_suspend_id = oldDetail.coa_suspend_id[i] ?? '';
                 let item_id = oldDetail.item_id[i] ?? '';
                 let base_qty = oldDetail.base_qty[i] ?? '';
                 let keterangan = oldDetail.keterangan[i] ?? '';
                 let berat = oldDetail.berat[i] ?? '';
-                let balance = oldDetail.balance[i] ?? '';
-                let memo = oldDetail.memo[i] ?? '';
-                let harga_input = oldDetail.harga_input[i] ?? '';
-                let harga = oldDetail.harga[i] ?? '';
-                let diskon_harga = oldDetail.diskon_harga[i] ?? '';
-                let diskon_persentase = oldDetail.diskon_persentase[i] ?? '';
-                let subtotal = oldDetail.subtotal[i] ?? '';
+                let balance = oldDetail.sisa[i] ?? '';
 
-                let no_mrq = oldDetail.no_mrq[i] ?? '';
+                let status = oldDetail.status[i] ?? '';
+                let tanggal = oldDetail.tanggal[i] ?? '';
+                let no_transaksi = oldDetail.no_transaksi[i] ?? '';
+                let no_referensi = oldDetail.no_referensi[i] ?? '';
                 let nama_item = oldDetail.nama_item[i] ?? '';
                 let jumlah = oldDetail.jumlah[i] ?? '';
                 let satuan = oldDetail.satuan[i] ?? '';
 
-
                 let rowNode = tableDetail.row.add([
                     nomor,
 
-                    `<input type="hidden" name="detail[so_detail_id][]" value="">
-                    <input type="hidden" name="detail[no_mrq][]" value="${no_mrq}">
-                    <input type="hidden" name="detail[build_id][]" value="${build_id}">
+                    `<input type="hidden" name="detail[invoice_detail_id][]" value="">
+                    <input type="hidden" name="detail[inventory_in_detail_id][]" value="${inventory_in_detail_id}">
+                    <input type="hidden" name="detail[inventory_in_id][]" value="${inventory_in_id}">
+                    <input type="hidden" name="detail[coa_suspend_id][]" value="${coa_suspend_id}">
+                    <input type="hidden" name="detail[no_mrq][]" value="${no_transaksi}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -1130,18 +1106,18 @@
             e.preventDefault();
         });
 
-        let initialCustomer = $('#customer option:selected').data('person_site_id');
+        let initialSupplier = $('#supplier option:selected').data('person_site_id');
 
         let oldLocation = "<?= set_value('location') ?>";
 
-        if (initialCustomer) {
-            loadLocation(initialCustomer, oldLocation);
+        if (initialSupplier) {
+            loadLocation(initialSupplier, oldLocation);
         }
 
-        $('#customer').on('change', function() {
-            let initialCustomer = $('#customer option:selected').data('person_site_id');
-            $('#person_site_id').val(initialCustomer);
-            loadLocation(initialCustomer);
+        $('#supplier').on('change', function() {
+            let initialSupplier = $('#supplier option:selected').data('person_site_id');
+            $('#person_site_id').val(initialSupplier);
+            loadLocation(initialSupplier);
         });
 
         // Event untuk input normal
@@ -1187,7 +1163,7 @@
             $("#checkAll").prop('checked', false);
             $('#loading').show();
             var storage = $('#storage').val();
-            var customer = $('#customer').val();
+            var supplier = $('#supplier').val();
 
             if (!storage) {
                 $('#loading').hide();
@@ -1199,45 +1175,47 @@
                 return;
             }
 
-            if (!customer) {
+            if (!supplier) {
                 $('#loading').hide();
                 Swal.fire({
                     icon: 'warning',
                     title: 'Warning',
-                    text: 'Customer tidak terisi, Mohon isi terlebih dahulu',
+                    text: 'supplier tidak terisi, Mohon isi terlebih dahulu',
                 });
                 return;
             }
 
             $.ajax({
                 type: "POST",
-                url: "<?= base_url() ?>so_kny/getMrq",
+                url: "<?= base_url() ?>po_kny/getMrq",
                 data: {
                     storage: storage,
-                    customer: customer,
+                    supplier: supplier,
                 },
                 dataType: "json",
                 success: function(response) {
                     $('#loading').hide();
                     tableItem.clear().draw();
 
-                    let existingBuildId = new Set();
+                    let existingInventoryInId = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let buildId = $(node).find('input[name="detail[build_id][]"]').val();
-                        if (buildId) existingBuildId.add(buildId);
+                        let inventoryInId = $(node).find('input[name="detail[inventory_in_detail_id][]"]').val();
+                        if (inventoryInId) existingInventoryInId.add(inventoryInId);
                     });
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            if (existingBuildId.has(item.BUILD_ID)) {
+                            if (existingInventoryInId.has(item.INVENTORY_IN_DETAIL_ID)) {
                                 return;
                             }
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
-                                data-build_id="${item.BUILD_ID}"
+                                data-inventory_in_detail_id="${item.INVENTORY_IN_DETAIL_ID}"
+                                data-inventory_in_id="${item.INVENTORY_IN_ID}"
+                                data-coa_suspend_id="${item.COA_SUSPEND_ID}"
                                 data-item_id="${item.ITEM_ID}"
                                 data-base_qty="${item.BASE_QTY}"
                                 data-note="${item.NOTE}"
@@ -1290,19 +1268,21 @@
             e.preventDefault();
             let rowsAdded = false;
 
-            let existingBuildId = new Set();
+            let existingInventoryDetailId = new Set();
             tableDetail.rows().every(function() {
                 let node = this.node();
-                let buildId = $(node).find('input[name="detail[build_id][]"]').val();
+                let inventoryDetailId = $(node).find('input[name="detail[inventory_detail_id][]"]').val();
 
-                if (buildId) existingBuildId.add(buildId);
+                if (inventoryDetailId) existingInventoryDetailId.add(inventoryDetailId);
             });
 
             let allRows = tableItem.rows().nodes();
             let nodesToDraw = [];
 
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
-                let build_id = $(this).data("build_id");
+                let inventory_in_detail_id = $(this).data("inventory_in_detail_id");
+                let inventory_in_id = $(this).data("inventory_in_id");
+                let coa_suspend_id = $(this).data("coa_suspend_id");
                 let item_id = $(this).data("item_id");
                 let base_qty = $(this).data("base_qty");
                 let keterangan = $(this).data("note") ?? '';
@@ -1323,7 +1303,7 @@
                     .column(2)
                     .data()
                     .toArray()
-                    .includes(build_id);
+                    .includes(inventory_in_detail_id);
 
                 if (exists) {
                     $(this).prop('checked', false).prop('disabled', true);
@@ -1333,9 +1313,11 @@
                 let rowNode = tableDetail.row.add([
                     "",
 
-                    `<input type="hidden" name="detail[so_detail_id][]" value="">
+                    `<input type="hidden" name="detail[invoice_detail_id][]" value="">
+                    <input type="hidden" name="detail[inventory_in_detail_id][]" value="${inventory_in_detail_id}">
+                    <input type="hidden" name="detail[inventory_in_id][]" value="${inventory_in_id}">
+                    <input type="hidden" name="detail[coa_suspend_id][]" value="${coa_suspend_id}">
                     <input type="hidden" name="detail[no_mrq][]" value="${no_transaksi}">
-                    <input type="hidden" name="detail[build_id][]" value="${build_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -1542,7 +1524,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '<?= base_url() ?>so_kny/del',
+                        url: '<?= base_url() ?>po_kny/del',
                         type: 'POST',
                         dataType: 'json',
                         data: {
@@ -1761,7 +1743,7 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
-        const so_detail_id = input.dataset.so_detail_id;
+        const invoice_detail_id = input.dataset.invoice_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
         const balance = parseFloat(input.dataset.balance);
         let value = parseFloat(input.value);
@@ -1776,7 +1758,7 @@
         }
 
         // Tidak boleh lebih dari balance
-        if (so_detail_id) {
+        if (invoice_detail_id) {
             // UPDATE
             const maxAllowed = balance + value_old;
 
@@ -1818,7 +1800,7 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
-        const so_detail_id = input.dataset.so_detail_id;
+        const invoice_detail_id = input.dataset.invoice_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
         const row = $(input).closest("tr");
         const updateSpan = (val) => {
@@ -1830,7 +1812,7 @@
 
         const balance = parseFloat(input.dataset.balance);
 
-        if (so_detail_id) {
+        if (invoice_detail_id) {
             // UPDATE
 
             // Tidak boleh minus atau nol
@@ -2076,6 +2058,7 @@
         $('#hid_ppn').val(ppn);
         $('#hid_ppn_code').val(ppn_code);
 
+        // ✅ TRIGGER UPDATE SEMUA BARIS DI TABEL DETAIL
         $('#table-detail tbody tr').each(function() {
             let row = $(this);
             hitungSubTotal(row, ppn_code, parseFloat(ppn));
@@ -2120,7 +2103,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat') ?>",
+                url: "<?= site_url('po_kny/get_hitung_diskon_bertingkat') ?>",
                 data: {
                     harga_input: nettoHargaInput,
                     persen: diskon_persentase
@@ -2440,23 +2423,23 @@
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $customer = $('#customer');
+        let $supplier = $('#supplier');
         let $storage = $('#storage');
 
         if (hasDetail) {
-            $customer.prop('disabled', true).trigger('change.select2');
+            $supplier.prop('disabled', true).trigger('change.select2');
             $storage.prop('disabled', true).trigger('change.select2');
 
             // Buat hidden input agar value tetap dikirim ke server
-            if ($('#customer-hidden').length === 0) {
+            if ($('#supplier-hidden').length === 0) {
                 $('<input>').attr({
                     type: 'hidden',
-                    id: 'customer-hidden',
-                    name: $customer.attr('name'),
-                    value: $customer.val()
+                    id: 'supplier-hidden',
+                    name: $supplier.attr('name'),
+                    value: $supplier.val()
                 }).appendTo('form');
             } else {
-                $('#customer-hidden').val($customer.val());
+                $('#supplier-hidden').val($supplier.val());
             }
 
             if ($('#storage-hidden').length === 0) {
@@ -2470,12 +2453,12 @@
                 $('#storage-hidden').val($storage.val());
             }
         } else {
-            $customer.prop('disabled', false).trigger('change.select2');
+            $supplier.prop('disabled', false).trigger('change.select2');
             $storage.prop('disabled', false).trigger('change.select2');
-            $('#customer-hidden').remove();
+            $('#supplier-hidden').remove();
             $('#storage-hidden').remove();
         }
-        $customer.trigger('change.select2');
+        $supplier.trigger('change.select2');
         $storage.trigger('change.select2');
     }
 
@@ -2496,20 +2479,20 @@
             text;
     }
 
-    function loadLocation(customer, selectedLocation = null) {
+    function loadLocation(supplier, selectedLocation = null) {
         $('#location').removeClass('readonly-select');
 
         $('#location')
             .empty()
             .prop('disabled', true)
             .trigger('change');
-        if (!customer) return;
+        if (!supplier) return;
 
         $.ajax({
-            url: "<?= base_url('so_kny/get_location_by_customer') ?>",
+            url: "<?= base_url('po_kny/get_location_by_supplier') ?>",
             type: "POST",
             data: {
-                customer: customer
+                supplier: supplier
             },
             dataType: "json",
             success: function(response) {

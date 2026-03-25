@@ -126,7 +126,6 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="location">Location:</label>
-                                            <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-map-2-fill"></i>
@@ -644,6 +643,7 @@
         });
 
         toggleStorageDisabled();
+        toggleShipToDisabled();
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
@@ -798,7 +798,6 @@
             ordering: false,
         });
 
-
         let oldDetail = <?= json_encode($detail ?? []) ?>;
 
         if (oldDetail && oldDetail.kode_item) {
@@ -876,6 +875,7 @@
                 $(rowNode).addClass('tr-height-30');
             });
             toggleStorageDisabled();
+            toggleShipToDisabled();
             tableDetail.draw(false);
         }
 
@@ -980,6 +980,7 @@
                         tableDetail.clear().draw();
                         $(this).data("prev", current);
                         toggleStorageDisabled();
+                        toggleShipToDisabled();
                     } else {
                         $(this).val(prev).trigger('change.select2', {
                             skipEvent: true
@@ -1212,6 +1213,7 @@
                 tableDetail.draw(false);
                 tableDetail.columns.adjust();
                 toggleStorageDisabled();
+                toggleShipToDisabled();
             }
 
             $("#modalMrq").modal("hide");
@@ -1334,6 +1336,7 @@
                     $("#checkAllParent").prop("checked", false);
 
                     toggleStorageDisabled();
+                    toggleShipToDisabled();
 
                     Swal.fire({
                         icon: 'success',
@@ -1742,6 +1745,33 @@
         $storage.trigger('change.select2');
     }
 
+    function toggleShipToDisabled() {
+        if (!tableDetail) return;
+
+        let hasDetail = tableDetail.rows().count() > 0;
+        let $ship_to = $('#ship_to');
+
+        if (hasDetail) {
+            $ship_to.prop('disabled', true).trigger('change.select2');
+
+            // Buat hidden input agar value tetap dikirim ke server
+            if ($('#ship_to-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'ship_to-hidden',
+                    name: $ship_to.attr('name'),
+                    value: $ship_to.val()
+                }).appendTo('form');
+            } else {
+                $('#ship_to-hidden').val($ship_to.val());
+            }
+        } else {
+            $ship_to.prop('disabled', false).trigger('change.select2');
+            $('#ship_to-hidden').remove();
+        }
+        $ship_to.trigger('change.select2');
+    }
+
     function resetmodalMrq() {
         tableItem.search('').columns().search('').draw();
 
@@ -1796,7 +1826,7 @@
                     });
 
                     $('#location')
-                        .prop('disabled', false)
+                        .prop('disabled', true)
                         .trigger('change');
                 }
             }
