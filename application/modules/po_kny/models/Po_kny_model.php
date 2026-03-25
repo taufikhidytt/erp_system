@@ -285,8 +285,8 @@ class Po_kny_model extends CI_Model
 
     public function delete($id)
     {
-        $this->db->where('SO_ID', $id);
-        $this->db->delete('so_detail');
+        $this->db->where('INVOICE_ID', $id);
+        $this->db->delete('invoice_detail');
 
         if ($this->db->error()['code'] != 0) {
             return $this->db->error();
@@ -298,10 +298,9 @@ class Po_kny_model extends CI_Model
     {
         $params = array(
             'STATUS_ID' => $status,
-            'PO_NO' => '',
         );
-        $this->db->where('SO_ID', $id);
-        $this->db->update('so', $params);
+        $this->db->where('INVOICE_ID', $id);
+        $this->db->update('invoice', $params);
 
         if ($this->db->error()['code'] != 0) {
             return $this->db->error();

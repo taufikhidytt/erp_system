@@ -390,12 +390,6 @@ class So_kny extends Back_Controller
                     ];
 
                     $this->db->insert('so_detail', $dataDetail);
-                    $error = $this->db->error();
-                    if ($error['code'] != 0) {
-                        $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('so_kny');
-                    }
                 }
 
                 if (stripos($post['PPN_CODE'], 'INCL') !== false) {
@@ -443,20 +437,35 @@ class So_kny extends Back_Controller
                 ];
 
                 $this->db->insert('so', $dataHeader);
-                $error = $this->db->error();
-                if ($error['code'] != 0) {
-                    $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('so_kny');
-                }
 
                 // ======================
                 // TRANSACTION CHECK
                 // ======================
                 if ($this->db->trans_status() === FALSE) {
+                    // Ambil error info SEBELUM rollback
+                    $error = $this->db->error();
+                    $lastQuery = $this->db->last_query();
+
+                    // Coba dapatkan error message langsung dari mysqli connection
+                    $mysqliError = '';
+                    if (isset($this->db->conn_id) && is_object($this->db->conn_id)) {
+                        if (method_exists($this->db->conn_id, 'error')) {
+                            $mysqliError = $this->db->conn_id->error;
+                        } elseif (isset($this->db->conn_id->error)) {
+                            $mysqliError = $this->db->conn_id->error;
+                        }
+                    }
+
+                    log_message('error', 'Database Error in so_kny/add: ' . print_r($error, TRUE));
+                    log_message('error', 'MySQLi Error: ' . $mysqliError);
+                    log_message('error', 'Last Query: ' . $lastQuery);
+
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('so_kny');
+
+                    // Gunakan error message dari mysqli jika tersedia
+                    $errorMsg = !empty($mysqliError) ? $mysqliError : (!empty($error['message']) ? $error['message'] : 'Unknown database error');
+                    $this->session->set_flashdata('warning', "Error DB: " . $errorMsg);
+                    redirect('so_kny/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
@@ -464,6 +473,8 @@ class So_kny extends Back_Controller
                 }
             }
         } catch (Exception $err) {
+            $this->db->trans_rollback();
+            log_message('error', 'Exception in so_kny/add: ' . $err->getMessage());
             return sendError('Server Error', $err->getMessage());
         }
     }
@@ -596,6 +607,11 @@ class So_kny extends Back_Controller
                             $dataDetail,
                             ['SO_DETAIL_ID' => $so_detail_id, 'SO_ID' => $so_id]
                         );
+                        // Cek error setelah update
+                        $updError = $this->db->error();
+                        if ($updError['code'] != 0) {
+                            log_message('error', 'Error after UPDATE detail: ' . print_r($updError, TRUE));
+                        }
                     } else {
                         // INSERT
                         $dataDetail['SO_ID']            = $so_id;
@@ -603,12 +619,10 @@ class So_kny extends Back_Controller
                         $dataDetail['CREATED_DATE']     = date('Y-m-d H:i:s');
 
                         $this->db->insert('so_detail', $dataDetail);
-
-                        $error = $this->db->error();
-                        if ($error['code'] != 0) {
-                            $this->db->trans_rollback();
-                            $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                            redirect('so_kny/detail/' . $id);
+                        // Cek error setelah insert
+                        $insError = $this->db->error();
+                        if ($insError['code'] != 0) {
+                            log_message('error', 'Error after INSERT detail: ' . print_r($insError, TRUE));
                         }
                     }
                 }
@@ -621,6 +635,12 @@ class So_kny extends Back_Controller
                         ->where('SO_ID', $so_id)
                         ->where_in('SO_DETAIL_ID', $deleteIds)
                         ->delete('so_detail');
+
+                    // Cek error setelah delete
+                    $deleteError = $this->db->error();
+                    if ($deleteError['code'] != 0) {
+                        log_message('error', 'Error after DELETE: ' . print_r($deleteError, TRUE));
+                    }
                 }
 
                 if (stripos($post['PPN_CODE'], 'INCL') !== false) {
@@ -660,13 +680,39 @@ class So_kny extends Back_Controller
                     'LAST_UPDATE_DATE'      => date('Y-m-d H:i:s'),
                 ], ['SO_ID' => $so_id]);
 
+                // Cek error setelah update header
+                $headerError = $this->db->error();
+                if ($headerError['code'] != 0) {
+                    log_message('error', 'Error after UPDATE header: ' . print_r($headerError, TRUE));
+                }
+
                 // ===============================
                 // COMMIT / ROLLBACK
                 // ===============================
                 if ($this->db->trans_status() === FALSE) {
-                    $this->db->trans_rollback();
+                    // Ambil error info SEBELUM rollback
                     $error = $this->db->error();
-                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    $lastQuery = $this->db->last_query();
+
+                    // Coba dapatkan error message langsung dari mysqli connection
+                    $mysqliError = '';
+                    if (isset($this->db->conn_id) && is_object($this->db->conn_id)) {
+                        if (method_exists($this->db->conn_id, 'error')) {
+                            $mysqliError = $this->db->conn_id->error;
+                        } elseif (isset($this->db->conn_id->error)) {
+                            $mysqliError = $this->db->conn_id->error;
+                        }
+                    }
+
+                    log_message('error', 'Database Error in so_kny/update: ' . print_r($error, TRUE));
+                    log_message('error', 'MySQLi Error: ' . $mysqliError);
+                    log_message('error', 'Last Query: ' . $lastQuery);
+
+                    $this->db->trans_rollback();
+
+                    // Gunakan error message dari mysqli jika tersedia
+                    $errorMsg = !empty($mysqliError) ? $mysqliError : (!empty($error['message']) ? $error['message'] : 'Unknown database error');
+                    $this->session->set_flashdata('warning', "Error DB: " . $errorMsg);
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Data berhasil diperbarui!');
@@ -675,6 +721,7 @@ class So_kny extends Back_Controller
             }
         } catch (Exception $err) {
             $this->db->trans_rollback();
+            log_message('error', 'Exception in so_kny/update: ' . $err->getMessage());
             return sendError('Server Error', $err->getMessage());
         }
     }
