@@ -224,7 +224,7 @@
                                                 <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Sales --</option>
                                                     <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= set_value('sales') == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " " . $sl->LAST_NAME ?></option>
+                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= set_value('sales') == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " - [" . $sl->LAST_NAME . "]" ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>

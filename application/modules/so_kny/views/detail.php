@@ -244,7 +244,7 @@
                                                     <option value="">-- Selected Sales --</option>
                                                     <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
                                                     <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $param == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " " . $sl->LAST_NAME ?></option>
+                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $param == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " - [" . $sl->LAST_NAME . "]" ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
