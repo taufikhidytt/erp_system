@@ -999,7 +999,18 @@
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
+            var ship_to = $('#ship_to').val();
             var storage = $('#storage').val();
+
+            if (!ship_to) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Ship to tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
 
             if (!storage) {
                 $('#loading').hide();
