@@ -133,6 +133,7 @@
                                                 <select name="location" id="location" class="form-control select2 <?= form_error('location') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Location --</option>
                                                 </select>
+                                                <input type="hidden" name="location_id" id="location_id">
                                             </div>
                                             <div class="text-danger"><?= form_error('location') ?></div>
                                         </div>
@@ -1821,6 +1822,8 @@
                                 ${item.SITE_NAME}
                             </option>`
                         );
+
+                        $('#location_id').val(item.PERSON_SITE_ID);
 
                         $('#address').val((item.ADDRESS1 ?? '') + '\n' + (item.CITY ?? ''));
                     });

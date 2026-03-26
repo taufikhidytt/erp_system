@@ -359,8 +359,6 @@ class Mrq extends Back_Controller
 
             $this->form_validation->set_rules('ship_to', 'ship to', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
-            // $this->form_validation->set_rules('item_finish_goods', 'item finish good', 'trim|required');
-            // $this->form_validation->set_rules('jumlah', 'jumlah', 'trim|required');
             if (!empty($this->input->post('item_finish_goods'))) {
                 $this->form_validation->set_rules('satuan', 'satuan', 'trim|required');
             }
@@ -482,15 +480,12 @@ class Mrq extends Back_Controller
                     'DOCUMENT_REFF_NO'      => $post['reff_cust'],
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PERSON_ID'             => $post['ship_to'],
-                    'PERSON_SITE_ID'        => $post['location'],
-                    // 'ITEM_ID'               => $post['item_finish_goods'],
-                    // 'BASE_QTY'              => $post['base_qty'],
+                    'PERSON_SITE_ID'        => $post['location_id'],
                     'ITEM_ID'               => isset($post['item_finish_goods']) && trim($post['item_finish_goods']) !== ''
                         ? $post['item_finish_goods']
                         : null,
                     'BASE_QTY'              => !empty($detail['base_qty'][$i]) ? $detail['base_qty'][$i] : 0,
                     'ENTERED_QTY'           => $post['jumlah'],
-                    // 'ITEM_DESCRIPTION'      => $post['item_description'],
                     'ENTERED_UOM'           => $post['satuan'],
                     'KONSINYASI_FLAG'       => 'Y',
                     'NOTE'                  => $post['keterangan'],
@@ -689,15 +684,12 @@ class Mrq extends Back_Controller
                     'DOCUMENT_REFF_NO'      => $post['reff_cust'],
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PERSON_ID'             => $post['ship_to'],
-                    'PERSON_SITE_ID'        => $post['location'],
-                    // 'ITEM_ID'               => $post['item_finish_goods'],
-                    // 'BASE_QTY'              => $post['base_qty'],
+                    'PERSON_SITE_ID'        => $post['location_id'],
                     'ITEM_ID'               => isset($post['item_finish_goods']) && trim($post['item_finish_goods']) !== ''
                         ? $post['item_finish_goods']
                         : null,
                     'BASE_QTY'              => !empty($post['base_qty']) ? $post['base_qty'] : 0,
                     'ENTERED_QTY'           => $post['jumlah'],
-                    // 'ITEM_DESCRIPTION'      => $post['item_description'],
                     'ENTERED_UOM'           => $post['satuan'],
                     'KONSINYASI_FLAG'       => 'Y',
                     'NOTE'                  => $post['keterangan'],
