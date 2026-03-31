@@ -35,7 +35,8 @@ class Out_kny extends Back_Controller
             $row['tanggal'] = $outkny->DOCUMENT_DATE ? date('Y-m-d H:i', strtotime($outkny->DOCUMENT_DATE)) : '-';
             $row['no_transaksi'] = $outkny->DOCUMENT_NO ? $outkny->DOCUMENT_NO : '-';
             $row['no_referensi'] = $outkny->DOCUMENT_REFF_NO ? $outkny->DOCUMENT_REFF_NO : '-';
-            $row['supplier'] = $outkny->PERSON_NAME ? $outkny->PERSON_NAME : '-';
+            $row['storage'] = $outkny->WAREHOUSE_NAME ? $outkny->WAREHOUSE_NAME : '-';
+            $row['supplier'] = $outkny->PERSON_NAME ? $outkny->PERSON_NAME . " [" . $outkny->PERSON_CODE . "]" : '-';
             $row['nama_item'] = $outkny->ITEM_DESCRIPTION ? $outkny->ITEM_DESCRIPTION : '-';
             $row['kode_item'] = $outkny->ITEM_CODE ? $outkny->ITEM_CODE : '-';
             $row['qty_mr'] = $outkny->QTY_MR ? number_format($outkny->QTY_MR, 2, '.', ',') : '-';
@@ -67,7 +68,7 @@ class Out_kny extends Back_Controller
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $header = ['No', 'Tanggal', 'No Transaksi', 'No Referensi', 'Supplier', 'Nama Item', 'Kode Item', 'Qty MR', 'Qty PO', 'Sisa', 'Satuan'];
+        $header = ['No', 'Tanggal', 'No Transaksi', 'No Referensi', 'Storage', 'Supplier', 'Nama Item', 'Kode Item', 'Qty MR', 'Qty PO', 'Sisa', 'Satuan'];
         $sheet->fromArray($header, NULL, 'A1');
 
         $row = 2;
@@ -78,7 +79,8 @@ class Out_kny extends Back_Controller
                 $outkny->DOCUMENT_DATE ? date('Y-m-d H:i', strtotime($outkny->DOCUMENT_DATE)) : '-',
                 $outkny->DOCUMENT_NO ?: '-',
                 $outkny->DOCUMENT_REFF_NO ?: '-',
-                $outkny->PERSON_NAME ?: '-',
+                $outkny->WAREHOUSE_NAME ?: '-',
+                $outkny->PERSON_NAME . " [" . $outkny->PERSON_CODE . "]" ?: '-',
                 $outkny->ITEM_DESCRIPTION ?: '-',
                 $outkny->ITEM_CODE ?: '-',
                 $outkny->QTY_MR ? number_format($outkny->QTY_MR, 2, '.', ',') : '-',

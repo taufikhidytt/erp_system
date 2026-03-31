@@ -105,12 +105,16 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="10" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="11" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
                                         </tr>
                                         <tr class="align-content-center">
                                             <th>No</th>
                                             <th>Tanggal</th>
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
+                                            <th>Storage</th>
                                             <th>Supplier</th>
                                             <th>Nama Item</th>
                                             <th>Kode Item</th>
@@ -185,6 +189,21 @@
                 },
                 {
                     "data": "no_referensi",
+                    "width": "10%",
+                    "render": function(data, type, row) {
+                        if (!data) return '';
+
+                        const limit = 20;
+                        if (data.length > limit) {
+                            return `<span title="${data.replace(/"/g, '&quot;')}">
+                                    ${data.substring(0, limit)}...
+                                </span>`;
+                        }
+                        return data;
+                    },
+                },
+                {
+                    "data": "storage",
                     "width": "10%",
                     "render": function(data, type, row) {
                         if (!data) return '';
