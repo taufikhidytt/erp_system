@@ -224,6 +224,7 @@ class Do_kny extends Back_Controller
                     "kode_item"     => $d->ITEM_CODE,
                     "nama_item"     => $d->ITEM_DESCRIPTION,
                     "jumlah"        => number_format((float)$d->ENTERED_QTY, 2, '.', ''),
+                    "sisa"          => number_format((float)$d->BALANCE, 2, '.', ''),
                     "satuan"        => $d->ENTERED_UOM,
                     "note"          => $d->NOTE,
                     "memo"          => $d->DESKRIPSI,

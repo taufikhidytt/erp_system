@@ -945,6 +945,7 @@
                                     <th class="text-center">Kode Item</th>
                                     <th class="text-center">Nama Item</th>
                                     <th class="text-end">Jumlah</th>
+                                    <th class="text-end">Sisa</th>
                                     <th class="text-center">Satuan</th>
                                     <th class="text-center">Note</th>
                                 </tr>
@@ -1002,6 +1003,13 @@
                         },
                         {
                             "data": "jumlah",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "sisa",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
