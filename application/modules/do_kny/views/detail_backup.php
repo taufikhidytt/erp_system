@@ -1,0 +1,1828 @@
+<style>
+    .form-xs textarea.form-control {
+        height: 80px !important;
+        min-height: 30px !important;
+        padding: 2px 6px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .view-mode {
+        cursor: pointer;
+    }
+
+    .form-xs textarea {
+        resize: vertical;
+    }
+
+    .auto-width {
+        width: 5ch;
+        /* default awal */
+        min-width: 70px;
+        max-width: 590px;
+    }
+
+    /* class untuk text yang mau di-ellipsis */
+    .ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .tr-height-30 td {
+        padding-top: 1px !important;
+        padding-bottom: 1px !important;
+        line-height: 25px;
+    }
+
+    #table-detail th:nth-child(2),
+    #table-detail td:nth-child(2) {
+        display: none !important;
+    }
+
+    .keterangan-view {
+        white-space: pre-line;
+    }
+</style>
+
+<div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
+<div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
+<div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
+
+<div class="page-content" data-aos="zoom-in">
+    <div class="container-fluid">
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item">
+                                <a href="<?= base_url('do_kny') ?>" class="text-decoration-underline">DO KNY</a>
+                            </li>
+                            <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-2">
+                    <div class="card-body">
+                        <form action="" method="post" id="myForm">
+                            <div class="row mb-2">
+                                <div class="col-lg-6 col-md-6 col-sm-12">
+                                    <span class="border border-1 border-dark p-2" id="statusDoKnyId"></span>
+                                    <span class="border border-1 border-warning p-2" id="readonlyDoKnyId"></span>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 text-end">
+                                    <a href="<?= base_url('do_kny/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
+                                        <i class="ri ri-add-box-fill"></i>
+                                    </a>
+                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
+                                        <i class="ri ri-save-3-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->INVENTORY_OUT_ID); ?>">
+                                        <i class="ri ri-delete-bin-5-fill"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
+                                        <i class="ri ri-reply-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="row form-xs">
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <input type="hidden" name="inventory_out_id" id="inventory_out_id" value="<?= $this->encrypt->encode($data->INVENTORY_OUT_ID); ?>">
+                                            <label for="no_transaksi">No Transaksi:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-barcode-box-fill"></i>
+                                                </span>
+                                                <input type="text" name="no_transaksi" id="no_transaksi" class="form-control <?= form_error('no_transaksi') ? 'is-invalid' : null; ?>" placeholder="Auto Generate" value="<?= $this->input->post('no_transaksi') ?? $data->DOCUMENT_NO; ?>" disabled readonly>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('no_transaksi') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="customer">Customer:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-user-3-fill"></i>
+                                                </span>
+                                                <select name="customer" id="customer" class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Customer --</option>
+                                                    <?php $param = $this->input->post('location_id') ?? $data->PERSON_SITE_ID; ?>
+                                                    <?php foreach ($customer->result() as $cs): ?>
+                                                        <option value="<?= $cs->PERSON_ID ?>" <?= $cs->PERSON_SITE_ID == $param ? 'selected' : null ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>">
+                                                            <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('ship_to') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="location">Location:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-map-2-fill"></i>
+                                                </span>
+                                                <select name="location" id="location" class="form-control select2 <?= form_error('location') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Location --</option>
+                                                </select>
+                                                <input type="hidden" name="location_id" id="location_id" class="form-control" readonly value="<?= $this->input->post('location_id') ?? $data->PERSON_SITE_ID; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('location') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <textarea name="address" id="address" class="form-control" disabled></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="tanggal">Tanggal:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? $data->DOCUMENT_DATE; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('tanggal') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sales">Sales:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-user-2-fill"></i>
+                                                </span>
+                                                <input type="text" name="sales" id="sales" class="form-control" placeholder="Enter Sales" value="<?= $this->input->post('sales') ?? $data->FIRST_NAME . " [" . $data->LAST_NAME . "]"; ?>" readonly>
+                                                <input type="hidden" name="sales_id" id="sales_id" value="<?= $this->input->post('sales_id') ?? $data->KARYAWAN_ID; ?>">
+                                                <input type="hidden" name="ppn_code" id="ppn_code" value="<?= $this->input->post('ppn_code') ?? $data->PPN_CODE; ?>">
+                                                <input type="hidden" name="ppn_percen" id="ppn_percen" value="<?= $this->input->post('ppn_percen') ?? $data->PPN_PERCEN; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('sales') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="po_customer">PO Customer:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-profile-fill"></i>
+                                                </span>
+                                                <input type="text" name="po_customer" id="po_customer" class="form-control" placeholder="Enter PO Customer" value="<?= $this->input->post('po_customer') ?? $data->DOCUMENT_REFF_NO; ?>" readonly>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('po_customer') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="storage">Storage:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-building-fill"></i>
+                                                </span>
+                                                <?php
+                                                $defaultValue = null;
+                                                foreach ($storage->result() as $st) {
+                                                    if ($st->PRIMARY_FLAG == 'Y') {
+                                                        $defaultValue = $st->WAREHOUSE_ID;
+                                                        break;
+                                                    }
+                                                }
+                                                ?>
+                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
+                                                    <?php if (!$defaultValue): ?>
+                                                        <option value="">-- Selected Storage --</option>
+                                                    <?php endif; ?>
+                                                    <?php $param = $this->input->post('storage') ?? $data->WAREHOUSE_ID; ?>
+                                                    <?php foreach ($storage->result() as $st): ?>
+                                                        <option
+                                                            value="<?= $st->WAREHOUSE_ID ?>"
+                                                            <?= $st->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $st->WAREHOUSE_ID ? 'selected' : '') ?>>
+                                                            <?= strtoupper($st->WAREHOUSE_NAME) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('storage') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="keterangan">Keterangan:</label>
+                                            <div class="input-group">
+                                                <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan') ?? $data->NOTE; ?></textarea>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('keterangan') ?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="card-body">
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#detail" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-none d-sm-block">Detail</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div class="tab-content py-3 text-muted">
+                                        <div class="tab-pane active" id="detail" role="tabpanel">
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
+                                                <i class="fa fa-trash"></i> Del
+                                            </button>
+                                            <button type="button" id="btn-modalMrq" class="btn btn-success btn-sm">
+                                                <i class="ri ri-add-box-fill"></i> Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive overflow-auto" style="max-height: 450px;">
+                                        <table class="table table-striped table-bordered" id="table-detail">
+                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
+                                                <tr style="text-align: center !important;">
+                                                    <th>No</th>
+                                                    <th style="padding:0; margin:0; border:none; display: none;"></th>
+                                                    <th>
+                                                        <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
+                                                    </th>
+                                                    <th>No Transaksi</th>
+                                                    <th>Nama Item</th>
+                                                    <th>Kode Item</th>
+                                                    <th>Memo</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Satuan</th>
+                                                    <th>Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $dataDetail = $this->db->query("SELECT COALESCE
+                                                    (
+                                                    CASE
+                                                        WHEN b.BASE_QTY = 0
+                                                        OR b.BASE_QTY IS NULL THEN
+                                                            b.ENTERED_QTY ELSE b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY )
+                                                            END) AS BALANCE,
+                                                    a.*,
+                                                    i.ITEM_CODE,
+                                                    i.ITEM_DESCRIPTION,
+                                                    inventory_out.DOCUMENT_NO,
+                                                    bl.DOCUMENT_NO AS no_transaksi
+                                                FROM
+                                                    inventory_out_detail a
+                                                    JOIN inventory_out ON inventory_out.INVENTORY_OUT_ID = a.INVENTORY_OUT_ID
+                                                    JOIN so_detail b ON a.SO_DETAIL_ID = b.SO_DETAIL_ID
+                                                    JOIN build bl ON b.BUILD_ID = bl.BUILD_ID
+                                                    JOIN item i ON a.ITEM_ID = i.ITEM_ID
+                                                WHERE
+                                                    a.INVENTORY_OUT_ID = '{$data->INVENTORY_OUT_ID}' 
+                                                ORDER BY
+                                                    a.INVENTORY_OUT_DETAIL_ID ASC ;");
+
+                                                if ($dataDetail->num_rows() > 0) { ?>
+                                                    <?php
+                                                    $no = 1;
+                                                    $postDetail = $this->input->post('detail');
+                                                    $i = 0;
+                                                    foreach ($dataDetail->result() as $dd): ?>
+                                                        <tr class="tr-height-30">
+                                                            <td><?= $no++ ?></td>
+                                                            <td style="display: none;">
+                                                                <input type="hidden" name="detail[build_detail_id][]" id="build_detail_id" value="<?= $this->encrypt->encode($dd->BUILD_DETAIL_ID); ?>">
+                                                                <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
+                                                                <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[unit_price][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[warehouse_id][]" value="<?= $dd->WAREHOUSE_ID ?>">
+                                                                <input type="hidden" name="detail[po_detail_id][]" value="<?= $dd->PO_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[tag_detail_id][]" value="<?= $dd->TAG_DETAIL_ID ?>">
+                                                                <input type="hidden" name="detail[harga_input][]" value="<?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                            </td>
+                                                            <td>
+                                                                <input type="checkbox" class="chkDetail">
+                                                            </td>
+                                                            <td class="ellipsis">
+                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->no_transaksi ?>">
+                                                                    <?= $dd->no_transaksi; ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[no_transaksi][]" value="<?= $dd->no_transaksi ?>">
+                                                            </td>
+
+                                                            <td class="ellipsis">
+                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                    <?= $dd->ITEM_DESCRIPTION; ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                            </td>
+
+                                                            <td class="ellipsis">
+                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
+                                                                    <?= $dd->ITEM_CODE; ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
+                                                            </td>
+                                                            <td>
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly><?= $dd->KET ?></textarea>
+                                                            </td>
+                                                            <td class="ellipsis text-end">
+                                                                <span class="view-mode qty-view ellipsis align-middle">
+                                                                    <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
+                                                                </span>
+                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab jumlah" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-inventory_out_detail_id="<?= $this->encrypt->encode($dd->INVENTORY_OUT_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                            </td>
+                                                            <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
+                                                                <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
+                                                                    <?= $dd->ENTERED_UOM ?>
+                                                                </span>
+                                                                <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
+                                                            </td>
+                                                            <td class="ellipsis">
+                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- container-fluid -->
+</div>
+<!-- End Page-content -->
+
+<!-- modal -->
+<div id="modalMrq" class="modal fade" style="font-size: 12px;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title mt-0" id="modalTitleForm"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="table-item">
+                        <thead>
+                            <tr class="text-nowrap">
+                                <th>
+                                    <input type="checkbox" name="checkAll" id="checkAll" class="">
+                                </th>
+                                <th></th>
+                                <th>No</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                                <th>No Transaksi</th>
+                                <th>No Referensi</th>
+                                <th>Nama Customer</th>
+                                <th>Gudang</th>
+                                <th>Sales</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light waves-effect" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary waves-effect waves-light" id="btnSubmit">Selected</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- / modal -->
+
+<!-- modal keterangan -->
+<div class="modal fade" id="modalKeterangan" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Keterangan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <textarea id="modalKeteranganText"
+                    class="form-control"
+                    rows="5"
+                    placeholder="Masukkan keterangan..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSaveKeterangan">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal memo -->
+<div class="modal fade" id="modalMemo" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Memo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <textarea id="modalMemoText"
+                    class="form-control"
+                    rows="5"
+                    placeholder="Masukkan Memo..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSaveMemo">
+                    Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let tableDetail;
+    let tableItem;
+    let existingSoDetailId = new Set();
+    $(document).ready(function() {
+        let inventory_out_id = $('#inventory_out_id').val();
+        $.ajax({
+            url: '<?= base_url() ?>do_kny/getStatus',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                inventory_out_id: inventory_out_id,
+            },
+            success: function(response) {
+                $('#statusDoKnyId').text(response.data[0].DISPLAY_NAME);
+                $('#readonlyDoKnyId').hide();
+
+                if (response.data[0].ITEM_FLAG === 'N') {
+                    $('#readonlyDoKnyId').show();
+                    $('#readonlyDoKnyId').text('READ ONLY');
+                    $('#myForm')
+                        .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
+                        .prop('disabled', true);
+
+                    $('#table-detail td').css('pointer-events', 'none');
+
+                    $('#submit').replaceWith(
+                        `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-save-3-fill"></i>
+                        </span>`
+                    );
+
+                    $('#del-submit').replaceWith(
+                        `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-delete-bin-5-fill"></i>
+                        </span>`
+                    );
+
+                    $('#removeRow').replaceWith(
+                        `<span type="button" id="removeRow" class="btn btn-danger btn-sm" disabled style="width: 55px; pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="fa fa-trash"></i> Del
+                        </span>`
+                    );
+
+                    $('#btn-modalMrq').replaceWith(
+                        `<span type="button" id="btn-modalMrq" class="btn btn-success btn-sm" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri ri-add-box-fill"></i> Add
+                        </span>`
+                    );
+                }
+            }
+        });
+
+        tableDetail = $('#table-detail').DataTable({
+            ordering: false,
+            autoWidth: false,
+            paging: false,
+            columnDefs: [{
+                    targets: 0,
+                    width: "2%",
+                    className: "text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no
+                {
+                    targets: 2,
+                    width: "2%",
+                    className: "text-right",
+                }, // checkbox
+                {
+                    targets: 3,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no transaksi
+                {
+                    targets: 4,
+                    width: "20%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // nama item
+                {
+                    targets: 5,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // kode item
+                {
+                    targets: 6,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // memo
+                {
+                    targets: 7,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                }, // jumlah
+                {
+                    targets: 8,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // satuan
+                {
+                    targets: 9,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // keterangan
+            ],
+        });
+
+        toggleStorageDisabled();
+
+        tableItem = $('#table-item').DataTable({
+            autoWidth: false,
+            columnDefs: [{
+                    targets: 0,
+                }, // checkbox
+                {
+                    targets: 1,
+                    className: 'details-control',
+                    defaultContent: '<i class="ri ri-add-line" style="cursor:pointer"></i>',
+                }, // expand child
+                {
+                    targets: 2,
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no
+                {
+                    targets: 3,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // status
+                {
+                    targets: 4,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // tanggal
+                {
+                    targets: 5,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no transaksi
+                {
+                    targets: 6,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // no refrensi
+                {
+                    targets: 7,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // nama customer
+                {
+                    targets: 8,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 15;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // gudang
+                {
+                    targets: 9,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                }, // sales
+                {
+                    targets: 10,
+                    visible: false,
+                }, // so_id
+            ],
+            autoWidth: false,
+            paging: true,
+            searching: true,
+            ordering: false,
+        });
+
+        let oldDetail = <?= json_encode($detail ?? []) ?>;
+
+        if (oldDetail && oldDetail.kode_item) {
+            oldDetail.kode_item.forEach(function(kode, i) {
+
+                let inventory_out_id = oldDetail.inventory_out_id[i] ?? '';
+
+                if (inventory_out_id !== '') {
+                    return;
+                }
+
+                let nomor = tableDetail.rows().count() + 1;
+
+                let no_transaksi = oldDetail.no_transaksi[i] ?? '';
+                let so_detail_id = oldDetail.so_detail_id[i] ?? '';
+                let item_id = oldDetail.item_id[i] ?? '';
+                let build_id = oldDetail.build_id[i] ?? '';
+                let nama_item = oldDetail.nama_item[i] ?? '';
+                let jumlah = oldDetail.jumlah[i] ?? '';
+                let base_qty = oldDetail.base_qty[i] ?? '';
+                let sisa = oldDetail.balance[i] ?? '';
+                let satuan = oldDetail.satuan[i] ?? '';
+                let unit_price = oldDetail.unit_price[i] ?? '';
+                let subtotal = oldDetail.subtotal[i] ?? '';
+                let hpp = oldDetail.hpp[i] ?? '';
+                let harga_input = oldDetail.harga_input[i] ?? '';
+                let berat = oldDetail.berat[i] ?? '';
+                let note = oldDetail.keterangan[i] ?? '';
+                let memo = oldDetail.memo[i] ?? '';
+                let diskon_price = oldDetail.diskon_price[i] ?? '';
+                let diskon_persen = oldDetail.diskon_persen[i] ?? '';
+                let diskon_input = oldDetail.diskon_input[i] ?? '';
+
+                let rowNode = tableDetail.row.add([
+                    nomor,
+
+                    `
+                    <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
+                    <input type="hidden" name="detail[so_detail_id][]" value="${so_detail_id}">
+                    <input type="hidden" name="detail[build_id][]" value="${build_id}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
+                    <input type="hidden" name="detail[diskon_price][]" value="${diskon_price}">
+                    <input type="hidden" name="detail[hpp][]" value="${hpp}">
+                    <input type="hidden" name="detail[diskon_persen][]" value="${diskon_persen}">
+                    <input type="hidden" name="detail[diskon_input][]" value="${diskon_input}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[balance][]" value="${sisa}">`,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_transaksi}">
+                    ${ellipsis(no_transaksi)}
+                    </span>
+                    <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
+                    `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                    ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
+
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
+
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
+                ]).node();
+                $(rowNode).addClass('tr-height-30');
+            });
+            toggleStorageDisabled();
+            tableDetail.draw(false);
+        }
+
+        //Initialize Select2 Elements
+        $('.select2').each(function() {
+            $(this).select2({
+                theme: 'bootstrap-5',
+                dropdownParent: $(this).parent(),
+            });
+        });
+
+        var flashsuccess = $('#flashSuccess').data('success');
+        var flashwarning = $('#flashWarning').data('warning');
+        var flasherror = $('#flashError').data('error');
+
+        if (flashsuccess) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: flashsuccess,
+            })
+        }
+
+        if (flashwarning) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: flashwarning,
+            })
+        }
+
+        if (flasherror) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: flasherror,
+            })
+        }
+
+        $('#location').prop('disabled', true);
+
+        $('#location').on('select2:opening', function(e) {
+            e.preventDefault();
+        });
+
+        let initialCustomer = $('#location_id').val();
+
+        let oldLocation = "<?= set_value('location') ?>";
+
+        if (initialCustomer) {
+            loadLocation(initialCustomer, oldLocation);
+        }
+
+        $('#customer').on('change', function() {
+            let initialCustomer = $(this).find(':selected').data('person_site_id');
+            loadLocation(initialCustomer);
+        });
+
+        $("#storage").data("prev", $("#storage").val());
+        $("#storage").on("change", function(e, data) {
+            let prev = $(this).data("prev");
+            let current = $(this).val();
+
+            if (prev && current !== prev && tableDetail.rows().count() > 0) {
+
+                Swal.fire({
+                    title: "Ganti Storage?",
+                    text: "Data yang sudah dipilih akan dihapus.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Ya, ganti",
+                    cancelButtonText: "Batal"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        tableDetail.clear().draw();
+                        $(this).data("prev", current);
+                        toggleStorageDisabled();
+                        toggleShipToDisabled();
+                    } else {
+                        $(this).val(prev).trigger('change.select2', {
+                            skipEvent: true
+                        });
+                    }
+                });
+            } else {
+                $(this).data("prev", current);
+            }
+        });
+
+        // modal
+        $("#btn-modalMrq").on("click", function() {
+            resetmodalMrq();
+            $('#loading').show();
+            var customer = $('#customer').val();
+            var storage = $('#storage').val();
+
+            if (!customer) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Customer tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
+
+            if (!storage) {
+                $('#loading').hide();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Storage tidak terisi, Mohon isi terlebih dahulu',
+                });
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "<?= base_url() ?>do_kny/getSo",
+                data: {
+                    customer: customer,
+                    storage: storage,
+                },
+                dataType: "json",
+                success: function(response) {
+                    $('#loading').hide();
+                    tableItem.clear().draw();
+
+                    // Reset global variable
+                    existingSoDetailId.clear();
+
+                    // Kumpulkan so_detail_id yang sudah ada di table detail
+                    let existingSoId = new Map(); // Map no_transaksi -> array of so_detail_id
+
+                    tableDetail.rows().every(function() {
+                        let node = this.node();
+                        let soDetailId = $(node).find('input[name="detail[so_detail_id][]"]').val();
+                        let noTransaksi = $(node).find('input[name="detail[no_transaksi][]"]').val();
+
+                        if (soDetailId) {
+                            existingSoDetailId.add(String(soDetailId));
+
+                            // Group by no_transaksi untuk restore check state
+                            if (!existingSoId.has(noTransaksi)) {
+                                existingSoId.set(noTransaksi, []);
+                            }
+                            existingSoId.get(noTransaksi).push(String(soDetailId));
+                        }
+                    });
+
+                    if (response.status === 'success' && Array.isArray(response.data)) {
+                        response.data.forEach(function(item, i) {
+                            var checkbox = `
+                            <input type="checkbox" class="chkRow"
+                                data-so_detail_id="${item.SO_DETAIL_ID}"
+                                data-so_id="${item.SO_ID}"
+                                data-build_id="${item.BUILD_ID}"
+                                data-status="${item.STATUS_NAME}"
+                                data-tanggal="${item.DOCUMENT_DATE}"
+                                data-no_transaksi="${item.DOCUMENT_NO}"
+                                data-no_referensi="${item.DOCUMENT_REFF_NO}"
+                                data-nama_person="${item.PERSON_NAME} - [${item.PERSON_CODE}]"
+                                data-gudang="${item.WAREHOUSE_NAME}"
+                                data-nama_sales="${item.FIRST_NAME} - [${item.LAST_NAME}]"
+                                data-sales_id="${item.KARYAWAN_ID}"
+                            >
+                            `;
+                            var expand = `<i class="ri ri-add-line" style="cursor:pointer"></i>`;
+                            tableItem.row.add([
+                                checkbox,
+                                expand,
+                                i + 1,
+                                item.STATUS_NAME,
+                                item.DOCUMENT_DATE,
+                                item.DOCUMENT_NO,
+                                item.DOCUMENT_REFF_NO,
+                                item.PERSON_NAME + " - [" + item.PERSON_CODE + "]",
+                                item.WAREHOUSE_NAME,
+                                item.FIRST_NAME + " - [" + item.LAST_NAME + "]",
+                                item.SO_ID
+                            ]);
+                        });
+                        tableItem.draw();
+
+                        // Show semua parent row setelah draw
+                        $('#table-item tbody tr').show();
+
+                        // Restore check state untuk parent yang sudah ada di table detail
+                        existingSoId.forEach(function(soDetailIds, noTransaksi) {
+                            let parentRow = $('#table-item tbody tr').filter(function() {
+                                var row = tableItem.row($(this));
+                                var rowData = row.data();
+                                return rowData && rowData[5] == noTransaksi;
+                            });
+
+                            if (parentRow.length > 0) {
+                                let parentCheckbox = parentRow.find('.chkRow');
+                                parentCheckbox.prop('checked', true);
+
+                                // Expand row dan check semua child
+                                let row = tableItem.row(parentRow);
+                                if (!row.child.isShown()) {
+                                    parentRow.data('shouldCheckAllChildren', true);
+                                    parentRow.find('td.details-control').trigger('click');
+                                } else {
+                                    // Row sudah expanded, check semua child
+                                    let soId = parentRow.find('.chkRow').data('so_id');
+                                    let childTableElem = $('#child-' + soId);
+                                    if (childTableElem.length) {
+                                        let childCheckboxes = childTableElem.find('tbody .childCheckbox');
+                                        childCheckboxes.prop('checked', true);
+                                        $('#checkAllChild_' + soId).prop('checked', true);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    $('#modalTitleForm').text('List Data');
+                    $('#modalMrq').modal('show');
+                }
+            });
+        });
+
+        // Centang semua
+        $("#checkAllParent").change(function() {
+            $(".chkDetail").prop('checked', $(this).prop('checked'));
+        });
+
+        $("#checkAll").change(function() {
+            $(".chkRow").prop('checked', $(this).prop('checked'));
+        });
+
+        // submit
+        $("#btnSubmit").on("click", function(e) {
+            e.preventDefault();
+            let rowsAdded = false;
+
+            let existingPO = new Set();
+            let existingTAG = new Set();
+            tableDetail.rows().every(function() {
+                let node = this.node();
+                let poId = $(node).find('input[name="detail[po_detail_id][]"]').val();
+                let tagId = $(node).find('input[name="detail[tag_detail_id][]"]').val();
+
+                if (poId) existingPO.add(poId);
+                if (tagId) existingTAG.add(tagId);
+            });
+
+            let allRows = tableItem.rows().nodes();
+
+            let nodesToDraw = [];
+
+            $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
+                let item_id = $(this).data("item_id");
+                let po_detail_id = $(this).data("po_detail_id");
+                let tag_detail_id = $(this).data("tag_detail_id");
+                let base_qty = $(this).data("base_qty");
+                let unit_price = $(this).data("unit_price");
+                let subtotal = $(this).data("subtotal");
+                let warehouse_id = $(this).data("warehouse_id");
+                let harga_input = $(this).data("harga_input");
+                let keterangan = $(this).data("note") ?? '';
+                let berat = $(this).data("berat");
+                let balance = $(this).data("sisa");
+
+                let status = $(this).data("status");
+                let tanggal = $(this).data("tanggal");
+                let no_transaksi = $(this).data("no_transaksi");
+                let no_referensi = $(this).data("no_referensi");
+                let nama_item = $(this).data("nama_item");
+                let kode_item = $(this).data("kode_item");
+                let jumlah = $(this).data("jumlah");
+                let sisa = $(this).data("sisa");
+                let satuan = $(this).data("satuan");
+
+                if (po_detail_id && existingPO.has(po_detail_id)) {
+                    $(this).prop('checked', false).prop('disabled', true);
+                    return;
+                }
+
+                if (tag_detail_id && existingTAG.has(tag_detail_id)) {
+                    $(this).prop('checked', false).prop('disabled', true);
+                    return;
+                }
+
+                if (po_detail_id) existingPO.add(po_detail_id);
+                if (tag_detail_id) existingTAG.add(tag_detail_id);
+
+                let rowNode = tableDetail.row.add([
+                    "",
+
+                    `
+                    <input type="hidden" name="detail[build_detail_id][]" value="">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
+                    <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
+                    <input type="hidden" name="detail[po_detail_id][]" value="${po_detail_id}">
+                    <input type="hidden" name="detail[tag_detail_id][]" value="${tag_detail_id}">
+                    <input type="hidden" name="detail[harga_input][]" value="${harga_input}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    <input type="hidden" name="detail[balance][]" value="${balance}">`,
+
+                    `<input type="checkbox" class="chkDetail">`,
+
+                    `<span class="ellipsis" title="${no_transaksi}">
+                    ${ellipsis(no_transaksi)}
+                    </span>
+                    <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
+                    `,
+
+                    `<span class="ellipsis" title="${nama_item}">
+                    ${ellipsis(nama_item)}
+                    </span>
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
+
+                    `<span class="ellipsis" title="${kode_item}">
+                        ${ellipsis(kode_item)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly></textarea>`,
+                    // memo
+
+                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+
+                    `<span class="ellipsis" title="${satuan}">
+                        ${ellipsis(satuan)}
+                    </span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+
+                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`,
+                ]).node();
+
+                $(rowNode).addClass('tr-height-30');
+
+                nodesToDraw.push(rowNode);
+
+                $(this).prop('checked', false).prop('disabled', true);
+
+                rowsAdded = true;
+            });
+
+            if (rowsAdded) {
+                tableDetail.draw(false);
+                tableDetail.columns.adjust();
+                toggleStorageDisabled();
+                toggleShipToDisabled();
+            }
+
+            $("#modalMrq").modal("hide");
+        });
+
+        $(document).on("click", "#table-detail tbody td", function(e) {
+
+            // kalau yang diklik memang input, biarkan normal
+            if ($(e.target).is("input, select, textarea")) return;
+
+            let td = $(this);
+            let span = td.find(".view-mode");
+            let input = td.find(".edit-mode");
+
+            // hanya jalan kalau memang ada view/edit mode
+            if (span.length && input.length) {
+                span.addClass("d-none");
+                input.removeClass("d-none").focus().select();
+            }
+        });
+
+        // keluar input
+        $(document).on("blur change", ".edit-mode", function() {
+            let input = $(this);
+            let span = input.prev(".view-mode");
+
+            let value = input.val();
+            if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
+                span.text(formatNumber(value, 2));
+            } else {
+                span.text(value === "" ? "0" : value);
+            }
+
+            input.addClass("d-none");
+            span.removeClass("d-none");
+        });
+
+        $(document).on("input", ".qty, .harga-input", function() {
+            let row = $(this).closest("tr");
+            let qty = parseFloat(row.find(".qty").val()) || 0;
+            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
+
+            let hargaInputDisplay = (harga_input === 0) ?
+                '0' :
+                harga_input.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+            let subtotal = qty * harga_input;
+
+            let subTotalDisplay = (subtotal === 0) ?
+                '0' :
+                subtotal.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
+            row.find(".subtotal-text").text(subTotalDisplay.toLocaleString("en-US"));
+
+            row.find('input[name="detail[harga][]"]').val(harga_input);
+            row.find('input[name="detail[subtotal][]"]').val(subtotal);
+        });
+
+        tableDetail.on("draw.dt", function() {
+            tableDetail
+                .column(0)
+                .nodes()
+                .each(function(cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+        });
+
+        $("#checkAllParent").prop("checked", false);
+
+        $("#checkAllParent").on("change", function() {
+            let isChecked = $(this).is(":checked");
+            $("#table-detail .chkDetail").prop("checked", isChecked);
+        });
+
+        $(document).on("change", ".chkDetail", function() {
+            let total = $("#table-detail .chkDetail").length;
+            let checked = $("#table-detail .chkDetail:checked").length;
+
+            $("#checkAllParent").prop("checked", total > 0 && total === checked);
+        });
+
+        $("#removeRow").on("click", function() {
+            let rowsToRemove = tableDetail.rows().nodes().to$().filter(function() {
+                return $(this).find(".chkDetail").is(":checked");
+            });
+
+            if (rowsToRemove.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Tidak ada item yang dipilih!'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Yakin mau hapus?',
+                text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6ebbff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    rowsToRemove.each(function() {
+                        tableDetail.row(this).remove();
+                    });
+                    tableDetail.draw(false);
+
+                    $("#checkAllParent").prop("checked", false);
+
+                    toggleStorageDisabled();
+                    toggleShipToDisabled();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                        // timer: 2500,
+                        showConfirmButton: true
+                    });
+                }
+            });
+        });
+
+        $(document).on('change', '.uom-select', function() {
+
+            let toQty = $(this).find(':selected').data('to-qty') || 1;
+
+            $(this)
+                .closest('tr')
+                .find('.uom-to-qty')
+                .val(toQty);
+        });
+
+        $(document).on('keydown', '.qty, .jumlah, .harga-input', function(e) {
+            if (
+                e.key === 'e' || e.key === 'E' ||
+                e.key === '+' || e.key === '-'
+            ) {
+                e.preventDefault();
+            }
+        });
+
+        $(document).on('input change', '.jumlah, .harga-input', function() {
+            let val = $(this).val();
+            if (val === '') return;
+
+            val = parseFloat(val);
+            if (val < 1) {
+                $(this).val(1);
+            }
+        });
+
+        $(document).on('change', '.uom-select', function() {
+            let toQty = $(this).find(':selected').data('to_qty') || 1;
+
+            let row = $(this).closest('tr');
+            row.find('input[name="detail[to_qty][]"]').val(toQty);
+        });
+    });
+
+    document.querySelectorAll('.auto-width').forEach(input => {
+        resizeInput(input);
+        input.addEventListener('input', () => resizeInput(input));
+    });
+
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('uom-select')) {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            const toQty = selectedOption.getAttribute('data-to_qty');
+
+            // cari hidden input dalam satu baris/form yang sama
+            const hiddenInput = e.target.closest('td, div, tr').querySelector('.to-qty');
+            if (hiddenInput) {
+                hiddenInput.value = toQty;
+            }
+        }
+    });
+
+    // set nilai awal saat halaman pertama kali load
+    document.querySelectorAll('.uom-select').forEach(function(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        const toQty = selectedOption.getAttribute('data-to_qty');
+
+        const hiddenInput = select.closest('td, div, tr').querySelector('.to-qty');
+        if (hiddenInput) {
+            hiddenInput.value = toQty;
+        }
+    });
+
+    $(document).on('keydown', '.enter-as-tab', function(e) {
+        if (e.which !== 13) return;
+
+        e.preventDefault();
+        const $row = $(this).closest('tr');
+
+        if ($(this).hasClass('qty-edit')) {
+            const $harga = $row.find('.harga-edit');
+
+            $row.find('.harga-view').addClass('d-none');
+            $harga.removeClass('d-none');
+            $harga.focus();
+            return;
+        }
+
+        if ($(this).hasClass('harga-edit')) {
+            $row.find('textarea[name="detail[keterangan][]"]').focus();
+            return;
+        }
+    });
+
+    let openedSelect = null;
+    let isOpening = false;
+
+    $(document).on('mousedown', '.uom-select', function() {
+        openedSelect = this;
+        isOpening = true;
+
+        $(this).find('option').each(function() {
+            $(this).text($(this).data('label'));
+        });
+    });
+
+    $(document).on('change', '.uom-select', function() {
+        let selected = $(this).find('option:selected');
+
+        $(this).closest('td')
+            .find('input[name="detail[to_qty][]"]')
+            .val(selected.data('to_qty') || '');
+    });
+
+    // dropdown ditutup
+    $(document).on('click', function() {
+        if (!openedSelect) return;
+
+        setTimeout(() => {
+            if (isOpening) {
+                isOpening = false;
+                return;
+            }
+
+            let $select = $(openedSelect);
+
+            $select.find('option').each(function() {
+                $(this).text($(this).data('code'));
+            });
+
+            openedSelect = null;
+        }, 0);
+    });
+
+    let activeKeteranganInput = null;
+
+    $('#table-detail tbody').on(
+        'click',
+        'textarea[name="detail[memo][]"]',
+        function() {
+
+            activeMemoInput = $(this);
+
+            // isi modal dengan nilai input saat ini
+            $('#modalMemoText').val($(this).val());
+
+            $('#modalMemo').modal('show');
+        }
+    );
+
+    $('#table-detail tbody').on(
+        'click',
+        'textarea[name="detail[keterangan][]"]',
+        function() {
+
+            activeKeteranganInput = $(this);
+
+            // isi modal dengan nilai input saat ini
+            $('#modalKeteranganText').val($(this).val())
+
+            $('#modalKeterangan').modal('show');
+        }
+    );
+
+    $('#btnSaveMemo').on('click', function() {
+        if (!activeMemoInput) return;
+
+        activeMemoInput.val(
+            $('#modalMemoText').val()
+        );
+
+        $('#modalMemo').modal('hide');
+    });
+
+    $('#btnSaveKeterangan').on('click', function() {
+        if (!activeKeteranganInput) return;
+
+        activeKeteranganInput.val(
+            $('#modalKeteranganText').val()
+        );
+
+        $('#modalKeterangan').modal('hide');
+    });
+
+    $('#modalMemo').on('hidden.bs.modal', function() {
+        activeMemoInput = null;
+        $('#modalMemoText').val('');
+    });
+
+    $('#modalKeterangan').on('hidden.bs.modal', function() {
+        activeKeteranganInput = null;
+        $('#modalKeteranganText').val('');
+    });
+
+    document.addEventListener('input', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const build_detail_id = input.dataset.build_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const balance = parseFloat(input.dataset.balance);
+        let value = parseFloat(input.value);
+
+        const row = $(input).closest("tr");
+
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        // Tidak boleh lebih dari balance
+        if (build_detail_id) {
+            // UPDATE
+            const maxAllowed = balance + value_old;
+
+            if (value > maxAllowed) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+        } else {
+            // ADD
+            if (value > balance) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+        }
+
+        updateSpan(value);
+    });
+
+    // // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const build_detail_id = input.dataset.build_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = parseFloat(input.dataset.balance);
+
+        if (build_detail_id) {
+            // UPDATE
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+            updateSpan(balance);
+        } else {
+            // ADD
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+            updateSpan(balance);
+        }
+    }, true);
+
+    $(document).on('click', '#del-submit', function() {
+        let id = $(this).data('id_del');
+
+        Swal.fire({
+            title: 'Yakin mau hapus?',
+            text: 'Data yang dihapus tidak bisa dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#70bcff',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url() ?>mrq/del',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id: id
+                    },
+                    beforeSend: function() {
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: res.message,
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Warning!',
+                                text: res.error,
+                                icon: 'warning'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal menghapus data!', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    function resizeInput(el) {
+        el.style.width = (el.value.length + 1) + 'ch';
+    }
+
+    function formatNumber(value, decimal = 2) {
+        if (value === "" || isNaN(value)) return "0.00";
+        return parseFloat(value).toLocaleString("en-US", {
+            minimumFractionDigits: decimal,
+            maximumFractionDigits: decimal
+        });
+    }
+
+    function toggleStorageDisabled() {
+        if (!tableDetail) return;
+
+        let hasDetail = tableDetail.rows().count() > 0;
+        let $customer = $('#customer');
+        let $storage = $('#storage');
+
+        if (hasDetail) {
+            $customer.prop('disabled', true).trigger('change.select2');
+            $storage.prop('disabled', true).trigger('change.select2');
+
+            // Buat hidden input agar value tetap dikirim ke server
+            if ($('#customer-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'customer-hidden',
+                    name: $customer.attr('name'),
+                    value: $customer.val()
+                }).appendTo('form');
+            } else {
+                $('#customer-hidden').val($customer.val());
+            }
+
+            if ($('#storage-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'storage-hidden',
+                    name: $storage.attr('name'),
+                    value: $storage.val()
+                }).appendTo('form');
+            } else {
+                $('#storage-hidden').val($storage.val());
+            }
+        } else {
+            $customer.prop('disabled', false).trigger('change.select2');
+            $storage.prop('disabled', false).trigger('change.select2');
+            $('#customer-hidden').remove();
+            $('#storage-hidden').remove();
+        }
+        $customer.trigger('change.select2');
+        $storage.trigger('change.select2');
+    }
+
+    function toggleShipToDisabled() {
+        if (!tableDetail) return;
+
+        let hasDetail = tableDetail.rows().count() > 0;
+        let $ship_to = $('#ship_to');
+
+        if (hasDetail) {
+            $ship_to.prop('disabled', true).trigger('change.select2');
+
+            // Buat hidden input agar value tetap dikirim ke server
+            if ($('#ship_to-hidden').length === 0) {
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'ship_to-hidden',
+                    name: $ship_to.attr('name'),
+                    value: $ship_to.val()
+                }).appendTo('form');
+            } else {
+                $('#ship_to-hidden').val($ship_to.val());
+            }
+        } else {
+            $ship_to.prop('disabled', false).trigger('change.select2');
+            $('#ship_to-hidden').remove();
+        }
+        $ship_to.trigger('change.select2');
+    }
+
+    function resetmodalMrq() {
+        tableItem.search('').columns().search('').draw();
+
+        $('#checkAll').prop('checked', false);
+
+        $('#tableItem').find('.chkRow')
+            .prop('checked', false)
+            .prop('disabled', false);
+    }
+
+    function ellipsis(text, limit = 25) {
+        if (!text) return '-';
+        return text.length > limit ?
+            text.substring(0, limit) + '...' :
+            text;
+    }
+
+    function loadLocation(shipTo, selectedLocation = null) {
+        $('#location')
+            .empty()
+            .prop('disabled', true)
+            .trigger('change');
+        if (!shipTo) return;
+
+        $.ajax({
+            url: "<?= base_url('mrq/get_location_by_shipto') ?>",
+            type: "POST",
+            data: {
+                ship_to: shipTo
+            },
+            dataType: "json",
+            success: function(response) {
+                if (response.status === 'success') {
+                    let locations = response.data;
+                    $.each(locations, function(i, item) {
+                        // let address = `${item.SITE_NAME ?? ''} ${item.ADDRESS1 ?? ''} ${item.CITY ?? ''}`;
+                        let selected = "";
+
+                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) {
+                            selected = "selected";
+                        } else if (!selectedLocation && item.PRIMARY_SHIP === "Y") {
+                            selected = "selected";
+                        }
+
+                        $('#location').append(
+                            `<option value="${item.PERSON_SITE_ID}" ${selected}>
+                                ${item.SITE_NAME}
+                            </option>`
+                        );
+
+                        $('#address').val((item.ADDRESS1 ?? '') + '\n' + (item.CITY ?? ''));
+                    });
+
+                    $('#location')
+                        .prop('disabled', true)
+                        .trigger('change');
+                }
+            }
+        });
+    }
+</script>

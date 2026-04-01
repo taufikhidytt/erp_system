@@ -16,12 +16,7 @@ class So_kny_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.PO_NO",
         "a.DOCUMENT_DATE",
-        "CONCAT(
-            p . PERSON_NAME,
-            ' - [',
-            p . PERSON_CODE,
-            ']'
-        )",
+        "Customer",
         "k.FIRST_NAME",
         "w.WAREHOUSE_NAME",
         "py.PAYMENT_TERM_NAME",

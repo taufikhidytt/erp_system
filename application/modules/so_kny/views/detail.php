@@ -354,6 +354,7 @@
                                                             <td style="display: none;">
                                                                 <input type="hidden" name="detail[so_detail_id][]" id="so_detail_id" value="<?= $this->encrypt->encode($dd->SO_DETAIL_ID); ?>">
                                                                 <input type="hidden" name="detail[build_id][]" value="<?= $dd->BUILD_ID ?>">
+                                                                <input type="hidden" name="detail[build_detail_id][]" value="<?= $dd->BUILD_DETAIL_ID ?>">
                                                                 <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
                                                                 <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
@@ -1000,6 +1001,7 @@
                 let nomor = tableDetail.rows().count() + 1;
 
                 let build_id = oldDetail.build_id[i] ?? '';
+                let build_detail_id = oldDetail.build_detail_id[i] ?? '';
                 let item_id = oldDetail.item_id[i] ?? '';
                 let base_qty = oldDetail.base_qty[i] ?? '';
                 let keterangan = oldDetail.keterangan[i] ?? '';
@@ -1024,6 +1026,7 @@
                     `<input type="hidden" name="detail[so_detail_id][]" value="">
                     <input type="hidden" name="detail[no_mrq][]" value="${no_mrq}">
                     <input type="hidden" name="detail[build_id][]" value="${build_id}">
+                    <input type="hidden" name="detail[build_detail_id][]" value="${build_detail_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -1221,23 +1224,30 @@
                     $('#loading').hide();
                     tableItem.clear().draw();
 
-                    let existingBuildId = new Set();
+                    // let existingBuildId = new Set();
+                    let existingBuildDetailId = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let buildId = $(node).find('input[name="detail[build_id][]"]').val();
-                        if (buildId) existingBuildId.add(buildId);
+                        // let buildId = $(node).find('input[name="detail[build_id][]"]').val();
+                        let buildDetailId = $(node).find('input[name="detail[build_detail_id][]"]').val();
+                        // if (buildId) existingBuildId.add(buildId);
+                        if (buildDetailId) existingBuildDetailId.add(buildDetailId);
                     });
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            if (existingBuildId.has(item.BUILD_ID)) {
+                            // if (existingBuildId.has(item.BUILD_ID)) {
+                            //     return;
+                            // }
+                            if (existingBuildDetailId.has(item.BUILD_DETAIL_ID)) {
                                 return;
                             }
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
                                 data-build_id="${item.BUILD_ID}"
+                                data-build_detail_id="${item.BUILD_DETAIL_ID}"
                                 data-item_id="${item.ITEM_ID}"
                                 data-base_qty="${item.BASE_QTY}"
                                 data-note="${item.NOTE}"
@@ -1286,16 +1296,21 @@
         });
 
         // submit
+        // unik berubah dari build_id menjadi build_detail_id
         $("#btnSubmit").on("click", function(e) {
             e.preventDefault();
             let rowsAdded = false;
 
-            let existingBuildId = new Set();
+            // let existingBuildId = new Set();
+            let existingBuildDetailId = new Set();
             tableDetail.rows().every(function() {
                 let node = this.node();
-                let buildId = $(node).find('input[name="detail[build_id][]"]').val();
 
-                if (buildId) existingBuildId.add(buildId);
+                // let buildId = $(node).find('input[name="detail[build_id][]"]').val();
+                let buildDetailId = $(node).find('input[name="detail[build_detail_id][]"]').val();
+
+                // if (buildId) existingBuildId.add(buildId);
+                if (buildDetailId) existingBuildDetailId.add(buildDetailId);
             });
 
             let allRows = tableItem.rows().nodes();
@@ -1303,6 +1318,7 @@
 
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
                 let build_id = $(this).data("build_id");
+                let build_detail_id = $(this).data("build_detail_id");
                 let item_id = $(this).data("item_id");
                 let base_qty = $(this).data("base_qty");
                 let keterangan = $(this).data("note") ?? '';
@@ -1323,7 +1339,8 @@
                     .column(2)
                     .data()
                     .toArray()
-                    .includes(build_id);
+                    // .includes(build_id);
+                    .includes(build_detail_id);
 
                 if (exists) {
                     $(this).prop('checked', false).prop('disabled', true);
@@ -1336,6 +1353,7 @@
                     `<input type="hidden" name="detail[so_detail_id][]" value="">
                     <input type="hidden" name="detail[no_mrq][]" value="${no_transaksi}">
                     <input type="hidden" name="detail[build_id][]" value="${build_id}">
+                    <input type="hidden" name="detail[build_detail_id][]" value="${build_detail_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">

@@ -144,50 +144,107 @@ class So_kny extends Back_Controller
         try {
             $storage = $this->input->post('storage');
             $customer = $this->input->post('customer');
-
             $data = $this->db->query("SELECT
-                a.BUILD_ID,
-                a.DOCUMENT_TYPE_ID,
-                a.STATUS_ID,
-                FN_GET_VAR_NAME ( a.STATUS_ID ) AS STATUS_NAME,
-                a.DOCUMENT_NO,
-                a.DOCUMENT_DATE,
-                a.DOCUMENT_REFF_NO,
-                psn.PERSON_ID,
-                psn.PERSON_CODE,
-                psn.PERSON_NAME,
-                w.WAREHOUSE_ID,
-                w.WAREHOUSE_NAME,
-                i.ITEM_ID,
-                i.ITEM_CODE,
-                i.ITEM_DESCRIPTION,
-                a.ENTERED_QTY,
-                a.BASE_QTY,
-            CASE
-                    WHEN a.BASE_QTY IS NULL 
-                    OR a.BASE_QTY = 0 THEN
-                        a.ENTERED_QTY ELSE a.ENTERED_QTY - ( COALESCE ( a.RECEIVED_ENTERED_QTY, 0 ) / a.BASE_QTY ) 
-                        END AS BALANCE,
+                    a.BUILD_ID,
+                    NULL AS BUILD_DETAIL_ID,
+                    a.DOCUMENT_TYPE_ID,
+                    a.STATUS_ID,
+                    FN_GET_VAR_NAME (a.STATUS_ID) AS STATUS_NAME,
+                    a.DOCUMENT_DATE,
+                    a.DOCUMENT_NO,
+                    a.DOCUMENT_REFF_NO,
+                    psn.PERSON_ID,
+                    psn.PERSON_CODE,
+                    psn.PERSON_NAME,
+                    w.WAREHOUSE_ID,
+                    w.WAREHOUSE_NAME,
+                    i.ITEM_ID,
+                    i.ITEM_CODE,
+                    i.ITEM_DESCRIPTION,
+                    a.ENTERED_QTY,
+                    a.BASE_QTY,
+                    CASE
+                        WHEN a.BASE_QTY IS NULL
+                        OR a.BASE_QTY = 0
+                        THEN a.ENTERED_QTY
+                        ELSE a.ENTERED_QTY - (
+                            COALESCE(a.RECEIVED_ENTERED_QTY, 0) / a.BASE_QTY
+                        )
+                    END AS BALANCE,
                     a.ENTERED_UOM,
                     i.BERAT,
-                    a.NOTE 
+                    a.NOTE
                 FROM
                     build a
-                    JOIN item i ON a.ITEM_ID = i.ITEM_ID
-                    JOIN person psn ON a.PERSON_ID = psn.PERSON_ID
-                    JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID 
-                WHERE
-                    a.ENTERED_QTY > 0 
-                    AND a.BASE_QTY > 0 
-                    AND COALESCE ( a.RECEIVED_ENTERED_QTY, 0 ) < a.ENTERED_QTY * a.BASE_QTY 
-                    AND a.DOCUMENT_TYPE_ID = 3 
+                    JOIN item i
+                        ON a.ITEM_ID = i.ITEM_ID
+                    JOIN person psn
+                        ON a.PERSON_ID = psn.PERSON_ID
+                    JOIN warehouse w
+                        ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                WHERE a.ENTERED_QTY > 0
+                    AND a.BASE_QTY > 0
+                    AND COALESCE(a.RECEIVED_ENTERED_QTY, 0) < a.ENTERED_QTY * a.BASE_QTY
+                    AND a.DOCUMENT_TYPE_ID = 3
+                    AND a.STATUS_ID NOT IN (
+                        FN_GET_VAR_VALUE ('DELETE'),
+                        FN_GET_VAR_VALUE ('CLOSE')
+                    )
                     AND w.WAREHOUSE_ID = '{$storage}'
                     AND psn.PERSON_ID = '{$customer}'
-                ORDER BY
-                a.DOCUMENT_DATE DESC,
-                a.BUILD_ID;
+                UNION
+                ALL
+                SELECT
+                    a.BUILD_ID,
+                    b.BUILD_DETAIL_ID,
+                    a.DOCUMENT_TYPE_ID,
+                    a.STATUS_ID,
+                    FN_GET_VAR_NAME (a.STATUS_ID) AS STATUS_NAME,
+                    a.DOCUMENT_DATE,
+                    a.DOCUMENT_NO,
+                    a.DOCUMENT_REFF_NO,
+                    psn.PERSON_ID,
+                    psn.PERSON_CODE,
+                    psn.PERSON_NAME,
+                    w.WAREHOUSE_ID,
+                    w.WAREHOUSE_NAME,
+                    i.ITEM_ID,
+                    i.ITEM_CODE,
+                    i.ITEM_DESCRIPTION,
+                    a.ENTERED_QTY,
+                    a.BASE_QTY,
+                    CASE
+                        WHEN a.BASE_QTY IS NULL
+                        OR a.BASE_QTY = 0
+                        THEN a.ENTERED_QTY
+                        ELSE a.ENTERED_QTY - (
+                            COALESCE(a.RECEIVED_ENTERED_QTY, 0) / a.BASE_QTY
+                        )
+                    END AS BALANCE,
+                    b.ENTERED_UOM,
+                    i.BERAT,
+                    a.NOTE
+                FROM
+                    build_detail b
+                    JOIN build a
+                        ON a.BUILD_ID = b.BUILD_ID
+                    JOIN item i
+                        ON b.ITEM_ID = i.ITEM_ID
+                    JOIN person psn
+                        ON a.PERSON_ID = psn.PERSON_ID
+                    JOIN warehouse w
+                        ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                WHERE COALESCE(a.ITEM_ID, 0) = 0
+                    AND a.DOCUMENT_TYPE_ID = 3
+                    AND a.STATUS_ID NOT IN (
+                        FN_GET_VAR_VALUE ('DELETE'),
+                        FN_GET_VAR_VALUE ('CLOSE')
+                    )
+                    AND w.WAREHOUSE_ID = '{$storage}'
+                    AND psn.PERSON_ID = '{$customer}'
+                ORDER BY DOCUMENT_DATE DESC,
+                    BUILD_ID
             ");
-
             if ($data->num_rows() > 0) {
                 $result = array(
                     'status' => 'success',
@@ -376,6 +433,7 @@ class So_kny extends Back_Controller
                         'GUDANG_ID'          => $post['storage'],
                         'KARYAWAN_ID'        => $post['sales'],
                         'BUILD_ID'           => $detail['build_id'][$i],
+                        'BUILD_DETAIL_ID'    => $detail['build_detail_id'][$i],
                         'DISCOUNT_PERCEN'    => $detail['diskon_persentase'][$i],
                         'HARGA_INPUT'        => str_replace([','], '', $detail['harga_input'][$i]),
                         'DISKON_INPUT'       => $detail['diskon_harga'][$i],
@@ -589,6 +647,7 @@ class So_kny extends Back_Controller
                         'GUDANG_ID'          => $post['storage'],
                         'KARYAWAN_ID'        => $post['sales'],
                         'BUILD_ID'           => $detail['build_id'][$i],
+                        'BUILD_DETAIL_ID'    => $detail['build_detail_id'][$i],
                         'DISCOUNT_PERCEN'    => $detail['diskon_persentase'][$i],
                         'HARGA_INPUT'        => str_replace([','], '', $detail['harga_input'][$i]),
                         'DISKON_INPUT'       => $detail['diskon_harga'][$i],
