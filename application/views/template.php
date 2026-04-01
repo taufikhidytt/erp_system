@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title><?= $title; ?> | <?= $this->session->userdata('name_ub'); ?></title>
+    <link rel="icon" type="image/png" href="<?= base_url('assets/logo/logo.png') ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- DataTables -->
