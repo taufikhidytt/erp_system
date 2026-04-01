@@ -125,21 +125,26 @@ class Sts_model extends CI_Model
 
     public function get_detail_by_pr_id($tag_konsi_id, $limit = null, $start = null)
     {
+        //po.DOCUMENT_NO No_FPK
         $this->db->select("
             i.ITEM_DESCRIPTION `Nama_Item`,
             i.ITEM_CODE `Kode_Item`,
             tkd.ENTERED_QTY `Qty`,
             tkd.ENTERED_UOM `UoM`,
-            po.DOCUMENT_NO No_FPK,
             tkd.NOTE `Note`,
             tkd.TAG_KONSI_DETAIL_ID,
             tkd.PO_DETAIL_ID,
             IF(tkd.ENTERED_UOM = i.UOM_CODE,(tkd.ENTERED_QTY * tkd.BASE_QTY - tkd.RECEIVED_ENTERED_QTY * tkd.RECEIVED_BASE_QTY),(tkd.ENTERED_QTY - (tkd.RECEIVED_ENTERED_QTY / tkd.BASE_QTY))) AS Sisa,
+            IF(tkd.PO_DETAIL_ID IS NOT NULL,po.DOCUMENT_NO,tg.DOCUMENT_NO) as No_FPK,
         ");
         $this->db->from("tag_konsi_detail tkd");
+        
         $this->db->join("item i", "tkd.ITEM_ID = i.ITEM_ID");
-        $this->db->join("po_detail pod", "tkd.PO_DETAIL_ID = pod.PO_DETAIL_ID");
-        $this->db->join("po", "pod.PO_ID = po.PO_ID");
+        $this->db->join("po_detail pod", "tkd.PO_DETAIL_ID = pod.PO_DETAIL_ID",'left');
+        $this->db->join("po", "pod.PO_ID = po.PO_ID","left");
+        $this->db->join("tag_detail td", "tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID",'left');
+        $this->db->join("tag tg", "td.TAG_ID = tg.TAG_ID","left");
+        
         $this->db->where("tkd.TAG_KONSI_ID", $tag_konsi_id);
         $this->db->order_by('tkd.TAG_KONSI_ID', 'ASC');
 

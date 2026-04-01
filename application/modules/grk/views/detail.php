@@ -199,6 +199,12 @@
                                                 <span class="d-none d-sm-block">Detail</span>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#info-detail" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-none d-sm-block">Info</span>
+                                            </a>
+                                        </li>
                                     </ul>
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
@@ -209,121 +215,140 @@
                                             <button type="button" id="btn-modalFPK" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
-                                                <tr style="text-align: center !important;">
-                                                    <th>No</th>
-                                                    <th style="padding:0; margin:0; border:none; display: none;"></th>
-                                                    <th>
-                                                        <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
-                                                    </th>
-                                                    <th>No FPK</th>
-                                                    <th>Nama Item</th>
-                                                    <th>Kode Item</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Satuan</th>
-                                                    <th>Harga Input</th>
-                                                    <th>Harga</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Sales</th>
-                                                    <th>Keterangan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                $dataDetail = $this->db->query("SELECT po_detail.*, item.ITEM_CODE, pr.DOCUMENT_NO, karyawan.FIRST_NAME, pr_detail.ENTERED_QTY as pr_ENTERED_QTY, pr_detail.BASE_QTY as pr_BASE_QTY, pr_detail.RECEIVED_ENTERED_QTY as pr_RECEIVED_ENTERED_QTY  FROM po_detail JOIN item ON item.ITEM_ID = po_detail.ITEM_ID JOIN pr_detail ON pr_detail.PR_DETAIL_ID = po_detail.PR_DETAIL_ID JOIN pr ON pr.PR_ID = pr_detail.PR_ID JOIN karyawan ON karyawan.KARYAWAN_ID = pr.KARYAWAN_ID WHERE po_detail.PO_ID = {$data->PO_ID} ORDER BY PO_DETAIL_ID ASC");
 
-                                                if ($dataDetail->num_rows() > 0) { ?>
-                                                    <?php
-                                                    $no = 1;
-                                                    $postDetail = $this->input->post('detail');
-                                                    $i = 0;
-                                                    foreach ($dataDetail->result() as $dd): ?>
-                                                        <?php
-                                                        $l = $dd->pr_RECEIVED_ENTERED_QTY /  $dd->pr_BASE_QTY;
-                                                        $balance = $dd->pr_ENTERED_QTY - $l; ?>
-                                                        <tr class="tr-height-30">
-                                                            <td><?= $no++ ?></td>
-                                                            <td style="display: none;">
-                                                                <input type="hidden" name="detail[po_detail_id][]" id="po_detail_id" value="<?= $this->encrypt->encode($dd->PO_DETAIL_ID); ?>">
-                                                                <input type="hidden" name="detail[pr_detail_id][]" value="<?= $dd->PR_DETAIL_ID ?>">
-                                                                <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
-                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[warehouse_id][]" value="<?= $dd->GUDANG_ID ?>">
-                                                                <input type="hidden" name="detail[lead_time][]" value="<?= $dd->ETA_LEADTIME ?>">
-                                                                <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
-                                                            </td>
-                                                            <td>
-                                                                <input type="checkbox" class="chkDetail">
-                                                            </td>
-                                                            <td class="ellipsis"">
-                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
-                                                                <?= $dd->DOCUMENT_NO; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[no_fpk][]" value="<?= $dd->DOCUMENT_NO ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                    <?= $dd->ITEM_DESCRIPTION; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
-                                                                    <?= $dd->ITEM_CODE; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="view-mode qty-view ellipsis align-middle">
-                                                                    <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode($dd->PO_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
-                                                            </td>
-                                                            <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
-                                                                <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
-                                                                    <?= $dd->ENTERED_UOM ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number"
-                                                                    class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
-                                                                    name="detail[harga_input][]"
-                                                                    value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="harga-input-b ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
-                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="subtotal-text ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
-                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="sales ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->FIRST_NAME ?>">
-                                                                    <?= $dd->FIRST_NAME ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[nama_sales][]" value="<?= $dd->FIRST_NAME ?>">
-                                                                <input type="hidden" name="detail[sales][]" value="<?= $postDetail['sales_id'][$i] ?? $dd->KARYAWAN_ID; ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
-                                                            </td>
+                                            <div class="table-responsive overflow-auto" style="max-height: 450px;">
+                                                <table class="table table-striped table-bordered" id="table-detail">
+                                                    <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
+                                                        <tr style="text-align: center !important;">
+                                                            <th>No</th>
+                                                            <th style="padding:0; margin:0; border:none; display: none;"></th>
+                                                            <th>
+                                                                <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
+                                                            </th>
+                                                            <th>No FPK</th>
+                                                            <th>Nama Item</th>
+                                                            <th>Kode Item</th>
+                                                            <th>Jumlah</th>
+                                                            <th>Satuan</th>
+                                                            <th>Harga Input</th>
+                                                            <th>Harga</th>
+                                                            <th>Subtotal</th>
+                                                            <th>Sales</th>
+                                                            <th>Keterangan</th>
                                                         </tr>
-                                                    <?php endforeach; ?>
-                                                <?php } ?>
-                                            </tbody>
-                                        </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        $dataDetail = $this->db->query("SELECT po_detail.*, item.ITEM_CODE, pr.DOCUMENT_NO, karyawan.FIRST_NAME, pr_detail.ENTERED_QTY as pr_ENTERED_QTY, pr_detail.BASE_QTY as pr_BASE_QTY, pr_detail.RECEIVED_ENTERED_QTY as pr_RECEIVED_ENTERED_QTY  FROM po_detail JOIN item ON item.ITEM_ID = po_detail.ITEM_ID JOIN pr_detail ON pr_detail.PR_DETAIL_ID = po_detail.PR_DETAIL_ID JOIN pr ON pr.PR_ID = pr_detail.PR_ID JOIN karyawan ON karyawan.KARYAWAN_ID = pr.KARYAWAN_ID WHERE po_detail.PO_ID = {$data->PO_ID} ORDER BY PO_DETAIL_ID ASC");
+
+                                                        if ($dataDetail->num_rows() > 0) { ?>
+                                                            <?php
+                                                            $no = 1;
+                                                            $postDetail = $this->input->post('detail');
+                                                            $i = 0;
+                                                            foreach ($dataDetail->result() as $dd): ?>
+                                                                <?php
+                                                                $l = $dd->pr_RECEIVED_ENTERED_QTY /  $dd->pr_BASE_QTY;
+                                                                $balance = $dd->pr_ENTERED_QTY - $l; ?>
+                                                                <tr class="tr-height-30">
+                                                                    <td><?= $no++ ?></td>
+                                                                    <td style="display: none;">
+                                                                        <input type="hidden" name="detail[po_detail_id][]" id="po_detail_id" value="<?= $this->encrypt->encode($dd->PO_DETAIL_ID); ?>">
+                                                                        <input type="hidden" name="detail[pr_detail_id][]" value="<?= $dd->PR_DETAIL_ID ?>">
+                                                                        <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
+                                                                        <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                        <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                        <input type="hidden" name="detail[warehouse_id][]" value="<?= $dd->GUDANG_ID ?>">
+                                                                        <input type="hidden" name="detail[lead_time][]" value="<?= $dd->ETA_LEADTIME ?>">
+                                                                        <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="checkbox" class="chkDetail">
+                                                                    </td>
+                                                                    <td class="ellipsis"">
+                                                                        <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
+                                                                        <?= $dd->DOCUMENT_NO; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[no_fpk][]" value="<?= $dd->DOCUMENT_NO ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                            <?= $dd->ITEM_DESCRIPTION; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
+                                                                            <?= $dd->ITEM_CODE; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis text-end">
+                                                                        <span class="view-mode qty-view ellipsis align-middle">
+                                                                            <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
+                                                                        </span>
+                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($balance == 0) ? '0' : rtrim(rtrim((string)$balance, '0'), '.') ?>" data-po_detail_id="<?= $this->encrypt->encode($dd->PO_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
+                                                                        <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
+                                                                            <?= $dd->ENTERED_UOM ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis text-end">
+                                                                        <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="number"
+                                                                            class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
+                                                                            name="detail[harga_input][]"
+                                                                            value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis text-end">
+                                                                        <span class="harga-input-b ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
+                                                                            <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis text-end">
+                                                                        <span class="subtotal-text ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
+                                                                            <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="sales ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->FIRST_NAME ?>">
+                                                                            <?= $dd->FIRST_NAME ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[nama_sales][]" value="<?= $dd->FIRST_NAME ?>">
+                                                                        <input type="hidden" name="detail[sales][]" value="<?= $postDetail['sales_id'][$i] ?? $dd->KARYAWAN_ID; ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        <?php } ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="info-detail" role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped w-100" id="table-info" data-url=" <?=  site_url('grk/get_info/' . base64url_encode($this->encrypt->encode($data->PO_ID))) ?>">
+                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                        <tr>
+                                                            <th></th> <th>No</th>
+                                                            <th>Nama Item</th>
+                                                            <th>Kode Item</th>
+                                                            <th>Satuan</th>
+                                                            <th>GRK</th>
+                                                            <th>STS/RSP/MR</th>
+                                                            <th>SISA</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -430,6 +455,23 @@
     </div>
 </div>
 
+<!-- table template info detail -->
+<div id="table-info-detail" class="d-none" data-url="<?= site_url('grk/get_info_detail/') ?>">
+    <table class="table table-sm table-bordered w-100">
+        <thead>
+            <tr class="align-middle">
+                <th width="30">No</th>
+                <th>No Transaksi</th>
+                <th>Tanggal</th>
+                <th class="text-end">Jumlah</th>
+                <th>Satuan</th>
+                <th>S.Loc</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <script>
     let tableDetail;
     let tableItem;
@@ -452,6 +494,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
+                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
 
                     $('#table-detail td').css('pointer-events', 'none');
 
@@ -1323,6 +1366,133 @@
 
             let row = $(this).closest('tr');
             row.find('input[name="detail[to_qty][]"]').val(toQty);
+        });
+
+
+        tableInfo = $('#table-info').DataTable({
+            "autoWidth": true,
+            "searching": true,
+            "processing": true,
+            "serverSide": true,
+            "ordering": true,
+            "info": true,
+            "order": [],
+            "ajax": {
+                "url": $('#table-info').data('url'),
+                "type": "POST"
+            },
+            "createdRow": function(row, data, dataIndex) {
+                $(row).attr('data-po_detail_id', data.po_detail_id);
+            },
+            "columns": [{
+                    "className": 'details-control',
+                    "orderable": false,
+                    "searchable": false,
+                    "data": null,
+                    "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>',
+                },
+                {
+                    "data": "no",
+                    "orderable": false,
+                    "searchable": false,
+                    "className": 'text-center',
+                },
+                {
+                    "data": "nama_item",
+                    render: function(data, type, row) {
+                        // if (type === 'display' && data && data.length > 20) {
+                        //     let cleanData = data.replace(/"/g, '&quot;'); 
+                        //     return `<span title="${cleanData}">
+                        //                 ${data.substr(0, 20)}...
+                        //             </span>`;
+                        // }
+                        return data;
+                    }
+                },
+                {
+                    "data": "kode_item"
+                },
+                {
+                    "data": "satuan"
+                },
+                {
+                    "data": "grk",
+                    "className": 'text-end',
+                },
+                {
+                    "data": "sts_rsp_mr",
+                    "className": 'text-end',
+                },
+                {
+                    "data": "sisa",
+                    "className": 'text-end',
+                },
+            ]
+        });
+
+        $('#table-info tbody').on('click', 'td.details-control', function() {
+            const tr    = $(this).closest('tr');
+            const row   = tableInfo.row(tr);
+            const poDetailId = tr.data('po_detail_id');
+            let icon    = $(this).find('i');
+
+            if (row.child.isShown()) {
+                const childTableId = 'child-' + poDetailId;
+                if ($.fn.DataTable.isDataTable('#' + $.escapeSelector(childTableId))) {
+                    $('#' + $.escapeSelector(childTableId)).DataTable().destroy();
+                }
+                row.child.hide();
+                icon.removeClass('ri-subtract-line').addClass('ri-add-line');
+            } else {
+                const childTableId = 'child-' + poDetailId;
+                const childHtml = $($('#table-info-detail').html()); 
+                childHtml.attr('id', childTableId);
+
+                row.child(childHtml).show();
+                icon.removeClass('ri-add-line').addClass('ri-subtract-line');
+                
+                $('#loading').show();
+
+                $.getJSON($('#table-info-detail').data('url') + poDetailId, function(res) {
+                    let html = '';
+                    
+                    if (res && res.length > 0) {
+                        res.forEach((data, i) => {
+                            html += `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${data.link?`<a href="${data.link}" target="_blank">${data.No_Transaksi}</a>`:data.No_Transaksi}</td>
+                                <td>${data.Tanggal}</td>
+                                <td class="text-end">${data.Jumlah}</td>
+                                <td>${data.Satuan}</td>
+                                <td>${data.S_Loc}</td>
+                            </tr>`;
+                        });
+                    } else {
+                        html = '<tr><td colspan="6" class="text-center">Data tidak ditemukan</td></tr>';
+                    }
+                    childHtml.find('tbody').html(html);
+
+                    if (res && res.length > 0) {
+                        $('#' + $.escapeSelector(childTableId)).DataTable({
+                            "ordering": true,
+                            "autoWidth": true,
+                            "paging": true,
+                            "searching": true,
+                            "info": false,
+                            "destroy": true,
+                            "order" : [],
+                            "columnDefs": [{
+                                "targets": 0,
+                                "orderable": false,
+                            }]
+                        });
+                    }
+                    $('#loading').hide();
+                }).fail(function() {
+                    $('#loading').hide();
+                });
+            }
         });
     });
 

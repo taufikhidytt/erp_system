@@ -575,4 +575,70 @@ class Fpk extends Back_Controller
             ->set_content_type('application/json')
             ->set_output(json_encode($result));
     }
+
+    public function get_info($id)
+    {
+        $id = (int) $this->encrypt->decode(base64url_decode($id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'pr_detail b',
+            'select' => [
+                'b.PR_ID, b.PR_DETAIL_ID, i.ITEM_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY FPK',
+                ['(b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS GRK', FALSE],
+                ['(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
+            ],
+            'joins' => [
+                ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+            ],
+            'where' => ['b.PR_ID' => $id],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function($row, $no) {
+            return [
+                'no' => $no,
+                'pr_detail_id' => base64url_encode($this->encrypt->encode($row->PR_DETAIL_ID)),
+                'nama_item' => $row->Nama_Item,
+                'kode_item' => $row->Kode_Item,
+                'satuan' => $row->Satuan,
+                'fpk' => number_format((float)$row->FPK, 2, '.', ','),
+                'grk' => number_format((float)$row->GRK, 2, '.', ','),
+                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+            ];
+        }));
+    }
+
+    public function get_info_detail($detail_id){
+        $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'pr_detail b',
+            'select' => [
+                'b.PR_DETAIL_ID,b.ITEM_ID,c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,a.PO_ID',
+                ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
+                
+            ],
+            'joins' => [
+                ['po_detail a', 'b.PR_DETAIL_ID = a.PR_DETAIL_ID', 'inner'],
+                ['po c', 'a.PO_ID = c.PO_ID', 'inner'],
+                ['warehouse w', 'a.GUDANG_ID = w.WAREHOUSE_ID', 'inner'],
+            ],
+            'where' => ['b.PR_DETAIL_ID' => $detail_id],
+            'order' => ['b.PR_DETAIL_ID' => 'asc'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+        ];
+        echo json_encode($this->datatables->generate($params, function($row, $no) {
+            return [
+                'no' => $no,
+                'no_transaksi' => '<a href="'.site_url('grk/detail/'.base64url_encode($this->encrypt->encode($row->PO_ID))).'" target="_blank">'.$row->No_Transaksi.'</a>',
+                'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
+                'satuan' => $row->Satuan,
+                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                's_loc' => $row->S_Loc,
+            ];
+        }));
+    }
 }

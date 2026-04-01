@@ -144,7 +144,8 @@ class So_kny extends Back_Controller
         try {
             $storage = $this->input->post('storage');
             $customer = $this->input->post('customer');
-            $data = $this->db->query("SELECT
+            $data = $this->db->query(
+                "SELECT
                     a.BUILD_ID,
                     NULL AS BUILD_DETAIL_ID,
                     a.DOCUMENT_TYPE_ID,
@@ -190,8 +191,8 @@ class So_kny extends Back_Controller
                         FN_GET_VAR_VALUE ('DELETE'),
                         FN_GET_VAR_VALUE ('CLOSE')
                     )
-                    AND w.WAREHOUSE_ID = '{$storage}'
-                    AND psn.PERSON_ID = '{$customer}'
+                    AND w.WAREHOUSE_ID = $storage
+                    AND psn.PERSON_ID = $customer
                 UNION
                 ALL
                 SELECT
@@ -214,12 +215,10 @@ class So_kny extends Back_Controller
                     a.ENTERED_QTY,
                     a.BASE_QTY,
                     CASE
-                        WHEN a.BASE_QTY IS NULL
-                        OR a.BASE_QTY = 0
-                        THEN a.ENTERED_QTY
-                        ELSE a.ENTERED_QTY - (
-                            COALESCE(a.RECEIVED_ENTERED_QTY, 0) / a.BASE_QTY
-                        )
+                        WHEN b.BASE_QTY IS NULL
+                        OR b.BASE_QTY = 0
+                        THEN b.ENTERED_QTY
+                        ELSE b.ENTERED_QTY - (COALESCE(b.SO_QTY, 0) / b.BASE_QTY)
                     END AS BALANCE,
                     b.ENTERED_UOM,
                     i.BERAT,
@@ -235,16 +234,19 @@ class So_kny extends Back_Controller
                     JOIN warehouse w
                         ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
                 WHERE COALESCE(a.ITEM_ID, 0) = 0
+                    AND b.ENTERED_QTY > 0
+                    AND b.BASE_QTY > 0
+                    AND COALESCE(b.SO_QTY, 0) < b.ENTERED_QTY * b.BASE_QTY
                     AND a.DOCUMENT_TYPE_ID = 3
                     AND a.STATUS_ID NOT IN (
                         FN_GET_VAR_VALUE ('DELETE'),
                         FN_GET_VAR_VALUE ('CLOSE')
                     )
-                    AND w.WAREHOUSE_ID = '{$storage}'
-                    AND psn.PERSON_ID = '{$customer}'
+                    AND w.WAREHOUSE_ID = $storage
+                    AND psn.PERSON_ID = $customer
                 ORDER BY DOCUMENT_DATE DESC,
-                    BUILD_ID
-            ");
+                    BUILD_ID"
+            );
             if ($data->num_rows() > 0) {
                 $result = array(
                     'status' => 'success',
@@ -863,5 +865,72 @@ class So_kny extends Back_Controller
                 return true;
             }
         }
+    }
+
+    public function get_info($id)
+    {
+        $id = (int) $this->encrypt->decode(base64url_decode($id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'so_detail b',
+            'select' => [
+                'b.SO_DETAIL_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY SO',
+                ['(b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS DO', FALSE],
+                ['(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
+            ],
+            'joins' => [
+                ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+            ],
+            'where' => ['b.SO_ID' => $id],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function($row, $no) {
+            return [
+                'no' => $no,
+                'so_detail_id' => base64url_encode($this->encrypt->encode($row->SO_DETAIL_ID)),
+                'nama_item' => $row->Nama_Item,
+                'kode_item' => $row->Kode_Item,
+                'satuan' => $row->Satuan,
+                'so' => number_format((float)$row->SO, 2, '.', ','),
+                'do' => number_format((float)$row->DO, 2, '.', ','),
+                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+            ];
+        }));
+    }
+
+    public function get_info_detail($detail_id){
+        $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'so_detail b',
+            'select' => [
+                'c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,
+                    b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,a.INVENTORY_OUT_ID',
+                ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
+                
+            ],
+            'joins' => [
+                ['inventory_out_detail a', 'b.SO_DETAIL_ID = a.SO_DETAIL_ID', 'inner'],
+                ['inventory_out c', 'a.INVENTORY_OUT_ID = c.INVENTORY_OUT_ID', 'inner'],
+                ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
+            ],
+            'where' => ['b.SO_DETAIL_ID' => $detail_id],
+            'order' => ['b.SO_DETAIL_ID' => 'asc'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+        ];
+        echo json_encode($this->datatables->generate($params, function($row, $no) {
+            return [
+                'no' => $no,
+                'no_transaksi' => '<a href="'.site_url('do_kny/detail/'.base64url_encode($this->encrypt->encode($row->INVENTORY_OUT_ID))).'" target="_blank">'.$row->No_Transaksi.'</a>',
+                'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
+                'satuan' => $row->Satuan,
+                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                's_loc' => $row->S_Loc,
+            ];
+        }));
     }
 }

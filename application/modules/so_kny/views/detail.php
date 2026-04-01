@@ -291,6 +291,12 @@
                                                 <span class="d-none d-sm-block">Detail</span>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#info-detail" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-none d-sm-block">Info</span>
+                                            </a>
+                                        </li>
                                     </ul>
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
@@ -301,241 +307,261 @@
                                             <button type="button" id="btn-modalMrq" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th style="padding:0; margin:0; border:none; display: none;"></th>
-                                                    <th>
-                                                        <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
-                                                    </th>
-                                                    <th>No MR</th>
-                                                    <th>Nama Item</th>
-                                                    <th>Kode Item</th>
-                                                    <th>Memo</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Satuan</th>
-                                                    <th>Harga Input</th>
-                                                    <th>Harga</th>
-                                                    <th>Disc.Rp</th>
-                                                    <th>Disc.%</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Keterangan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php $dataDetail = $this->db->query("SELECT
-                                                so_detail.*,
-                                                so.DOCUMENT_NO,
-                                                a.DOCUMENT_NO no_mrq,
-                                                i.ITEM_CODE,
-                                                CASE
-                                                    WHEN a.BASE_QTY IS NULL 
-                                                    OR a.BASE_QTY = 0 THEN
-                                                        a.ENTERED_QTY ELSE a.ENTERED_QTY - ( COALESCE ( a.RECEIVED_ENTERED_QTY, 0 ) / a.BASE_QTY ) 
-                                                        END AS BALANCE
-                                                FROM so_detail
-                                                JOIN so ON so.SO_ID = so_detail.SO_ID 
-                                                JOIN build a ON a.BUILD_ID = so_detail.BUILD_ID
-                                                JOIN item i ON so_detail.ITEM_ID = i.ITEM_ID
-                                                WHERE so_detail.SO_ID = '{$data->SO_ID}'");
 
-                                                if ($dataDetail->num_rows() > 0) { ?>
-                                                    <?php
-                                                    $no = 1;
-                                                    $postDetail = $this->input->post('detail');
-                                                    $i = 0;
-                                                    foreach ($dataDetail->result() as $dd): ?>
-                                                        <tr class="tr-height-30">
-                                                            <td><?= $no++ ?></td>
-                                                            <td style="display: none;">
-                                                                <input type="hidden" name="detail[so_detail_id][]" id="so_detail_id" value="<?= $this->encrypt->encode($dd->SO_DETAIL_ID); ?>">
-                                                                <input type="hidden" name="detail[build_id][]" value="<?= $dd->BUILD_ID ?>">
-                                                                <input type="hidden" name="detail[build_detail_id][]" value="<?= $dd->BUILD_DETAIL_ID ?>">
-                                                                <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
-                                                                <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->BALANCE, '0'), '.'), 0, '.', ',') ?>">
-                                                            </td>
-                                                            <td>
-                                                                <input type="checkbox" class="chkDetail">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->no_mrq ?>">
-                                                                    <?= $dd->no_mrq; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[no_mrq][]" value="<?= $dd->no_mrq ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                    <?= $dd->ITEM_DESCRIPTION; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
-                                                                    <?= $dd->ITEM_CODE; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
-                                                            </td>
-                                                            <td>
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly><?= $dd->DESKRIPSI ?></textarea>
-                                                            </td>
-                                                            <td class="ellipsis text-end">
-                                                                <span class="view-mode qty-view ellipsis align-middle">
-                                                                    <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-so_detail_id="<?= $this->encrypt->encode($dd->SO_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
-                                                                    <?= $dd->ENTERED_UOM ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="view-mode harga-view"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="<?= $dd->HARGA_INPUT ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="harga-input-b"><?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="view-mode harga-view diskon-harga-view"><?= number_format(rtrim(rtrim($dd->DISKON_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="<?= number_format(rtrim(rtrim($dd->DISKON_INPUT, '0'), '.'), 2, '.', ','); ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="view-mode"><?= $dd->DISCOUNT_PERCEN ?></span>
-                                                                <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="<?= $dd->DISCOUNT_PERCEN ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <span class="subtotal"><?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
-                                                            </td>
-                                                            <td class="ellipsis">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
-                                                            </td>
+                                            <div class="table-responsive overflow-auto" style="max-height: 450px;">
+                                                <table class="table table-striped table-bordered" id="table-detail">
+                                                    <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th style="padding:0; margin:0; border:none; display: none;"></th>
+                                                            <th>
+                                                                <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
+                                                            </th>
+                                                            <th>No MR</th>
+                                                            <th>Nama Item</th>
+                                                            <th>Kode Item</th>
+                                                            <th>Memo</th>
+                                                            <th>Jumlah</th>
+                                                            <th>Satuan</th>
+                                                            <th>Harga Input</th>
+                                                            <th>Harga</th>
+                                                            <th>Disc.Rp</th>
+                                                            <th>Disc.%</th>
+                                                            <th>Subtotal</th>
+                                                            <th>Keterangan</th>
                                                         </tr>
-                                                    <?php endforeach; ?>
-                                                <?php } ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6 col-md-12 col-sm-12">
-                                            <table class="table ">
-                                                <tbody>
-                                                    <tr>
-                                                        <td style="vertical-align:middle; font-weight:bold;">Diskon</td>
-                                                        <td>:</td>
-                                                        <td class="text-left">
-                                                            <input id="cal_diskon_percen" name="TOTAL_DISCOUNT_PERCEN" class="form-control form-control-sm input-container persen-detail" placeholder="Persen" value="<?= $this->input->post('TOTAL_DISCOUNT_PERCEN') ?? $data->TOTAL_DISCOUNT_PERCEN ?>" data-mode="false" style="width: 130px;">
-                                                        </td>
-                                                        <td class="text-center">%</td>
-                                                        <td class="text-center">=</td>
-                                                        <?php $total_diskon = number_format($data->TOTAL_DISKON_INPUT, 2, '.', ',');
-                                                        ?>
-                                                        <td class="text-right">
-                                                            <input type="text" id="cal_diskon_price" name="TOTAL_DISKON_INPUT" class="form-control form-control-sm input-container" placeholder="Rupiah" value="<?= $total_diskon; ?>">
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="vertical-align:middle; font-weight:bold;">PPN</td>
-                                                        <td>:</td>
-                                                        <td colspan="3" class="text-left">
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php $dataDetail = $this->db->query("SELECT
+                                                        so_detail.*,
+                                                        so.DOCUMENT_NO,
+                                                        a.DOCUMENT_NO no_mrq,
+                                                        i.ITEM_CODE,
+                                                        CASE
+                                                            WHEN a.BASE_QTY IS NULL 
+                                                            OR a.BASE_QTY = 0 THEN
+                                                                a.ENTERED_QTY ELSE a.ENTERED_QTY - ( COALESCE ( a.RECEIVED_ENTERED_QTY, 0 ) / a.BASE_QTY ) 
+                                                                END AS BALANCE
+                                                        FROM so_detail
+                                                        JOIN so ON so.SO_ID = so_detail.SO_ID 
+                                                        JOIN build a ON a.BUILD_ID = so_detail.BUILD_ID
+                                                        JOIN item i ON so_detail.ITEM_ID = i.ITEM_ID
+                                                        WHERE so_detail.SO_ID = '{$data->SO_ID}'");
+
+                                                        if ($dataDetail->num_rows() > 0) { ?>
                                                             <?php
-                                                            $defaultValue = null;
-                                                            foreach ($ppn_code->result() as $pc) {
-                                                                if ($pc->PRIMARY_FLAG == 'Y') {
-                                                                    $defaultValue = $pc->PPN_CODE;
-                                                                    break;
-                                                                }
-                                                            }
-                                                            ?>
-                                                            <select name="cal_ppn_code" id="cal_ppn_code" class="form-control form-select-sm select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
-                                                                <?php if (!$defaultValue): ?>
-                                                                    <option value="">-- Selected PPN Code --</option>
-                                                                <?php endif; ?>
-                                                                <?php
-                                                                $selected_ppn_persen = $this->input->post('cal_ppn_code') ?? ($data->PPN_PERCEN ?? '');
-                                                                $selected_ppn_code = $this->input->post('ppn_code_selected') ?? ($data->PPN_CODE ?? '');
+                                                            $no = 1;
+                                                            $postDetail = $this->input->post('detail');
+                                                            $i = 0;
+                                                            foreach ($dataDetail->result() as $dd): ?>
+                                                                <tr class="tr-height-30">
+                                                                    <td><?= $no++ ?></td>
+                                                                    <td style="display: none;">
+                                                                        <input type="hidden" name="detail[so_detail_id][]" id="so_detail_id" value="<?= $this->encrypt->encode($dd->SO_DETAIL_ID); ?>">
+                                                                        <input type="hidden" name="detail[build_id][]" value="<?= $dd->BUILD_ID ?>">
+                                                                        <input type="hidden" name="detail[build_detail_id][]" value="<?= $dd->BUILD_DETAIL_ID ?>">
+                                                                        <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
+                                                                        <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                        <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
+                                                                        <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->BALANCE, '0'), '.'), 0, '.', ',') ?>">
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="checkbox" class="chkDetail">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->no_mrq ?>">
+                                                                            <?= $dd->no_mrq; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[no_mrq][]" value="<?= $dd->no_mrq ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                            <?= $dd->ITEM_DESCRIPTION; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_CODE ?>">
+                                                                            <?= $dd->ITEM_CODE; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
+                                                                    </td>
+                                                                    <td>
+                                                                        <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly><?= $dd->DESKRIPSI ?></textarea>
+                                                                    </td>
+                                                                    <td class="ellipsis text-end">
+                                                                        <span class="view-mode qty-view ellipsis align-middle">
+                                                                            <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
+                                                                        </span>
+                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-so_detail_id="<?= $this->encrypt->encode($dd->SO_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
+                                                                            <?= $dd->ENTERED_UOM ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[satuan][]" value="<?= $dd->ENTERED_UOM ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="view-mode harga-view"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="<?= $dd->HARGA_INPUT ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="harga-input-b"><?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="hidden" name="detail[harga][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="view-mode harga-view diskon-harga-view"><?= number_format(rtrim(rtrim($dd->DISKON_INPUT, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="<?= number_format(rtrim(rtrim($dd->DISKON_INPUT, '0'), '.'), 2, '.', ','); ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="view-mode"><?= $dd->DISCOUNT_PERCEN ?></span>
+                                                                        <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="<?= $dd->DISCOUNT_PERCEN ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <span class="subtotal"><?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="hidden" name="detail[subtotal][]" value="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
+                                                                    </td>
+                                                                    <td class="ellipsis">
+                                                                        <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        <?php } ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-12 col-sm-12">
+                                                    <table class="table ">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="vertical-align:middle; font-weight:bold;">Diskon</td>
+                                                                <td>:</td>
+                                                                <td class="text-left">
+                                                                    <input id="cal_diskon_percen" name="TOTAL_DISCOUNT_PERCEN" class="form-control form-control-sm input-container persen-detail" placeholder="Persen" value="<?= $this->input->post('TOTAL_DISCOUNT_PERCEN') ?? $data->TOTAL_DISCOUNT_PERCEN ?>" data-mode="false" style="width: 130px;">
+                                                                </td>
+                                                                <td class="text-center">%</td>
+                                                                <td class="text-center">=</td>
+                                                                <?php $total_diskon = number_format($data->TOTAL_DISKON_INPUT, 2, '.', ',');
                                                                 ?>
-                                                                <?php foreach ($ppn_code->result() as $pc): ?>
-                                                                    <option
-                                                                        value="<?= $pc->PERCENTAGE ?>" data-code="<?= $pc->PPN_CODE ?>"
-                                                                        <?= set_value('ppn_code_selected') == $pc->PPN_CODE ? 'selected' : ($defaultValue == $pc->PPN_CODE ? 'selected' : '') ?>>
-                                                                        <?= strtoupper($pc->PPN_CODE) ?>
-                                                                    </option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                            <?= ($selected_ppn_persen == $pc->PERCENTAGE && $selected_ppn_code == $pc->PPN_CODE) ? 'selected' : '' ?>
-                                                            <input type="hidden" name="ppn_code_selected" id="ppn_code_selected" value="<?= set_value('ppn_code_selected') ?>">
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                                <td class="text-right">
+                                                                    <input type="text" id="cal_diskon_price" name="TOTAL_DISKON_INPUT" class="form-control form-control-sm input-container" placeholder="Rupiah" value="<?= $total_diskon; ?>">
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="vertical-align:middle; font-weight:bold;">PPN</td>
+                                                                <td>:</td>
+                                                                <td colspan="3" class="text-left">
+                                                                    <?php
+                                                                    $defaultValue = null;
+                                                                    foreach ($ppn_code->result() as $pc) {
+                                                                        if ($pc->PRIMARY_FLAG == 'Y') {
+                                                                            $defaultValue = $pc->PPN_CODE;
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                    ?>
+                                                                    <select name="cal_ppn_code" id="cal_ppn_code" class="form-control form-select-sm select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
+                                                                        <?php if (!$defaultValue): ?>
+                                                                            <option value="">-- Selected PPN Code --</option>
+                                                                        <?php endif; ?>
+                                                                        <?php
+                                                                        $selected_ppn_persen = $this->input->post('cal_ppn_code') ?? ($data->PPN_PERCEN ?? '');
+                                                                        $selected_ppn_code = $this->input->post('ppn_code_selected') ?? ($data->PPN_CODE ?? '');
+                                                                        ?>
+                                                                        <?php foreach ($ppn_code->result() as $pc): ?>
+                                                                            <option
+                                                                                value="<?= $pc->PERCENTAGE ?>" data-code="<?= $pc->PPN_CODE ?>"
+                                                                                <?= set_value('ppn_code_selected') == $pc->PPN_CODE ? 'selected' : ($defaultValue == $pc->PPN_CODE ? 'selected' : '') ?>>
+                                                                                <?= strtoupper($pc->PPN_CODE) ?>
+                                                                            </option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
+                                                                    <?= ($selected_ppn_persen == $pc->PERCENTAGE && $selected_ppn_code == $pc->PPN_CODE) ? 'selected' : '' ?>
+                                                                    <input type="hidden" name="ppn_code_selected" id="ppn_code_selected" value="<?= set_value('ppn_code_selected') ?>">
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class=" col-lg-1 col-md-12 col-sm-12">
+                                                    <input type="hidden" name="TOTAL_DISKON_INPUT_HIDDEN" id="hid_diskon_input" value="<?= $data->TOTAL_DISKON_INPUT ?>" title="hid_diskon_input">
+                                                    <input type="hidden" name="DISKON_PERCEN" id="hid_diskon_percen" value="<?= $data->TOTAL_DISCOUNT_PERCEN ?>" title="hid_diskon_percen">
+                                                    <input type="hidden" name="DISKON_PRICE" id="hid_diskon_price" value="<?= $data->TOTAL_DISKON_INPUT ?>" title="hid_diskon_price">
+                                                    <input type="hidden" name="PPN_PERCEN" id="hid_ppn" value="<?= $data->PPN_PERCEN ?>" title="hid_ppn">
+                                                    <input type="hidden" name="PPN_CODE" id="hid_ppn_code" value="<?= $data->PPN_CODE ?>" title="hid_ppn_code">
+                                                    <input type="hidden" name="PPN_AMOUNT" id="hid_ppn_amount" value="<?= $data->PPN_AMOUNT ?>" title="hid_ppn_amount">
+                                                    <input type="hidden" name="TOTAL_AMOUNT" id="hid_total_amount" value="<?= $data->TOTAL_AMOUNT ?>" title="hid_total_amount">
+                                                    <input type="hidden" name="TOTAL_NET" id="hid_total_net" value="<?= $data->TOTAL_NET ?>" title="hid_total_net">
+                                                </div>
+                                                <div class="col-lg-5 col-md-12 col-sm-12">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="font-weight:bold;">Total</td>
+                                                                <td>:</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td class="text-right" style="text-align: right">
+                                                                    <div id="v_total_amount"></div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-weight:bold;">Diskon</td>
+                                                                <td>:</td>
+                                                                <td class="text-left">
+                                                                </td>
+                                                                <td></td>
+                                                                <td class="text-right" style="text-align: right">
+                                                                    <div id="v_diskon"></div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-weight:bold;">PPN</td>
+                                                                <td>:</td>
+                                                                <td class="text-left">
+                                                                </td>
+                                                                <td></td>
+                                                                <td class="text-right" style="text-align: right">
+                                                                    <div id="v_ppn_amount"></div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-weight:bold;">
+                                                                    <h5>GRAND TOTAL</h5>
+                                                                </td>
+                                                                <td>:</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td class="text-right text-danger" style="text-align: right">
+                                                                    <h5>
+                                                                        <div id="v_total_net"></div>
+                                                                    </h5>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class=" col-lg-1 col-md-12 col-sm-12">
-                                            <input type="hidden" name="TOTAL_DISKON_INPUT_HIDDEN" id="hid_diskon_input" value="<?= $data->TOTAL_DISKON_INPUT ?>" title="hid_diskon_input">
-                                            <input type="hidden" name="DISKON_PERCEN" id="hid_diskon_percen" value="<?= $data->TOTAL_DISCOUNT_PERCEN ?>" title="hid_diskon_percen">
-                                            <input type="hidden" name="DISKON_PRICE" id="hid_diskon_price" value="<?= $data->TOTAL_DISKON_INPUT ?>" title="hid_diskon_price">
-                                            <input type="hidden" name="PPN_PERCEN" id="hid_ppn" value="<?= $data->PPN_PERCEN ?>" title="hid_ppn">
-                                            <input type="hidden" name="PPN_CODE" id="hid_ppn_code" value="<?= $data->PPN_CODE ?>" title="hid_ppn_code">
-                                            <input type="hidden" name="PPN_AMOUNT" id="hid_ppn_amount" value="<?= $data->PPN_AMOUNT ?>" title="hid_ppn_amount">
-                                            <input type="hidden" name="TOTAL_AMOUNT" id="hid_total_amount" value="<?= $data->TOTAL_AMOUNT ?>" title="hid_total_amount">
-                                            <input type="hidden" name="TOTAL_NET" id="hid_total_net" value="<?= $data->TOTAL_NET ?>" title="hid_total_net">
-                                        </div>
-                                        <div class="col-lg-5 col-md-12 col-sm-12">
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <td style="font-weight:bold;">Total</td>
-                                                        <td>:</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td class="text-right" style="text-align: right">
-                                                            <div id="v_total_amount"></div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="font-weight:bold;">Diskon</td>
-                                                        <td>:</td>
-                                                        <td class="text-left">
-                                                        </td>
-                                                        <td></td>
-                                                        <td class="text-right" style="text-align: right">
-                                                            <div id="v_diskon"></div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="font-weight:bold;">PPN</td>
-                                                        <td>:</td>
-                                                        <td class="text-left">
-                                                        </td>
-                                                        <td></td>
-                                                        <td class="text-right" style="text-align: right">
-                                                            <div id="v_ppn_amount"></div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="font-weight:bold;">
-                                                            <h5>GRAND TOTAL</h5>
-                                                        </td>
-                                                        <td>:</td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td class="text-right text-danger" style="text-align: right">
-                                                            <h5>
-                                                                <div id="v_total_net"></div>
-                                                            </h5>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+
+                                        <div class="tab-pane" id="info-detail" role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped w-100" id="table-info" data-url=" <?=  site_url('so_kny/get_info/' . base64url_encode($this->encrypt->encode($data->SO_ID))) ?>">
+                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                        <tr>
+                                                            <th></th> <th>No</th>
+                                                            <th>Nama Item</th>
+                                                            <th>Kode Item</th>
+                                                            <th>Satuan</th>
+                                                            <th>SO</th>
+                                                            <th>DO</th>
+                                                            <th>SISA</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -650,9 +676,25 @@
     </div>
 </div>
 
+<div id="table-info-detail" class="d-none" data-url="<?= site_url('so_kny/get_info_detail/') ?>">
+    <table class="table table-sm table-bordered w-100">
+        <thead>
+            <tr class="align-middle">
+                <th width="30">No</th>
+                <th>No Transaksi</th>
+                <th>Tanggal</th>
+                <th>Jumlah</th>
+                <th>Satuan</th>
+                <th>S.Loc</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
 <script>
     let tableDetail;
     let tableItem;
+    let tableInfo;
     $(document).ready(function() {
         setTimeout(function() {
             calculateGrandTotal();
@@ -684,6 +726,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
+                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
 
                     $('#table-detail td').css('pointer-events', 'none');
 
@@ -1656,6 +1699,122 @@
 
         });
 
+        tableInfo = $('#table-info').DataTable({
+            "autoWidth": true,
+            "searching": true,
+            "processing": true,
+            "serverSide": true,
+            "ordering": true,
+            "info": true,
+            "order": [],
+            "ajax": {
+                "url": $('#table-info').data('url'),
+                "type": "POST"
+            },
+            "createdRow": function(row, data, dataIndex) {
+                $(row).attr('data-so_detail_id', data.so_detail_id);
+            },
+            "columns": [{
+                    "className": 'details-control',
+                    "orderable": false,
+                    "searchable": false,
+                    "data": null,
+                    "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>',
+                },
+                {
+                    "data": "no",
+                    "orderable": false,
+                    "searchable": false,
+                    "className": 'text-center',
+                },
+                {
+                    "data": "nama_item",
+                    render: function(data, type, row) {
+                        // if (type === 'display' && data && data.length > 20) {
+                        //     let cleanData = data.replace(/"/g, '&quot;'); 
+                        //     return `<span title="${cleanData}">
+                        //                 ${data.substr(0, 20)}...
+                        //             </span>`;
+                        // }
+                        return data;
+                    }
+                },
+                {
+                    "data": "kode_item"
+                },
+                {
+                    "data": "satuan"
+                },
+                {
+                    "data": "so",
+                    "className": 'text-end',
+                },
+                {
+                    "data": "do",
+                    "className": 'text-end',
+                },
+                {
+                    "data": "sisa",
+                    "className": 'text-end',
+                },
+            ]
+        });
+        $('#table-info tbody').on('click', 'td.details-control', function() {
+            const tr    = $(this).closest('tr');
+            const row   = tableInfo.row(tr);
+            const infoDetailID = tr.data('so_detail_id');
+            let icon    = $(this).find('i');
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                icon.removeClass('ri-subtract-line').addClass('ri-add-line');
+            }else{
+                const childTableId = 'child-' + infoDetailID;
+                const childHtml = $($('#table-info-detail').html());
+                childHtml.attr('id', childTableId);
+
+                row.child(childHtml).show();
+                icon.removeClass('ri-add-line').addClass('ri-subtract-line');
+
+                $('#' + $.escapeSelector(childTableId)).DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": $('#table-info-detail').data('url') + infoDetailID,
+                        "type": "POST",
+                    },
+                    "columns": [
+                        {
+                            "data": "no",
+                            "orderable": false,
+                            "className": 'text-center',
+                        },
+                        {
+                            "data": "no_transaksi",
+                        },
+                        {
+                            "data": "tanggal",
+                        },
+                        {
+                            "data": "jumlah",
+                            'className': 'text-end',
+                        },
+                        {
+                            "data": "satuan",
+                        },
+                        {
+                            "data": "s_loc",
+                        },
+                    ],
+                    "paging": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": true,
+                    "order" : []
+                });
+            }
+        });
     });
 
     // persen detail

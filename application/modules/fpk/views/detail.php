@@ -239,6 +239,12 @@
                                                 <span class="d-none d-sm-block">Detail</span>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#info-detail" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="ri ri-eye-2-fill"></i></span>
+                                                <span class="d-none d-sm-block">Info</span>
+                                            </a>
+                                        </li>
                                     </ul>
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
@@ -249,131 +255,151 @@
                                             <button type="button" id="btn-modalItem" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
-                                        </div>
-                                    </div>
-                                    <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail" style="table-layout: fixed;">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
-                                                <tr style="text-align: center !important;">
-                                                    <th style="width: 5%;">No</th>
-                                                    <th style="padding:0; margin:0; border:none; display: none;"></th>
-                                                    <th style="width: 2%;">
-                                                        <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
-                                                    </th>
-                                                    <th style="width: 22%;">Nama Item</th>
-                                                    <th style="width: 13%;">Kode Item</th>
-                                                    <th style="width: 8%;">Jumlah</th>
-                                                    <th style="width: 10%;">Satuan</th>
-                                                    <th style="width: 10%;">Harga Input</th>
-                                                    <th style="width: 10%;">Harga</th>
-                                                    <th style="width: 10%;">Subtotal</th>
-                                                    <th style="width: 10%;">Keterangan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php $dataDetail = $this->db->query("SELECT pr_detail.*, item.ITEM_CODE FROM pr_detail JOIN item ON item.ITEM_ID = pr_detail.ITEM_ID WHERE pr_detail.PR_ID = {$data->PR_ID} ORDER BY PR_DETAIL_ID ASC");
-                                                if ($dataDetail->num_rows() > 0) { ?>
-                                                    <?php
-                                                    $no = 1;
-                                                    $limit = 20;
-                                                    $postDetail = $this->input->post('detail');
-                                                    $i = 0;
-                                                    foreach ($dataDetail->result() as $dd): ?>
-                                                        <tr class="tr-height-30">
-                                                            <td style="width: 5%"><?= $no++ ?></td>
-                                                            <td style="display: none;">
-                                                                <input type="hidden" name="detail[pr_detail][]" id="pr_detail" value="<?= $this->encrypt->encode($dd->PR_DETAIL_ID); ?>">
-                                                            </td>
-                                                            <td style="width: 2%">
-                                                                <input type="checkbox" class="chkDetail">
-                                                            </td>
-                                                            <td style="width: 22%" class="ellipsis">
-                                                                <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                    <?= $dd->ITEM_DESCRIPTION; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
-                                                            </td>
-                                                            <td style="width: 13%" class="ellipsis">
-                                                                <span class="ellipsis align-middle">
-                                                                    <?= $dd->ITEM_CODE; ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
-                                                            </td>
-                                                            <td style="width: 8%" class="ellipsis text-end">
-                                                                <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis">
-                                                                <?php $data_uom_selected = $this->db->query("SELECT
-                                                                    *
-                                                                FROM (
-                                                                    -- Unit dasar (default)
-                                                                    SELECT
-                                                                        0 AS URUT,
-                                                                        i.ITEM_ID,
-                                                                        i.UOM_CODE,
-                                                                        1 AS TO_QTY,
-                                                                        CONCAT('1.00 ', i.UOM_CODE) AS KONVERSI
-                                                                    FROM item i
-                                                                    WHERE i.ITEM_ID = {$dd->ITEM_ID}
-                                                                    UNION ALL
-                                                                    -- Unit alternatif (konversi)
-                                                                    SELECT
-                                                                        1 AS URUT,
-                                                                        iu.ITEM_ID,
-                                                                        iu.UOM_CODE,
-                                                                        COALESCE(iu.TO_QTY, 1) AS TO_QTY,
-                                                                        CONCAT(
-                                                                            ROUND(COALESCE(iu.TO_QTY, 1) * 1, 2),
-                                                                            ' ',
-                                                                            i.UOM_CODE
-                                                                        ) AS KONVERSI
-                                                                    FROM item_uom iu
-                                                                    INNER JOIN item i 
-                                                                        ON iu.ITEM_ID = i.ITEM_ID
-                                                                    WHERE iu.ITEM_ID = {$dd->ITEM_ID}
-                                                                ) AS unit_data
-                                                                ORDER BY URUT, TO_QTY"); ?>
 
-                                                                <select class="form-control form-control-sm uom-select auto-width border-0" name="detail[uom][]" style="min-height: calc(1.5em + .5rem + 0px) !important;">
-                                                                    <?php
-                                                                    $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
-                                                                    foreach ($data_uom_selected->result() as $dus): ?>
-                                                                        <option value="<?= $dus->UOM_CODE ?>" data-code="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" data-label="<?= $dus->UOM_CODE ?> (<?= $dus->TO_QTY ?>)" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>>
-                                                                            <?= $dus->UOM_CODE ?>
-                                                                        </option>
-                                                                    <?php endforeach; ?>
-                                                                </select>
-                                                                <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number"
-                                                                    class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
-                                                                    name="detail[harga_input][]" min="0" step="any"
-                                                                    value="<?= $postDetail['harga_input'][$i] ?? rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <span class="harga-input-b ellipsis">
-                                                                    <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <span class="subtotal-text ellipsis">
-                                                                    <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
-                                                                </span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
-                                                            </td>
-                                                            <td style="width: 10%" class="ellipsis text-end">
-                                                                <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
-                                                            </td>
+                                            <div class="table-responsive overflow-auto" style="max-height: 450px;">
+                                                <table class="table table-striped table-bordered" id="table-detail" style="table-layout: fixed;">
+                                                    <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
+                                                        <tr style="text-align: center !important;">
+                                                            <th style="width: 5%;">No</th>
+                                                            <th style="padding:0; margin:0; border:none; display: none;"></th>
+                                                            <th style="width: 2%;">
+                                                                <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
+                                                            </th>
+                                                            <th style="width: 22%;">Nama Item</th>
+                                                            <th style="width: 13%;">Kode Item</th>
+                                                            <th style="width: 8%;">Jumlah</th>
+                                                            <th style="width: 10%;">Satuan</th>
+                                                            <th style="width: 10%;">Harga Input</th>
+                                                            <th style="width: 10%;">Harga</th>
+                                                            <th style="width: 10%;">Subtotal</th>
+                                                            <th style="width: 10%;">Keterangan</th>
                                                         </tr>
-                                                    <?php endforeach; ?>
-                                                <?php } ?>
-                                            </tbody>
-                                        </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php $dataDetail = $this->db->query("SELECT pr_detail.*, item.ITEM_CODE FROM pr_detail JOIN item ON item.ITEM_ID = pr_detail.ITEM_ID WHERE pr_detail.PR_ID = {$data->PR_ID} ORDER BY PR_DETAIL_ID ASC");
+                                                        if ($dataDetail->num_rows() > 0) { ?>
+                                                            <?php
+                                                            $no = 1;
+                                                            $limit = 20;
+                                                            $postDetail = $this->input->post('detail');
+                                                            $i = 0;
+                                                            foreach ($dataDetail->result() as $dd): ?>
+                                                                <tr class="tr-height-30">
+                                                                    <td style="width: 5%"><?= $no++ ?></td>
+                                                                    <td style="display: none;">
+                                                                        <input type="hidden" name="detail[pr_detail][]" id="pr_detail" value="<?= $this->encrypt->encode($dd->PR_DETAIL_ID); ?>">
+                                                                    </td>
+                                                                    <td style="width: 2%">
+                                                                        <input type="checkbox" class="chkDetail">
+                                                                    </td>
+                                                                    <td style="width: 22%" class="ellipsis">
+                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                            <?= $dd->ITEM_DESCRIPTION; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                        <input type="hidden" name="detail[id_item][]" value="<?= $dd->ITEM_ID ?>">
+                                                                    </td>
+                                                                    <td style="width: 13%" class="ellipsis">
+                                                                        <span class="ellipsis align-middle">
+                                                                            <?= $dd->ITEM_CODE; ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[kode_item][]" value="<?= $dd->ITEM_CODE ?>">
+                                                                    </td>
+                                                                    <td style="width: 8%" class="ellipsis text-end">
+                                                                        <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                    </td>
+                                                                    <td style="width: 10%" class="ellipsis">
+                                                                        <?php $data_uom_selected = $this->db->query("SELECT
+                                                                            *
+                                                                        FROM (
+                                                                            -- Unit dasar (default)
+                                                                            SELECT
+                                                                                0 AS URUT,
+                                                                                i.ITEM_ID,
+                                                                                i.UOM_CODE,
+                                                                                1 AS TO_QTY,
+                                                                                CONCAT('1.00 ', i.UOM_CODE) AS KONVERSI
+                                                                            FROM item i
+                                                                            WHERE i.ITEM_ID = {$dd->ITEM_ID}
+                                                                            UNION ALL
+                                                                            -- Unit alternatif (konversi)
+                                                                            SELECT
+                                                                                1 AS URUT,
+                                                                                iu.ITEM_ID,
+                                                                                iu.UOM_CODE,
+                                                                                COALESCE(iu.TO_QTY, 1) AS TO_QTY,
+                                                                                CONCAT(
+                                                                                    ROUND(COALESCE(iu.TO_QTY, 1) * 1, 2),
+                                                                                    ' ',
+                                                                                    i.UOM_CODE
+                                                                                ) AS KONVERSI
+                                                                            FROM item_uom iu
+                                                                            INNER JOIN item i 
+                                                                                ON iu.ITEM_ID = i.ITEM_ID
+                                                                            WHERE iu.ITEM_ID = {$dd->ITEM_ID}
+                                                                        ) AS unit_data
+                                                                        ORDER BY URUT, TO_QTY"); ?>
+
+                                                                        <select class="form-control form-control-sm uom-select auto-width border-0" name="detail[uom][]" style="min-height: calc(1.5em + .5rem + 0px) !important;">
+                                                                            <?php
+                                                                            $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
+                                                                            foreach ($data_uom_selected->result() as $dus): ?>
+                                                                                <option value="<?= $dus->UOM_CODE ?>" data-code="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" data-label="<?= $dus->UOM_CODE ?> (<?= $dus->TO_QTY ?>)" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>>
+                                                                                    <?= $dus->UOM_CODE ?>
+                                                                                </option>
+                                                                            <?php endforeach; ?>
+                                                                        </select>
+                                                                        <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
+                                                                    </td>
+                                                                    <td style="width: 10%" class="ellipsis text-end">
+                                                                        <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <input type="number"
+                                                                            class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
+                                                                            name="detail[harga_input][]" min="0" step="any"
+                                                                            value="<?= $postDetail['harga_input'][$i] ?? rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
+                                                                    </td>
+                                                                    <td style="width: 10%" class="ellipsis text-end">
+                                                                        <span class="harga-input-b ellipsis">
+                                                                            <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                    </td>
+                                                                    <td style="width: 10%" class="ellipsis text-end">
+                                                                        <span class="subtotal-text ellipsis">
+                                                                            <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
+                                                                        </span>
+                                                                        <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                    </td>
+                                                                    <td style="width: 10%" class="ellipsis text-end">
+                                                                        <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach; ?>
+                                                        <?php } ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane" id="info-detail" role="tabpanel">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped w-100" id="table-info" data-url=" <?=  site_url('fpk/get_info/' . base64url_encode($this->encrypt->encode($data->PR_ID))) ?>">
+                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                        <tr>
+                                                            <th></th> <th>No</th>
+                                                            <th>Nama Item</th>
+                                                            <th>Kode Item</th>
+                                                            <th>Satuan</th>
+                                                            <th>FPK</th>
+                                                            <th>GRK</th>
+                                                            <th>SISA</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -475,9 +501,26 @@
     </div>
 </div>
 
+<!-- table template info detail -->
+<div id="table-info-detail" class="d-none" data-url="<?= site_url('fpk/get_info_detail/') ?>">
+    <table class="table table-sm table-bordered w-100">
+        <thead>
+            <tr class="align-middle">
+                <th width="30">No</th>
+                <th>No Transaksi</th>
+                <th>Tanggal</th>
+                <th>Jumlah</th>
+                <th>Satuan</th>
+                <th>S.Loc</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
 <script>
     let tableDetail;
     let tableItem;
+    let tableInfo;
 
     $(document).ready(function() {
         let pr_id = $('#pr_id').val();
@@ -499,7 +542,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
-
+                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
                     $('#table-detail td').css('pointer-events', 'none');
 
                     $('#submit').replaceWith(
@@ -1213,6 +1256,123 @@
 
             let row = $(this).closest('tr');
             row.find('input[name="detail[to_qty][]"]').val(toQty);
+        });
+
+        tableInfo = $('#table-info').DataTable({
+            "autoWidth": true,
+            "searching": true,
+            "processing": true,
+            "serverSide": true,
+            "ordering": true,
+            "info": true,
+            "order": [],
+            "ajax": {
+                "url": $('#table-info').data('url'),
+                "type": "POST"
+            },
+            "createdRow": function(row, data, dataIndex) {
+                $(row).attr('data-pr_detail_id', data.pr_detail_id);
+            },
+            "columns": [{
+                    "className": 'details-control',
+                    "orderable": false,
+                    "searchable": false,
+                    "data": null,
+                    "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>',
+                },
+                {
+                    "data": "no",
+                    "orderable": false,
+                    "searchable": false,
+                    "className": 'text-center',
+                },
+                {
+                    "data": "nama_item",
+                    render: function(data, type, row) {
+                        // if (type === 'display' && data && data.length > 20) {
+                        //     let cleanData = data.replace(/"/g, '&quot;'); 
+                        //     return `<span title="${cleanData}">
+                        //                 ${data.substr(0, 20)}...
+                        //             </span>`;
+                        // }
+                        return data;
+                    }
+                },
+                {
+                    "data": "kode_item"
+                },
+                {
+                    "data": "satuan"
+                },
+                {
+                    "data": "fpk",
+                    "className": 'text-end',
+                },
+                {
+                    "data": "grk",
+                    "className": 'text-end',
+                },
+                {
+                    "data": "sisa",
+                    "className": 'text-end',
+                },
+            ]
+        });
+        $('#table-info tbody').on('click', 'td.details-control', function() {
+            const tr    = $(this).closest('tr');
+            const row   = tableInfo.row(tr);
+            const prDetailId = tr.data('pr_detail_id');
+            let icon    = $(this).find('i');
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                icon.removeClass('ri-subtract-line').addClass('ri-add-line');
+            }else{
+                const childTableId = 'child-' + prDetailId;
+                const childHtml = $($('#table-info-detail').html());
+                childHtml.attr('id', childTableId);
+
+                row.child(childHtml).show();
+                icon.removeClass('ri-add-line').addClass('ri-subtract-line');
+
+                $('#' + $.escapeSelector(childTableId)).DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": $('#table-info-detail').data('url') + prDetailId,
+                        "type": "POST",
+                    },
+                    "order" : [],
+                    "columns": [
+                        {
+                            "data": "no",
+                            "orderable": false,
+                            "className": 'text-center',
+                        },
+                        {
+                            "data": "no_transaksi",
+                        },
+                        {
+                            "data": "tanggal",
+                        },
+                        {
+                            "data": "jumlah",
+                            'className': 'text-end',
+                        },
+                        {
+                            "data": "satuan",
+                        },
+                        {
+                            "data": "s_loc",
+                        },
+                    ],
+                    "paging": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": true
+                });
+            }
         });
     });
 

@@ -583,4 +583,127 @@ class Rco extends Back_Controller
                 'code'    => $db_error['code']
             ]));
     }
+
+    public function get_info($id)
+    {
+        $id = (int) $this->encrypt->decode(base64url_decode($id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'tag_detail b',
+            'select' => [
+                'b.TAG_DETAIL_ID,i.ITEM_DESCRIPTION Nama_Item,i.ITEM_CODE Kode_Item,b.ENTERED_UOM Satuan,b.ENTERED_QTY RCO,',
+                ['(b.DELIVERED_ENTERED_QTY / b.BASE_QTY) AS MR_STS_RSP', FALSE],
+                ['b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY) AS SISA', FALSE],
+            ],
+            'joins' => [
+                ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+            ],
+            'where' => ['b.TAG_ID' => $id],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
+            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function($row, $no) {
+            return [
+                'no' => $no,
+                'tag_detail_id' => base64url_encode($this->encrypt->encode($row->TAG_DETAIL_ID)),
+                'nama_item' => $row->Nama_Item,
+                'kode_item' => $row->Kode_Item,
+                'satuan' => $row->Satuan,
+                'rco' => number_format((float)$row->RCO, 2, '.', ','),
+                'mr_sts_rsp' => number_format((float)$row->MR_STS_RSP, 2, '.', ','),
+                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+            ];
+        }));
+    }
+
+    public function get_info_detail($detail_id)
+    {
+        $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
+        $query = "SELECT
+                b.TAG_ID,
+                b.TAG_DETAIL_ID,
+                b.ITEM_ID,
+                c.DOCUMENT_NO No_Transaksi,
+                c.DOCUMENT_DATE Tanggal,
+                (a.ENTERED_QTY * b.BASE_QTY) Jumlah,
+                b.ENTERED_UOM Satuan,
+                w.WAREHOUSE_NAME `S.Loc`,
+                w.WAREHOUSE_ID,
+                a.TAG_PINJAM_ID HEADER_ID,
+                a.TAG_PINJAM_DETAIL_ID DETAIL_ID
+            FROM
+                tag_detail b
+                JOIN tag_pinjam_detail a
+                    ON b.TAG_DETAIL_ID = a.TAG_DETAIL_ID
+                JOIN tag_pinjam c
+                    ON a.TAG_PINJAM_ID = c.TAG_PINJAM_ID
+                JOIN warehouse w
+                    ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+            WHERE b.TAG_DETAIL_ID = $detail_id
+            UNION
+            ALL
+            SELECT
+                b.TAG_ID,
+                b.TAG_DETAIL_ID,
+                b.ITEM_ID,
+                c.DOCUMENT_NO No_Transaksi,
+                c.DOCUMENT_DATE Tanggal,
+                (a.ENTERED_QTY * b.BASE_QTY) Jumlah,
+                b.ENTERED_UOM Satuan,
+                w.WAREHOUSE_NAME `S.Loc`,
+                w.WAREHOUSE_ID,
+                a.BUILD_ID HEADER_ID,
+                a.BUILD_DETAIL_ID DETAIL_ID
+            FROM
+                tag_detail b
+                JOIN build_detail a
+                    ON b.TAG_DETAIL_ID = a.TAG_DETAIL_ID
+                JOIN build c
+                    ON a.BUILD_ID = c.BUILD_ID
+                JOIN warehouse w
+                    ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+            WHERE b.TAG_DETAIL_ID = $detail_id
+            UNION
+            ALL
+            SELECT
+                b.TAG_ID,
+                b.TAG_DETAIL_ID,
+                b.ITEM_ID,
+                c.DOCUMENT_NO No_Transaksi,
+                c.DOCUMENT_DATE Tanggal,
+                (a.ENTERED_QTY * b.BASE_QTY) Jumlah,
+                b.ENTERED_UOM Satuan,
+                w.WAREHOUSE_NAME `S.Loc`,
+                w.WAREHOUSE_ID,
+                a.TAG_KONSI_ID HEADER_ID,
+                a.TAG_KONSI_DETAIL_ID DETAIL_ID
+            FROM
+                tag_detail b
+                JOIN tag_konsi_detail a
+                    ON b.TAG_DETAIL_ID = a.TAG_DETAIL_ID
+                JOIN tag_konsi c
+                    ON a.TAG_KONSI_ID = c.TAG_KONSI_ID
+                JOIN warehouse w
+                    ON c.TO_WH_ID = w.WAREHOUSE_ID
+            WHERE b.TAG_DETAIL_ID = $detail_id
+            ";
+        $data = $this->db->query($query)->result();
+        foreach ($data as $d) {
+            $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
+            $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
+            $No_Transaksi = explode('/',$d->No_Transaksi);
+            $d->link = null;
+            if(strtoupper($No_Transaksi[0]) == 'RSP'){
+                $d->link = site_url('rsp/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
+            }else if(strtoupper($No_Transaksi[0]) == 'MR'){
+                $d->link = site_url('mrq/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
+            }else if(strtoupper($No_Transaksi[0]) == 'SJS'){
+                $d->link = site_url('sts/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
+            }
+            
+        }
+        echo json_encode($data);
+    }
 }

@@ -204,7 +204,7 @@
                                     <th>Jumlah</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No GRK</th>
+                                    <th>No GRK / No RCO</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

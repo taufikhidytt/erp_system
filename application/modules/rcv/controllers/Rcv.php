@@ -592,4 +592,102 @@ class Rcv extends Back_Controller
                 'code'    => $db_error['code']
             ]));
     }
+
+    public function get_info($id)
+    {
+        $id = (int) $this->encrypt->decode(base64url_decode($id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'tag_detail b',
+            'select' => [
+                'b.TAG_DETAIL_ID,i.ITEM_DESCRIPTION Nama_Item,i.ITEM_CODE Kode_Item,b.ENTERED_UOM Satuan,b.ENTERED_QTY RCV,',
+                ['(b.DELIVERED_ENTERED_QTY / b.BASE_QTY) AS RHO_MR', FALSE],
+                ['b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY) AS SISA', FALSE],
+            ],
+            'joins' => [
+                ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+            ],
+            'where' => ['b.TAG_ID' => $id],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
+            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function($row, $no) {
+            return [
+                'no' => $no,
+                'tag_detail_id' => base64url_encode($this->encrypt->encode($row->TAG_DETAIL_ID)),
+                'nama_item' => $row->Nama_Item,
+                'kode_item' => $row->Kode_Item,
+                'satuan' => $row->Satuan,
+                'rcv' => number_format((float)$row->RCV, 2, '.', ','),
+                'rho_mr' => number_format((float)$row->RHO_MR, 2, '.', ','),
+                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+            ];
+        }));
+    }
+
+    public function get_info_detail($detail_id)
+    {
+        $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
+        $query = "SELECT
+                b.TAG_ID,
+                b.TAG_DETAIL_ID,
+                b.ITEM_ID,
+                c.DOCUMENT_NO No_Transaksi,
+                c.DOCUMENT_DATE Tanggal,
+                (a.ENTERED_QTY * b.BASE_QTY) Jumlah,
+                b.ENTERED_UOM Satuan,
+                w.WAREHOUSE_NAME `S.Loc`,
+                w.WAREHOUSE_ID,
+                a.REQUEST_QTY_ID HEADER_ID,
+                a.REQUEST_QTY_DETAIL_ID DETAIL_ID
+            FROM
+                tag_detail b
+                JOIN request_qty_detail a
+                    ON b.TAG_DETAIL_ID = a.TAG_DETAIL_ID
+                JOIN request_qty c
+                    ON a.REQUEST_QTY_ID = c.REQUEST_QTY_ID
+                JOIN warehouse w
+                    ON c.TO_WH_ID = w.WAREHOUSE_ID
+            WHERE b.TAG_DETAIL_ID = $detail_id 
+            UNION
+            ALL
+            SELECT
+                b.TAG_ID,
+                b.TAG_DETAIL_ID,
+                b.ITEM_ID,
+                c.DOCUMENT_NO No_Transaksi,
+                c.DOCUMENT_DATE Tanggal,
+                (a.ENTERED_QTY * b.BASE_QTY) Jumlah,
+                b.ENTERED_UOM Satuan,
+                w.WAREHOUSE_NAME `S.Loc`,
+                w.WAREHOUSE_ID,
+                a.BUILD_ID HEADER_ID,
+                a.BUILD_DETAIL_ID DETAIL_ID
+            FROM
+                tag_detail b
+                JOIN build_detail a
+                    ON b.TAG_DETAIL_ID = a.TAG_DETAIL_ID
+                JOIN build c
+                    ON a.BUILD_ID = c.BUILD_ID
+                JOIN warehouse w
+                    ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+            WHERE b.TAG_DETAIL_ID = $detail_id
+            ";
+        $data = $this->db->query($query)->result();
+        foreach ($data as $d) {
+            $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
+            $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
+            $No_Transaksi = explode('/',$d->No_Transaksi);
+            $d->link = null;
+            if(strtoupper($No_Transaksi[0]) == 'RHO'){
+                $d->link = site_url('rho/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
+            }else if(strtoupper($No_Transaksi[0]) == 'MR'){
+                $d->link = site_url('mrq/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
+            }
+            
+        }
+        echo json_encode($data);
+    }
 }
