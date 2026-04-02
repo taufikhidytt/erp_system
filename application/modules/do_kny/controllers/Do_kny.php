@@ -374,7 +374,7 @@ class Do_kny extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('do_kny');
+                        redirect('do_kny/add');
                     }
                 }
 

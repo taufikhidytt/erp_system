@@ -17,7 +17,7 @@ class Fpk_model extends CI_Model
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
         "a.NEED_DATE",
-        "CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' )",
+        "Supplier",
         "k.FIRST_NAME",
         "w.WAREHOUSE_NAME",
         "a.TOTAL_AMOUNT",

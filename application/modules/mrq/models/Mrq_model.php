@@ -19,7 +19,7 @@ class Mrq_model extends CI_Model
         "w.WAREHOUSE_NAME",
         "p.PERSON_NAME",
         "a.UNIT",
-        "a.ITEM_DESCRIPTION",
+        "i.ITEM_DESCRIPTION",
         "a.ENTERED_UOM",
     );
 
@@ -30,9 +30,15 @@ class Mrq_model extends CI_Model
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
         "w.WAREHOUSE_NAME",
-        "p.PERSON_NAME",
+        "CONCAT(
+            p . PERSON_NAME,
+            ' - [',
+            p . PERSON_CODE,
+            ']'
+        )",
+        // "p.PERSON_NAME",
         "a.UNIT",
-        "a.ITEM_DESCRIPTION",
+        "i.ITEM_DESCRIPTION",
         "a.ENTERED_UOM",
     );
 
@@ -51,6 +57,7 @@ class Mrq_model extends CI_Model
             w.WAREHOUSE_NAME AS Storage,
             a.PERSON_ID,
             p.PERSON_NAME AS Customer,
+            p.PERSON_CODE,
             a.UNIT AS Unit,
             i.ITEM_ID,
             i.ITEM_DESCRIPTION AS Nama_Item,

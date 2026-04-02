@@ -16,7 +16,7 @@ class Rsp_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "CONCAT(p . PERSON_NAME, ' - [', p . PERSON_CODE, ']')",
+        "Supplier",
         "w.WAREHOUSE_NAME",
     );
 

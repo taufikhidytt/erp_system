@@ -16,10 +16,10 @@ class Po_kny_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "CONCAT(p . PERSON_NAME, ' - [', p . PERSON_CODE, ']')",
+        "Supplier",
         "WAREHOUSE_NAME",
         "PAYMENT_TERM_NAME",
-        "TOTAL_NET Total"
+        "Total"
     );
 
     var $column_search = array(
@@ -31,7 +31,7 @@ class Po_kny_model extends CI_Model
         "CONCAT(p . PERSON_NAME, ' - [', p . PERSON_CODE, ']')",
         "WAREHOUSE_NAME",
         "PAYMENT_TERM_NAME",
-        "TOTAL_NET Total"
+        "TOTAL_NET"
     );
 
     var $order = array('a.DOCUMENT_DATE' => 'DESC');
