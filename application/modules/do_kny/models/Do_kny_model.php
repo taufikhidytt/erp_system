@@ -166,7 +166,7 @@ class Do_kny_model extends CI_Model
     {
         $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
 
-        $sql = "SELECT
+        $sql = "SELECT DISTINCT
             a.DOCUMENT_REFF_NO,
             a.KARYAWAN_ID,
             a.PO_NO,
@@ -193,6 +193,11 @@ class Do_kny_model extends CI_Model
                 b.UNIT_PRICE,
                 b.DISCOUNT_PRICE,
                 b.SUBTOTAL,
+                    IF(
+                    bl.ITEM_ID IS NULL,
+                    bd.UNIT_PRICE - bd.DISCOUNT_PRICE,
+                    bl.TOTAL_AMOUNT
+                ) AS HPP,
                 bl.TOTAL_AMOUNT AS HPP,
                 b.HARGA_INPUT,
                 b.DISKON_INPUT,
@@ -203,6 +208,7 @@ class Do_kny_model extends CI_Model
                 so a
                 JOIN so_detail b ON a.SO_ID = b.SO_ID
                 JOIN build bl ON b.BUILD_ID = bl.BUILD_ID
+                JOIN build_detail bd ON bl.BUILD_ID = bd.BUILD_ID
                 JOIN item i ON b.ITEM_ID = i.ITEM_ID
                 JOIN person psn ON a.PERSON_ID = psn.PERSON_ID
                 JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
