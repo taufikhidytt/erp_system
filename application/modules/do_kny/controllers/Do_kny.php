@@ -408,7 +408,7 @@ class Do_kny extends Back_Controller
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', $error['message']);
-                    redirect('do_kny');
+                    redirect('do_kny/add');
                 }
 
                 // ======================
@@ -417,7 +417,7 @@ class Do_kny extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('do_kny');
+                    redirect('do_kny/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
