@@ -83,6 +83,9 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
+                                    <a href="<?= site_url('do_kny/print/'.base64url_encode($this->encrypt->encode($data->INVENTORY_OUT_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                        <i class="ri ri-printer-fill"></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="row">
@@ -2218,4 +2221,9 @@
             }
         });
     }
+    $(document).on('click','#btn-print', function(){
+        setTimeout(function(){
+            $('#loading').hide();
+        },300);
+    });
 </script>

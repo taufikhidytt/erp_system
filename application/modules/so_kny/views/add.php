@@ -96,7 +96,7 @@
                                                 <select name="customer" id="customer" class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Customer --</option>
                                                     <?php foreach ($customer->result() as $cs): ?>
-                                                        <option value="<?= $cs->PERSON_ID ?>" <?= set_value('person_site_id') == $cs->PERSON_SITE_ID ? 'selected' : '' ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>">
+                                                        <option value="<?= $cs->PERSON_ID ?>" <?= set_value('person_site_id') == $cs->PERSON_SITE_ID ? 'selected' : '' ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>" data-payment_term_id="<?= $cs->PAYMENT_TERM_ID ?>" data-karyawan_id="<?= $cs->KARYAWAN_ID ?>">
                                                             <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -142,22 +142,22 @@
                                                             <i class="ri ri-money-dollar-box-fill"></i>
                                                         </span>
                                                         <?php
-                                                        $defaultValue = null;
+                                                        $defaultPaymentTerm = null;
                                                         foreach ($payment_term->result() as $pt) {
                                                             if ($pt->PRIMARY_FLAG == 'Y') {
-                                                                $defaultValue = $pt->PAYMENT_TERM_ID;
+                                                                $defaultPaymentTerm = $pt->PAYMENT_TERM_ID;
                                                                 break;
                                                             }
                                                         }
                                                         ?>
                                                         <select name="payment_term" id="payment_term" class="form-control select2 <?= form_error('payment_term') ? 'is-invalid' : null; ?>">
-                                                            <?php if (!$defaultValue): ?>
+                                                            <?php if (!$defaultPaymentTerm): ?>
                                                                 <option value="">-- Selected payment_term --</option>
                                                             <?php endif; ?>
                                                             <?php foreach ($payment_term->result() as $pt): ?>
                                                                 <option
                                                                     value="<?= $pt->PAYMENT_TERM_ID ?>"
-                                                                    <?= set_value('payment_term') ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultValue == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
+                                                                    <?= set_value('payment_term') ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultPaymentTerm == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
                                                                     <?= $pt->PAYMENT_TERM_NAME ?>
                                                                 </option>
                                                             <?php endforeach; ?>
@@ -954,10 +954,26 @@
             loadLocation(initialCustomer, oldLocation);
         }
 
+        var defaultPaymentTerm = "<?= $defaultPaymentTerm ?>";
+
         $('#customer').on('change', function() {
             let initialCustomer = $('#customer option:selected').data('person_site_id');
             $('#person_site_id').val(initialCustomer);
             loadLocation(initialCustomer);
+
+            var paymentTermId = $(this).find(':selected').data('payment_term_id');
+            if (paymentTermId) {
+                $('#payment_term').val(paymentTermId).trigger('change');
+            } else {
+                $('#payment_term').val(defaultPaymentTerm).trigger('change');
+            }
+
+            var karyawan_id = $(this).find(':selected').data('karyawan_id');
+            if (karyawan_id) {
+                $('#sales').val(karyawan_id).trigger('change');
+            } else {
+                $('#sales').val('').trigger('change');
+            }
         });
 
         // Event untuk input normal

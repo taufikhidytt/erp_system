@@ -83,6 +83,9 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
+                                    <a href="<?= site_url('so_kny/print/' . base64url_encode($this->encrypt->encode($data->SO_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                        <i class="ri ri-printer-fill"></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="row">
@@ -113,7 +116,7 @@
                                                     $selected_person_site_id = $this->input->post('person_site_id') ?? ($data->PERSON_SITE_ID ?? '');
                                                     ?>
                                                     <?php foreach ($customer->result() as $cs): ?>
-                                                        <option value="<?= $cs->PERSON_ID ?>" <?= ($selected_customer == $cs->PERSON_ID && $selected_person_site_id == $cs->PERSON_SITE_ID) ? 'selected' : '' ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>">
+                                                        <option value="<?= $cs->PERSON_ID ?>" <?= ($selected_customer == $cs->PERSON_ID && $selected_person_site_id == $cs->PERSON_SITE_ID) ? 'selected' : '' ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>" data-payment_term_id="<?= $cs->PAYMENT_TERM_ID ?>" data-karyawan_id="<?= $cs->KARYAWAN_ID ?>">
                                                             <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -159,23 +162,23 @@
                                                             <i class="ri ri-money-dollar-box-fill"></i>
                                                         </span>
                                                         <?php
-                                                        $defaultValue = null;
+                                                        $defaultPaymentTerm = null;
                                                         foreach ($payment_term->result() as $pt) {
                                                             if ($pt->PRIMARY_FLAG == 'Y') {
-                                                                $defaultValue = $pt->PAYMENT_TERM_ID;
+                                                                $defaultPaymentTerm = $pt->PAYMENT_TERM_ID;
                                                                 break;
                                                             }
                                                         }
                                                         ?>
                                                         <select name="payment_term" id="payment_term" class="form-control select2 <?= form_error('payment_term') ? 'is-invalid' : null; ?>">
-                                                            <?php if (!$defaultValue): ?>
+                                                            <?php if (!$defaultPaymentTerm): ?>
                                                                 <option value="">-- Selected payment_term --</option>
                                                             <?php endif; ?>
                                                             <?php $param = $this->input->post('payment_term') ?? $data->PAYMENT_TERM_ID; ?>
                                                             <?php foreach ($payment_term->result() as $pt): ?>
                                                                 <option
                                                                     value="<?= $pt->PAYMENT_TERM_ID ?>"
-                                                                    <?= $param ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultValue == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
+                                                                    <?= $param ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultPaymentTerm == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
                                                                     <?= $pt->PAYMENT_TERM_NAME ?>
                                                                 </option>
                                                             <?php endforeach; ?>
@@ -547,10 +550,11 @@
 
                                         <div class="tab-pane" id="info-detail" role="tabpanel">
                                             <div class="table-responsive">
-                                                <table class="table table-striped w-100" id="table-info" data-url=" <?=  site_url('so_kny/get_info/' . base64url_encode($this->encrypt->encode($data->SO_ID))) ?>">
+                                                <table class="table table-striped w-100" id="table-info" data-url=" <?= site_url('so_kny/get_info/' . base64url_encode($this->encrypt->encode($data->SO_ID))) ?>">
                                                     <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr>
-                                                            <th></th> <th>No</th>
+                                                            <th></th>
+                                                            <th>No</th>
                                                             <th>Nama Item</th>
                                                             <th>Kode Item</th>
                                                             <th>Satuan</th>
@@ -726,7 +730,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
-                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
+                    $('#table-info_wrapper').find('input,select').prop('disabled', false);
 
                     $('#table-detail td').css('pointer-events', 'none');
 
@@ -1184,10 +1188,26 @@
             loadLocation(initialCustomer, oldLocation);
         }
 
+        var defaultPaymentTerm = "<?= $defaultPaymentTerm ?>";
+
         $('#customer').on('change', function() {
             let initialCustomer = $('#customer option:selected').data('person_site_id');
             $('#person_site_id').val(initialCustomer);
             loadLocation(initialCustomer);
+
+            var paymentTermId = $(this).find(':selected').data('payment_term_id');
+            if (paymentTermId) {
+                $('#payment_term').val(paymentTermId).trigger('change');
+            } else {
+                $('#payment_term').val(defaultPaymentTerm).trigger('change');
+            }
+
+            var karyawan_id = $(this).find(':selected').data('karyawan_id');
+            if (karyawan_id) {
+                $('#sales').val(karyawan_id).trigger('change');
+            } else {
+                $('#sales').val('').trigger('change');
+            }
         });
 
         // Event untuk input normal
@@ -1760,15 +1780,15 @@
             ]
         });
         $('#table-info tbody').on('click', 'td.details-control', function() {
-            const tr    = $(this).closest('tr');
-            const row   = tableInfo.row(tr);
+            const tr = $(this).closest('tr');
+            const row = tableInfo.row(tr);
             const infoDetailID = tr.data('so_detail_id');
-            let icon    = $(this).find('i');
+            let icon = $(this).find('i');
 
             if (row.child.isShown()) {
                 row.child.hide();
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
-            }else{
+            } else {
                 const childTableId = 'child-' + infoDetailID;
                 const childHtml = $($('#table-info-detail').html());
                 childHtml.attr('id', childTableId);
@@ -1783,8 +1803,7 @@
                         "url": $('#table-info-detail').data('url') + infoDetailID,
                         "type": "POST",
                     },
-                    "columns": [
-                        {
+                    "columns": [{
                             "data": "no",
                             "orderable": false,
                             "className": 'text-center',
@@ -1811,7 +1830,7 @@
                     "ordering": true,
                     "info": true,
                     "autoWidth": true,
-                    "order" : []
+                    "order": []
                 });
             }
         });
@@ -2737,4 +2756,10 @@
         // Set nilai jatuh tempo
         $('#jatuh_tempo').val(formatted);
     }
+
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
+            $('#loading').hide();
+        }, 300);
+    });
 </script>

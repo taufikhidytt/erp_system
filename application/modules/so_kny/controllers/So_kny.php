@@ -934,4 +934,23 @@ class So_kny extends Back_Controller
             ];
         }));
     }
+
+    public function print($id)
+    {
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $so    = $this->so_kny->get_so_detail($id)->row();
+        if ($so) {
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'so_kny/pdf',
+                'data' => [
+                    'so' => $so,
+                    'so_detail' => $this->so_kny->get_detail_by_so_id($id)->result()
+                ],
+                'title' => str_replace('/', ' ', $so->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/', ' ', $so->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

@@ -106,7 +106,7 @@
                                                 <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
                                                     <option value="">-- Selected Supplier --</option>
                                                     <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('person_site_id') == $sp->PERSON_SITE_ID ? 'selected' : '' ?> data-person_site_id="<?= $sp->PERSON_SITE_ID ?>">
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('person_site_id') == $sp->PERSON_SITE_ID ? 'selected' : '' ?> data-person_site_id="<?= $sp->PERSON_SITE_ID ?>" data-payment_term_id="<?= $sp->PAYMENT_TERM_ID ?>">
                                                             <?= strtoupper($sp->PERSON_NAME) . ' - [' . strtoupper($sp->PERSON_CODE) . '] - ' . strtoupper($sp->SITE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -154,22 +154,22 @@
                                                             <i class="ri ri-money-dollar-box-fill"></i>
                                                         </span>
                                                         <?php
-                                                        $defaultValue = null;
+                                                        $defaultPaymentTerm = null;
                                                         foreach ($payment_term->result() as $pt) {
                                                             if ($pt->PRIMARY_FLAG == 'Y') {
-                                                                $defaultValue = $pt->PAYMENT_TERM_ID;
+                                                                $defaultPaymentTerm = $pt->PAYMENT_TERM_ID;
                                                                 break;
                                                             }
                                                         }
                                                         ?>
                                                         <select name="payment_term" id="payment_term" class="form-control select2 <?= form_error('payment_term') ? 'is-invalid' : null; ?>">
-                                                            <?php if (!$defaultValue): ?>
+                                                            <?php if (!$defaultPaymentTerm): ?>
                                                                 <option value="">-- Selected payment_term --</option>
                                                             <?php endif; ?>
                                                             <?php foreach ($payment_term->result() as $pt): ?>
                                                                 <option
                                                                     value="<?= $pt->PAYMENT_TERM_ID ?>"
-                                                                    <?= set_value('payment_term') ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultValue == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
+                                                                    <?= set_value('payment_term') ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultPaymentTerm == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
                                                                     <?= $pt->PAYMENT_TERM_NAME ?>
                                                                 </option>
                                                             <?php endforeach; ?>
@@ -789,7 +789,9 @@
             oldDetail.kode_item.forEach(function(kode, i) {
                 let nomor = tableDetail.rows().count() + 1;
 
-                let build_id = oldDetail.build_id[i] ?? '';
+                let inventory_in_detail_id = oldDetail.inventory_in_detail_id[i];
+                let inventory_in_id = oldDetail.inventory_in_id[i];
+                let coa_suspend_id = oldDetail.coa_suspend_id[i];
                 let item_id = oldDetail.item_id[i] ?? '';
                 let base_qty = oldDetail.base_qty[i] ?? '';
                 let keterangan = oldDetail.keterangan[i] ?? '';
@@ -817,7 +819,9 @@
                         ${ellipsis(no_transaksi)}
                     </span>
                     <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
-                    <input type="hidden" name="detail[build_id][]" value="${build_id}">
+                    <input type="hidden" name="detail[inventory_in_detail_id][]" value="${inventory_in_detail_id}">
+                    <input type="hidden" name="detail[inventory_in_id][]" value="${inventory_in_id}">
+                    <input type="hidden" name="detail[coa_suspend_id][]" value="${coa_suspend_id}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
                     <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -925,10 +929,19 @@
             loadLocation(initialSupplier, oldLocation);
         }
 
+        var defaultPaymentTerm = "<?= $defaultPaymentTerm ?>";
+
         $('#supplier').on('change', function() {
             let initialSupplier = $('#supplier option:selected').data('person_site_id');
             $('#person_site_id').val(initialSupplier);
             loadLocation(initialSupplier);
+
+            var paymentTermId = $(this).find(':selected').data('payment_term_id');
+            if (paymentTermId) {
+                $('#payment_term').val(paymentTermId).trigger('change');
+            } else {
+                $('#payment_term').val(defaultPaymentTerm).trigger('change');
+            }
         });
 
         // Event untuk input normal
@@ -1031,6 +1044,11 @@
                                 data-base_qty="${item.BASE_QTY}"
                                 data-note="${item.NOTE}"
                                 data-berat="${item.BERAT}"
+                                data-harga_input="${item.HARGA_INPUT}"
+                                data-harga="${item.UNIT_PRICE}"
+                                data-diskon_input="${item.DISKON_INPUT}"
+                                data-diskon_percen="${item.DISCOUNT_PERCEN}"
+                                data-subtotal="${item.SUBTOTAL}"
 
                                 data-status="${item.STATUS_NAME}"
                                 data-tanggal="${item.DOCUMENT_DATE}"
@@ -1088,6 +1106,11 @@
                 let keterangan = $(this).data("note") ?? '';
                 let berat = $(this).data("berat");
                 let balance = $(this).data("sisa");
+                let harga_input = $(this).data('harga_input') ?? '0';
+                let harga = $(this).data('harga') ?? '0';
+                let diskon_input = $(this).data('diskon_input') ?? '0';
+                let diskon_percen = $(this).data('diskon_percen') ?? '0';
+                let subtotal = $(this).data('subtotal') ?? '0';
 
                 let status = $(this).data("status");
                 let tanggal = $(this).data("tanggal");
@@ -1151,30 +1174,36 @@
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">
                     `,
 
-                    `<span class="view-mode harga-view">0.00</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="">`,
+                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${harga_input}">`,
                     // harga input
 
-                    `<span class="harga-input-b">0.00</span>
-                    <input type="hidden" name="detail[harga][]" value="">`,
+                    `<span class="harga-input-b">${formatNumber(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
                     // harga
 
-                    `<span class="view-mode harga-view diskon-harga-view"></span>
-                    <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="">`,
+                    `<span class="view-mode harga-view diskon-harga-view">${formatNumber(diskon_input)}</span>
+                    <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="${diskon_input}">`,
                     // diskon rp
 
-                    `<span class="view-mode"></span>
-                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="">`,
+                    `<span class="view-mode">${diskon_percen}</span>
+                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="${diskon_percen}">`,
                     // diskon %
 
-                    `<span class="subtotal">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]" value="">`,
+                    `<span class="subtotal">${formatNumber(subtotal)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
                     // subtotal
 
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`,
                 ]).node();
 
+                let row = $(rowNode);
+                let ppn = $('#cal_ppn_code').val();
+                let ppn_code = $('#cal_ppn_code option:selected').text().trim();
+
                 $(rowNode).addClass('tr-height-30');
+
+                hitungSubTotal(row, ppn_code, ppn);
 
                 rowsAdded = true;
             });
@@ -1304,6 +1333,12 @@
                         timer: 1500,
                         showConfirmButton: false
                     });
+
+                    let row = $(rowsToRemove);
+                    let ppn = $('#cal_ppn_code').val();
+                    let ppn_code = $('#cal_ppn_code option:selected').text().trim();
+
+                    hitungSubTotal(row, ppn_code, ppn);
                 }
             });
         });

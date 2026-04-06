@@ -173,6 +173,7 @@ class Po_kny extends Back_Controller
                     b.UNIT_PRICE,
                     b.SUBTOTAL,
                     b.HARGA_INPUT,
+                    b.DISCOUNT_PERCEN,
                     b.DISKON_INPUT,
                     i.BERAT,
                     b.NOTE 
@@ -786,5 +787,23 @@ class Po_kny extends Back_Controller
                 'error'   => $db_error['message'],
                 'code'    => $db_error['code']
             ]));
+    }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $po    = $this->po_kny->get_po_detail($id)->row();
+        if($po){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'po_kny/pdf',
+                'data' => [
+                    'po' => $po,
+                    'po_detail' => $this->po_kny->get_detail_by_po_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $po->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $po->DOCUMENT_NO), 'A4', 'portrait');
+        }
     }
 }

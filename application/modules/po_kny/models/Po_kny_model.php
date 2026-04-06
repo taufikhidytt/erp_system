@@ -307,4 +307,21 @@ class Po_kny_model extends CI_Model
         }
         return true;
     }
+
+    public function get_po_detail($id){
+        $this->db->select("
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
+            w.WAREHOUSE_NAME,
+            ps.SITE_NAME, ps.ADDRESS1, ps.ADDRESS2, ps.ADDRESS3, ps.CITY,
+            py.PAYMENT_TERM_NAME,
+        ");
+        $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        $this->db->from('invoice a');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('person_site ps', 'a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
+        $this->db->join('payment_term py', 'a.PAYMENT_TERM_ID = py.PAYMENT_TERM_ID');
+        $this->db->where('a.INVOICE_ID',$id);
+        return $this->db->get();
+    }
 }

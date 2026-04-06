@@ -170,6 +170,7 @@ class So_kny_model extends CI_Model
                     a.UNIT_PRICE Harga,
                     a.DISCOUNT_PRICE Diskon,
                     a.SUBTOTAL Total,
+                    a.DESKRIPSI,
                     b.DOCUMENT_NO No_MR,
                     w.WAREHOUSE_NAME `S_Loc_In`,
                     a.NOTE Note,
@@ -349,5 +350,25 @@ class So_kny_model extends CI_Model
             return $this->db->error();
         }
         return true;
+    }
+
+    public function get_so_detail($id){
+        $this->db->select("
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,a.JTEMPO,
+            a.PO_NO PO_Customer,
+            w.WAREHOUSE_NAME,
+            ps.SITE_NAME, ps.ADDRESS1, ps.ADDRESS2, ps.ADDRESS3, ps.CITY,
+            py.PAYMENT_TERM_NAME,
+            k.FIRST_NAME SALES,k.LAST_NAME SALES_LAST_NAME,
+        ");
+        $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        $this->db->from('so a');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('person_site ps', 'a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
+        $this->db->join('payment_term py', 'a.PAYMENT_TERM_ID = py.PAYMENT_TERM_ID');
+        $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
+        $this->db->where('a.SO_ID',$id);
+        return $this->db->get();
     }
 }

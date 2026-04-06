@@ -695,4 +695,22 @@ class Do_kny extends Back_Controller
                 'code'    => $db_error['code']
             ]));
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $do    = $this->do_kny->get_do_detail($id)->row();
+        if($do){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'do_kny/pdf',
+                'data' => [
+                    'do' => $do,
+                    'do_detail' => $this->do_kny->get_do_detail_by_inventory_out_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $do->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $do->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

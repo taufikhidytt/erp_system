@@ -83,6 +83,9 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
+                                    <a href="<?= site_url('po_kny/print/'.base64url_encode($this->encrypt->encode($data->INVOICE_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                        <i class="ri ri-printer-fill"></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="row">
@@ -123,7 +126,7 @@
                                                     $selected_person_site_id = $this->input->post('person_site_id') ?? ($data->PERSON_SITE_ID ?? '');
                                                     ?>
                                                     <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= ($selected_supplier == $sp->PERSON_ID && $selected_person_site_id == $sp->PERSON_SITE_ID) ? 'selected' : '' ?> data-person_site_id="<?= $sp->PERSON_SITE_ID ?>">
+                                                        <option value="<?= $sp->PERSON_ID ?>" <?= ($selected_supplier == $sp->PERSON_ID && $selected_person_site_id == $sp->PERSON_SITE_ID) ? 'selected' : '' ?> data-person_site_id="<?= $sp->PERSON_SITE_ID ?>" data-payment_term_id="<?= $sp->PAYMENT_TERM_ID ?>">
                                                             <?= strtoupper($sp->PERSON_NAME) . ' - [' . strtoupper($sp->PERSON_CODE) . '] - ' . strtoupper($sp->SITE_NAME) ?>
                                                         </option>
                                                     <?php endforeach; ?>
@@ -171,23 +174,23 @@
                                                             <i class="ri ri-money-dollar-box-fill"></i>
                                                         </span>
                                                         <?php
-                                                        $defaultValue = null;
+                                                        $defaultPaymentTerm = null;
                                                         foreach ($payment_term->result() as $pt) {
                                                             if ($pt->PRIMARY_FLAG == 'Y') {
-                                                                $defaultValue = $pt->PAYMENT_TERM_ID;
+                                                                $defaultPaymentTerm = $pt->PAYMENT_TERM_ID;
                                                                 break;
                                                             }
                                                         }
                                                         ?>
                                                         <select name="payment_term" id="payment_term" class="form-control select2 <?= form_error('payment_term') ? 'is-invalid' : null; ?>">
-                                                            <?php if (!$defaultValue): ?>
+                                                            <?php if (!$defaultPaymentTerm): ?>
                                                                 <option value="">-- Selected payment_term --</option>
                                                             <?php endif; ?>
                                                             <?php $param = $this->input->post('payment_term') ?? $data->PAYMENT_TERM_ID; ?>
                                                             <?php foreach ($payment_term->result() as $pt): ?>
                                                                 <option
                                                                     value="<?= $pt->PAYMENT_TERM_ID ?>"
-                                                                    <?= $param ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultValue == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
+                                                                    <?= $param ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultPaymentTerm == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
                                                                     <?= $pt->PAYMENT_TERM_NAME ?>
                                                                 </option>
                                                             <?php endforeach; ?>
@@ -975,19 +978,22 @@
 
                 let nomor = tableDetail.rows().count() + 1;
 
-                let inventory_in_detail_id = oldDetail.inventory_in_detail_id[i] ?? '';
-                let inventory_in_id = oldDetail.inventory_in_id[i] ?? '';
-                let coa_suspend_id = oldDetail.coa_suspend_id[i] ?? '';
+                let inventory_in_detail_id = oldDetail.inventory_in_detail_id[i];
+                let inventory_in_id = oldDetail.inventory_in_id[i];
+                let coa_suspend_id = oldDetail.coa_suspend_id[i];
                 let item_id = oldDetail.item_id[i] ?? '';
                 let base_qty = oldDetail.base_qty[i] ?? '';
                 let keterangan = oldDetail.keterangan[i] ?? '';
                 let berat = oldDetail.berat[i] ?? '';
-                let balance = oldDetail.sisa[i] ?? '';
+                let balance = oldDetail.balance[i] ?? '';
+                let memo = oldDetail.memo[i] ?? '';
+                let harga_input = oldDetail.harga_input[i] ?? '';
+                let harga = oldDetail.harga[i] ?? '';
+                let diskon_harga = oldDetail.diskon_harga[i] ?? '';
+                let diskon_persentase = oldDetail.diskon_persentase[i] ?? '';
+                let subtotal = oldDetail.subtotal[i] ?? '';
 
-                let status = oldDetail.status[i] ?? '';
-                let tanggal = oldDetail.tanggal[i] ?? '';
                 let no_transaksi = oldDetail.no_transaksi[i] ?? '';
-                let no_referensi = oldDetail.no_referensi[i] ?? '';
                 let nama_item = oldDetail.nama_item[i] ?? '';
                 let jumlah = oldDetail.jumlah[i] ?? '';
                 let satuan = oldDetail.satuan[i] ?? '';
@@ -1007,8 +1013,8 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${no_mrq}">
-                        ${ellipsis(no_mrq)}
+                    `<span class="ellipsis" title="${no_transaksi}">
+                        ${ellipsis(no_transaksi)}
                     </span>`,
 
                     `<span class="ellipsis" title="${nama_item}">
@@ -1114,10 +1120,19 @@
             loadLocation(initialSupplier, oldLocation);
         }
 
+        var defaultPaymentTerm = "<?= $defaultPaymentTerm ?>";
+
         $('#supplier').on('change', function() {
             let initialSupplier = $('#supplier option:selected').data('person_site_id');
             $('#person_site_id').val(initialSupplier);
             loadLocation(initialSupplier);
+
+            var paymentTermId = $(this).find(':selected').data('payment_term_id');
+            if (paymentTermId) {
+                $('#payment_term').val(paymentTermId).trigger('change');
+            } else {
+                $('#payment_term').val(defaultPaymentTerm).trigger('change');
+            }
         });
 
         // Event untuk input normal
@@ -1220,6 +1235,11 @@
                                 data-base_qty="${item.BASE_QTY}"
                                 data-note="${item.NOTE}"
                                 data-berat="${item.BERAT}"
+                                data-harga_input="${item.HARGA_INPUT}"
+                                data-harga="${item.UNIT_PRICE}"
+                                data-diskon_input="${item.DISKON_INPUT}"
+                                data-diskon_percen="${item.DISCOUNT_PERCEN}"
+                                data-subtotal="${item.SUBTOTAL}"
 
                                 data-status="${item.STATUS_NAME}"
                                 data-tanggal="${item.DOCUMENT_DATE}"
@@ -1288,6 +1308,11 @@
                 let keterangan = $(this).data("note") ?? '';
                 let berat = $(this).data("berat");
                 let balance = $(this).data("sisa");
+                let harga_input = $(this).data('harga_input') ?? '0';
+                let harga = $(this).data('harga') ?? '0';
+                let diskon_input = $(this).data('diskon_input') ?? '0';
+                let diskon_percen = $(this).data('diskon_percen') ?? '0';
+                let subtotal = $(this).data('subtotal') ?? '0';
 
                 let status = $(this).data("status");
                 let tanggal = $(this).data("tanggal");
@@ -1352,30 +1377,36 @@
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">
                     `,
 
-                    `<span class="view-mode harga-view">0.00</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="">`,
+                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${harga_input}">`,
                     // harga input
 
-                    `<span class="harga-input-b">0.00</span>
-                    <input type="hidden" name="detail[harga][]" value="">`,
+                    `<span class="harga-input-b">${formatNumber(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
                     // harga
 
-                    `<span class="view-mode harga-view diskon-harga-view"></span>
-                    <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="">`,
+                    `<span class="view-mode harga-view diskon-harga-view">${formatNumber(diskon_input)}</span>
+                    <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="${diskon_input}">`,
                     // diskon rp
 
-                    `<span class="view-mode"></span>
-                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="">`,
+                    `<span class="view-mode">${diskon_percen}</span>
+                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="${diskon_percen}">`,
                     // diskon %
 
-                    `<span class="subtotal">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]" value="">`,
+                    `<span class="subtotal">${formatNumber(subtotal)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
                     // subtotal
 
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`,
                 ]).node();
 
+                let row = $(rowNode);
+                let ppn = $('#cal_ppn_code').val();
+                let ppn_code = $('#cal_ppn_code option:selected').text().trim();
+
                 $(rowNode).addClass('tr-height-30');
+
+                hitungSubTotal(row, ppn_code, ppn);
 
                 rowsAdded = true;
             });
@@ -1505,6 +1536,12 @@
                         timer: 1500,
                         showConfirmButton: false
                     });
+
+                    let row = $(rowsToRemove);
+                    let ppn = $('#cal_ppn_code').val();
+                    let ppn_code = $('#cal_ppn_code option:selected').text().trim();
+
+                    hitungSubTotal(row, ppn_code, ppn);
                 }
             });
         });
@@ -1742,6 +1779,9 @@
     document.addEventListener('input', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
 
+        let ppn = $('#cal_ppn_code').val();
+        let ppn_code = $('#cal_ppn_code option:selected').text().trim();
+
         const input = e.target;
         const invoice_detail_id = input.dataset.invoice_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
@@ -1771,6 +1811,7 @@
                 }).then(() => {
                     input.value = value_old;
                     input.focus();
+                    hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(value_old);
                 });
                 return;
@@ -1786,6 +1827,7 @@
                 }).then(() => {
                     input.value = balance;
                     input.focus();
+                    hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(balance);
                 });
                 return;
@@ -1798,6 +1840,9 @@
     // // jika jumlah kosong
     document.addEventListener('blur', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
+
+        let ppn = $('#cal_ppn_code').val();
+        let ppn_code = $('#cal_ppn_code option:selected').text().trim();
 
         const input = e.target;
         const invoice_detail_id = input.dataset.invoice_detail_id;
@@ -1825,6 +1870,7 @@
                 }).then(() => {
                     input.value = value_old;
                     input.focus();
+                    hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(value_old);
                 });
                 return;
@@ -1840,10 +1886,12 @@
                 }).then(() => {
                     input.value = value_old;
                     input.focus();
+                    hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(value_old);
                 });
                 return;
             }
+            hitungSubTotal(row, ppn_code, ppn);
             updateSpan(balance);
         } else {
             // ADD
@@ -1858,6 +1906,7 @@
                 }).then(() => {
                     input.value = input.dataset.balance;
                     input.focus();
+                    hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(balance);
                 });
                 return;
@@ -1873,10 +1922,12 @@
                 }).then(() => {
                     input.value = input.dataset.balance;
                     input.focus();
+                    hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(balance);
                 });
                 return;
             }
+            hitungSubTotal(row, ppn_code, ppn);
             updateSpan(balance);
         }
 
@@ -2543,4 +2594,9 @@
         // Set nilai jatuh tempo
         $('#jatuh_tempo').val(formatted);
     }
+    $(document).on('click','#btn-print', function(){
+        setTimeout(function(){
+            $('#loading').hide();
+        },300);
+    });
 </script>

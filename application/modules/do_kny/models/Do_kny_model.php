@@ -401,4 +401,50 @@ class Do_kny_model extends CI_Model
         }
         return true;
     }
+
+    public function get_do_detail($id){
+        $this->db->select("
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
+            w.WAREHOUSE_NAME,
+            ps.SITE_NAME, ps.ADDRESS1, ps.ADDRESS2, ps.ADDRESS3, ps.CITY,
+            k.FIRST_NAME SALES,k.LAST_NAME SALES_LAST_NAME,
+        ");
+        $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        $this->db->from('inventory_out a');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('person_site ps', 'a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
+        $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
+        $this->db->where('a.INVENTORY_OUT_ID',$id);
+        return $this->db->get();
+    }
+
+    public function get_do_detail_by_inventory_out_id($inventory_out_id)
+    {
+        $sql = "SELECT
+            i.ITEM_DESCRIPTION Nama_Item,
+            i.ITEM_CODE Kode_Item,
+            a.ENTERED_QTY Qty,
+            a.ENTERED_UOM UoM,
+            a.KET MEMO,
+            s.DOCUMENT_NO No_SO,
+            b.DOCUMENT_NO No_MR,
+            w.WAREHOUSE_NAME S_Loc,
+            a.NOTE Note,
+            a.INVENTORY_OUT_DETAIL_ID,
+            a.INVENTORY_OUT_ID,
+            a.BUILD_ID,
+            w.WAREHOUSE_ID
+        FROM
+            inventory_out_detail a
+            JOIN item i ON a.ITEM_ID = i.ITEM_ID
+            JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+            JOIN build b ON a.BUILD_ID = b.BUILD_ID
+            join so_detail sd ON a.SO_DETAIL_ID = sd.SO_DETAIL_ID
+            join so s ON sd.SO_ID = s.SO_ID
+        WHERE
+            a.INVENTORY_OUT_ID = '{$inventory_out_id}'";
+
+        return $this->db->query($sql);
+    }
 }
