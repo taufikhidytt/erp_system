@@ -4,7 +4,7 @@
 
 <table class="info-container" cellspacing="0" cellpadding="0">
     <tr>
-        <td class="info-card" style="border-left: 4px solid #8a9e8c;">
+        <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>No Transaksi</td><td class="info-dots">:</td><td><?= $mrq->DOCUMENT_NO ?></td></tr>
                 <tr><td>Ship To</td><td class="info-dots">:</td><td><?= $mrq->SHIP_TO ?? '-' ?></td></tr>
@@ -17,7 +17,7 @@
             </table>
         </td>
         <td width="4%"></td>
-        <td class="info-card" style="border-left: 4px solid #c4a49a;">
+        <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($mrq->DOCUMENT_DATE)) ?></td></tr>
                 <tr><td>Ship Date</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($mrq->SHIP_DATE)) ?></td></tr>
@@ -31,7 +31,7 @@
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
-        <td colspan="3" class="info-card" style="border-left: 4px solid #8a9e8c;">
+        <td colspan="3" class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Note : <?= $mrq->NOTE??'-' ?></td>
             </table>

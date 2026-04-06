@@ -4,7 +4,7 @@
 
 <table class="info-container" cellspacing="0" cellpadding="0">
     <tr>
-        <td class="info-card" style="border-left: 4px solid #8a9e8c;">
+        <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>No Transaksi</td><td class="info-dots">:</td><td><?= $rsp->DOCUMENT_NO ?></td></tr>
                 <tr><td>Supplier</td><td class="info-dots">:</td><td><?= $rsp->SUPPLIER ?? '-' ?></td></tr>
@@ -12,7 +12,7 @@
             </table>
         </td>
         <td width="4%"></td>
-        <td class="info-card" style="border-left: 4px solid #c4a49a;">
+        <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($rsp->DOCUMENT_DATE)) ?></td></tr>
                 <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $rsp->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
@@ -21,7 +21,7 @@
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
-        <td colspan="3" class="info-card" style="border-left: 4px solid #8a9e8c;">
+        <td colspan="3" class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Note : <?= $rsp->NOTE??'-' ?></td>
             </table>

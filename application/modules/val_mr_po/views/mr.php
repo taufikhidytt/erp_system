@@ -8,8 +8,9 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nomor Transaksi SO</th>
-                        <th>Nomor Transaksi MR</th>
+                        <th>No. SO</th>
+                        <th>No. MR</th>
+                        <th>No. PO Customer</th>
                         <th>Nama Item SO</th>
                         <th>Nama Item MR</th>
                         <th class="text-end">QTY MR</th>
@@ -34,6 +35,7 @@
                             <td><?= ($no++) ?></td>
                             <td><?= $item['SO_No'] ?></td>
                             <td><?= $item['MR_No'] ?></td>
+                            <td><?= $item['PO_NO'] ?></td>
                             <td><?= $item['SO_Nama_Item'] ?></td>
                             <td><?= $item['MR_Nama_Item'] ?></td>
                             <td class="text-end"><?= number_format($item['MR_Qty'],2,'.',',') ?></td>

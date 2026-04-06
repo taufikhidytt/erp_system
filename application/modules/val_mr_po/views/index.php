@@ -28,7 +28,7 @@
                         <div class="row">
                             <div class="col-xxl-4 col-md-6">
                                 <div class="mb-3">
-                                    <label for="so_id" class="form-label">Nomor PO</label>
+                                    <label for="so_id" class="form-label">Nomor PO Customer / Sales Order</label>
                                     <span class="text-danger">*</span>
                                     <div class="input-group">
                                         <span class="input-group-text">

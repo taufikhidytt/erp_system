@@ -48,7 +48,6 @@
         </tr>
         <tr>
             <th width="5%">No</th>
-            <th width="12%">No SO</th>
             <th width="12%">No MR</th>
             <th width="22%">Nama Item</th> <th width="18%">Memo</th>
             <th width="8%" style="text-align:right !important">Jumlah</th>
@@ -59,7 +58,6 @@
         <?php foreach ($do_detail as $k => $v) { ?>
             <tr>
                 <td><?=  $k+1 ?></td>
-                <td><?= $v->No_SO ?></td>
                 <td><?= $v->No_MR ?></td>
                 <td><?= $v->Nama_Item ?></td>
                 <td><?= $v->MEMO ?? '-' ?></td>

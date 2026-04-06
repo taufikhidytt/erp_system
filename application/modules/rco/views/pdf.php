@@ -4,7 +4,7 @@
 
 <table class="info-container" cellspacing="0" cellpadding="0">
     <tr>
-        <td class="info-card" style="border-left: 4px solid #8a9e8c;">
+        <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>No Transaksi</td><td class="info-dots">:</td><td><?= $rco->DOCUMENT_NO ?></td></tr>
                 <tr><td>Site Storage</td><td class="info-dots">:</td><td><?= $rco->WAREHOUSE_NAME ?? '-' ?></td></tr>
@@ -12,7 +12,7 @@
             </table>
         </td>
         <td width="4%"></td>
-        <td class="info-card" style="border-left: 4px solid #c4a49a;">
+        <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($rco->DOCUMENT_DATE)) ?></td></tr>
                 <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $rco->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
@@ -21,7 +21,7 @@
     </tr>
     <tr><td colspan="3">&nbsp;</td></tr>
     <tr>
-        <td colspan="3" class="info-card" style="border-left: 4px solid #8a9e8c;">
+        <td colspan="3" class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Note : <?= $rco->NOTE??'-' ?></td>
             </table>

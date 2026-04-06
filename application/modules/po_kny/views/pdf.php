@@ -16,7 +16,6 @@
         <td class="info-card" style="border-left: 4px polid #8a9e8c;">
             <table width="100%" class="info-row">
                 <tr><td style="min-width: 70px !important;">No Transaksi</td><td class="info-dots">:</td><td><?= $po->DOCUMENT_NO ?></td></tr>
-                <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $po->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
                 <tr><td>Supplier</td><td class="info-dots">:</td><td><?= $po->Customer ?? '-' ?></td></tr>
                 <tr><td>Location</td><td class="info-dots">:</td><td><?= ($po->ADDRESS1 ?? '-').($po->CITY?' '.$po->CITY:'') ?></td></tr>
             </table>
@@ -25,6 +24,7 @@
         <td class="info-card" style="border-left: 4px polid #c4a49a;">
             <table width="100%" class="info-row">
                 <tr><td style="width: 70px !important;">Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($po->DOCUMENT_DATE)) ?></td></tr>
+                <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $po->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
                 <tr><td>Payment Term</td><td class="info-dots">:</td><td><?= $po->PAYMENT_TERM_NAME ?? '-' ?></td></tr>
                 <tr><td>Storage</td><td class="info-dots">:</td><td><?= $po->WAREHOUSE_NAME ?? '-' ?></td></tr>
                 </table>
@@ -78,8 +78,20 @@
     </tbody>
     <tfoot>
         <tr class="total-row">
-            <td colspan="8" style="text-align:center !important">TOTAL</td>
+            <td colspan="8" style="text-align:right !important">TOTAL</td>
             <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_AMOUNT,2,'.',',') ?></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="8" style="text-align:right !important">Diskon</td>
+            <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_DISCOUNT,2,'.',',') ?></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="8" style="text-align:right !important">PPN</td>
+            <td colspan="2" style="text-align:right !important"><?= number_format($po->PPN_AMOUNT,2,'.',',') ?></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="8" style="text-align:right !important">GRAND TOTAL</td>
+            <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_NET,2,'.',',') ?></td>
         </tr>
     </tfoot>
 </table>
