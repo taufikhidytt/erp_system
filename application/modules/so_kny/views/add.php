@@ -120,18 +120,6 @@
                                         <div class="mb-3">
                                             <textarea name="address" id="address" class="form-control" disabled></textarea>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="tanggal">Tanggal:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-calendar-2-fill"></i>
-                                                </span>
-                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
-                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? date('Y-m-d\TH:i') ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('tanggal') ?></div>
-                                        </div>
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6 col-sm-12">
                                                 <div class="mb-3">
@@ -183,6 +171,18 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="tanggal">Tanggal:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
+                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? date('Y-m-d\TH:i') ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('tanggal') ?></div>
+                                        </div>
                                         <div class="mb-3">
                                             <label for="storage">Storage:</label>
                                             <span class="text-danger">*</span>
