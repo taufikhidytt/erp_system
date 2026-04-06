@@ -64,7 +64,7 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <form action="" method="post">
+                        <form action="" method="post" id="myForm">
                             <div class="row mb-2">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <span class="border border-1 border-dark p-2" id="statusPoId"></span>
@@ -83,7 +83,7 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
-                                    <a href="<?= site_url('po_kny/print/'.base64url_encode($this->encrypt->encode($data->INVOICE_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                    <a href="<?= site_url('po_kny/print/' . base64url_encode($this->encrypt->encode($data->INVOICE_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
                                         <i class="ri ri-printer-fill"></i>
                                     </a>
                                 </div>
@@ -2594,9 +2594,9 @@
         // Set nilai jatuh tempo
         $('#jatuh_tempo').val(formatted);
     }
-    $(document).on('click','#btn-print', function(){
-        setTimeout(function(){
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
             $('#loading').hide();
-        },300);
+        }, 300);
     });
 </script>
