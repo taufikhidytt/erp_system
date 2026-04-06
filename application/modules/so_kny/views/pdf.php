@@ -80,8 +80,20 @@
     </tbody>
     <tfoot>
         <tr class="total-row">
-            <td colspan="8" style="text-align:center !important">TOTAL</td>
+            <td colspan="8" style="text-align:right !important">TOTAL</td>
             <td colspan="2" style="text-align:right !important"><?= number_format($so->TOTAL_AMOUNT,2,'.',',') ?></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="8" style="text-align:right !important">Diskon</td>
+            <td colspan="2" style="text-align:right !important"><?= number_format($so->TOTAL_DISCOUNT,2,'.',',') ?></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="8" style="text-align:right !important">PPN</td>
+            <td colspan="2" style="text-align:right !important"><?= number_format($so->PPN_AMOUNT,2,'.',',') ?></td>
+        </tr>
+        <tr class="total-row">
+            <td colspan="8" style="text-align:right !important">GRAND TOTAL</td>
+            <td colspan="2" style="text-align:right !important"><?= number_format($so->TOTAL_NET,2,'.',',') ?></td>
         </tr>
     </tfoot>
 </table>

@@ -64,7 +64,7 @@
             <div class="col-12">
                 <div class="card border-2">
                     <div class="card-body">
-                        <form action="" method="post">
+                        <form action="" method="post" id="myForm">
                             <div class="row mb-2">
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <span class="border border-1 border-dark p-2" id="statusSoId"></span>

@@ -355,7 +355,7 @@ class So_kny_model extends CI_Model
     public function get_so_detail($id){
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,a.JTEMPO,
-            a.PO_NO PO_Customer,
+            a.PO_NO PO_Customer, a.TOTAL_DISCOUNT,a.PPN_AMOUNT,a.TOTAL_NET,
             w.WAREHOUSE_NAME,
             ps.SITE_NAME, ps.ADDRESS1, ps.ADDRESS2, ps.ADDRESS3, ps.CITY,
             py.PAYMENT_TERM_NAME,
