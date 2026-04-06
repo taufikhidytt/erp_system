@@ -345,4 +345,22 @@ class Mrq_model extends CI_Model
         }
         return true;
     }
+
+    public function get_mrq_detail($id){
+        $this->db->select("
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
+            a.ENTERED_QTY,a.ENTERED_UOM,a.HOUR_MINUTES,a.SHIP_DATE,a.REFF_PR,a.UNIT,a.LOKASI,
+            w.WAREHOUSE_NAME,
+            ps.SITE_NAME,ps.ADDRESS1,ps.ADDRESS2,ps.ADDRESS3,ps.CITY,
+            i.ITEM_NAME,
+        ");
+        $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SHIP_TO",true);
+        $this->db->from('build a');
+        $this->db->join('person p','a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('person_site ps','a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID', 'left');
+        $this->db->where('a.BUILD_ID',$id);
+        return $this->db->get();
+    }
 }

@@ -690,4 +690,22 @@ class Rcv extends Back_Controller
         }
         echo json_encode($data);
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $rcv    = $this->rcv->get_rcv_detail($id)->row();
+        if($rcv){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'rcv/pdf',
+                'data' => [
+                    'rcv' => $rcv,
+                    'rcv_detail' => $this->rcv->get_detail_by_tag_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $rcv->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $rcv->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

@@ -89,6 +89,9 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
+                                    <a href="<?= site_url('mrq/print/'.base64url_encode($this->encrypt->encode($data->BUILD_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                        <i class="ri ri-printer-fill"></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="row">
@@ -222,16 +225,7 @@
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
-                                        <div class="mb-3">
-                                            <label for="hour_minutes">Hour Minutes:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-map-pin-time-fill"></i>
-                                                </span>
-                                                <input type="text" name="hour_minutes" id="hour_minutes" class="form-control <?= form_error('hour_minutes') ? 'is-invalid' : null; ?>" placeholder="Enter Hour Minutes" value="<?= $this->input->post('hour_minutes') ?? $data->HOUR_MINUTES; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('hour_minutes') ?></div>
-                                        </div>
+                                        
                                         <div class="mb-3">
                                             <label for="tanggal">Tanggal:</label>
                                             <span class="text-danger">*</span>
@@ -294,6 +288,16 @@
                                                 <input type="text" name="code" id="code" class="form-control <?= form_error('code') ? 'is-invalid' : null; ?>" placeholder="Enter Code" value="<?= $this->input->post('code') ?? $data->LOKASI; ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('code') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="hour_minutes">Hour Minutes:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-map-pin-time-fill"></i>
+                                                </span>
+                                                <input type="text" name="hour_minutes" id="hour_minutes" class="form-control <?= form_error('hour_minutes') ? 'is-invalid' : null; ?>" placeholder="Enter Hour Minutes" value="<?= $this->input->post('hour_minutes') ?? $data->HOUR_MINUTES; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('hour_minutes') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
@@ -2055,4 +2059,10 @@
             });
         }
     }
+
+    $(document).on('click','#btn-print', function(){
+        setTimeout(function(){
+            $('#loading').hide();
+        },300);
+    });
 </script>

@@ -157,8 +157,11 @@
                                                 </span>
                                                 <input type="text" name="sales" id="sales" class="form-control" placeholder="Enter Sales" value="<?= $this->input->post('sales') ?? $data->FIRST_NAME . " [" . $data->LAST_NAME . "]"; ?>" readonly>
                                                 <input type="hidden" name="sales_id" id="sales_id" value="<?= $this->input->post('sales_id') ?? $data->KARYAWAN_ID; ?>">
+                                                <input type="hidden" name="so_id" id="so_id" value="<?= $this->input->post('so_id') ?? $data->SO_ID; ?>">
                                                 <input type="hidden" name="ppn_code" id="ppn_code" value="<?= $this->input->post('ppn_code') ?? $data->PPN_CODE; ?>">
                                                 <input type="hidden" name="ppn_percen" id="ppn_percen" value="<?= $this->input->post('ppn_percen') ?? $data->PPN_PERCEN; ?>">
+                                                <input type="hidden" name="pph_code" id="pph_code" value="<?= $this->input->post('pph_code') ?? $data->PPH_CODE; ?>">
+                                                <input type="hidden" name="pph_percen" id="pph_percen" value="<?= $this->input->post('pph_percen') ?? $data->PPH_PERCEN; ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('sales') ?></div>
                                         </div>
@@ -758,6 +761,7 @@
                 let nomor = tableDetail.rows().count() + 1;
 
                 let no_transaksi = oldDetail.no_transaksi[i] ?? '';
+                let no_mr = oldDetail.no_mr[i] ?? '';
                 let so_detail_id = oldDetail.so_detail_id[i] ?? '';
                 let item_id = oldDetail.item_id[i] ?? '';
                 let build_id = oldDetail.build_id[i] ?? '';
@@ -804,6 +808,12 @@
                     <input type="hidden" name="detail[no_transaksi][]" value="${no_transaksi}">
                     `,
 
+                    `<span class="ellipsis" title="${no_mr}">
+                        ${ellipsis(no_mr)}
+                    </span>
+                    <input type="hidden" name="detail[no_mr][]" value="${no_mr}">
+                    `,
+
                     `<span class="ellipsis" title="${nama_item}">
                     ${ellipsis(nama_item)}
                     </span>
@@ -839,6 +849,14 @@
                 dropdownParent: $(this).parent(),
             });
         });
+
+        <?php if (isset($warning)): ?>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: <?= json_encode($warning) ?>
+            });
+        <?php endif; ?>
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -1005,7 +1023,7 @@
                                 item.PERSON_NAME + " - [" + item.PERSON_CODE + "]",
                                 item.WAREHOUSE_NAME,
                                 item.FIRST_NAME + " - [" + item.LAST_NAME + "]",
-                                item.SO_ID
+                                item.SO_ID,
                             ]);
                         });
                         tableItem.draw();
@@ -1556,6 +1574,8 @@
                 let nama_karyawan = childCheckbox.data("karyawan");
                 let ppn_code = childCheckbox.data("ppn_code");
                 let ppn_percen = childCheckbox.data("ppn_percen");
+                let pph_code = childCheckbox.data("pph_code");
+                let pph_percen = childCheckbox.data("pph_percen");
                 let diskon_price = childCheckbox.data("diskon_price");
                 let diskon_persen = childCheckbox.data("diskon_persen");
                 let diskon_input = childCheckbox.data("diskon_input");
@@ -1570,7 +1590,6 @@
                 // Ambil data parent dari tableItem
                 var parentDataTable = tableItem.row(parentRow).data();
                 let no_transaksi = parentDataTable ? parentDataTable[5] : '-'; // No Transaksi ada di index 5
-                let no_so = parentDataTable ? parentDataTable[3] : '-'; // No SO ada di index 3
 
                 // ==========================================
                 // Cegah duplicate - skip jika sudah ada di table detail
@@ -1586,8 +1605,11 @@
 
                 $('#sales').val(nama_karyawan);
                 $('#sales_id').val(karyawan_id);
+                $('#so_id').val(so_id);
                 $('#ppn_code').val(ppn_code);
                 $('#ppn_percen').val(ppn_percen);
+                $('#pph_code').val(pph_code);
+                $('#pph_percen').val(pph_percen);
                 $('#po_customer').val(po_no);
 
                 let rowNode = tableDetail.row.add([

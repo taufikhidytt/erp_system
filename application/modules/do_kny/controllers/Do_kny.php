@@ -38,6 +38,7 @@ class Do_kny extends Back_Controller
                 ' . ($do_kny->No_Transaksi ? $do_kny->No_Transaksi : '-') . '
             </a>';
             $row['po_customer'] = $do_kny->PO_Customer ? $do_kny->PO_Customer : '-';
+            $row['no_so'] = $do_kny->NO_SO ? $do_kny->NO_SO : '-';
             $row['tanggal'] = $do_kny->Tanggal ? date('Y-m-d H:i', strtotime($do_kny->Tanggal)) : '-';
             $row['customer'] = $do_kny->Customer ? $do_kny->Customer : '-';
             $row['sales'] = $do_kny->Sales ? $do_kny->Sales : '-';
@@ -155,7 +156,11 @@ class Do_kny extends Back_Controller
                 w.WAREHOUSE_NAME,
                 k.KARYAWAN_ID,
                 k.FIRST_NAME,
-                k.LAST_NAME 
+                k.LAST_NAME,
+                a.PPN_CODE,
+                a.PPN_PERCEN,
+                a.PPH_CODE,
+                a.PPH_PERCEN
             FROM
                 so a
                 JOIN so_detail b ON a.SO_ID = b.SO_ID
@@ -171,9 +176,7 @@ class Do_kny extends Back_Controller
                 AND bl.APPROVED_FLAG = 'Y' 
                 AND bl.DOCUMENT_TYPE_ID = 3 
                 AND w.WAREHOUSE_ID = {$storage}
-                
                 AND psn.PERSON_ID = {$customer}
-                
             GROUP BY
                 a.SO_ID 
             ORDER BY
@@ -218,7 +221,7 @@ class Do_kny extends Back_Controller
 
             foreach ($list->result() as $d) {
                 $data[] = [
-                    "checkbox"      => '<input type="checkbox" class="childCheckbox" data-so_detail_id="' . $d->SO_DETAIL_ID . '" data-so_id="' . $d->SO_ID . '" data-no_mr="' . $d->DOCUMENT_NO . '", data-build_id="' . $d->BUILD_ID . '" data-item_id="' . $d->ITEM_ID . '" data-kode_item="' . htmlspecialchars($d->ITEM_CODE ?? '') . '" data-nama_item="' . htmlspecialchars($d->ITEM_DESCRIPTION ?? '') . '" data-jumlah="' . $d->ENTERED_QTY . '" data-base_qty="' . $d->BASE_QTY . '" data-sisa="' . $d->BALANCE . '" data-satuan="' . $d->ENTERED_UOM . '" data-unit_price="' . $d->UNIT_PRICE . '" data-subtotal="' . $d->SUBTOTAL . '" data-harga_input="' . $d->HARGA_INPUT . '" data-berat="' . $d->BERAT . '" data-note="' . htmlspecialchars($d->NOTE ?? '') . '" data-memo="' . htmlspecialchars($d->DESKRIPSI ?? '') . '" data-po_no="' . $d->PO_NO . '" data-karyawan_id="' . $d->KARYAWAN_ID . '" data-ppn_code="' . $d->PPN_CODE . '" data-ppn_percen="' . $d->PPN_PERCEN . '" data-karyawan="' . $d->FIRST_NAME . ' [' . $d->LAST_NAME . ']" data-diskon_price="' . $d->DISCOUNT_PRICE . '" data-hpp="' . $d->HPP . '" data-diskon_input="' . $d->DISKON_INPUT . '" data-diskon_persen="' . $d->DISCOUNT_PERCEN . '">',
+                    "checkbox"      => '<input type="checkbox" class="childCheckbox" data-so_detail_id="' . $d->SO_DETAIL_ID . '" data-so_id="' . $d->SO_ID . '" data-no_mr="' . $d->DOCUMENT_NO . '", data-build_id="' . $d->BUILD_ID . '" data-item_id="' . $d->ITEM_ID . '" data-kode_item="' . htmlspecialchars($d->ITEM_CODE ?? '') . '" data-nama_item="' . htmlspecialchars($d->ITEM_DESCRIPTION ?? '') . '" data-jumlah="' . $d->ENTERED_QTY . '" data-base_qty="' . $d->BASE_QTY . '" data-sisa="' . $d->BALANCE . '" data-satuan="' . $d->ENTERED_UOM . '" data-unit_price="' . $d->UNIT_PRICE . '" data-subtotal="' . $d->SUBTOTAL . '" data-harga_input="' . $d->HARGA_INPUT . '" data-berat="' . $d->BERAT . '" data-note="' . htmlspecialchars($d->NOTE ?? '') . '" data-memo="' . htmlspecialchars($d->DESKRIPSI ?? '') . '" data-po_no="' . $d->PO_NO . '" data-karyawan_id="' . $d->KARYAWAN_ID . '" data-ppn_code="' . $d->PPN_CODE . '" data-ppn_percen="' . $d->PPN_PERCEN . '" data-pph_code="' . $d->PPH_CODE . '" data-pph_percen="' . $d->PPH_PERCEN . '" data-karyawan="' . $d->FIRST_NAME . ' [' . $d->LAST_NAME . ']" data-diskon_price="' . $d->DISCOUNT_PRICE . '" data-hpp="' . $d->HPP . '" data-diskon_input="' . $d->DISKON_INPUT . '" data-diskon_persen="' . $d->DISCOUNT_PERCEN . '">',
                     "no"            => $no++,
                     "no_mr"         => $d->DOCUMENT_NO,
                     "kode_item"     => $d->ITEM_CODE,
@@ -373,8 +376,17 @@ class Do_kny extends Back_Controller
                     $error = $this->db->error();
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('do_kny/add');
+                        $data['title'] = 'Tambah DO KNY';
+                        $data['breadcrumb'] = 'Tambah DO KNY';
+                        $data['customer'] = $this->do_kny->get_customer();
+                        $data['storage'] = $this->do_kny->get_storage();
+                        $data['detail'] = $this->input->post('detail');
+                        $data['warning'] =  $error['message'];
+                        $this->template->load('template', 'do_kny/add', $data);
+                        return;
+
+                        // $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                        // redirect('do_kny/add');
                     }
                 }
 
@@ -395,6 +407,9 @@ class Do_kny extends Back_Controller
                     'KARYAWAN_ID'           => $post['sales_id'],
                     'PPN_CODE'              => $post['ppn_code'],
                     'PPN_PERCEN'            => $post['ppn_percen'],
+                    'SO_ID'                 => $post['so_id'],
+                    'PPH_CODE'              => $post['pph_code'],
+                    'PPH_PERCEN'            => $post['pph_percen'],
                     'NOTE'                  => $post['keterangan'],
                     'KONSINYASI_FLAG'       => 'Y',
                     'CREATED_BY'            => $this->session->userdata('id'),
@@ -407,8 +422,17 @@ class Do_kny extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('do_kny/add');
+                    $data['title'] = 'Tambah DO KNY';
+                    $data['breadcrumb'] = 'Tambah DO KNY';
+                    $data['customer'] = $this->do_kny->get_customer();
+                    $data['storage'] = $this->do_kny->get_storage();
+                    $data['detail'] = $this->input->post('detail');
+                    $data['warning'] =  $error['message'];
+                    $this->template->load('template', 'do_kny/add', $data);
+                    return;
+
+                    // $this->session->set_flashdata('warning', $error['message']);
+                    // redirect('do_kny/add');
                 }
 
                 // ======================
@@ -589,6 +613,9 @@ class Do_kny extends Back_Controller
                     'KARYAWAN_ID'           => $post['sales_id'],
                     'PPN_CODE'              => $post['ppn_code'],
                     'PPN_PERCEN'            => $post['ppn_percen'],
+                    'SO_ID'                 => $post['so_id'],
+                    'PPH_CODE'              => $post['pph_code'],
+                    'PPH_PERCEN'            => $post['pph_percen'],
                     'NOTE'                  => $post['keterangan'],
                     'KONSINYASI_FLAG'       => 'Y',
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
@@ -598,9 +625,9 @@ class Do_kny extends Back_Controller
                 // ===============================
                 // COMMIT / ROLLBACK
                 // ===============================
-                if ($this->db->trans_status() === FALSE) {
+                $error = $this->db->error();
+                if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $error = $this->db->error();
                     $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
                 } else {
                     $this->db->trans_commit();

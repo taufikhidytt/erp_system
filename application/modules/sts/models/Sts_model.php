@@ -203,4 +203,17 @@ class Sts_model extends CI_Model
         }
         return true;
     }
+
+    public function get_sts_detail($id){
+        $this->db->select("
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
+            w.WAREHOUSE_NAME,
+            to_w.WAREHOUSE_NAME as TO_WAREHOUSE_NAME,
+        ");
+        $this->db->from('tag_konsi a');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('warehouse to_w', 'a.TO_WH_ID = to_w.WAREHOUSE_ID');
+        $this->db->where('a.TAG_KONSI_ID',$id);
+        return $this->db->get();
+    }
 }

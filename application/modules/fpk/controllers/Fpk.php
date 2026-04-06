@@ -641,4 +641,22 @@ class Fpk extends Back_Controller
             ];
         }));
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $fpk    = $this->fpk->get_fpk_detail($id)->row();
+        if($fpk){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'fpk/pdf',
+                'data' => [
+                    'fpk' => $fpk,
+                    'fpk_detail' => $this->fpk->get_detail_by_pr_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $fpk->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $fpk->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

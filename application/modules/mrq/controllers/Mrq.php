@@ -843,4 +843,22 @@ class Mrq extends Back_Controller
             ];
         }));
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $mrq    = $this->mrq->get_mrq_detail($id)->row();
+        if($mrq){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'mrq/pdf',
+                'data' => [
+                    'mrq' => $mrq,
+                    'mrq_detail' => $this->mrq->get_detail_by_build_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $mrq->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $mrq->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

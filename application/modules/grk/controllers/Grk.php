@@ -600,7 +600,7 @@ class Grk extends Back_Controller
                 'satuan' => $row->Satuan,
                 'grk' => number_format((float)$row->GRK, 2, '.', ','),
                 'sts_rsp_mr' => number_format((float)$row->STS_RSP_MR, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'sisa' => number_format((float)$row->Sisa, 2, '.', ','),
             ];
         }));
     }
@@ -726,5 +726,23 @@ class Grk extends Back_Controller
             
         }
         echo json_encode($data);
+    }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $grk    = $this->grk->get_grk_detail($id)->row();
+        if($grk){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'grk/pdf',
+                'data' => [
+                    'grk' => $grk,
+                    'grk_detail' => $this->grk->get_detail_by_pr_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $grk->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $grk->DOCUMENT_NO), 'A4', 'portrait');
+        }
     }
 }

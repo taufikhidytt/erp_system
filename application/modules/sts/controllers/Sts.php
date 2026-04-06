@@ -696,4 +696,22 @@ class Sts extends Back_Controller
             ];
         }));
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $sts    = $this->sts->get_sts_detail($id)->row();
+        if($sts){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'sts/pdf',
+                'data' => [
+                    'sts' => $sts,
+                    'sts_detail' => $this->sts->get_detail_by_pr_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $sts->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $sts->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

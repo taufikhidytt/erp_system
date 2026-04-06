@@ -202,16 +202,6 @@
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <label for="hour_minutes">Hour Minutes:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-map-pin-time-fill"></i>
-                                                </span>
-                                                <input type="text" name="hour_minutes" id="hour_minutes" class="form-control <?= form_error('hour_minutes') ? 'is-invalid' : null; ?>" placeholder="Enter Hour Minutes" value="<?= $this->input->post('hour_minutes'); ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('hour_minutes') ?></div>
-                                        </div>
-                                        <div class="mb-3">
                                             <label for="tanggal">Tanggal:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -274,6 +264,16 @@
                                                 <input type="text" name="code" id="code" class="form-control <?= form_error('code') ? 'is-invalid' : null; ?>" placeholder="Enter Code" value="<?= $this->input->post('code'); ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('code') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="hour_minutes">Hour Minutes:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-map-pin-time-fill"></i>
+                                                </span>
+                                                <input type="text" name="hour_minutes" id="hour_minutes" class="form-control <?= form_error('hour_minutes') ? 'is-invalid' : null; ?>" placeholder="Enter Hour Minutes" value="<?= $this->input->post('hour_minutes'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('hour_minutes') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>

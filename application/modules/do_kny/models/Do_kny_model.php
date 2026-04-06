@@ -13,9 +13,10 @@ class Do_kny_model extends CI_Model
         null,
         null,
         "DISPLAY_NAME",
-        "DOCUMENT_NO",
-        "DOCUMENT_REFF_NO",
-        "DOCUMENT_DATE",
+        "a.DOCUMENT_NO",
+        "a.DOCUMENT_REFF_NO",
+        "s.DOCUMENT_NO",
+        "a.DOCUMENT_DATE",
         "Customer",
         "FIRST_NAME",
         "WAREHOUSE_NAME",
@@ -24,9 +25,10 @@ class Do_kny_model extends CI_Model
     var $column_search = array(
         null,
         "DISPLAY_NAME",
-        "DOCUMENT_NO",
-        "DOCUMENT_REFF_NO",
-        "DOCUMENT_DATE",
+        "a.DOCUMENT_NO",
+        "a.DOCUMENT_REFF_NO",
+        "s.DOCUMENT_NO",
+        "a.DOCUMENT_DATE",
         "CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE)",
         "FIRST_NAME",
         "WAREHOUSE_NAME",
@@ -41,6 +43,7 @@ class Do_kny_model extends CI_Model
         $this->db->distinct();
         $this->db->select("
             a.INVENTORY_OUT_ID,
+            a.SO_ID,
             b.DISPLAY_NAME STATUS,
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO PO_Customer,
@@ -49,13 +52,15 @@ class Do_kny_model extends CI_Model
             k.KARYAWAN_ID,
             k.FIRST_NAME Sales,
             w.WAREHOUSE_ID,
-            w.WAREHOUSE_NAME `S_Loc`
+            w.WAREHOUSE_NAME S_Loc,
+            s.DOCUMENT_NO NO_SO
         ");
         $this->db->from('inventory_out a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
+        $this->db->join('so s', 'a.SO_ID = s.SO_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 
         $i = 0;
@@ -114,6 +119,7 @@ class Do_kny_model extends CI_Model
         $this->db->distinct();
         $this->db->select("
             a.INVENTORY_OUT_ID,
+            a.SO_ID,
             b.DISPLAY_NAME STATUS,
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO PO_Customer,
@@ -122,13 +128,15 @@ class Do_kny_model extends CI_Model
             k.KARYAWAN_ID,
             k.FIRST_NAME Sales,
             w.WAREHOUSE_ID,
-            w.WAREHOUSE_NAME `S_Loc`
+            w.WAREHOUSE_NAME S_Loc,
+            s.DOCUMENT_NO NO_SO
         ");
         $this->db->from('inventory_out a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
+        $this->db->join('so s', 'a.SO_ID = s.SO_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
@@ -172,6 +180,8 @@ class Do_kny_model extends CI_Model
             a.PO_NO,
             a.PPN_CODE,
             a.PPN_PERCEN,
+            a.PPH_CODE,
+	        a.PPH_PERCEN,
             b.SO_DETAIL_ID,
             b.SO_ID,
             b.BUILD_ID,
@@ -184,46 +194,53 @@ class Do_kny_model extends CI_Model
             k.FIRST_NAME,
             k.LAST_NAME,
             b.DISCOUNT_PERCEN,
-        CASE
+            CASE
                 WHEN b.BASE_QTY = 0
-                OR b.BASE_QTY IS NULL THEN
-                    b.ENTERED_QTY ELSE b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY )
-                    END AS BALANCE,
-                b.ENTERED_UOM,
-                b.UNIT_PRICE,
-                b.DISCOUNT_PRICE,
-                b.SUBTOTAL,
-                    IF(
-                    bl.ITEM_ID IS NULL,
-                    bd.UNIT_PRICE - bd.DISCOUNT_PRICE,
-                    bl.TOTAL_AMOUNT
-                ) AS HPP,
-                bl.TOTAL_AMOUNT AS HPP,
-                b.HARGA_INPUT,
-                b.DISKON_INPUT,
-                i.BERAT,
-                b.NOTE,
-                b.DESKRIPSI
-            FROM
-                so a
-                JOIN so_detail b ON a.SO_ID = b.SO_ID
-                JOIN build bl ON b.BUILD_ID = bl.BUILD_ID
-                JOIN build_detail bd ON bl.BUILD_ID = bd.BUILD_ID
-                JOIN item i ON b.ITEM_ID = i.ITEM_ID
-                JOIN person psn ON a.PERSON_ID = psn.PERSON_ID
-                JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
-                JOIN karyawan k ON a.KARYAWAN_ID = k.KARYAWAN_ID
-            WHERE
-                b.ENTERED_QTY > 0
-                AND b.BASE_QTY > 0
-                AND b.RECEIVED_ENTERED_QTY < b.ENTERED_QTY * b.BASE_QTY / NULLIF( b.RECEIVED_BASE_QTY, 0 )
-                AND bl.APPROVED_FLAG = 'Y'
-                AND bl.DOCUMENT_TYPE_ID = {$tipe_id['TYPE_ID']}
-                AND w.WAREHOUSE_ID = {$storage}
-                AND psn.PERSON_ID = {$customer}
-                AND a.SO_ID = {$so_id}
-            ORDER BY
-            bl.DOCUMENT_DATE DESC,
+                OR b.BASE_QTY IS NULL
+                THEN b.ENTERED_QTY
+                ELSE b.ENTERED_QTY - (
+                    b.RECEIVED_ENTERED_QTY / b.BASE_QTY
+                )
+            END AS BALANCE,
+            b.ENTERED_UOM,
+            b.UNIT_PRICE,
+            b.DISCOUNT_PRICE,
+            b.SUBTOTAL,
+            IF(
+                bl.ITEM_ID IS NULL,
+                bd.UNIT_PRICE - bd.DISCOUNT_PRICE,
+                bl.TOTAL_AMOUNT
+            ) AS HPP,
+            b.HARGA_INPUT,
+            b.DISKON_INPUT,
+            i.BERAT,
+            b.NOTE,
+            b.DESKRIPSI
+        FROM
+            so a
+            JOIN so_detail b
+                ON a.SO_ID = b.SO_ID
+            JOIN build bl
+                ON b.BUILD_ID = bl.BUILD_ID
+            JOIN build_detail bd
+                ON bl.BUILD_ID = bd.BUILD_ID
+            JOIN item i
+                ON b.ITEM_ID = i.ITEM_ID
+            JOIN person psn
+                ON a.PERSON_ID = psn.PERSON_ID
+            JOIN warehouse w
+                ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+            JOIN karyawan k
+                ON a.KARYAWAN_ID = k.KARYAWAN_ID
+        WHERE b.ENTERED_QTY > 0
+            AND b.BASE_QTY > 0
+            AND b.RECEIVED_ENTERED_QTY < b.ENTERED_QTY * b.BASE_QTY / NULLIF(b.RECEIVED_BASE_QTY, 0)
+            AND bl.APPROVED_FLAG = 'Y'
+            AND bl.DOCUMENT_TYPE_ID = {$tipe_id['TYPE_ID']}
+            AND w.WAREHOUSE_ID = {$storage}
+            AND psn.PERSON_ID = {$customer}
+            AND a.SO_ID = {$so_id}
+        ORDER BY bl.DOCUMENT_DATE DESC,
             b.SO_DETAIL_ID";
 
         if ($limit !== null && $start !== null) {

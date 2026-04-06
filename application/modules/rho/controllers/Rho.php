@@ -644,4 +644,22 @@ class Rho extends Back_Controller
             ];
         }));
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $rho    = $this->rho->get_rho_detail($id)->row();
+        if($rho){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'rho/pdf',
+                'data' => [
+                    'rho' => $rho,
+                    'rho_detail' => $this->rho->get_detail_by_request_qty_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $rho->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $rho->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

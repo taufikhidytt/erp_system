@@ -479,11 +479,11 @@ class So_kny extends Back_Controller
                     'KARYAWAN_ID'           => $post['sales'],
                     'PPN_CODE'              => $post['PPN_CODE'],
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
+                    'PPH_CODE'              => 'NO PPH',
+                    'PPH_PERCEN'            => '0',
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
                     'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT'],
-
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
-
                     'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
                     'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
                     'TOTAL_NET'             => $post['TOTAL_NET'],
@@ -726,11 +726,11 @@ class So_kny extends Back_Controller
                     'KARYAWAN_ID'           => $post['sales'],
                     'PPN_CODE'              => $post['PPN_CODE'],
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
+                    'PPH_CODE'              => 'NO PPH',
+                    'PPH_PERCEN'            => '0',
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
                     'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT'],
-
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
-
                     'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
                     'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
                     'TOTAL_NET'             => $post['TOTAL_NET'],
@@ -882,12 +882,12 @@ class So_kny extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.SO_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
             'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'so_detail_id' => base64url_encode($this->encrypt->encode($row->SO_DETAIL_ID)),
@@ -901,7 +901,8 @@ class So_kny extends Back_Controller
         }));
     }
 
-    public function get_info_detail($detail_id){
+    public function get_info_detail($detail_id)
+    {
         $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
         $this->load->model('M_datatables', 'datatables');
         $params = [
@@ -910,7 +911,7 @@ class So_kny extends Back_Controller
                 'c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,
                     b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,a.INVENTORY_OUT_ID',
                 ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
-                
+
             ],
             'joins' => [
                 ['inventory_out_detail a', 'b.SO_DETAIL_ID = a.SO_DETAIL_ID', 'inner'],
@@ -919,13 +920,13 @@ class So_kny extends Back_Controller
             ],
             'where' => ['b.SO_DETAIL_ID' => $detail_id],
             'order' => ['b.SO_DETAIL_ID' => 'asc'],
-            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
-            'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
-                'no_transaksi' => '<a href="'.site_url('do_kny/detail/'.base64url_encode($this->encrypt->encode($row->INVENTORY_OUT_ID))).'" target="_blank">'.$row->No_Transaksi.'</a>',
+                'no_transaksi' => '<a href="' . site_url('do_kny/detail/' . base64url_encode($this->encrypt->encode($row->INVENTORY_OUT_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
                 'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),

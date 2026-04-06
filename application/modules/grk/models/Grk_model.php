@@ -209,4 +209,17 @@ class Grk_model extends CI_Model
         $this->db->update('po', $params);
         return ($this->db->error()['code'] == 0);
     }
+
+    public function get_grk_detail($id){
+        $this->db->select("
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
+            w.WAREHOUSE_NAME,
+        ");
+        $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER",true);
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->from('po a');
+        $this->db->where('a.PO_ID',$id);
+        return $this->db->get();
+    }
 }

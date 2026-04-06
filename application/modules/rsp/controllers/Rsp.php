@@ -642,4 +642,22 @@ class Rsp extends Back_Controller
                 'code'    => $db_error['code']
             ]));
     }
+
+    public function print($id){
+        $id     = (int) $this->encrypt->decode(base64url_decode($id));
+        $rsp    = $this->rsp->get_rsp_detail($id)->row();
+        if($rsp){
+            $this->load->library('pdf');
+            $data = [
+                'dir_view' => 'rsp/pdf',
+                'data' => [
+                    'rsp' => $rsp,
+                    'rsp_detail' => $this->rsp->get_detail_by_tag_pinjam_id($id)->result()
+                ],
+                'title' => str_replace('/',' ', $rsp->DOCUMENT_NO),
+            ];
+            $html = $this->load->view('template_pdf', $data, true);
+            $this->pdf->generate($html, str_replace('/',' ', $rsp->DOCUMENT_NO), 'A4', 'portrait');
+        }
+    }
 }

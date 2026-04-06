@@ -88,16 +88,19 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="3" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="date" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="date" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
                                         <tr class="align-content-center">
@@ -106,6 +109,7 @@
                                             <th>Status</th>
                                             <th>No Transaksi</th>
                                             <th>PO Customer</th>
+                                            <th>No SO</th>
                                             <th>Tanggal</th>
                                             <th>Customer</th>
                                             <th>Sales</th>
@@ -170,6 +174,10 @@
                 },
                 {
                     "data": "po_customer",
+                    "width": "10%",
+                },
+                {
+                    "data": "no_so",
                     "width": "10%",
                 },
                 {
