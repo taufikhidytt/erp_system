@@ -240,6 +240,7 @@ class Do_kny_model extends CI_Model
             AND w.WAREHOUSE_ID = {$storage}
             AND psn.PERSON_ID = {$customer}
             AND a.SO_ID = {$so_id}
+            GROUP BY b.SO_DETAIL_ID
         ORDER BY bl.DOCUMENT_DATE DESC,
             b.SO_DETAIL_ID";
 
