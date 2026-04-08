@@ -861,4 +861,69 @@ class Mrq extends Back_Controller
             $this->pdf->generate($html, str_replace('/',' ', $mrq->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
+
+    public function get_material(){
+        $item_id = (int) $this->input->post('item_id');
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'bom a',
+            'select' => [
+                'a.BOM_ID,a.DOCUMENT_NO,a.ENTERED_QTY,a.UOM_CODE,a.UNIT,a.LOKASI,a.NOTE,
+                i.ITEM_DESCRIPTION,i.ITEM_CODE',
+            ],
+            'joins'         => [ ['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner'] ],
+            'where'         => [ 'a.ITEM_ID' => $item_id ],
+            'where_raw'     => [ "( ( a.ACTIVE_FLAG = 'Y' AND a.END_DATE >= CURDATE()) OR ( CURDATE()  BETWEEN a.START_DATE AND a.END_DATE ) )" ],
+            'column_search' => ['a.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE','a.UNIT','a.LOKASI', 'a.NOTE'],
+            'column_order'  => [null, 'a.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE','a.UNIT','a.LOKASI', 'a.NOTE'],
+            'order'         => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
+            return [
+                'no' => $no,
+                'bom_id' => base64url_encode($this->encrypt->encode($row->BOM_ID)),
+                'document_no' => $row->DOCUMENT_NO,
+                'nama_item' => $row->ITEM_DESCRIPTION,
+                'kode_item' => $row->ITEM_CODE,
+                'satuan' => $row->UOM_CODE,
+                'qty' => number_format((float)$row->ENTERED_QTY, 2, '.', ','),
+                'unit' => $row->UNIT,
+                'code' => $row->LOKASI,
+                'note' => $row->NOTE,
+            ];
+        }));
+    }
+
+    public function get_material_detail(){
+        $bom_id = (int) $this->encrypt->decode(base64url_decode($this->input->post('bom_id')));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'bom_detail a',
+            'select' => [
+                'b.DOCUMENT_NO,a.ENTERED_QTY,a.ENTERED_UOM,a.NOTE,
+                i.ITEM_DESCRIPTION,i.ITEM_CODE',
+            ],
+            'joins'         => [ 
+                ['bom b', 'a.BOM_ID = b.BOM_ID', 'inner'],
+                ['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner'],
+            ],
+            'where'         => [ 'a.BOM_ID' => $bom_id ],
+            'column_search' => ['b.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
+            'column_order'  => [null, 'b.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
+            'order'         => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
+            return [
+                'no' => $no,
+                'document_no' => $row->DOCUMENT_NO,
+                'nama_item' => $row->ITEM_DESCRIPTION,
+                'kode_item' => $row->ITEM_CODE,
+                'satuan' => $row->ENTERED_UOM,
+                'qty' => number_format((float)$row->ENTERED_QTY, 2, '.', ','),
+                'note' => $row->NOTE,
+            ];
+        }));
+    }
 }

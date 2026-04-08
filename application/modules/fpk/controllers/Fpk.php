@@ -30,8 +30,8 @@ class Fpk extends Back_Controller
         foreach ($list as $fpk) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $fpk->Status ? $fpk->Status : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($fpk->Status,$fpk->Warna_Status);
             $row['no_transaksi'] = '
             <a href="' . base_url('fpk/detail/' . base64url_encode($this->encrypt->encode($fpk->PR_ID))) . '">
                 ' . ($fpk->No_Transaksi ? $fpk->No_Transaksi : '-') . '
@@ -121,7 +121,8 @@ class Fpk extends Back_Controller
                 ) AS STOK,
                 mr.DISPLAY_NAME AS BRAND,
                 tipe.DISPLAY_NAME AS TIPE,
-                i.JENIS_ID
+                i.JENIS_ID,
+                b.PRICE_BUY
             FROM
                 item i
                 JOIN ERP_LOOKUP_VALUE e
@@ -213,11 +214,15 @@ class Fpk extends Back_Controller
     public function getStatus()
     {
         $pr_id = $this->encrypt->decode($this->input->post('pr_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM pr a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PR_ID = {$pr_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME,b.MENU_ICON FROM pr a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PR_ID = {$pr_id}");
         if ($data->num_rows() > 0) {
+            $rows = $data->result();
+            foreach ($rows as $row) {
+                $row->badge_status = badge_status($row->DISPLAY_NAME,$row->MENU_ICON);
+            }
             $result = array(
                 'status' => 'sukses',
-                'data' => $data->result_array(),
+                'data' => $rows,
             );
         } else {
             $result = array(

@@ -232,34 +232,27 @@ class Mrq_model extends CI_Model
 
     public function get_item_finish_goods()
     {
-        return $this->db->query("SELECT DISTINCT
-                    i.ITEM_ID,
-                    b.BUILD_ID,
-                    b.DOCUMENT_NO,
-                    i.ITEM_CODE,
-                    LEFT ( i.ITEM_DESCRIPTION, 40 ) AS ITEM_DESCRIPTION,
-                    LEFT ( i.ASSY_CODE, 30 ) AS ASSY_CODE,
-                    LEFT ( e.DISPLAY_NAME, 30 ) AS CATEGORY,
-                    i.UOM_CODE,
-                    COALESCE ( s.STOK, 0 ) AS STOK,
-                    mr.DISPLAY_NAME AS BRAND,
-                    tipe.DISPLAY_NAME AS TIPE,
-                    i.JENIS_ID 
-                FROM
-                    item i
-                    JOIN erp_lookup_value e ON e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID
-                    JOIN erp_lookup_value tipe ON i.TYPE_ID = tipe.ERP_LOOKUP_VALUE_ID
-                    JOIN erp_lookup_value mr ON i.MEREK_ID = mr.ERP_LOOKUP_VALUE_ID
-                    LEFT JOIN ( SELECT ITEM_ID, SUM( QTY_AWAL + QTY_MASUK - QTY_KELUAR ) AS STOK FROM item_stok GROUP BY ITEM_ID ) s ON i.ITEM_ID = s.ITEM_ID
-                    LEFT JOIN build b ON i.ITEM_ID = b.ITEM_ID 
-                WHERE
-                    i.ACTIVE_FLAG = 'Y' 
-                    AND i.APPROVE_FLAG = 'Y' 
-                    AND i.TYPE_ID = FN_GET_VAR_VALUE ( 'INV' ) 
-                    AND i.JENIS_ID = FN_GET_VAR_VALUE ( 'GOODS' ) 
-                    AND i.ITEM_KMS = 'N' 
-                ORDER BY
-                    i.ITEM_CODE");
+        return $this->db->query("SELECT 
+                DISTINCT i.ITEM_ID, i.ITEM_CODE,
+                LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION,
+                LEFT(i.ASSY_CODE, 30) AS ASSY_CODE,
+                LEFT(e.DISPLAY_NAME, 30) AS CATEGORY, 
+                i.UOM_CODE, COALESCE(s.STOK, 0) AS STOK, 
+                mr.DISPLAY_NAME AS BRAND, 
+                tipe.DISPLAY_NAME AS TIPE, 
+                i.JENIS_ID
+            FROM item i
+            JOIN erp_lookup_value e ON e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID
+            JOIN erp_lookup_value tipe ON i.TYPE_ID = tipe.ERP_LOOKUP_VALUE_ID
+            JOIN erp_lookup_value mr ON i.MEREK_ID = mr.ERP_LOOKUP_VALUE_ID
+            JOIN (
+                SELECT ITEM_ID, SUM(QTY_AWAL + QTY_MASUK - QTY_KELUAR) AS STOK
+                FROM item_stok
+                GROUP BY ITEM_ID
+                ) s ON i.ITEM_ID = s.ITEM_ID
+            WHERE i.ACTIVE_FLAG = 'Y' AND i.APPROVE_FLAG = 'Y' AND i.TYPE_ID = FN_GET_VAR_VALUE ('INV') AND i.JENIS_ID = FN_GET_VAR_VALUE ('GOODS') AND i.ITEM_KMS = 'N'
+            ORDER BY i.ITEM_CODE
+        ");
     }
 
     public function get_ship_to()

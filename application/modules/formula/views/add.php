@@ -46,7 +46,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('fpk') ?>" class="text-decoration-underline">FPK</a>
+                                <a href="<?= base_url('formula') ?>" class="text-decoration-underline">Formula</a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>
@@ -87,124 +87,132 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="no_referensi">No Referensi:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
-                                                </span>
-                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi'); ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="supplier">Supplier:</label>
+                                            <label for="item_finish_goods">Item Finish Goods:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
+                                                    <i class="ri ri-stack-fill"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') ==  $sp->PERSON_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
+                                                <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Item Finish Goods --</option>
+                                                    <?php foreach ($item_finish_goods->result() as $ifg): ?>
+                                                        <option
+                                                            value="<?= $ifg->ITEM_ID ?>"
+                                                            data-description="<?= htmlspecialchars($ifg->ITEM_DESCRIPTION) ?>"
+                                                            <?= set_value('item_finish_goods') ==  $ifg->ITEM_ID ? 'selected' :  '' ?>>
+                                                            <?= strtoupper($ifg->ITEM_DESCRIPTION . " ~ " . $ifg->ITEM_CODE) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
+                                                <input type="hidden" name="item_description" id="item_description" value="">
                                             </div>
-                                            <div class="text-danger"><?= form_error('supplier') ?></div>
+                                            <div class="text-danger"><?= form_error('item_finish_goods') ?></div>
                                         </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="satuan" id="label_satuan">Satuan:</label>
+                                            <!-- <span class="text-danger">*</span> -->
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-paint-fill"></i>
+                                                </span>
+                                                <select name="satuan" id="satuan" class="form-control select2 <?= form_error('satuan') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Satuan --</option>
+                                                </select>
+                                                <input type="hidden" name="base_qty" id="base_qty">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('satuan') ?></div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-lg-6 col-md-6 col-sm-12">
                                                 <div class="mb-3">
-                                                    <label for="tanggal">Tanggal:</label>
-                                                    <span class="text-danger">*</span>
+                                                    <label for="unit">Unit:</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">
-                                                            <i class="ri ri-calendar-2-fill"></i>
+                                                            <i class="ri ri-price-tag-3-fill"></i>
                                                         </span>
-                                                        <?php date_default_timezone_set('Asia/Jakarta'); ?>
-                                                        <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? date('Y-m-d\TH:i') ?>">
+                                                        <input type="text" name="unit" id="unit" class="form-control <?= form_error('unit') ? 'is-invalid' : null; ?>" placeholder="Enter Unit" value="<?= $this->input->post('unit'); ?>">
                                                     </div>
-                                                    <div class="text-danger"><?= form_error('tanggal') ?></div>
+                                                    <div class="text-danger"><?= form_error('unit') ?></div>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6 col-md-6 col-sm-12">
                                                 <div class="mb-3">
-                                                    <label for="tanggal_dibutuhkan">Tanggal Dibutuhkan:</label>
-                                                    <span class="text-danger">*</span>
+                                                    <label for="code">Code:</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text">
-                                                            <i class="ri ri-calendar-event-fill"></i>
+                                                            <i class="ri ri-barcode-line"></i>
                                                         </span>
-                                                        <input type="datetime-local" name="tanggal_dibutuhkan" id="tanggal_dibutuhkan" class="form-control <?= form_error('tanggal_dibutuhkan') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal Dibutuhkan" value="<?= $this->input->post('tanggal_dibutuhkan'); ?>">
+                                                        <input type="text" name="code" id="code" class="form-control <?= form_error('code') ? 'is-invalid' : null; ?>" placeholder="Enter Code" value="<?= $this->input->post('code'); ?>">
                                                     </div>
-                                                    <div class="text-danger"><?= form_error('tanggal_dibutuhkan') ?></div>
+                                                    <div class="text-danger"><?= form_error('code') ?></div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="gudang">Gudang:</label>
-                                            <span class="text-danger">*</span>
+                                            <label for="keterangan">Keterangan:</label>
                                             <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-home-gear-fill"></i>
-                                                </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($gudang->result() as $gd) {
-                                                    if ($gd->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $gd->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Gudang --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($gudang->result() as $gd): ?>
-                                                        <option
-                                                            value="<?= $gd->WAREHOUSE_ID ?>"
-                                                            <?= set_value('gudang') ==  $gd->WAREHOUSE_ID ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($gd->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan'); ?></textarea>
                                             </div>
-                                            <div class="text-danger"><?= form_error('gudang') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="sales">Sales:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-user-2-fill"></i>
-                                                </span>
-                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Sales --</option>
-                                                    <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= set_value('sales') ==  $sl->KARYAWAN_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sl->FIRST_NAME) . ' - [' . strtoupper($sl->LAST_NAME) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('sales') ?></div>
+                                            <div class="text-danger"><?= form_error('keterangan') ?></div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row form-xs">
-                                <div class="col-lg-12 col-md-12 col-sm-12">
-                                    <div class="mb-3">
-                                        <label for="keterangan">Keterangan:</label>
-                                        <div class="input-group">
-                                            <textarea name="keterangan" id="keterangan" class="form-control <?= form_error('keterangan') ? 'is-invalid' : null ?>" placeholder="Enter Keterangan"><?= $this->input->post('keterangan'); ?></textarea>
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <div class="mb-3">
+                                            <label for="tanggal">Tanggal:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
+                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? date('Y-m-d\TH:i') ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
-                                        <div class="text-danger"><?= form_error('keterangan') ?></div>
+                                        <div class="mb-3">
+                                            <label for="start_date">Start Date:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
+                                                <input type="datetime-local" name="start_date" id="start_date" class="form-control <?= form_error('start_date') ? 'is-invalid' : null; ?>" placeholder="Enter Start Date" value="<?= $this->input->post('start_date') ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('start_date') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="end_date">End Date:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-calendar-2-fill"></i>
+                                                </span>
+                                                <?php date_default_timezone_set('Asia/Jakarta'); ?>
+                                                <input type="datetime-local" name="end_date" id="end_date" class="form-control <?= form_error('end_date') ? 'is-invalid' : null; ?>" placeholder="Enter End Date" value="<?= $this->input->post('end_date') ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('end_date') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="no_reff">No Reff:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-price-tag-3-fill"></i>
+                                                </span>
+                                                <input type="text" name="no_reff" id="no_reff" class="form-control <?= form_error('no_reff') ? 'is-invalid' : null; ?>" placeholder="Enter No Reff" value="<?= $this->input->post('no_reff'); ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('no_reff') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="status">Status:</label>
+                                            <div class="input-group">
+                                                <div class="form-check form-switch mb-3" dir="ltr">
+                                                    <input type="checkbox" name="status" class="form-check-input" id="customSwitch1" checked>
+                                                    <label class="form-check-label" for="customSwitch1"></label>
+                                                </div>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('status') ?></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -222,18 +230,16 @@
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
                                         <div class="tab-pane active" id="detail" role="tabpanel">
-                                            <div class="mb-3">
-                                                <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;height:29px">
-                                                    <i class="fa fa-trash"></i> Del
-                                                </button>
-                                                <button type="button" id="btn-modalItem" class="btn btn-success btn-sm" style="height:29px">
-                                                    <i class="ri ri-add-box-fill"></i> Add
-                                                </button>
-                                            </div>
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
+                                                <i class="fa fa-trash"></i> Del
+                                            </button>
+                                            <button type="button" id="btn-modalMrq" class="btn btn-success btn-sm">
+                                                <i class="ri ri-add-box-fill"></i> Add
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered table-sm" id="table-detail">
+                                        <table class="table table-striped table-bordered" id="table-detail">
                                             <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
                                                 <tr>
                                                     <th>No</th>
@@ -244,9 +250,6 @@
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
                                                     <th>Satuan</th>
-                                                    <th>Harga Input</th>
-                                                    <th>Harga</th>
-                                                    <th>Subtotal</th>
                                                     <th>Keterangan</th>
                                                 </tr>
                                             </thead>
@@ -257,24 +260,6 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="row justify-content-end">
-                                <div class="col-md-4">
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="font-weight:bold;">Total</td>
-                                                <td>:</td>
-                                                <td></td>
-                                                <td></td>
-                                                <td class="text-right" style="text-align: right">
-                                                    <p id="total-text">0.00</p>
-                                                    <input type="hidden" name="total" id="total">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -287,8 +272,8 @@
 <!-- End Page-content -->
 
 <!-- modal -->
-<div id="modalItem" class="modal fade" style="font-size: 12px;">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+<div id="modalMrq" class="modal fade" style="font-size: 12px;">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title mt-0" id="modalTitleForm"></h5>
@@ -296,21 +281,21 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-sm" id="table-item">
-                        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                    <table class="table table-bordered table-striped" id="table-item">
+                        <thead>
                             <tr class="text-nowrap">
                                 <th>
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
                                 </th>
                                 <th>No</th>
-                                <th>Nama Item</th>
                                 <th>Kode Item</th>
-                                <th>Assy Code</th>
+                                <th>Nama Item</th>
+                                <th>Assy Kode</th>
                                 <th>Kategori</th>
                                 <th>Satuan</th>
-                                <th>Stock</th>
+                                <th>Jumlah</th>
                                 <th>Brand</th>
-                                <th>Harga Beli</th>
+                                <th>Tipe</th>
                             </tr>
                         </thead>
                     </table>
@@ -355,7 +340,6 @@
     </div>
 </div>
 
-
 <script>
     let tableDetail;
     let tableItem;
@@ -379,77 +363,45 @@
                 }, // checkbox
                 {
                     targets: 2,
-                    width: "29%",
+                    width: "10%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
                 }, // nama item
                 {
                     targets: 3,
-                    width: "10%",
-                    className: "ellipsis text-center",
+                    width: "15%",
+                    className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
-                }, // code item
+                }, // kode item
                 {
                     targets: 4,
-                    width: "6%",
+                    width: "10%",
                     className: "ellipsis text-end",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer'
+                        td.style.cursor = 'pointer';
                     }
-
                 }, // jumlah
                 {
                     targets: 5,
-                    width: "8%",
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
                     }
-
                 }, // satuan
                 {
                     targets: 6,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer'
-                    }
-
-                }, // harga input
-                {
-                    targets: 7,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // harga
-                {
-                    targets: 8,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-
-                }, // subtotal
-                {
-                    targets: 9,
-                    width: "10%",
+                    width: "15%",
                     className: "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-
                 }, // keterangan
             ],
         });
@@ -458,37 +410,16 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : 'text-center',
-                    width: "5%"
                 }, // checkbox
                 {
                     targets: 1,
-                    className : 'text-center',
-                    width: "5%",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
+                    }
                 }, // no
                 {
                     targets: 2,
-                    width: "28%",
                     className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 35;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    },
-                }, // item description
-                {
-                    targets: 3,
-                    width: "12%",
-                    className: "ellipsis text-center",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 20;
@@ -500,10 +431,9 @@
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
-                }, // item code
+                }, // kode item
                 {
-                    targets: 4,
-                    width: "10%",
+                    targets: 3,
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -515,11 +445,25 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
+                    }
+                }, // nama item
+                {
+                    targets: 4,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ?
+                            data.substring(0, limit) + '...' :
+                            data;
+                        return `<span title="${data}">${text}</span>`;
                     },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 }, // assy code
                 {
                     targets: 5,
-                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -531,11 +475,10 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
+                    }
                 }, // kategori
                 {
                     targets: 6,
-                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -547,15 +490,14 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // uom
+                    }
+                }, // satuan
                 {
                     targets: 7,
-                    width: "10%",
                     className: "ellipsis text-end",
                     render: function(data) {
                         if (!data) return '-';
-                        let limit = 20;
+                        let limit = 15;
                         let text = data.length > limit ?
                             data.substring(0, limit) + '...' :
                             data;
@@ -563,11 +505,10 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // stok
+                    }
+                }, // jumlah
                 {
                     targets: 8,
-                    width: "10%",
                     className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
@@ -579,23 +520,23 @@
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
+                    }
                 }, // brand
                 {
                     targets: 9,
-                    className: "ellipsis text-end",
+                    className: "ellipsis",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 20;
                         let text = data.length > limit ?
                             data.substring(0, limit) + '...' :
                             data;
-                        return `<span title="${data}">${formatNumber(text,2)}</span>`;
+                        return `<span title="${data}">${text}</span>`;
                     },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
-                    },
-                }, // price
+                    }
+                }, // tipe
             ],
             autoWidth: false,
             paging: true,
@@ -609,14 +550,17 @@
             oldDetail.kode_item.forEach(function(kode, i) {
                 let nomor = tableDetail.rows().count() + 1;
 
-                let nama = oldDetail.nama_item[i] ?? '';
-                let id_item = oldDetail.id_item[i] ?? '';
-                let qty = oldDetail.qty[i] ?? 1;
-                let uom = oldDetail.uom[i] ?? '';
-                let to_qty = oldDetail.to_qty[i] ?? 1;
-                let hargaInput = oldDetail.harga_input[i] ?? 0;
-                let harga = oldDetail.harga[i] ?? 0;
-                let subtotal = oldDetail.subtotal[i] ?? 0;
+                let item_id = oldDetail.item_id[i];
+                let kode_item = oldDetail.kode_item[i];
+                let nama_item = oldDetail.nama_item[i];
+                let assy_code = oldDetail.assy_code[i];
+                let kategori = oldDetail.kategori[i];
+                let satuan = oldDetail.satuan[i];
+                let jumlah = oldDetail.jumlah[i] ?? '';
+                let brand = oldDetail.brand[i];
+                let tipe = oldDetail.tipe[i];
+                let jenis_id = oldDetail.jenis_id[i];
+                let berat = oldDetail.berat[i] ?? '';
                 let keterangan = oldDetail.keterangan[i] ?? '';
 
                 let rowNode = tableDetail.row.add([
@@ -624,45 +568,41 @@
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${nama}">
-                        ${ellipsis(nama)}
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
                     </span>
-                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
-                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[assy_code][]" value="${assy_code}">
+                    <input type="hidden" name="detail[kategori][]" value="${kategori}">
+                    <input type="hidden" name="detail[stok][]" value="${jumlah}">
+                    <input type="hidden" name="detail[brand][]" value="${brand}">
+                    <input type="hidden" name="detail[tipe][]" value="${tipe}">
+                    <input type="hidden" name="detail[jenis_id][]" value="${jenis_id}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    `,
 
-                    `${kode}
-                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+                    `<span class="ellipsis" title="${kode}">
+                        ${ellipsis(kode)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">
+                    `,
 
-                    `<span class="view-mode qty-view">${formatNumber(qty)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}">`,
+                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none jumlah" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any">`,
 
-                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
-                        <option value="${uom}" selected>${uom}</option>
+                    `<select class="form-control form-control-sm uom-select border-0 ellipsis" name="detail[satuan][]" title="${satuan}">
+                        <option value="">Loading...</option>
                     </select>
-                    <input type="hidden" name="detail[to_qty][]" value="${to_qty}">`,
+                    <input type="hidden" class="form-control form-control-sm" name="detail[base_qty][]">`,
 
-                    `<span class="view-mode harga-view">${formatNumber(hargaInput)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${hargaInput}">`,
-
-                    `<span class="harga-input-b">${formatNumber(harga)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
-
-                    `<span class="subtotal">${formatNumber(subtotal)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
-
-                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`
+                    `<textarea class="form-control form-control-sm border-0" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
                 ]).node();
-
                 $(rowNode).addClass('tr-height-30');
-
-                loadUom($(rowNode), id_item, uom);
-
+                loadUom($(rowNode), item_id, satuan);
             });
-
+            toggleItemDisabled();
             tableDetail.draw(false);
-            toggleSupplierDisabled();
-
-            hitungTotal();
         }
 
         //Initialize Select2 Elements
@@ -701,110 +641,161 @@
             })
         }
 
-        $("#supplier").data("prev", $("#supplier").val());
+        if ($('#tanggal').val()) {
+            let tgl = $('#tanggal').val();
 
-        $("#supplier").on("change", function(e, data) {
-            let prev = $(this).data("prev");
-            let current = $(this).val();
+            if (!$('#start_date').val()) {
+                $('#start_date').val(tgl);
+            }
+            $('#start_date').attr('min', tgl);
 
-            if (prev && current !== prev && tableDetail.rows().count() > 0) {
+            if (!$('#end_date').val()) {
+                $('#end_date').val(addOneYear($('#start_date').val()));
+            }
+            $('#end_date').attr('min', $('#start_date').val());
+        }
 
+        $('#tanggal').on('change', function() {
+            let tgl = $(this).val();
+
+            $('#start_date').val(tgl);
+            $('#start_date').attr('min', tgl);
+
+            $('#end_date').val(addOneYear(tgl));
+            $('#end_date').attr('min', tgl);
+        });
+
+        $('#start_date').on('change', function() {
+            let start = $(this).val();
+            let tgl = $('#tanggal').val();
+            if (start < tgl) {
                 Swal.fire({
-                    title: "Ganti Supplier?",
-                    text: "Data item yang sudah dipilih akan dihapus.",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Ya, ganti",
-                    cancelButtonText: "Batal"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        tableDetail.clear().draw();
-                        $(this).data("prev", current);
-                        toggleSupplierDisabled();
-                    } else {
-                        $(this).val(prev).trigger('change.select2', {
-                            skipEvent: true
-                        });
-                    }
-                });
-            } else {
-                $(this).data("prev", current);
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Start Date tidak boleh lebih kecil dari Tanggal',
+                })
+                $(this).val(tgl);
+                start = tgl;
+            }
+            $('#end_date').attr('min', start);
+            if ($('#end_date').val() < start) {
+                $('#end_date').val(addOneYear(start));
             }
         });
 
-        // modal
-        $("#btn-modalItem").on("click", function() {
-            resetModalItem();
+        $('#end_date').on('change', function() {
+            let end = $(this).val();
+            let start = $('#start_date').val();
 
+            if (end < start) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'End Date tidak boleh lebih kecil dari Start Date',
+                })
+                $(this).val(addOneYear(start));
+            }
+        });
+
+        $('#satuan').prop('disabled', true);
+
+        let initialItem = $('#item_finish_goods').val();
+        let oldSatuan = "<?= set_value('satuan') ?>";
+
+        if (initialItem) {
+            loadSatuan(initialItem, oldSatuan);
+        }
+        $('#item_finish_goods').on('change', function() {
+            let description = $(this).find(':selected').data('description');
+            $('#item_description').val(description);
+
+            let itemId = $(this).val();
+            var label = $('#label_satuan');
+
+            // hapus dulu *
+            label.find('span.text-danger').remove();
+
+            // jika ada value, tambahkan *
+            if (itemId) {
+                label.append(' <span class="text-danger">*</span>');
+            }
+            loadSatuan(itemId);
+        });
+
+        // modal
+        $("#btn-modalMrq").on("click", function() {
+            resetModalItem();
             $("#checkAll").prop('checked', false);
             $('#loading').show();
-            var supplier = $('#supplier').val();
+            var item_finish_goods = $('#item_finish_goods').val();
 
-            if (!supplier) {
+            if (!item_finish_goods) {
                 $('#loading').hide();
                 Swal.fire({
                     icon: 'warning',
                     title: 'Warning',
-                    text: 'Supplier tidak terisi, Mohon isi terlebih dahulu',
+                    text: 'Item tidak terisi, Mohon isi terlebih dahulu',
                 });
                 return;
             }
+
             $.ajax({
                 type: "POST",
-                url: "<?= base_url() ?>fpk/getItemBySupplier",
+                url: "<?= base_url() ?>formula/getItem",
                 data: {
-                    id_supplier: supplier,
+                    item_finish_goods: item_finish_goods,
                 },
                 dataType: "json",
                 success: function(response) {
                     $('#loading').hide();
                     tableItem.clear().draw();
 
-                    let existingCodes = new Set();
+                    let existingItemId = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let kode = $(node).find('input[name="detail[kode_item][]"]').val();
-                        if (kode) {
-                            existingCodes.add(kode);
-                        }
+                        let itemId = $(node).find('input[name="detail[item_id][]"]').val();
+                        if (itemId) existingItemId.add(itemId);
                     });
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
 
-                            if (existingCodes.has(item.ITEM_CODE)) {
+                            if (existingItemId.has(item.ITEM_ID)) {
                                 return;
                             }
 
-                            var stok = parseFloat(item.STOK).toFixed(2);
-                            var price_buy = parseFloat(item.PRICE_BUY).toFixed(2);
-
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
-                                data-id_item="${item.ITEM_ID}"
-                                data-name="${item.ITEM_DESCRIPTION}"
-                                data-code="${item.ITEM_CODE}"
-                                data-uom="${item.UOM}"
-                                data-price_buy="${price_buy}"
+                                data-item_id="${item.ITEM_ID}"
+                                data-kode_item="${item.ITEM_CODE}"
+                                data-nama_item="${item.ITEM_DESCRIPTION.replace(/"/g, '&quot;')}"
+                                data-assy_code="${item.ASSY_CODE}"
+                                data-kategori="${item.CATEGORY}"
+                                data-satuan="${item.ENTERED_UOM}"
+                                data-jumlah="${item.STOK}"
+                                data-brand="${item.BRAND}"
+                                data-tipe="${item.TIPE}"
+                                data-jenis_id="${item.JENIS_ID}"
+                                data-berat="${item.BERAT}"
                             >
                             `;
                             tableItem.row.add([
                                 checkbox,
                                 i + 1,
-                                item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
+                                item.ITEM_DESCRIPTION,
                                 item.ASSY_CODE,
                                 item.CATEGORY,
                                 item.UOM,
-                                stok,
+                                parseFloat(item.STOK).toFixed(2),
                                 item.BRAND,
-                                price_buy
+                                item.TIPE,
                             ]);
                         });
                         tableItem.draw();
                     }
-                    $('#modalTitleForm').text('Master Item');
-                    $('#modalItem').modal('show');
+                    $('#modalTitleForm').text('List Data');
+                    $('#modalMrq').modal('show');
                 }
             });
         });
@@ -822,75 +813,93 @@
         $("#btnSubmit").on("click", function(e) {
             e.preventDefault();
             let rowsAdded = false;
+
+            let existingItemId = new Set();
+
+            tableDetail.rows().every(function() {
+                let node = this.node();
+
+                let itemId = $(node)
+                    .find('input[name="detail[item_id][]"]')
+                    .val();
+
+                if (itemId) existingItemId.add(String(itemId));
+            });
+
             let allRows = tableItem.rows().nodes();
             $(allRows).find('.chkRow:checked:not(:disabled)').each(function() {
-                let id_item = $(this).data("id_item");
-                let nama = $(this).data("name");
-                let kode = $(this).data("code");
-                let uom = $(this).data("uom");
-                let price_buy = $(this).data("price_buy");
+                let item_id = $(this).data("item_id");
+                let kode_item = $(this).data("kode_item");
+                let nama_item = $(this).data("nama_item");
+                let assy_code = $(this).data("assy_code");
+                let kategori = $(this).data("kategori");
+                let satuan = $(this).data("satuan");
+                let jumlah = $(this).data("jumlah");
+                let brand = $(this).data("brand");
+                let tipe = $(this).data("tipe");
+                let jenis_id = $(this).data("jenis_id");
+                let berat = $(this).data("berat");
 
-                // Cegah double di tableDetail
-                let exists = tableDetail
-                    .column(4) // kolom kode
-                    .data()
-                    .toArray()
-                    .includes(kode);
-
-                if (exists) {
-                    $(this).prop('checked', false).prop('disabled', true);
+                // ==========================================
+                // Cegah duplicate item id
+                // ==========================================
+                if (item_id && existingItemId.has(item_id)) {
+                    checkbox.prop("checked", false).prop("disabled", true);
                     return;
                 }
+
+                // Simpan supaya tidak double dalam 1x submit
+                if (item_id) existingItemId.add(item_id);
 
                 let rowNode = tableDetail.row.add([
                     "",
 
                     `<input type="checkbox" class="chkDetail">`,
 
-                    `<span class="ellipsis" title="${nama}">
-                        ${ellipsis(nama)}
+                    `<span class="ellipsis" title="${nama_item}">
+                        ${ellipsis(nama_item)}
                     </span>
-                    <input type="hidden" name="detail[nama_item][]" value="${nama}">
-                    <input type="hidden" name="detail[id_item][]" value="${id_item}">`,
+                    <input type="hidden" name="detail[nama_item][]" value="${nama_item}">
+                    <input type="hidden" name="detail[item_id][]" value="${item_id}">
+                    <input type="hidden" name="detail[assy_code][]" value="${assy_code}">
+                    <input type="hidden" name="detail[kategori][]" value="${kategori}">
+                    <input type="hidden" name="detail[stok][]" value="${jumlah}">
+                    <input type="hidden" name="detail[brand][]" value="${brand}">
+                    <input type="hidden" name="detail[tipe][]" value="${tipe}">
+                    <input type="hidden" name="detail[jenis_id][]" value="${jenis_id}">
+                    <input type="hidden" name="detail[berat][]" value="${berat}">
+                    `,
 
-                    `${kode}
-                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
+                    `<span class="ellipsis" title="${kode_item}">
+                        ${ellipsis(kode_item)}
+                    </span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
+                    `,
 
                     `<span class="view-mode qty-view">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none jumlah" name="detail[jumlah][]" value="" min="0" step="any">`,
 
-                    `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
+                    `<select class="form-control form-control-sm uom-select border-0 ellipsis" name="detail[satuan][]" title="${satuan}">
                         <option value="">Loading...</option>
                     </select>
-                    <input type="hidden" class="form-control form-control-sm" name="detail[to_qty][]">`,
+                    <input type="hidden" class="form-control form-control-sm" name="detail[base_qty][]">`,
 
-                    `<span class="view-mode harga-view">${formatNumber(price_buy,2)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${price_buy}">`,
-
-                    `<span class="harga-input-b">${formatNumber(price_buy,2)}</span>
-                    <input type="hidden" name="detail[harga][]"  value="${price_buy}">`,
-
-                    `<span class="subtotal">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]">`,
-
-                    `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`
+                    `<textarea class="form-control form-control-sm border-0" name="detail[keterangan][]" rows="1" readonly></textarea>`,
                 ]).node();
 
                 $(rowNode).addClass('tr-height-30');
 
                 rowsAdded = true;
-                loadUom($(rowNode), id_item);
-                setTimeout(function(){
-                    $(document).find('.qty').trigger('input');
-                },300);
-            });
 
+                loadUom($(rowNode), item_id);
+            });
 
             if (rowsAdded) {
                 tableDetail.draw(false);
-                toggleSupplierDisabled();
+                tableDetail.columns.adjust();
+                toggleItemDisabled();
             }
-            $("#modalItem").modal("hide");
+            $("#modalMrq").modal("hide");
         });
 
         $(document).on("click", "#table-detail tbody td", function(e) {
@@ -923,35 +932,6 @@
 
             input.addClass("d-none");
             span.removeClass("d-none");
-        });
-
-        $(document).on("input", ".qty, .harga-input", function() {
-            let row = $(this).closest("tr");
-            let qty = parseFloat(row.find(".qty").val()) || 0;
-            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
-
-            let hargaInputDisplay = (harga_input === 0) ?
-                '0' :
-                harga_input.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-            let subtotal = qty * harga_input;
-
-            let subTotalDisplay = (subtotal === 0) ?
-                '0' :
-                subtotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
-            row.find(".subtotal").text(subTotalDisplay.toLocaleString("en-US"));
-
-            row.find('input[name="detail[harga][]"]').val(harga_input);
-            row.find('input[name="detail[subtotal][]"]').val(subtotal);
-            hitungTotal();
         });
 
         tableDetail.on("draw.dt", function() {
@@ -989,8 +969,6 @@
                 });
                 return;
             }
-
-
             Swal.fire({
                 title: 'Yakin mau hapus?',
                 text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
@@ -1007,11 +985,10 @@
                         tableDetail.row(this).remove();
                     });
                     tableDetail.draw(false);
-                    hitungTotal();
 
                     $("#checkAllParent").prop("checked", false);
 
-                    toggleSupplierDisabled();
+                    toggleItemDisabled();
 
                     Swal.fire({
                         icon: 'success',
@@ -1026,7 +1003,7 @@
 
         $(document).on('change', '.uom-select', function() {
 
-            let toQty = $(this).find(':selected').data('to-qty') || 1;
+            let toQty = $(this).find(':selected').data('base_qty') || 1;
 
             $(this)
                 .closest('tr')
@@ -1034,7 +1011,7 @@
                 .val(toQty);
         });
 
-        $(document).on('keydown', '.qty, .harga-input', function(e) {
+        $(document).on('keydown', '.jumlah, .harga-input', function(e) {
             if (
                 e.key === 'e' || e.key === 'E' ||
                 e.key === '+' || e.key === '-'
@@ -1043,7 +1020,7 @@
             }
         });
 
-        $(document).on('input change', '.qty, .harga-input', function() {
+        $(document).on('input change', '.jumlah', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1054,32 +1031,11 @@
         });
 
         $(document).on('change', '.uom-select', function() {
-            let toQty = $(this).find(':selected').data('to_qty') || 1;
+            let toQty = $(this).find(':selected').data('base_qty') || 1;
 
             let row = $(this).closest('tr');
-            row.find('input[name="detail[to_qty][]"]').val(toQty);
+            row.find('input[name="detail[base_qty][]"]').val(toQty);
         });
-    });
-
-    $(document).on('keydown', '.enter-as-tab', function(e) {
-        if (e.which !== 13) return;
-
-        e.preventDefault();
-        const $row = $(this).closest('tr');
-
-        if ($(this).hasClass('qty-edit')) {
-            const $harga = $row.find('.harga-edit');
-
-            $row.find('.harga-view').addClass('d-none');
-            $harga.removeClass('d-none');
-            $harga.focus();
-            return;
-        }
-
-        if ($(this).hasClass('harga-edit')) {
-            $row.find('textarea[name="detail[keterangan][]"]').focus();
-            return;
-        }
     });
 
     let openedSelect = null;
@@ -1092,34 +1048,6 @@
         $(this).find('option').each(function() {
             $(this).text($(this).data('label'));
         });
-    });
-
-    $(document).on('change', '.uom-select', function() {
-        let selected = $(this).find('option:selected');
-
-        $(this).closest('td')
-            .find('input[name="detail[to_qty][]"]')
-            .val(selected.data('to_qty') || '');
-    });
-
-    // dropdown ditutup
-    $(document).on('click', function() {
-        if (!openedSelect) return;
-
-        setTimeout(() => {
-            if (isOpening) {
-                isOpening = false;
-                return;
-            }
-
-            let $select = $(openedSelect);
-
-            $select.find('option').each(function() {
-                $(this).text($(this).data('code'));
-            });
-
-            openedSelect = null;
-        }, 0);
     });
 
     let activeKeteranganInput = null;
@@ -1153,24 +1081,14 @@
         $('#modalKeteranganText').val('');
     });
 
-    function hitungTotal() {
-        let total = 0;
+    const $switch = $('#customSwitch1');
+    const $label = $('label[for="customSwitch1"]');
 
-        $("tr").each(function() {
-            let text = $(this).find(".subtotal").text();
-            let subtotal = Number(text.replace(/,/g, '')) || 0;
-            total += subtotal;
-        });
+    updateLabel();
+    $switch.on('change', updateLabel);
 
-        let totalDisplay = (total === 0) ?
-            '0' :
-            total.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-
-        $("#total-text").text(totalDisplay);
-        $("#total").val(total);
+    function updateLabel() {
+        $label.text($switch.is(':checked') ? 'Active' : 'Inactive');
     }
 
     let uomLoadingCount = 0;
@@ -1178,13 +1096,13 @@
     function loadUom(row, itemId) {
 
         let uomSelect = row.find('.uom-select');
-        let toQtyInput = row.find('input[name="detail[to_qty][]"]');
+        let toQtyInput = row.find('input[name="detail[base_qty][]"]');
 
         uomLoadingCount++;
         $('#loading').show();
 
         $.ajax({
-            url: "<?= base_url() ?>fpk/get_uom",
+            url: "<?= base_url() ?>formula/get_uom",
             type: 'POST',
             dataType: 'json',
             data: {
@@ -1195,8 +1113,8 @@
 
                 $.each(res.data, function(i, v) {
                     html += `
-                    <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-to_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
-                        ${v.UOM_CODE}
+                    <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-base_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
+                        ${v.UOM_CODE} (${v.TO_QTY})
                     </option>
                 `;
                 });
@@ -1204,7 +1122,7 @@
                 uomSelect.html(html);
 
                 let firstOption = uomSelect.find('option:first');
-                toQtyInput.val(firstOption.data('to_qty'));
+                toQtyInput.val(firstOption.data('base_qty'));
             },
             error: function(xhr, status, error) {
                 console.error("Error load Uom:", error);
@@ -1228,29 +1146,31 @@
         });
     }
 
-    function toggleSupplierDisabled() {
+    function toggleItemDisabled() {
+        if (!tableDetail) return;
+
         let hasDetail = tableDetail.rows().count() > 0;
-        let $supplier = $('#supplier');
+        let $item_finish_goods = $('#item_finish_goods');
 
         if (hasDetail) {
-            $supplier.prop('disabled', true).trigger('change.select2');
+            $item_finish_goods.prop('disabled', true).trigger('change.select2');
 
             // Buat hidden input agar value tetap dikirim ke server
-            if ($('#supplier-hidden').length === 0) {
+            if ($('#item_finish_goods-hidden').length === 0) {
                 $('<input>').attr({
                     type: 'hidden',
-                    id: 'supplier-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
+                    id: 'item_finish_goods-hidden',
+                    name: $item_finish_goods.attr('name'),
+                    value: $item_finish_goods.val()
                 }).appendTo('form');
             } else {
-                $('#supplier-hidden').val($supplier.val());
+                $('#item_finish_goods-hidden').val($item_finish_goods.val());
             }
-
         } else {
-            $supplier.prop('disabled', false).trigger('change.select2');
-            $('#supplier-hidden').remove();
+            $item_finish_goods.prop('disabled', false).trigger('change.select2');
+            $('#item_finish_goods-hidden').remove();
         }
+        $item_finish_goods.trigger('change.select2');
     }
 
     function resetModalItem() {
@@ -1268,5 +1188,71 @@
         return text.length > limit ?
             text.substring(0, limit) + '...' :
             text;
+    }
+
+    function loadSatuan(item, selectedSatuan = null) {
+        $('#satuan')
+            .empty()
+            .prop('disabled', true)
+            .trigger('change');
+        if (!item) return;
+
+        if (item) {
+            $.ajax({
+                url: "<?= base_url('mrq/get_item_uom') ?>",
+                type: "POST",
+                data: {
+                    item_id: item
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.status === "success") {
+
+                        let units = response.data;
+
+                        $.each(units, function(i, unit) {
+
+                            let selected = "";
+
+                            if (selectedSatuan && selectedSatuan === unit.UOM_CODE) {
+                                selected = "selected";
+                            } else if (!selectedSatuan && unit.URUT == 0) {
+                                selected = "selected";
+                            }
+
+                            $('#satuan').append(
+                                `<option value="${unit.UOM_CODE}" ${selected}>
+                                    ${unit.UOM_CODE} (${unit.TO_QTY})
+                                </option>`
+                            );
+
+                            $('#base_qty').val(unit.TO_QTY);
+                        });
+
+                        $('#satuan')
+                            .prop('disabled', false)
+                            .trigger('change');
+                    }
+                }
+            });
+        }
+    }
+
+    function addOneYear(dateString) {
+        let date = new Date(dateString);
+
+        // tambah 1 tahun
+        date.setFullYear(date.getFullYear() + 1);
+
+        // format ke datetime-local (LOCAL TIME, bukan UTC)
+        const pad = (n) => String(n).padStart(2, '0');
+
+        let year = date.getFullYear();
+        let month = pad(date.getMonth() + 1);
+        let day = pad(date.getDate());
+        let hours = pad(date.getHours());
+        let minutes = pad(date.getMinutes());
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 </script>

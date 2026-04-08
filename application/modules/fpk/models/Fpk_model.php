@@ -45,7 +45,7 @@ class Fpk_model extends CI_Model
         $this->db->distinct();
         $this->db->select("
             a.PR_ID,
-            b.DISPLAY_NAME Status,
+            b.DISPLAY_NAME Status, b.MENU_ICON Warna_Status,
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,
@@ -169,7 +169,7 @@ class Fpk_model extends CI_Model
 
     public function getGudang()
     {
-        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = {$this->session->userdata('id')} WHERE ACTIVE_FLAG = 'Y' GROUP BY a.WAREHOUSE_ID ORDER BY IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
+        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = {$this->session->userdata('id')} WHERE ACTIVE_FLAG = 'Y' AND a.JENIS_ID = FN_GET_VAR_VALUE ('PST') GROUP BY a.WAREHOUSE_ID ORDER BY IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
     }
 
     public function getSales()
@@ -205,9 +205,10 @@ class Fpk_model extends CI_Model
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
+            k.FIRST_NAME as SALES_FIRST_NAME,
+            k.LAST_NAME as SALES_LAST_NAME,
         ");
         $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER",true);
-        $this->db->select("CONCAT( k.FIRST_NAME, ' - [', k.LAST_NAME, ']' ) as SALES",true);
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');

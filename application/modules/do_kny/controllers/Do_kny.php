@@ -696,6 +696,75 @@ class Do_kny extends Back_Controller
             ]));
     }
 
+    public function get_info($id)
+    {
+        $id = (int) $this->encrypt->decode(base64url_decode($id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'inventory_out_detail b',
+            'select' => [
+                'b.INVENTORY_OUT_DETAIL_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY DO',
+                ['(b.INVOICE_ENTERED_QTY / b.BASE_QTY) AS INV', FALSE],
+                ['(b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
+            ],
+            'joins' => [
+                ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+            ],
+            'where' => ['b.INVENTORY_OUT_ID' => $id],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.INVOICE_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / b.BASE_QTY))'],
+            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+        ];
+
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
+            return [
+                'no' => $no,
+                'do_detail_id' => base64url_encode($this->encrypt->encode($row->INVENTORY_OUT_DETAIL_ID)),
+                'nama_item' => $row->Nama_Item,
+                'kode_item' => $row->Kode_Item,
+                'satuan' => $row->Satuan,
+                'do' => number_format((float)$row->DO, 2, '.', ','),
+                'inv' => number_format((float)$row->INV, 2, '.', ','),
+                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+            ];
+        }));
+    }
+
+    public function get_info_detail($detail_id)
+    {
+        $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
+        $this->load->model('M_datatables', 'datatables');
+        $params = [
+            'table' => 'inventory_out_detail b',
+            'select' => [
+                'c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,
+                    b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc',
+                ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
+
+            ],
+            'joins' => [
+                ['nota_penjualan_detail a', 'b.INVENTORY_OUT_DETAIL_ID = a.INVENTORY_OUT_DETAIL_ID', 'inner'],
+                ['nota_penjualan c', 'a.NOTA_PENJUALAN_ID = c.NOTA_PENJUALAN_ID', 'inner'],
+                ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
+            ],
+            'where' => ['b.INVENTORY_OUT_DETAIL_ID' => $detail_id],
+            'order' => ['b.INVENTORY_OUT_DETAIL_ID' => 'asc'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+        ];
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
+            return [
+                'no' => $no,
+                // 'no_transaksi' => '<a href="' . site_url('do_kny/detail/' . base64url_encode($this->encrypt->encode($row->INVENTORY_OUT_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
+                'no_transaksi' => $row->No_Transaksi,
+                'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
+                'satuan' => $row->Satuan,
+                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                's_loc' => $row->S_Loc,
+            ];
+        }));
+    }
+
     public function print($id){
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $do    = $this->do_kny->get_do_detail($id)->row();

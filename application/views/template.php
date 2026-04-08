@@ -124,6 +124,14 @@
         .form-xs textarea {
             resize: vertical;
         }
+
+        .nav-tabs .nav-link.active{
+            background-color: #e9ecef;
+        }
+        .details-control{
+            font-weight: bolder;
+            color: #1DAA61;
+        }
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>

@@ -181,3 +181,47 @@ function base64url_decode($data)
 {
     return base64_decode(strtr($data, '-_.', '+/='));
 }
+
+function img_to_base64($path) {
+    if(file_exists($path)) {
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        return $base64;
+    } else return '';
+}
+
+function badge_status($label,$color=''){
+    if(!$label) return '-';
+    
+    $colors = getBadgeStyle($color);
+    return '<span class="badge" style="font-size: 10.5px; background-color: '.$colors['bg'].'; 
+             color: '.$colors['text'].'; 
+            ">'.$label.'</span>';
+}
+function getBadgeStyle($hexColor, $opacity = 0.2) {
+    // 1. Bersihkan hex
+    $hex = str_replace("#", "", $hexColor);
+    
+    // 2. Ambil nilai RGB
+    if(strlen($hex) == 3) {
+        $r = hexdec(substr($hex,0,1).substr($hex,0,1));
+        $g = hexdec(substr($hex,1,1).substr($hex,1,1));
+        $b = hexdec(substr($hex,2,1).substr($hex,2,1));
+    } else {
+        $r = hexdec(substr($hex,0,2));
+        $g = hexdec(substr($hex,2,2));
+        $b = hexdec(substr($hex,4,2));
+    }
+
+    // 3. Tentukan warna teks (Hitam atau Putih) berdasarkan brightness
+    // Rumus standar YIQ untuk menentukan kontras
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    $textColor = ($yiq >= 128) ? "#000000" : "#ffffff";
+
+    return [
+        'bg'     => "rgba($r, $g, $b, $opacity)",
+        'text'   => $hexColor,
+        'border' => $hexColor
+    ];
+}

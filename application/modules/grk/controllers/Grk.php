@@ -600,7 +600,7 @@ class Grk extends Back_Controller
                 'satuan' => $row->Satuan,
                 'grk' => number_format((float)$row->GRK, 2, '.', ','),
                 'sts_rsp_mr' => number_format((float)$row->STS_RSP_MR, 2, '.', ','),
-                'sisa' => number_format((float)$row->Sisa, 2, '.', ','),
+                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
             ];
         }));
     }

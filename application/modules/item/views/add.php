@@ -549,14 +549,11 @@
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <div class="row justify-content-start">
-                                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                                    <label class="form-check-label" for="konsinyasi" style="margin-right: 20px;">
-                                                        Konsinyasi
-                                                    </label>
-                                                </div>
-                                                <div class="col-lg-3 col-md-4 col-sm-6">
-                                                    <input class="form-check-input" type="checkbox" name="konsinyasi" id="konsinyasi" <?= set_value('konsinyasi') == 'Y' ? 'checked' : null ?>>
+                                            <label for="konsinyasi">Konsinyasi:</label>
+                                            <div class="input-group">
+                                                <div class="form-check form-switch mb-3" dir="ltr">
+                                                    <input type="checkbox" name="konsinyasi" class="form-check-input" id="konsinyasi" <?= set_value('konsinyasi') == 'Y' ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="konsinyasi-text"></label>
                                                 </div>
                                             </div>
                                             <div class="text-danger"><?= form_error('konsinyasi') ?></div>
@@ -1288,6 +1285,16 @@
             }
         });
     });
+
+    const $switch = $('#konsinyasi');
+    const $label = $('label[for="konsinyasi-text"]');
+
+    updateLabel();
+    $switch.on('change', updateLabel);
+
+    function updateLabel() {
+        $label.text($switch.is(':checked') ? 'Yes' : 'No');
+    }
 
     function updateDescription() {
         let brandText = $('#brand option:selected').text().trim();

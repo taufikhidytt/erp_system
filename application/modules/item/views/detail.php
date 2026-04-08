@@ -26,7 +26,22 @@
                     <div class="card-body">
                         <form action="" method="post">
                             <div class="row mb-2">
-                                <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
+                                <div class="col-lg-6 col-md-6 col-sm-12 d-flex align-items-center gap-2 label-status">
+                                    <?php if ($data->APPROVE_FLAG == 'N') { ?>
+                                        <h4 id="statusPR" style="width: 100px;">
+                                            <span class="badge" style="font-size: 15.5px; background-color: rgba(0, 2, 109, 0.21); color: #000d7eb0;">
+                                                NEED APPROVED
+                                            </span>
+                                        </h4>
+                                    <?php } else { ?>
+                                        <h4 id="statusPR" style="width: 100px;">
+                                            <span class="badge" style="font-size: 15.5px; background-color: rgba(30, 126, 52, 0.2); color: #1E7E34;">
+                                                APPROVED
+                                            </span>
+                                        </h4>
+                                    <?php } ?>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <a href="<?= base_url('item/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
                                         <i class="ri ri-add-box-fill"></i>
                                     </a>
@@ -424,7 +439,39 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="mb-3">
+                                                    <label for="konsinyasi">Konsinyasi:</label>
+                                                    <div class="input-group">
+                                                        <div class="form-check form-switch mb-3" dir="ltr">
+                                                            <input type="checkbox" name="konsinyasi" class="form-check-input" id="konsinyasi" <?= set_value('konsinyasi', $data->ITEM_KMS ?? '') === 'Y' ? 'checked' : '' ?>>
+                                                            <label class="form-check-label" for="konsinyasi-text"></label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-danger"><?= form_error('konsinyasi') ?></div>
+                                                </div>
+                                            </div>
+                                            <?php if ($data->APPROVE_FLAG == 'N'): ?>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 text-end">
+                                                    <div class="mb-3">
+                                                        <label for="approve">Approve:</label>
+                                                        <div class="input-group justify-content-end">
+                                                            <div class="form-check form-switch mb-3" dir="ltr">
+                                                                <input type="checkbox"
+                                                                    id="approveSwitch"
+                                                                    class="form-check-input"
+                                                                    data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>"
+                                                                    <?= $data->APPROVE_FLAG === 'Y' ? 'checked disabled' : '' ?>>
+                                                                <label for="approve-text"></label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-danger"><?= form_error('approve') ?></div>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <!-- <div class="mb-3">
                                             <div class="row justify-content-start">
                                                 <div class="col-lg-3 col-md-4 col-sm-6">
                                                     <label class="form-check-label" for="konsinyasi" style="margin-right: 20px;">
@@ -436,14 +483,14 @@
                                                 </div>
                                             </div>
                                             <div class="text-danger"><?= form_error('konsinyasi') ?></div>
-                                        </div>
-                                        <div class="float-start">
+                                        </div> -->
+                                        <!-- <div class="float-start">
                                             <?php if ($data->APPROVE_FLAG == 'N'): ?>
                                                 <button type="button" class="btn btn-primary btn-sm btn-approve" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Approve">
                                                     <i class="ri ri-thumb-up-fill"></i> Approve
                                                 </button>
                                             <?php endif; ?>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -1280,8 +1327,17 @@
             }
         });
 
-        $(document).on('click', '.btn-approve', function() {
-            var id = $(this).data('id'); // ambil id terenkripsi
+        $(document).on('change', '#approveSwitch', function() {
+            var $this = $(this);
+            var id = $this.data('id');
+            var isChecked = $this.is(':checked');
+
+            // ❌ cegah uncheck
+            if (!isChecked) {
+                $this.prop('checked', true);
+                return;
+            }
+
             Swal.fire({
                 title: 'Apakah anda yakin?',
                 text: "Ingin approve data ini?",
@@ -1293,6 +1349,10 @@
                 cancelButtonText: 'Cancel!'
             }).then((result) => {
                 if (result.isConfirmed) {
+
+                    $('#loading').show();
+                    $this.prop('disabled', true);
+
                     $.ajax({
                         url: "<?= base_url('item/approve') ?>",
                         method: "POST",
@@ -1302,6 +1362,7 @@
                         dataType: 'json',
                         success: function(response) {
                             $('#loading').hide();
+
                             if (response.success) {
                                 Swal.fire({
                                     title: 'Sukses',
@@ -1309,38 +1370,109 @@
                                     icon: 'success',
                                     confirmButtonColor: '#3085d6',
                                     confirmButtonText: 'Ok'
-                                }).then((result) => {
+                                }).then(() => {
                                     window.location.href = "<?= base_url('item/detail/') ?>" + id;
                                 });
+
                             } else {
-                                $('#loading').hide();
                                 Swal.fire({
                                     title: 'Warning',
                                     text: response.message,
                                     icon: 'warning',
                                     confirmButtonColor: '#3085d6',
                                     confirmButtonText: 'Ok'
-                                }).then((result) => {
+                                }).then(() => {
                                     window.location.href = "<?= base_url('item/detail/') ?>" + id;
                                 });
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function() {
                             $('#loading').hide();
+
                             Swal.fire({
                                 title: 'Error',
-                                text: 'Gagal hapus data!',
+                                text: 'Gagal approve data!',
                                 icon: 'error',
                                 confirmButtonColor: '#3085d6',
                                 confirmButtonText: 'Ok'
-                            }).then((result) => {
+                            }).then(() => {
                                 window.location.href = "<?= base_url('item/detail/') ?>" + id;
                             });
+
+                            // rollback kalau gagal
+                            $this.prop('checked', false);
+                            $this.prop('disabled', false);
                         }
                     });
+
+                } else {
+                    // kalau cancel → balikin ke OFF
+                    $this.prop('checked', false);
                 }
             });
         });
+
+        // $(document).on('click', '.btn-approve', function() {
+        //     var id = $(this).data('id'); // ambil id terenkripsi
+        //     Swal.fire({
+        //         title: 'Apakah anda yakin?',
+        //         text: "Ingin approve data ini?",
+        //         icon: 'warning',
+        //         showCancelButton: true,
+        //         confirmButtonColor: '#3085d6',
+        //         cancelButtonColor: '#ff0022ff',
+        //         confirmButtonText: 'Yess, Approve data ini!',
+        //         cancelButtonText: 'Cancel!'
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             $.ajax({
+        //                 url: "<?= base_url('item/approve') ?>",
+        //                 method: "POST",
+        //                 data: {
+        //                     id: id
+        //                 },
+        //                 dataType: 'json',
+        //                 success: function(response) {
+        //                     $('#loading').hide();
+        //                     if (response.success) {
+        //                         Swal.fire({
+        //                             title: 'Sukses',
+        //                             text: response.message,
+        //                             icon: 'success',
+        //                             confirmButtonColor: '#3085d6',
+        //                             confirmButtonText: 'Ok'
+        //                         }).then((result) => {
+        //                             window.location.href = "<?= base_url('item/detail/') ?>" + id;
+        //                         });
+        //                     } else {
+        //                         $('#loading').hide();
+        //                         Swal.fire({
+        //                             title: 'Warning',
+        //                             text: response.message,
+        //                             icon: 'warning',
+        //                             confirmButtonColor: '#3085d6',
+        //                             confirmButtonText: 'Ok'
+        //                         }).then((result) => {
+        //                             window.location.href = "<?= base_url('item/detail/') ?>" + id;
+        //                         });
+        //                     }
+        //                 },
+        //                 error: function(xhr, status, error) {
+        //                     $('#loading').hide();
+        //                     Swal.fire({
+        //                         title: 'Error',
+        //                         text: 'Gagal hapus data!',
+        //                         icon: 'error',
+        //                         confirmButtonColor: '#3085d6',
+        //                         confirmButtonText: 'Ok'
+        //                     }).then((result) => {
+        //                         window.location.href = "<?= base_url('item/detail/') ?>" + id;
+        //                     });
+        //                 }
+        //             });
+        //         }
+        //     });
+        // });
 
         $(document).on('click', '.btn-delete', function() {
             var id = $(this).data('id'); // ambil id terenkripsi
@@ -1405,6 +1537,26 @@
             });
         });
     });
+
+    const $switch = $('#konsinyasi');
+    const $label = $('label[for="konsinyasi-text"]');
+
+    updateLabelKons();
+    $switch.on('change', updateLabelKons);
+
+    function updateLabelKons() {
+        $label.text($switch.is(':checked') ? 'Yes' : 'No');
+    }
+
+    const approve = $('#approve');
+    const approveLabel = $('label[for="approve-text"]');
+
+    updateLabelApp();
+    approve.on('change', updateLabelApp);
+
+    function updateLabelApp() {
+        approveLabel.text(approve.is(':checked') ? 'Yes' : 'No');
+    }
 
     function updateDescription() {
         let brandText = $('#brand option:selected').text().trim();

@@ -42,6 +42,10 @@
     .keterangan-view {
         white-space: pre-line;
     }
+
+    .table-sub tbody td{
+        font-family: monospace;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
@@ -426,8 +430,8 @@
 
 <!-- table template info detail -->
 <div id="table-info-detail" class="d-none" data-url="<?= site_url('rcv/get_info_detail/') ?>">
-    <table class="table table-sm table-bordered w-100">
-        <thead>
+    <table class="table table-sm table-bordered w-100 table-sub">
+        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
             <tr class="align-middle">
                 <th width="30">No</th>
                 <th>No Transaksi</th>
@@ -1271,12 +1275,18 @@
                     "searchable": false,
                     "data": null,
                     "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
                 {
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
                     "className": 'text-center',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
                 {
                     "data": "nama_item",
@@ -1288,25 +1298,43 @@
                         //             </span>`;
                         // }
                         return data;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
                     }
                 },
                 {
-                    "data": "kode_item"
+                    "data": "kode_item",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
                 {
-                    "data": "satuan"
+                    "data": "satuan",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
                 {
                     "data": "rcv",
                     "className": 'text-end',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
                 {
                     "data": "rho_mr",
                     "className": 'text-end',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
                 {
                     "data": "sisa",
                     "className": 'text-end',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
             ]
         });

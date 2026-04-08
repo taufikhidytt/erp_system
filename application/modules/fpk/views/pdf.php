@@ -16,7 +16,7 @@
             <table width="100%" class="info-row">
                 <tr><td>Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($fpk->DOCUMENT_DATE)) ?></td></tr>
                 <tr><td>Gudang</td><td class="info-dots">:</td><td><?= $fpk->WAREHOUSE_NAME ?? '-' ?></td></tr>
-                <tr><td>Sales</td><td class="info-dots">:</td><td><?= $fpk->SALES ?? '-' ?></td></tr>
+                <tr><td>Sales</td><td class="info-dots">:</td><td><?= $fpk->SALES_FIRST_NAME.($fpk->SALES_LAST_NAME?' ['.$fpk->SALES_LAST_NAME.']':'') ?></td></tr>
 
             </table>
         </td>

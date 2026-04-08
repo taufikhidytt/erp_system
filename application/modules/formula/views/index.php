@@ -20,26 +20,12 @@
         white-space: nowrap;
     }
 
-    #table table th, #table table td {
-        white-space: nowrap !important;
-        width: 1px !important;
-        padding-right: 6px !important;
-        padding-left: 6px !important;
-    }
-
-    #table table th:nth-child(2), 
-    #table table td:nth-child(2){
-        width: 200px !important; 
-        white-space: normal !important;
-    }
-    #table table th:nth-child(3), 
-    #table table td:nth-child(3){
-        width: 70px !important; 
-        max-width: 70px !important; 
-    }
-
     #table td {
         white-space: nowrap;
+        height: 30px !important;
+        min-height: 30px !important;
+        padding-top: 12px !important;
+        padding-bottom: 1px !important;
         padding-right: 6px !important;
         padding-left: 6px !important;
         font-size: 0.75rem !important;
@@ -85,7 +71,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table text-center table-sm" id="table">
+                                <table class="table table-striped text-center w-100" id="table">
                                     <thead>
                                         <tr>
                                             <th>
@@ -95,43 +81,47 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
-                                            <th style="width: 80%;">
+                                            <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="2" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="3" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="date" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="date" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="date" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="date" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <select class="column_search" data-column="9" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">Semua</option>
+                                                    <option value="Y">✔ Active</option>
+                                                    <option value="N">✖ Inactive</option>
+                                                </select>
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center">
                                             <th></th>
                                             <th>No</th>
-                                            <th>Status</th>
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
-                                            <th>Tanggal</th>
-                                            <th>Dibutuhkan</th>
-                                            <th>Supplier</th>
-                                            <th>Sales</th>
-                                            <th>Gudang</th>
-                                            <th>Total</th>
+                                            <th>Nama Item</th>
+                                            <th>Satuan</th>
+                                            <th>Unit</th>
+                                            <th>Code</th>
+                                            <th>Tanggal Mulai</th>
+                                            <th>Tanggal Selesai</th>
+                                            <th>Flag</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -156,7 +146,7 @@
                 text: '<i class="ri ri-add-circle-fill"></i> Tambah',
                 className: 'btn btn-sm btn-primary',
                 action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('fpk/add') ?>";
+                    window.location.href = "<?= base_url('formula/add') ?>";
                 }
             }],
             "autoWidth": false,
@@ -166,60 +156,59 @@
             "ordering": true,
             "order": [],
             "ajax": {
-                "url": "<?= site_url('fpk/get_data'); ?>",
+                "url": "<?= site_url('formula/get_data'); ?>",
                 "type": "POST"
             },
             "columns": [{
                     "className": 'details-control',
                     "orderable": false,
                     "data": null,
+                    "width": "5%",
                     "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>'
                 },
                 {
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
-                    "className" : "text-center",
+                    "width": "5%",
                 },
                 {
-                    "data": "status",
-                    "className" : "text-center",
+                    "data": "no_transaksi",
+                    "width": "10%",
                 },
                 {
-                    "data": "no_transaksi"
+                    "data": "no_referensi",
+                    "width": "10%",
                 },
                 {
-                    "data": "no_referensi"
+                    "data": "nama_item",
+                    "width": "10%",
                 },
                 {
-                    "data": "tanggal",
-                    "className" : "text-center",
+                    "data": "satuan",
+                    "width": "10%",
                 },
                 {
-                    "data": "tanggal_dibutuhkan",
-                    "className" : "text-center",
+                    "data": "unit",
+                    "width": "10%",
                 },
                 {
-                    "data": "supplier",
-                    "render": function(data) {
-                        if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
-                    }
+                    "data": "lokasi",
+                    "width": "10%",
                 },
                 {
-                    "data": "sales",
-                    "render": function(data) {
-                        if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
-                    }
+                    "data": "tanggal_mulai",
+                    "width": "10%",
                 },
                 {
-                    "data": "gudang"
+                    "data": "tanggal_selesai",
+                    "width": "10%",
                 },
                 {
-                    "data": "total",
-                    "className": "text-end",
-                }
+                    "data": "active_flag",
+                    "className": "text-center",
+                    "width": "20%",
+                },
             ]
         });
 
@@ -230,7 +219,7 @@
             var icon = $(this).find('i');
 
             var rowData = row.data();
-            var prId = rowData.pr_id;
+            var bom_id = rowData.bom_id;
 
             if (row.child.isShown()) {
                 // Close row
@@ -238,19 +227,16 @@
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
             } else {
                 // Open row dengan child row datatable
-                var childTableId = 'child-' + prId;
+                var childTableId = 'child-' + bom_id;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
-                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
-                                <tr class="align-middle">
+                            <thead>
+                                <tr class="align-middle" style="height: 45px;">
                                     <th>No</th>
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
-                                    <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>Harga</th>
-                                    <th>Subtotal</th>
-                                    <th>Keterangan</th>
+                                    <th>Note</th>
                                 </tr>
                             </thead>
                         </table>`;
@@ -262,62 +248,39 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": "<?= site_url('fpk/get_detail'); ?>",
+                        "url": "<?= site_url('formula/get_detail'); ?>",
                         "type": "POST",
                         "data": {
-                            pr_id: prId
+                            bom_id: bom_id
                         }
                     },
                     "columns": [{
                             "data": "no",
-                            className : "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "item",
+                            "data": "nama_item",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "item_code",
-                            className : "text-center text-nowrap",
+                            "data": "kode_item",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "qty",
+                            "data": "jumlah",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
                         },
                         {
-                            "data": "sisa",
-                            "className": "text-end",
-                            createdCell: function(td) {
-                                td.style.fontFamily = 'monospace';
-                            }
-                        },
-                        {
-                            "data": "entered_uom",
-                            createdCell: function(td) {
-                                td.style.fontFamily = 'monospace';
-                            }
-                        },
-                        {
-                            "data": "price",
-                            "className": "text-end",
-                            createdCell: function(td) {
-                                td.style.fontFamily = 'monospace';
-                            }
-                        },
-                        {
-                            "data": "total",
-                            "className": "text-end",
+                            "data": "satuan",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -326,7 +289,6 @@
                             "data": "note",
                             "render": function(data, type, row) {
                                 if (!data) return '';
-
                                 const limit = 30;
                                 if (data.length > limit) {
                                     return `<span title="${data.replace(/"/g, '&quot;')}">
@@ -384,26 +346,4 @@
             })
         }
     });
-
-    function dataDetail(details) {
-        // Sesuaikan format detail di sini
-        return `
-            <table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Harga</th>
-                    <th>Total</th>
-                </tr>
-                ${details.map(d => `
-                    <tr>
-                        <td>${d.item}</td>
-                        <td>${d.qty}</td>
-                        <td>${d.price}</td>
-                        <td>${d.total}</td>
-                    </tr>
-                `).join('')}
-            </table>
-        `;
-    }
 </script>

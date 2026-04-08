@@ -295,6 +295,12 @@
                                                 <span class="d-none d-sm-block">Detail</span>
                                             </a>
                                         </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#tab-material" role="tab" aria-selected="true">
+                                                <span class="d-block d-sm-none"><i class="ri ri-stack-fill"></i></span>
+                                                <span class="d-none d-sm-block">Formula</span>
+                                            </a>
+                                        </li>
                                     </ul>
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
@@ -305,27 +311,32 @@
                                             <button type="button" id="btn-modalMrq" class="btn btn-success btn-sm">
                                                 <i class="ri ri-add-box-fill"></i> Add
                                             </button>
+
+                                            <div class="table-responsive overflow-auto" style="max-height: 450px;">
+                                                <table class="table table-bordered" id="table-detail">
+                                                    <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>
+                                                                <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
+                                                            </th>
+                                                            <th>No Transaksi</th>
+                                                            <th>Nama Item</th>
+                                                            <th>Kode Item</th>
+                                                            <th>Jumlah</th>
+                                                            <th>Satuan</th>
+                                                            <th>Keterangan</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
-                                                <tr>
-                                                    <th>No</th>
-                                                    <th>
-                                                        <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
-                                                    </th>
-                                                    <th>No Transaksi</th>
-                                                    <th>Nama Item</th>
-                                                    <th>Kode Item</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Satuan</th>
-                                                    <th>Keterangan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
+
+                                        <div class="tab-pane" id="tab-material" role="tabpanel" data-url="<?= site_url('mrq/get_material/') ?>" data-url_detail="<?= site_url('mrq/get_material_detail/') ?>">
+                                            
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1541,3 +1552,5 @@
         }
     }
 </script>
+
+<?php $this->load->view('mrq/tab_material'); ?>
