@@ -254,7 +254,7 @@ class Item_model extends CI_Model
             'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
             'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
             'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
-            'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
+            'CUSTOM5'           => $post['satuan'] ? htmlspecialchars($post['satuan']) : null,
             'ACTIVE_FLAG'       => null,
             'LAST_UPDATE_BY'    => $this->session->userdata('id'),
             'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
@@ -358,113 +358,152 @@ class Item_model extends CI_Model
     public function update($post)
     {
         date_default_timezone_set('Asia/Jakarta');
-        $params = array(
-            'MEREK_ID'          => $post['brand'] ? htmlspecialchars($post['brand']) : null,
-            'GROUP_ID'          => $post['category'] ? htmlspecialchars($post['category']) : null,
-            'PART_NUMBER'       => $post['part_number'] ? htmlspecialchars($post['part_number']) : null,
-            'ITEM_DESCRIPTION'  => $post['description'] ? htmlspecialchars($post['description']) : null,
-            'ASSY_CODE'         => $post['assy_code'] ? htmlspecialchars($post['assy_code']) : null,
-            'UOM_CODE'          => $post['satuan'] ? htmlspecialchars($post['satuan']) : null,
-            'TYPE_ID'           => $post['type'] ? htmlspecialchars($post['type']) : null,
-            'MIN_STOCK'         => $post['min_stock'] ? htmlspecialchars($post['min_stock']) : null,
-            'LEAD_TIME'         => $post['lead_time'] ? htmlspecialchars($post['lead_time']) : null,
-            'LOKASI'            => $post['lokasi'] ? htmlspecialchars($post['lokasi']) : null,
-            'LOKASI_ID'         => $post['rak'] ? htmlspecialchars($post['rak']) : null,
-            'PANJANG'           => $post['length'] ? htmlspecialchars($post['length']) : null,
-            'CUSTOM1'           => 'M',
-            'LEBAR'             => $post['width'] ? htmlspecialchars($post['width']) : null,
-            'CUSTOM2'           => 'M',
-            'TINGGI'            => $post['height'] ? htmlspecialchars($post['height']) : null,
-            'CUSTOM3'           => 'M',
-            'BERAT'             => $post['weight'] ? htmlspecialchars($post['weight']) : null,
-            'CUSTOM4'           => 'Kg',
-            'M3'                => $post['kubikasi'] ? htmlspecialchars($post['kubikasi']) : null,
-            'MADE_IN_ID'        => $post['made_in'] ? htmlspecialchars($post['made_in']) : null,
-            'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
-            'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
-            'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
-            'PERSON_ID'         => $post['supplier'] ? htmlspecialchars($post['supplier']) : null,
-            'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
-            'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
-            'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
-            'CUSTOM5'           => $post['satuan2'] ? htmlspecialchars($post['satuan2']) : null,
-            'ACTIVE_FLAG'       => NULL,
-            'LAST_UPDATE_BY'    => $this->session->userdata('id'),
-            'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
-        );
 
-        if (!empty($post['obsolete'])) {
-            $params['OBSOLETE_FLAG'] = 'Y';
-        } else {
-            $params['OBSOLETE_FLAG'] = 'N';
-        }
+        $normalize = function ($value) {
+            if ($value === '') return null;
+            if (is_null($value)) return null;
+            $trimmed = trim((string)$value);
+            if ($trimmed === '') return null;
 
-        if (!empty($post['new_product_name'])) {
-            $params['PRODUK_BARU'] = htmlspecialchars($post['new_product_name']);
-        } else {
-            $params['PRODUK_BARU'] = null;
-        }
+            if (is_numeric($trimmed)) {
+                return number_format((float)$trimmed, 4, '.', '');
+            }
+            return $trimmed;
+        };
 
-        if (!empty($post['konsinyasi'])) {
-            $params['ITEM_KMS'] = 'Y';
-        } else {
-            $params['ITEM_KMS'] = 'N';
-        }
+        $this->db->where('ITEM_ID', $post['id']);
+        $old = $this->db->get('item')->row_array();
 
-        $params['COA_ID'] = null;
-        $params['COA_JUAL_ID'] = null;
-        $params['COA_DISC_JUAL_ID'] = null;
+        $dataCompare = [
+            'MEREK_ID'          => !empty($post['brand']) ? $post['brand'] : null,
+            'GROUP_ID'          => !empty($post['category']) ? $post['category'] : null,
+            'PART_NUMBER'       => $post['part_number'] ?? null,
+            'ITEM_DESCRIPTION'  => $post['description'] ?? null,
+            'ASSY_CODE'         => $post['assy_code'] ?? null,
+            'UOM_CODE'          => !empty($post['satuan']) ? $post['satuan'] : null,
+            'TYPE_ID'           => !empty($post['type']) ? $post['type'] : null,
+            'MIN_STOCK'         => $post['min_stock'] ?? null,
+            'LEAD_TIME'         => $post['lead_time'] ?? null,
+            'LOKASI'            => $post['lokasi'] ?? null,
+            'LOKASI_ID'         => !empty($post['rak']) ? $post['rak'] : null,
+            'PANJANG'           => $post['length'] ?? null,
+            'CUSTOM1'           => 'METER',
+            'LEBAR'             => $post['width'] ?? null,
+            'CUSTOM2'           => 'METER',
+            'TINGGI'            => $post['height'] ?? null,
+            'CUSTOM3'           => 'METER',
+            'BERAT'             => $post['weight'] ?? null,
+            'CUSTOM4'           => 'KG',
+            'M3'                => $post['kubikasi'] ?? null,
+            'CUSTOM5'           => $post['satuan'] ?? null,
+            'MADE_IN_ID'        => !empty($post['made_in']) ? $post['made_in'] : null,
+            'TIPE_ID'           => !empty($post['komoditi']) ? $post['komoditi'] : null,
+            'JENIS_ID'          => !empty($post['jenis']) ? $post['jenis'] : null,
+            'GRADE_ID'          => !empty($post['grade']) ? $post['grade'] : null,
+            'HPP_AWAL'          => $post['hpp'] ?? null,
+            'NOTE'              => $post['keterangan'] ?? null,
+            'MOQ'               => $post['min_order_quantity'] ?? null,
+            'ACTIVE_FLAG'       => 'Y',
 
+            'OBSOLETE_FLAG'     => !empty($post['obsolete']) ? 'Y' : 'N',
+            'PRODUK_BARU'       => !empty($post['new_product_name']) ? $post['new_product_name'] : null,
+            'ITEM_KMS'          => !empty($post['konsinyasi']) ? 'Y' : 'N',
+            'PERSON_ID'         => !empty($post['supplier']) ? $post['supplier'] : null,
+
+            'COA_ID'            => null,
+            'COA_JUAL_ID'       => null,
+            'COA_DISC_JUAL_ID'  => null,
+            'COA_SUSPEND_ID'    => null,
+            'COA_HPP_ID'        => null,
+            'COA_RET_JUAL_ID'   => null,
+            'COA_RET_BELI_ID'   => null,
+        ];
+
+        // Logika COA_ID (acc_persediaan / acc_pembelian / acc_pembelian_uang_muka)
         if (!empty($post['acc_persediaan'])) {
-            $params['COA_ID'] = htmlspecialchars($post['acc_persediaan']);
+            $dataCompare['COA_ID'] = $post['acc_persediaan'];
         } elseif (!empty($post['acc_pembelian'])) {
-            $params['COA_ID'] = htmlspecialchars($post['acc_pembelian']);
+            $dataCompare['COA_ID'] = $post['acc_pembelian'];
         } elseif (!empty($post['acc_pembelian_uang_muka'])) {
-            $params['COA_ID'] = htmlspecialchars($post['acc_pembelian_uang_muka']);
+            $dataCompare['COA_ID'] = $post['acc_pembelian_uang_muka'];
         }
 
-
+        // Logika COA_JUAL_ID (acc_penjualan_barang / acc_penjualan_jasa / acc_penjualan_uang_muka)
         if (!empty($post['acc_penjualan_barang'])) {
-            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_barang']);
+            $dataCompare['COA_JUAL_ID'] = $post['acc_penjualan_barang'];
         } elseif (!empty($post['acc_penjualan_jasa'])) {
-            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_jasa']);
+            $dataCompare['COA_JUAL_ID'] = $post['acc_penjualan_jasa'];
         } elseif (!empty($post['acc_penjualan_uang_muka'])) {
-            $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_uang_muka']);
+            $dataCompare['COA_JUAL_ID'] = $post['acc_penjualan_uang_muka'];
         }
 
-
+        // Logika COA_DISC_JUAL_ID (acc_disc_penjualan / acc_disc_penjualan_jasa)
         if (!empty($post['acc_disc_penjualan'])) {
-            $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan']);
+            $dataCompare['COA_DISC_JUAL_ID'] = $post['acc_disc_penjualan'];
         } elseif (!empty($post['acc_disc_penjualan_jasa'])) {
-            $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan_jasa']);
+            $dataCompare['COA_DISC_JUAL_ID'] = $post['acc_disc_penjualan_jasa'];
         }
 
-
-        // BARANG
+        // Logika COA_SUSPEND_ID (acc_utang_suspend)
         if (!empty($post['acc_utang_suspend'])) {
-            $params['COA_SUSPEND_ID'] = htmlspecialchars($post['acc_utang_suspend']);
-        } else {
-            $params['COA_SUSPEND_ID'] = null;
+            $dataCompare['COA_SUSPEND_ID'] = $post['acc_utang_suspend'];
         }
 
+        // Logika COA_HPP_ID (acc_hpp)
         if (!empty($post['acc_hpp'])) {
-            $params['COA_HPP_ID'] = htmlspecialchars($post['acc_hpp']);
-        } else {
-            $params['COA_HPP_ID'] = null;
+            $dataCompare['COA_HPP_ID'] = $post['acc_hpp'];
         }
 
+        // Logika COA_RET_JUAL_ID (acc_retur_penjualan)
         if (!empty($post['acc_retur_penjualan'])) {
-            $params['COA_RET_JUAL_ID'] = htmlspecialchars($post['acc_retur_penjualan']);
-        } else {
-            $params['COA_RET_JUAL_ID'] = null;
+            $dataCompare['COA_RET_JUAL_ID'] = $post['acc_retur_penjualan'];
         }
 
+        // Logika COA_RET_BELI_ID (acc_retur_pembelian)
         if (!empty($post['acc_retur_pembelian'])) {
-            $params['COA_RET_BELI_ID'] = htmlspecialchars($post['acc_retur_pembelian']);
-        } else {
-            $params['COA_RET_BELI_ID'] = null;
+            $dataCompare['COA_RET_BELI_ID'] = $post['acc_retur_pembelian'];
         }
 
+        $isChanged = false;
+
+        foreach ($dataCompare as $key => $value) {
+            $oldValue = $old[$key] ?? null;
+            if ($normalize($oldValue) !== $normalize($value)) {
+                $isChanged = true;
+                break;
+            }
+        }
+
+        $params = [];
+
+        foreach ($dataCompare as $key => $value) {
+            $params[$key] = is_null($value) ? null : htmlspecialchars($value);
+        }
+
+        $params['LAST_UPDATE_BY']   = $this->session->userdata('id');
+        $params['LAST_UPDATE_DATE'] = date('Y-m-d H:i:s');
+
+        if ($isChanged) {
+            $params['APPROVE_FLAG'] = 'N';
+        } else {
+            $params['APPROVE_FLAG'] = $old['APPROVE_FLAG'] ?? 'N';
+        }
+
+        if (!$isChanged) {
+
+            $this->db->where('ITEM_ID', $post['id']);
+            $this->db->update('item', [
+                'LAST_UPDATE_BY'   => $params['LAST_UPDATE_BY'],
+                'LAST_UPDATE_DATE' => $params['LAST_UPDATE_DATE'],
+                'APPROVE_FLAG'     => $params['APPROVE_FLAG']
+            ]);
+
+            return [
+                'status'   => 'success',
+                'affected' => $this->db->affected_rows(),
+                'message'  => 'Tidak ada perubahan data'
+            ];
+        }
         $this->db->where('ITEM_ID', $post['id']);
         $this->db->update('item', $params);
 
@@ -478,10 +517,143 @@ class Item_model extends CI_Model
         }
 
         return [
-            'status' => 'success',
+            'status'   => 'success',
             'affected' => $this->db->affected_rows()
         ];
     }
+
+    // public function update($post)
+    // {
+    //     date_default_timezone_set('Asia/Jakarta');
+    //     $params = array(
+    //         'MEREK_ID'          => $post['brand'] ? htmlspecialchars($post['brand']) : null,
+    //         'GROUP_ID'          => $post['category'] ? htmlspecialchars($post['category']) : null,
+    //         'PART_NUMBER'       => $post['part_number'] ? htmlspecialchars($post['part_number']) : null,
+    //         'ITEM_DESCRIPTION'  => $post['description'] ? htmlspecialchars($post['description']) : null,
+    //         'ASSY_CODE'         => $post['assy_code'] ? htmlspecialchars($post['assy_code']) : null,
+    //         'UOM_CODE'          => $post['satuan'] ? htmlspecialchars($post['satuan']) : null,
+    //         'TYPE_ID'           => $post['type'] ? htmlspecialchars($post['type']) : null,
+    //         'MIN_STOCK'         => $post['min_stock'] ? htmlspecialchars($post['min_stock']) : null,
+    //         'LEAD_TIME'         => $post['lead_time'] ? htmlspecialchars($post['lead_time']) : null,
+    //         'LOKASI'            => $post['lokasi'] ? htmlspecialchars($post['lokasi']) : null,
+    //         'LOKASI_ID'         => $post['rak'] ? htmlspecialchars($post['rak']) : null,
+    //         'PANJANG'           => $post['length'] ? htmlspecialchars($post['length']) : null,
+    //         'CUSTOM1'           => 'M',
+    //         'LEBAR'             => $post['width'] ? htmlspecialchars($post['width']) : null,
+    //         'CUSTOM2'           => 'M',
+    //         'TINGGI'            => $post['height'] ? htmlspecialchars($post['height']) : null,
+    //         'CUSTOM3'           => 'M',
+    //         'BERAT'             => $post['weight'] ? htmlspecialchars($post['weight']) : null,
+    //         'CUSTOM4'           => 'Kg',
+    //         'M3'                => $post['kubikasi'] ? htmlspecialchars($post['kubikasi']) : null,
+    //         'MADE_IN_ID'        => $post['made_in'] ? htmlspecialchars($post['made_in']) : null,
+    //         'TIPE_ID'           => $post['komoditi'] ? htmlspecialchars($post['komoditi']) : null,
+    //         'JENIS_ID'          => $post['jenis'] ? htmlspecialchars($post['jenis']) : null,
+    //         'GRADE_ID'          => $post['grade'] ? htmlspecialchars($post['grade']) : null,
+    //         'HPP_AWAL'          => $post['hpp'] ? htmlspecialchars($post['hpp']) : null,
+    //         'NOTE'              => $post['keterangan'] ? htmlspecialchars($post['keterangan']) : null,
+    //         'MOQ'               => $post['min_order_quantity'] ? htmlspecialchars($post['min_order_quantity']) : null,
+    //         'CUSTOM5'           => $post['satuan'] ? htmlspecialchars($post['satuan']) : null,
+    //         'ACTIVE_FLAG'       => NULL,
+    //         'LAST_UPDATE_BY'    => $this->session->userdata('id'),
+    //         'LAST_UPDATE_DATE'  => date('Y-m-d H:i:s'),
+    //     );
+
+    //     if (!empty($post['obsolete'])) {
+    //         $params['OBSOLETE_FLAG'] = 'Y';
+    //     } else {
+    //         $params['OBSOLETE_FLAG'] = 'N';
+    //     }
+
+    //     if (!empty($post['new_product_name'])) {
+    //         $params['PRODUK_BARU'] = htmlspecialchars($post['new_product_name']);
+    //     } else {
+    //         $params['PRODUK_BARU'] = null;
+    //     }
+
+    //     if (!empty($post['konsinyasi'])) {
+    //         $params['ITEM_KMS'] = 'Y';
+    //     } else {
+    //         $params['ITEM_KMS'] = 'N';
+    //     }
+
+    //     if (!empty($post['supplier'])) {
+    //         $params['PERSON_ID'] = htmlspecialchars($post['supplier']);
+    //     } else {
+    //         $params['PERSON_ID'] = null;
+    //     }
+
+    //     $params['COA_ID'] = null;
+    //     $params['COA_JUAL_ID'] = null;
+    //     $params['COA_DISC_JUAL_ID'] = null;
+
+    //     if (!empty($post['acc_persediaan'])) {
+    //         $params['COA_ID'] = htmlspecialchars($post['acc_persediaan']);
+    //     } elseif (!empty($post['acc_pembelian'])) {
+    //         $params['COA_ID'] = htmlspecialchars($post['acc_pembelian']);
+    //     } elseif (!empty($post['acc_pembelian_uang_muka'])) {
+    //         $params['COA_ID'] = htmlspecialchars($post['acc_pembelian_uang_muka']);
+    //     }
+
+
+    //     if (!empty($post['acc_penjualan_barang'])) {
+    //         $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_barang']);
+    //     } elseif (!empty($post['acc_penjualan_jasa'])) {
+    //         $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_jasa']);
+    //     } elseif (!empty($post['acc_penjualan_uang_muka'])) {
+    //         $params['COA_JUAL_ID'] = htmlspecialchars($post['acc_penjualan_uang_muka']);
+    //     }
+
+
+    //     if (!empty($post['acc_disc_penjualan'])) {
+    //         $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan']);
+    //     } elseif (!empty($post['acc_disc_penjualan_jasa'])) {
+    //         $params['COA_DISC_JUAL_ID'] = htmlspecialchars($post['acc_disc_penjualan_jasa']);
+    //     }
+
+
+    //     // BARANG
+    //     if (!empty($post['acc_utang_suspend'])) {
+    //         $params['COA_SUSPEND_ID'] = htmlspecialchars($post['acc_utang_suspend']);
+    //     } else {
+    //         $params['COA_SUSPEND_ID'] = null;
+    //     }
+
+    //     if (!empty($post['acc_hpp'])) {
+    //         $params['COA_HPP_ID'] = htmlspecialchars($post['acc_hpp']);
+    //     } else {
+    //         $params['COA_HPP_ID'] = null;
+    //     }
+
+    //     if (!empty($post['acc_retur_penjualan'])) {
+    //         $params['COA_RET_JUAL_ID'] = htmlspecialchars($post['acc_retur_penjualan']);
+    //     } else {
+    //         $params['COA_RET_JUAL_ID'] = null;
+    //     }
+
+    //     if (!empty($post['acc_retur_pembelian'])) {
+    //         $params['COA_RET_BELI_ID'] = htmlspecialchars($post['acc_retur_pembelian']);
+    //     } else {
+    //         $params['COA_RET_BELI_ID'] = null;
+    //     }
+
+    //     $this->db->where('ITEM_ID', $post['id']);
+    //     $this->db->update('item', $params);
+
+    //     $error = $this->db->error();
+
+    //     if ($error['code'] != 0) {
+    //         return [
+    //             'status'  => 'error',
+    //             'message' => $error['message']
+    //         ];
+    //     }
+
+    //     return [
+    //         'status' => 'success',
+    //         'affected' => $this->db->affected_rows()
+    //     ];
+    // }
 
     public function approve($id)
     {

@@ -235,13 +235,16 @@
                     "data": "made_in"
                 },
                 {
-                    "data": "konsy"
+                    "data": "konsy",
+                    "className": "text-center",
                 },
                 {
-                    "data": "approved"
+                    "data": "approved",
+                    "className": "text-center",
                 },
                 {
-                    "data": "status"
+                    "data": "status",
+                    "className": "text-center",
                 }
             ]
         });

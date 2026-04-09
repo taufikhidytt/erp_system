@@ -281,7 +281,7 @@
                                                     </thead>
                                                     <tbody>
                                                         <?php
-                                                        $dataDetail = $this->db->query("SELECT bom_detail.*, item.ITEM_CODE FROM bom_detail JOIN item ON item.ITEM_ID = bom_detail.ITEM_ID WHERE bom_detail.BOM_ID = '{$data->BOM_ID}'");
+                                                        $dataDetail = $this->db->query("SELECT bom_detail.*, item.ITEM_CODE, item.ITEM_DESCRIPTION as nama_item FROM bom_detail JOIN item ON item.ITEM_ID = bom_detail.ITEM_ID WHERE bom_detail.BOM_ID = '{$data->BOM_ID}'");
 
                                                         if ($dataDetail->num_rows() > 0) { ?>
                                                             <?php
@@ -301,10 +301,10 @@
                                                                     </td>
 
                                                                     <td class="ellipsis">
-                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ITEM_DESCRIPTION ?>">
-                                                                            <?= $dd->ITEM_DESCRIPTION; ?>
+                                                                        <span class="ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->nama_item ?>">
+                                                                            <?= $dd->nama_item; ?>
                                                                         </span>
-                                                                        <input type="hidden" name="detail[nama_item][]" value="<?= $dd->ITEM_DESCRIPTION ?>">
+                                                                        <input type="hidden" name="detail[nama_item][]" value="<?= $dd->nama_item ?>">
                                                                     </td>
 
                                                                     <td class="ellipsis">

@@ -48,16 +48,16 @@ class Item extends Back_Controller
             $row['price_last_sell'] = $item->PRICE_LAST_SELL ? number_format($item->PRICE_LAST_SELL, 2) : '-';
             $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Weeks" : '-';
             if ($item->KONSY == 'Y') {
-                $returnKonsy = 'Yes';
+                $returnKonsy = '<i class="text-success fa fa-check"></i>';
             } elseif ($item->KONSY == 'N') {
-                $returnKonsy = 'No';
+                $returnKonsy = '<i class="text-danger fa fa-times"></i>';
             } else {
                 $returnKonsy = '-';
             }
             $row['konsy'] = $returnKonsy;
-            $item->KONSY == 'Y' ? 'Yes' : 'No';
-            $row['approved'] = $item->APPROVED == 'Y' ? 'Yes' : 'No';
-            $row['status'] = $item->OBSOLETE == 'Y' ? 'Yes' : 'No';
+            $item->KONSY == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
+            $row['approved'] = $item->APPROVED == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
+            $row['status'] = $item->OBSOLETE == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
             $data[] = $row;
         }
 

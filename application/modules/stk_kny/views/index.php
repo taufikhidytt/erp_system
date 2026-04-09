@@ -171,7 +171,7 @@
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-striped text-center w-100 text-nowrap" id="table-summary">
-                                        <thead>
+                                        <!-- <thead>
                                             <tr>
                                                 <th></th>
                                                 <th><input type="text" class="column_search form-control form-control-sm" placeholder="Cari Nama"></th>
@@ -248,6 +248,21 @@
                                                 <th id="total_kons_sampit"></th>
                                                 <th id="total_neglasari"></th>
                                                 <th id="total_total_stok"></th>
+                                            </tr>
+                                        </tfoot> -->
+
+                                        <thead>
+                                            <tr id="search-row">
+                                                <!-- Column search akan di-generate JS -->
+                                            </tr>
+                                            <tr id="header-row">
+                                                <!-- Header akan di-generate JS -->
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <tr id="footer-row">
+                                                <!-- Footer summary akan di-generate JS -->
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -430,48 +445,132 @@
         // ===============================================================
 
         // Tab summary stok
-        var tableSummary = $('#table-summary').DataTable({
-            processing: true,
-            serverSide: true,
-            autoWidth: false,
-            order: [],
-            ajax: {
-                url: "<?= site_url('stk_kny/get_data_summary'); ?>",
-                type: "POST",
-            },
-            drawCallback: function(settings) {
-                var json = settings.json;
-                if (json && json.summary) {
-                    $('#total_pusat').text(json.summary.total_pusat);
-                    $('#total_pinjam').text(json.summary.total_pinjam);
-                    $('#total_uncomplete').text(json.summary.total_uncomplete);
-                    $('#total_booked').text(json.summary.total_booked);
-                    $('#total_kons_jia').text(json.summary.total_kons_jia);
-                    $('#total_kons_bbi').text(json.summary.total_kons_bbi);
-                    $('#total_kons_bki').text(json.summary.total_kons_bki);
-                    $('#total_kons_hss').text(json.summary.total_kons_hss);
-                    $('#total_kons_thc').text(json.summary.total_kons_thc);
-                    $('#total_kons_gd_hydraulic').text(json.summary.total_kons_gd_hydraulic);
-                    $('#total_kons_tfp').text(json.summary.total_kons_tfp);
-                    $('#total_teknikal').text(json.summary.total_teknikal);
-                    $('#total_kons_gun').text(json.summary.total_kons_gun);
-                    $('#total_kons_hs').text(json.summary.total_kons_hs);
-                    $('#total_kons_nhc').text(json.summary.total_kons_nhc);
-                    $('#total_kons_sampit').text(json.summary.total_kons_sampit);
-                    $('#total_neglasari').text(json.summary.total_neglasari);
-                    $('#total_total_stok').text(json.summary.total_total_stok);
+        var tableSummary;
+
+        $.ajax({
+            url: "<?= site_url('stk_kny/get_columns'); ?>",
+            method: "GET",
+            dataType: "json",
+            success: function(columns) {
+
+                function formatColumn(col) {
+                    return col.replace(/_/g, ' ');
                 }
-            },
-            columnDefs: [{
-                className: 'text-end',
-                targets: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-            }]
+
+                function formatKey(col) {
+                    return col.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                }
+
+                // HEADER
+                $('#header-row').append('<th>No</th>');
+                columns.forEach(col => {
+                    $('#header-row').append('<th>' + formatColumn(col) + '</th>');
+                });
+
+                // SEARCH ROW
+                $('#search-row').append('<th></th>');
+                columns.forEach(col => {
+                    $('#search-row').append(
+                        '<th><input type="text" class="column_search form-control form-control-sm" placeholder="Cari ' + formatColumn(col) + '"></th>'
+                    );
+                });
+
+                // FOOTER
+                $('#footer-row').append('<th style="text-align:right">Total :</th>');
+                columns.forEach(col => {
+                    $('#footer-row').append('<th id="total_' + formatKey(col) + '"></th>');
+                });
+
+                // COLUMNS
+                let dtColumns = [{
+                    data: 'NO',
+                    className: 'text-start'
+                }];
+
+                const leftAlignColumns = ['NO', 'NAMA_ITEM', 'KODE_ITEM', 'SATUAN'];
+
+                columns.forEach(col => {
+                    dtColumns.push({
+                        data: col,
+                        className: leftAlignColumns.includes(col) ? 'text-start' : 'text-end',
+                        render: function(data, type) {
+
+                            // format hanya untuk numeric
+                            if (!leftAlignColumns.includes(col) && type === 'display' && !isNaN(data) && data !== null) {
+                                return parseFloat(data).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                });
+                            }
+
+                            return data;
+                        }
+                    });
+                });
+
+                // INIT DATATABLE
+                tableSummary = $('#table-summary').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    autoWidth: false,
+                    order: [
+                        [1, 'asc']
+                    ],
+                    ajax: {
+                        url: "<?= site_url('stk_kny/get_data_summary'); ?>",
+                        type: "POST",
+                    },
+                    columns: dtColumns,
+                    drawCallback: function(settings) {
+                        var json = settings.json;
+                        if (json && json.summary) {
+                            for (let key in json.summary) {
+                                $('#total_' + key).text(json.summary[key]);
+                            }
+                        }
+                    }
+                });
+
+                // SEARCH PER COLUMN
+                $('#table-summary thead').on('keyup change', '.column_search', function() {
+                    let index = $(this).parent().index();
+                    tableSummary.column(index).search(this.value).draw();
+                });
+            }
         });
 
-        $('#table-summary thead').on('keyup change', '.column_search', function() {
-            let index = $(this).parent().index();
-            tableSummary.column(index).search(this.value).draw();
-        });
+        // var tableSummary = $('#table-summary').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     autoWidth: false,
+        //     order: [],
+        //     ajax: {
+        //         url: "<?= site_url('stk_kny/get_data_summary'); ?>",
+        //         type: "POST",
+        //     },
+        //     drawCallback: function(settings) {
+        //         var json = settings.json;
+        //         if (json && json.summary) {
+        //             // Dynamic update footer
+        //             for (const key in json.summary) {
+        //                 $('#' + key).text(json.summary[key]);
+        //             }
+        //         }
+        //     },
+        //     columnDefs: [{
+        //         className: 'text-end',
+        //         targets: "_all" // semua kolom numeric akan rata kanan, bisa sesuaikan jika perlu
+        //     }]
+        // });
+
+        // --------------------------
+        // Column search
+        // --------------------------
+
+        // $('#table-summary thead').on('keyup change', '.column_search', function() {
+        //     let index = $(this).parent().index();
+        //     tableSummary.column(index).search(this.value).draw();
+        // });
 
         $('#export_excel_summary_stok').on('click', function() {
             window.location.href = "<?= site_url('stk_kny/export_excel_summary_stok') ?>";

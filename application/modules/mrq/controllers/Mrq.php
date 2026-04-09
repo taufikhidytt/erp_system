@@ -844,10 +844,11 @@ class Mrq extends Back_Controller
         }));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $mrq    = $this->mrq->get_mrq_detail($id)->row();
-        if($mrq){
+        if ($mrq) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'mrq/pdf',
@@ -855,14 +856,15 @@ class Mrq extends Back_Controller
                     'mrq' => $mrq,
                     'mrq_detail' => $this->mrq->get_detail_by_build_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $mrq->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $mrq->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $mrq->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $mrq->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 
-    public function get_material(){
+    public function get_material()
+    {
         $item_id = (int) $this->input->post('item_id');
         $this->load->model('M_datatables', 'datatables');
         $params = [
@@ -871,11 +873,11 @@ class Mrq extends Back_Controller
                 'a.BOM_ID,a.DOCUMENT_NO,a.ENTERED_QTY,a.UOM_CODE,a.UNIT,a.LOKASI,a.NOTE,
                 i.ITEM_DESCRIPTION,i.ITEM_CODE',
             ],
-            'joins'         => [ ['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner'] ],
-            'where'         => [ 'a.ITEM_ID' => $item_id ],
-            'where_raw'     => [ "( ( a.ACTIVE_FLAG = 'Y' AND a.END_DATE >= CURDATE()) OR ( CURDATE()  BETWEEN a.START_DATE AND a.END_DATE ) )" ],
-            'column_search' => ['a.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE','a.UNIT','a.LOKASI', 'a.NOTE'],
-            'column_order'  => [null, 'a.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE','a.UNIT','a.LOKASI', 'a.NOTE'],
+            'joins'         => [['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner']],
+            'where'         => ['a.ITEM_ID' => $item_id],
+            'where_raw'     => ["( ( a.ACTIVE_FLAG = 'Y' AND a.END_DATE >= CURDATE()) OR ( CURDATE()  BETWEEN a.START_DATE AND a.END_DATE ) )"],
+            'column_search' => ['a.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE', 'a.UNIT', 'a.LOKASI', 'a.NOTE'],
+            'column_order'  => [null, 'a.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE', 'a.UNIT', 'a.LOKASI', 'a.NOTE'],
             'order'         => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
@@ -883,7 +885,10 @@ class Mrq extends Back_Controller
             return [
                 'no' => $no,
                 'bom_id' => base64url_encode($this->encrypt->encode($row->BOM_ID)),
-                'document_no' => $row->DOCUMENT_NO,
+                'document_no' => '
+                    <a href="' . base_url('formula/detail/' . base64url_encode($this->encrypt->encode($row->BOM_ID))) . '" target="_blank">
+                        ' . ($row->DOCUMENT_NO ? $row->DOCUMENT_NO : '-') . '
+                    </a>',
                 'nama_item' => $row->ITEM_DESCRIPTION,
                 'kode_item' => $row->ITEM_CODE,
                 'satuan' => $row->UOM_CODE,
@@ -895,7 +900,8 @@ class Mrq extends Back_Controller
         }));
     }
 
-    public function get_material_detail(){
+    public function get_material_detail()
+    {
         $bom_id = (int) $this->encrypt->decode(base64url_decode($this->input->post('bom_id')));
         $this->load->model('M_datatables', 'datatables');
         $params = [
@@ -904,13 +910,13 @@ class Mrq extends Back_Controller
                 'b.DOCUMENT_NO,a.ENTERED_QTY,a.ENTERED_UOM,a.NOTE,
                 i.ITEM_DESCRIPTION,i.ITEM_CODE',
             ],
-            'joins'         => [ 
+            'joins'         => [
                 ['bom b', 'a.BOM_ID = b.BOM_ID', 'inner'],
                 ['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
-            'where'         => [ 'a.BOM_ID' => $bom_id ],
-            'column_search' => ['b.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
-            'column_order'  => [null, 'b.DOCUMENT_NO','i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
+            'where'         => ['a.BOM_ID' => $bom_id],
+            'column_search' => ['b.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
+            'column_order'  => [null, 'b.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
             'order'         => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
