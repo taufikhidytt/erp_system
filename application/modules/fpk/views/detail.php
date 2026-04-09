@@ -1349,7 +1349,7 @@
                 {
                     "data": "kode_item",
                     width: "15%",
-                    "className" : "ellipsis",
+                    "className" : "ellipsis text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }

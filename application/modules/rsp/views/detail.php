@@ -42,6 +42,11 @@
     .keterangan-view {
         white-space: pre-line;
     }
+
+    .label-status span {
+        font-size: 1rem !important;
+        width: 100% !important;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
@@ -72,9 +77,9 @@
                     <div class="card-body">
                         <form action="" method="post" id="myForm">
                             <div class="row mb-2">
-                                <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <span class="border border-1 border-dark p-2" id="statusRcoId"></span>
-                                    <span class="border border-1 border-warning p-2" id="readonlyRcoId"></span>
+                                <div class="col-lg-6 col-md-6 col-sm-12 d-flex align-items-center gap-2 label-status">
+                                    <h5 id="statusRcoId" style="width: 100px;"></h5>
+                                    <h5 style="width: 100px;" id="readonlyRcoId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <a href="<?= base_url('rsp/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
@@ -219,7 +224,7 @@
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail">
+                                        <table class="table table-striped table-bordered table-sm" id="table-detail">
                                             <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
                                                 <tr style="text-align: center !important;">
                                                     <th>No</th>
@@ -289,7 +294,7 @@
                                                                 <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
                                                                 <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
                                                             </td>
-                                                            <td>
+                                                            <td class="text-center">
                                                                 <input type="checkbox" class="chkDetail">
                                                             </td>
                                                             <td class="ellipsis">
@@ -353,7 +358,7 @@
 
 <!-- modal -->
 <div id="modalRSP" class="modal fade" style="font-size: 12px;">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title mt-0" id="modalTitleForm"></h5>
@@ -361,8 +366,8 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped" id="table-item">
-                        <thead>
+                    <table class="table table-bordered table-striped table-sm" id="table-item">
+                        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                             <tr class="text-nowrap">
                                 <th>
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
@@ -434,12 +439,12 @@
                 tag_pinjam_id: tag_pinjam_id,
             },
             success: function(response) {
-                $('#statusRcoId').text(response.data[0].DISPLAY_NAME);
+                $('#statusRcoId').html(badgeStatus(response.data[0].DISPLAY_NAME,response.data[0].MENU_ICON));
                 $('#readonlyRcoId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
                     $('#readonlyRcoId').show();
-                    $('#readonlyRcoId').text('READ ONLY');
+                    $('#readonlyRcoId').html('<span class="badge bg-secondary">READ ONLY</span>');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
@@ -517,7 +522,7 @@
                 {
                     targets: 6,
                     width: "8%",
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -554,33 +559,36 @@
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
-            columnDefs: [{
+            columnDefs: [
+                {
                     targets: 0,
+                    className : "text-center",
                 }, // checkbox
                 {
                     targets: 1,
+                    className : "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // no
                 {
                     targets: 2,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
+                    className: "ellipsis text-center",
+                    // render: function(data) {
+                    //     if (!data) return '-';
+                    //     let limit = 20;
+                    //     let text = data.length > limit ?
+                    //         data.substring(0, limit) + '...' :
+                    //         data;
+                    //     return `<span title="${data}">${text}</span>`;
+                    // },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // status
                 {
                     targets: 3,
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 20;
@@ -640,7 +648,7 @@
                 }, // nama item
                 {
                     targets: 7,
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 15;
@@ -950,7 +958,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 no++,
-                                item.STATUS_NAME,
+                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
                                 item.No_Reff_1,
                                 item.No_Reff_2,
                                 item.DOCUMENT_REFF_NO,

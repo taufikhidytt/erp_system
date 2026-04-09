@@ -30,8 +30,8 @@ class Grk extends Back_Controller
         foreach ($list as $grk) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $grk->Status ? $grk->Status : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($grk->Status, $grk->Warna_Status);
             $row['no_transaksi'] = '
             <a href="' . base_url('grk/detail/' . base64url_encode($this->encrypt->encode($grk->PO_ID))) . '">
                 ' . ($grk->No_Transaksi ? $grk->No_Transaksi : '-') . '
@@ -110,7 +110,8 @@ class Grk extends Back_Controller
                 b.PR_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                s.DISPLAY_NAME as STATUS_NAME,
+                s.MENU_ICON,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.DOCUMENT_REFF_NO,
@@ -144,6 +145,8 @@ class Grk extends Back_Controller
                     ON b.ITEM_ID = i.ITEM_ID
                 JOIN warehouse w
                     ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                JOIN erp_lookup_value s
+                    ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
             WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                 AND (
                     b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
@@ -155,7 +158,7 @@ class Grk extends Back_Controller
                 AND a.DOCUMENT_TYPE_ID = '{$tipe_id['TYPE_ID']}'
                 AND a.PERSON_ID = {$supplier}
                 -- AND a.DOCUMENT_NO = 'FPK/BKI/260100003'
-            ORDER BY a.DOCUMENT_DATE DESC
+            ORDER BY a.DOCUMENT_DATE
                 -- a.DOCUMENT_NO,
                 -- b.PR_DETAIL_ID;
             ");
@@ -180,11 +183,15 @@ class Grk extends Back_Controller
     public function getStatus()
     {
         $po_id = $this->encrypt->decode($this->input->post('po_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM po a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PO_ID = {$po_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM po a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.PO_ID = {$po_id}");
         if ($data->num_rows() > 0) {
+            $rows = $data->result();
+            foreach ($rows as $row) {
+                $row->badge_status = badge_status($row->DISPLAY_NAME,$row->MENU_ICON);
+            }
             $result = array(
                 'status' => 'sukses',
-                'data' => $data->result_array(),
+                'data' => $rows,
             );
         } else {
             $result = array(
@@ -588,7 +595,7 @@ class Grk extends Back_Controller
             'where' => ['b.PO_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['b.PO_DETAIL_ID' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function($row, $no) {
@@ -616,8 +623,10 @@ class Grk extends Back_Controller
                 Jumlah,
                 Satuan,
                 `S.Loc` as S_Loc,
-                HEADER_ID
-            FROM (SELECT
+                HEADER_ID,
+                Erp_Menu_Name
+            FROM (
+                SELECT
                     b.PO_ID,
                     b.PO_DETAIL_ID,
                     b.ITEM_ID,
@@ -628,7 +637,8 @@ class Grk extends Back_Controller
                     w.WAREHOUSE_NAME `S.Loc`,
                     w.WAREHOUSE_ID,
                     a.TAG_KONSI_ID HEADER_ID,
-                    a.TAG_KONSI_DETAIL_ID DETAIL_ID
+                    a.TAG_KONSI_DETAIL_ID DETAIL_ID,
+                    'STS' Erp_Menu_Name
                 FROM
                     po_detail b
                     JOIN tag_konsi_detail a
@@ -651,7 +661,8 @@ class Grk extends Back_Controller
                     w.WAREHOUSE_NAME `S.Loc`,
                     w.WAREHOUSE_ID,
                     a.TAG_PINJAM_ID HEADER_ID,
-                    a.TAG_PINJAM_DETAIL_ID DETAIL_ID
+                    a.TAG_PINJAM_DETAIL_ID DETAIL_ID,
+                    'RSP' Erp_Menu_Name
                 FROM
                     po_detail b
                     JOIN tag_pinjam_detail a
@@ -674,7 +685,8 @@ class Grk extends Back_Controller
                     w.WAREHOUSE_NAME `S.Loc`,
                     w.WAREHOUSE_ID,
                     a.BUILD_ID HEADER_ID,
-                    a.BUILD_DETAIL_ID DETAIL_ID
+                    a.BUILD_DETAIL_ID DETAIL_ID,
+                    'MRQ' Erp_Menu_Name
                 FROM
                     po_detail b
                     JOIN build_detail a
@@ -697,7 +709,8 @@ class Grk extends Back_Controller
                     w.WAREHOUSE_NAME `S.Loc`,
                     w.WAREHOUSE_ID,
                     a.INVENTORY_IN_ID HEADER_ID,
-                    a.INVENTORY_IN_DETAIL_ID DETAIL_ID
+                    a.INVENTORY_IN_DETAIL_ID DETAIL_ID,
+                    'PO' Erp_Menu_Name
                 FROM
                     po_detail b
                     JOIN inventory_in_detail a
@@ -709,20 +722,12 @@ class Grk extends Back_Controller
                 WHERE b.PO_DETAIL_ID = $detail_id
             ) AS table_union
         ";
-
+    
         $data = $this->db->query($query)->result();
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
             $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
-            $No_Transaksi = explode('/',$d->No_Transaksi);
-            $d->link = null;
-            if(strtoupper($No_Transaksi[0]) == 'SJS'){
-                $d->link = site_url('sts/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            }else if(strtoupper($No_Transaksi[0]) == 'RSP'){
-                $d->link = site_url('rsp/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            }else if(strtoupper($No_Transaksi[0]) == 'MR'){
-                $d->link = site_url('mrq/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            }
+            $d->link = site_url(strtolower($d->Erp_Menu_Name)."/detail/".base64url_encode($this->encrypt->encode($d->HEADER_ID)));
             
         }
         echo json_encode($data);

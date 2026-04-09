@@ -30,8 +30,8 @@ class Sts extends Back_Controller
         foreach ($list as $sts) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $sts->STATUS ? $sts->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($sts->STATUS,$sts->Warna_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('sts/detail/' . base64url_encode($this->encrypt->encode($sts->TAG_KONSI_ID))) . '">
                 ' . ($sts->No_Transaksi ? $sts->No_Transaksi : '-') . '
@@ -111,7 +111,8 @@ class Sts extends Back_Controller
                             NULL TAG_DETAIL_ID,
                             a.DOCUMENT_TYPE_ID,
                             a.STATUS_ID,
-                            FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                            s.DISPLAY_NAME as STATUS_NAME,
+                            s.MENU_ICON,
                             a.DOCUMENT_DATE,
                             a.DOCUMENT_NO,
                             a.DOCUMENT_REFF_NO,
@@ -140,6 +141,8 @@ class Sts extends Back_Controller
                                 ON b.ITEM_ID = i.ITEM_ID
                             JOIN warehouse w
                                 ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                            JOIN erp_lookup_value s
+                                ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID 
                         WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                             AND (
                                 b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
@@ -158,7 +161,8 @@ class Sts extends Back_Controller
                             b.TAG_DETAIL_ID,
                             a.DOCUMENT_TYPE_ID,
                             a.STATUS_ID,
-                            FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                            s.DISPLAY_NAME as STATUS_NAME,
+                            s.MENU_ICON,
                             a.DOCUMENT_DATE,
                             a.DOCUMENT_NO,
                             a.DOCUMENT_REFF_NO,
@@ -187,6 +191,8 @@ class Sts extends Back_Controller
                                 ON b.ITEM_ID = i.ITEM_ID
                             JOIN warehouse w
                                 ON b.TO_WH_ID = w.WAREHOUSE_ID
+                            JOIN erp_lookup_value s
+                                ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                         WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                             AND (
                                 b.DELIVERED_ENTERED_QTY * b.DELIVERED_BASE_QTY
@@ -221,7 +227,7 @@ class Sts extends Back_Controller
     public function getStatus()
     {
         $tag_konsi_id = $this->encrypt->decode($this->input->post('tag_konsi_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM tag_konsi a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_KONSI_ID = {$tag_konsi_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM tag_konsi a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_KONSI_ID = {$tag_konsi_id}");
         if ($data->num_rows() > 0) {
             $result = array(
                 'status' => 'sukses',
@@ -647,7 +653,7 @@ class Sts extends Back_Controller
             'where' => ['b.TAG_KONSI_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['b.TAG_KONSI_DETAIL_ID' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function($row, $no) {
@@ -681,7 +687,7 @@ class Sts extends Back_Controller
                 ['warehouse w', 'a.TO_WH_ID = w.WAREHOUSE_ID', 'inner'],
             ],
             'where' => ['b.TAG_KONSI_DETAIL_ID' => $detail_id],
-            'order' => ['b.TAG_KONSI_DETAIL_ID' => 'asc'],
+            // 'order' => ['b.TAG_KONSI_DETAIL_ID' => 'asc'],
             'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
             'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];

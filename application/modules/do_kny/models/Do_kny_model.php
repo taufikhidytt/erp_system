@@ -44,7 +44,7 @@ class Do_kny_model extends CI_Model
         $this->db->select("
             a.INVENTORY_OUT_ID,
             a.SO_ID,
-            b.DISPLAY_NAME STATUS,
+            b.DISPLAY_NAME STATUS, b.MENU_ICON WARNA_STATUS,
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO PO_Customer,
             a.DOCUMENT_DATE Tanggal,
@@ -208,7 +208,7 @@ class Do_kny_model extends CI_Model
             b.SUBTOTAL,
             IF(
                 bl.ITEM_ID IS NULL,
-                bd.UNIT_PRICE - bd.DISCOUNT_PRICE,
+                bd.UNIT_PRICE,
                 bl.TOTAL_AMOUNT
             ) AS HPP,
             b.HARGA_INPUT,
@@ -223,7 +223,7 @@ class Do_kny_model extends CI_Model
             JOIN build bl
                 ON b.BUILD_ID = bl.BUILD_ID
             JOIN build_detail bd
-                ON bl.BUILD_ID = bd.BUILD_ID
+                ON b.BUILD_DETAIL_ID = bd.BUILD_DETAIL_ID
             JOIN item i
                 ON b.ITEM_ID = i.ITEM_ID
             JOIN person psn

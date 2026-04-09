@@ -46,6 +46,11 @@
     .table-sub tbody td{
         font-family: monospace;
     }
+
+    .label-status span {
+        font-size: 1rem !important;
+        width: 100% !important;
+    }
 </style>
 
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
@@ -76,9 +81,9 @@
                     <div class="card-body">
                         <form action="" method="post" id="myForm">
                             <div class="row mb-2">
-                                <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <span class="border border-1 border-dark p-2" id="statusRcoId"></span>
-                                    <span class="border border-1 border-warning p-2" id="readonlyRcoId"></span>
+                                <div class="col-lg-6 col-md-6 col-sm-12 d-flex align-items-center gap-2 label-status">
+                                    <h5 id="statusRcoId" style="width: 100px;"></h5>
+                                    <h5 style="width: 100px;" id="readonlyRcoId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <a href="<?= base_url('rco/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
@@ -229,15 +234,17 @@
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
                                         <div class="tab-pane active" id="detail" role="tabpanel">
-                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
-                                                <i class="fa fa-trash"></i> Del
-                                            </button>
-                                            <button type="button" id="btn-modalRCO" class="btn btn-success btn-sm">
-                                                <i class="ri ri-add-box-fill"></i> Add
-                                            </button>
+                                            <div class="mb-3">
+                                                <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;height:29.89px">
+                                                        <i class="fa fa-trash"></i> Del
+                                                    </button>
+                                                    <button type="button" id="btn-modalRCO" class="btn btn-success btn-sm">
+                                                        <i class="ri ri-add-box-fill"></i> Add
+                                                    </button>
+                                            </div>
 
                                             <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                                <table class="table table-striped table-bordered" id="table-detail">
+                                                <table class="table table-striped table-bordered table-sm" id="table-detail">
                                                     <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr style="text-align: center !important;">
                                                             <th>No</th>
@@ -346,7 +353,7 @@
 
                                         <div class="tab-pane" id="info-detail" role="tabpanel">
                                             <div class="table-responsive">
-                                                <table class="table table-striped w-100" id="table-info" data-url=" <?=  site_url('rco/get_info/' . base64url_encode($this->encrypt->encode($data->TAG_ID))) ?>">
+                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?=  site_url('rco/get_info/' . base64url_encode($this->encrypt->encode($data->TAG_ID))) ?>">
                                                     <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr>
                                                             <th></th> <th>No</th>
@@ -380,7 +387,7 @@
 
 <!-- modal -->
 <div id="modalRCO" class="modal fade" style="font-size: 12px;">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title mt-0" id="modalTitleForm"></h5>
@@ -388,8 +395,8 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped" id="table-item">
-                        <thead>
+                    <table class="table table-bordered table-striped table-sm" id="table-item">
+                        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                             <tr class="text-nowrap">
                                 <th>
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
@@ -454,9 +461,9 @@
     <table class="table table-sm table-bordered w-100 table-sub">
         <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
             <tr class="align-middle">
-                <th width="30">No</th>
+                <th class="text-center" width="30">No</th>
                 <th>No Transaksi</th>
-                <th>Tanggal</th>
+                <th class="text-center">Tanggal</th>
                 <th class="text-end">Jumlah</th>
                 <th>Satuan</th>
                 <th>S.Loc</th>
@@ -480,12 +487,12 @@
                 tag_id: tag_id,
             },
             success: function(response) {
-                $('#statusRcoId').text(response.data[0].DISPLAY_NAME);
+                $('#statusRcoId').html(badgeStatus(response.data[0].DISPLAY_NAME,response.data[0].MENU_ICON));
                 $('#readonlyRcoId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
                     $('#readonlyRcoId').show();
-                    $('#readonlyRcoId').text('READ ONLY');
+                    $('#readonlyRcoId').html('<span class="badge bg-secondary">READ ONLY</span>');
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
@@ -506,7 +513,7 @@
                     );
 
                     $('#removeRow').replaceWith(
-                        `<span type="button" id="removeRow" class="btn btn-danger btn-sm" disabled style="width: 55px; pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                        `<span type="button" id="removeRow" class="btn btn-danger btn-sm" disabled style="width: 55px;height:29.89px; pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="fa fa-trash"></i> Del
                         </span>`
                     );
@@ -556,7 +563,7 @@
                 {
                     targets: 5,
                     width: "8%",
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -595,31 +602,33 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
+                    className : "text-center",
                 }, // checkbox
                 {
                     targets: 1,
+                    className : "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // no
                 {
                     targets: 2,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
+                    className: "ellipsis text-center",
+                    // render: function(data) {
+                    //     if (!data) return '-';
+                    //     let limit = 20;
+                    //     let text = data.length > limit ?
+                    //         data.substring(0, limit) + '...' :
+                    //         data;
+                    //     return `<span title="${data}">${text}</span>`;
+                    // },
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // status
                 {
                     targets: 3,
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 20;
@@ -679,7 +688,7 @@
                 }, // nama item
                 {
                     targets: 7,
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 15;
@@ -981,7 +990,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 no++,
-                                item.STATUS_NAME,
+                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
@@ -1302,7 +1311,7 @@
                 $(row).attr('data-tag_detail_id', data.tag_detail_id);
             },
             "columns": [{
-                    "className": 'details-control',
+                    "className": 'details-control text-center',
                     "orderable": false,
                     "searchable": false,
                     "data": null,
@@ -1337,6 +1346,7 @@
                 },
                 {
                     "data": "kode_item",
+                    className : "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -1400,16 +1410,16 @@
                         res.forEach((data, i) => {
                             html += `
                             <tr>
-                                <td>${i + 1}</td>
+                                <td class="text-center">${i + 1}</td>
                                 <td>${data.link?`<a href="${data.link}" target="_blank">${data.No_Transaksi}</a>`:data.No_Transaksi}</td>
-                                <td>${data.Tanggal}</td>
+                                <td class="text-center">${data.Tanggal}</td>
                                 <td class="text-end">${data.Jumlah}</td>
                                 <td>${data.Satuan}</td>
                                 <td>${data['S.Loc']}</td>
                             </tr>`;
                         });
                     } else {
-                        html = '<tr><td colspan="6" class="text-center">Data tidak ditemukan</td></tr>';
+                        html = '<tr><td colspan="6" class="text-center">No data available in table</td></tr>';
                     }
                     childHtml.find('tbody').html(html);
 

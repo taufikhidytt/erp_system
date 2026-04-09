@@ -598,7 +598,7 @@ class Fpk extends Back_Controller
             'where' => ['b.PR_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['b.PR_DETAIL_ID' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function($row, $no) {
@@ -631,7 +631,7 @@ class Fpk extends Back_Controller
                 ['warehouse w', 'a.GUDANG_ID = w.WAREHOUSE_ID', 'inner'],
             ],
             'where' => ['b.PR_DETAIL_ID' => $detail_id],
-            'order' => ['b.PR_DETAIL_ID' => 'asc'],
+            // 'order' => ['b.PR_DETAIL_ID' => 'asc'],
             'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
             'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];

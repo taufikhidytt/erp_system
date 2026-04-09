@@ -4,10 +4,10 @@
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped text-center w-100" id="table-mr">
-                <thead>
+            <table class="table text-center w-100 table-sm" id="table-mr">
+                <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                     <tr>
-                        <th>No</th>
+                        <th class="text-center">No</th>
                         <th>No. SO</th>
                         <th>No. MR</th>
                         <th>No. PO Customer</th>
@@ -32,7 +32,7 @@
                             }    
                         ?>
                         <tr>
-                            <td><?= ($no++) ?></td>
+                            <td class="text-center"><?= ($no++) ?></td>
                             <td><?= $item['SO_No'] ?></td>
                             <td><?= $item['MR_No'] ?></td>
                             <td><?= $item['PO_NO'] ?></td>

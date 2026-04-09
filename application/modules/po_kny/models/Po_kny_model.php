@@ -43,7 +43,7 @@ class Po_kny_model extends CI_Model
         $this->db->distinct();
         $this->db->select("
             a.INVOICE_ID,
-            b.DISPLAY_NAME STATUS,
+            b.DISPLAY_NAME STATUS, b.MENU_ICON WARNA_STATUS,
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,

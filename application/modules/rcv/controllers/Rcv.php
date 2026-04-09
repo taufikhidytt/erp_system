@@ -30,8 +30,8 @@ class Rcv extends Back_Controller
         foreach ($list as $rcv) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $rcv->STATUS ? $rcv->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($rcv->STATUS,$rcv->Warna_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rcv/detail/' . base64url_encode($this->encrypt->encode($rcv->TAG_ID))) . '">
                 ' . ($rcv->No_Transaksi ? $rcv->No_Transaksi : '-') . '
@@ -110,7 +110,8 @@ class Rcv extends Back_Controller
                 b.PO_DETAIL_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                s.DISPLAY_NAME as STATUS_NAME,
+                s.MENU_ICON,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.DOCUMENT_REFF_NO,
@@ -143,6 +144,8 @@ class Rcv extends Back_Controller
                     ON a.TO_WH_ID = w.WAREHOUSE_ID
                 JOIN warehouse wh
                     ON a.WAREHOUSE_ID = wh.WAREHOUSE_ID
+                JOIN erp_lookup_value s
+                    ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
             WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                 AND (
                     b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
@@ -180,7 +183,7 @@ class Rcv extends Back_Controller
     public function getStatus()
     {
         $tag_id = $this->encrypt->decode($this->input->post('tag_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM tag a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_ID = {$tag_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM tag a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_ID = {$tag_id}");
         if ($data->num_rows() > 0) {
             $result = array(
                 'status' => 'sukses',
@@ -610,7 +613,7 @@ class Rcv extends Back_Controller
             'where' => ['b.TAG_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function($row, $no) {
@@ -641,7 +644,8 @@ class Rcv extends Back_Controller
                 w.WAREHOUSE_NAME `S.Loc`,
                 w.WAREHOUSE_ID,
                 a.REQUEST_QTY_ID HEADER_ID,
-                a.REQUEST_QTY_DETAIL_ID DETAIL_ID
+                a.REQUEST_QTY_DETAIL_ID DETAIL_ID,
+                'RHO' Erp_Menu_Name
             FROM
                 tag_detail b
                 JOIN request_qty_detail a
@@ -664,7 +668,8 @@ class Rcv extends Back_Controller
                 w.WAREHOUSE_NAME `S.Loc`,
                 w.WAREHOUSE_ID,
                 a.BUILD_ID HEADER_ID,
-                a.BUILD_DETAIL_ID DETAIL_ID
+                a.BUILD_DETAIL_ID DETAIL_ID,
+                'MRQ' Erp_Menu_Name
             FROM
                 tag_detail b
                 JOIN build_detail a
@@ -679,13 +684,7 @@ class Rcv extends Back_Controller
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
             $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
-            $No_Transaksi = explode('/',$d->No_Transaksi);
-            $d->link = null;
-            if(strtoupper($No_Transaksi[0]) == 'RHO'){
-                $d->link = site_url('rho/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            }else if(strtoupper($No_Transaksi[0]) == 'MR'){
-                $d->link = site_url('mrq/detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            }
+            $d->link = site_url(strtolower($d->Erp_Menu_Name).'/'.'detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
             
         }
         echo json_encode($data);

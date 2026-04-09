@@ -45,7 +45,7 @@ class Grk_model extends CI_Model
         $this->db->distinct();
         $this->db->select("
             a.PO_ID,
-            b.DISPLAY_NAME `Status`,
+            b.DISPLAY_NAME `Status`, b.MENU_ICON `Warna_Status`,
             a.DOCUMENT_NO `No_Transaksi`,
             a.DOCUMENT_REFF_NO `No_Referensi`,
             a.DOCUMENT_DATE `Tanggal`,

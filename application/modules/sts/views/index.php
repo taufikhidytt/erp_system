@@ -22,10 +22,6 @@
 
     #table td {
         white-space: nowrap;
-        height: 30px !important;
-        min-height: 30px !important;
-        padding-top: 12px !important;
-        padding-bottom: 1px !important;
         padding-right: 6px !important;
         padding-left: 6px !important;
         font-size: 0.75rem !important;
@@ -71,7 +67,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-striped text-center w-100" id="table">
+                                <table class="table text-center w-100 table-sm" id="table">
                                     <thead>
                                         <tr>
                                             <th>
@@ -97,7 +93,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center">
+                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th></th>
                                             <th>No</th>
                                             <th>Status</th>
@@ -144,7 +140,7 @@
                 "type": "POST"
             },
             "columns": [{
-                    "className": 'details-control',
+                    "className": 'details-control text-center',
                     "orderable": false,
                     "data": null,
                     "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>'
@@ -153,9 +149,11 @@
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
+                    "className" : "text-center"
                 },
                 {
                     "data": "status",
+                    "className" : "text-center"
                 },
                 {
                     "data": "no_transaksi",
@@ -165,6 +163,7 @@
                 },
                 {
                     "data": "tanggal",
+                    "className" : "text-center",
                 },
                 {
                     "data": "main_storage",
@@ -196,8 +195,8 @@
                 // Open row dengan child row datatable
                 var childTableId = 'child-' + tag_konsi_id;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
-                            <thead>
-                                <tr class="align-middle" style="height: 45px;">
+                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                <tr class="align-middle">
                                     <th>No</th>
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
@@ -225,6 +224,7 @@
                     },
                     "columns": [{
                             "data": "no",
+                            className : "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -237,6 +237,7 @@
                         },
                         {
                             "data": "kode_item",
+                            className : "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

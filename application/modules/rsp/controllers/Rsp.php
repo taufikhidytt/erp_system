@@ -31,8 +31,8 @@ class Rsp extends Back_Controller
         foreach ($list as $rsp) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $rsp->STATUS ? $rsp->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($rsp->STATUS,$rsp->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rsp/detail/' . base64url_encode($this->encrypt->encode($rsp->TAG_PINJAM_ID))) . '">
                 ' . ($rsp->No_Transaksi ? $rsp->No_Transaksi : '-') . '
@@ -111,7 +111,8 @@ class Rsp extends Back_Controller
                     NULL TAG_DETAIL_ID,
                     a.DOCUMENT_TYPE_ID,
                     a.STATUS_ID,
-                    FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                    s.DISPLAY_NAME as STATUS_NAME,
+                    s.MENU_ICON,
                     pr.DOCUMENT_NO No_Reff_1,
                     a.DOCUMENT_NO No_Reff_2,
                     a.DOCUMENT_REFF_NO,
@@ -146,6 +147,8 @@ class Rsp extends Back_Controller
                         ON i.PERSON_ID = psn.PERSON_ID
                     JOIN warehouse w
                         ON b.GUDANG_ID = w.WAREHOUSE_ID
+                    JOIN erp_lookup_value s
+                        ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                 WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                     AND (
                         b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
@@ -165,7 +168,8 @@ class Rsp extends Back_Controller
                     b.TAG_DETAIL_ID,
                     a.DOCUMENT_TYPE_ID,
                     a.STATUS_ID,
-                    FN_GET_VAR_NAME (a.STATUS_ID) STATUS_NAME,
+                    s.DISPLAY_NAME as STATUS_NAME,
+                    s.MENU_ICON,
                     pr.DOCUMENT_NO No_Reff_1,
                     a.DOCUMENT_NO No_Reff_2,
                     a.DOCUMENT_REFF_NO,
@@ -204,6 +208,8 @@ class Rsp extends Back_Controller
                         ON i.PERSON_ID = psn.PERSON_ID
                     JOIN warehouse w
                         ON b.TO_WH_ID = w.WAREHOUSE_ID
+                    JOIN erp_lookup_value s
+                        ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                 WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                     AND (
                         b.DELIVERED_ENTERED_QTY * b.DELIVERED_BASE_QTY
@@ -239,7 +245,7 @@ class Rsp extends Back_Controller
     public function getStatus()
     {
         $tag_pinjam_id = $this->encrypt->decode($this->input->post('tag_pinjam_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM tag_pinjam a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_PINJAM_ID = {$tag_pinjam_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM tag_pinjam a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.TAG_PINJAM_ID = {$tag_pinjam_id}");
         if ($data->num_rows() > 0) {
             $result = array(
                 'status' => 'sukses',

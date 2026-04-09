@@ -31,8 +31,8 @@ class Do_kny extends Back_Controller
         foreach ($list as $do_kny) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $do_kny->STATUS ? $do_kny->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($do_kny->STATUS,$do_kny->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('do_kny/detail/' . base64url_encode($this->encrypt->encode($do_kny->INVENTORY_OUT_ID))) . '">
                 ' . ($do_kny->No_Transaksi ? $do_kny->No_Transaksi : '-') . '
@@ -145,7 +145,8 @@ class Do_kny extends Back_Controller
                 b.BUILD_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME ( a.STATUS_ID ) AS STATUS_NAME,
+                s.DISPLAY_NAME as STATUS_NAME,
+                s.MENU_ICON,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.PO_NO AS DOCUMENT_REFF_NO,
@@ -169,6 +170,7 @@ class Do_kny extends Back_Controller
                 JOIN person psn ON a.PERSON_ID = psn.PERSON_ID
                 JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
                 JOIN karyawan k ON a.KARYAWAN_ID = k.KARYAWAN_ID 
+                JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
             WHERE
                 b.ENTERED_QTY > 0 
                 AND b.BASE_QTY > 0 
@@ -250,7 +252,7 @@ class Do_kny extends Back_Controller
     {
         $inventory_out_id = $this->encrypt->decode($this->input->post('inventory_out_id'));
 
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM inventory_out a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.INVENTORY_OUT_ID = {$inventory_out_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM inventory_out a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.INVENTORY_OUT_ID = {$inventory_out_id}");
 
         if ($data->num_rows() > 0) {
             $result = array(
@@ -713,7 +715,7 @@ class Do_kny extends Back_Controller
             'where' => ['b.INVENTORY_OUT_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.INVOICE_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -748,7 +750,7 @@ class Do_kny extends Back_Controller
                 ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
             ],
             'where' => ['b.INVENTORY_OUT_DETAIL_ID' => $detail_id],
-            'order' => ['b.INVENTORY_OUT_DETAIL_ID' => 'asc'],
+            // 'order' => ['b.INVENTORY_OUT_DETAIL_ID' => 'asc'],
             'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
             'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];

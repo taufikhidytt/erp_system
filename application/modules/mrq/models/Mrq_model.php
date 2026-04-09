@@ -50,7 +50,7 @@ class Mrq_model extends CI_Model
 
         $this->db->select("
             a.BUILD_ID,
-            b.DISPLAY_NAME AS Status,
+            b.DISPLAY_NAME AS Status, b.MENU_ICON AS WarnaStatus,
             a.DOCUMENT_NO AS No_Transaksi,
             a.DOCUMENT_REFF_NO AS No_Referensi,
             a.DOCUMENT_DATE AS Tanggal,

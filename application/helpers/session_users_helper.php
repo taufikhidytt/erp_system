@@ -195,7 +195,7 @@ function badge_status($label,$color=''){
     if(!$label) return '-';
     
     $colors = getBadgeStyle($color);
-    return '<span class="badge" style="font-size: 10.5px; background-color: '.$colors['bg'].'; 
+    return '<span class="badge" style="font-size: 12px;width: 82px; background-color: '.$colors['bg'].'; 
              color: '.$colors['text'].'; 
             ">'.$label.'</span>';
 }

@@ -69,7 +69,8 @@
                     "data": "nama_item",
                 },
                 {
-                    "data": "kode_item"
+                    "data": "kode_item",
+                    "className" : "text-center"
                 },
                 {
                     "data": "qty",
@@ -119,7 +120,8 @@
                     "data": "nama_item",
                 },
                 {
-                    "data": "kode_item"
+                    "data": "kode_item",
+                    "className" : "text-center"
                 },
                 {
                     "data": "qty",
@@ -149,7 +151,7 @@
     function renderMaterial(){
         $('#tab-material').html(`
             <div class="table-responsive overflow-auto mb-5" style="max-height: 450px;">
-                <table class="table table-bordered table-hover" id="table-material">
+                <table class="table table-bordered table-hover table-sm" id="table-material">
                     <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
                         <tr><th colspan="9">Finish Goods</th></tr>
                         <tr>
@@ -169,7 +171,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-striped table-bordered" id="table-material-detail">
+                <table class="table table-striped table-bordered table-sm" id="table-material-detail">
                     <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
                         <tr><th colspan="7">RAW Material</th></tr>
                         <tr>

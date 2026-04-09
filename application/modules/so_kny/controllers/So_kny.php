@@ -31,8 +31,8 @@ class So_kny extends Back_Controller
         foreach ($list as $so_kny) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $so_kny->STATUS ? $so_kny->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($so_kny->STATUS, $so_kny->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('so_kny/detail/' . base64url_encode($this->encrypt->encode($so_kny->SO_ID))) . '">
                 ' . ($so_kny->No_Transaksi ? $so_kny->No_Transaksi : '-') . '
@@ -150,7 +150,8 @@ class So_kny extends Back_Controller
                     NULL AS BUILD_DETAIL_ID,
                     a.DOCUMENT_TYPE_ID,
                     a.STATUS_ID,
-                    FN_GET_VAR_NAME (a.STATUS_ID) AS STATUS_NAME,
+                    s.DISPLAY_NAME as STATUS_NAME,
+                    s.MENU_ICON,
                     a.DOCUMENT_DATE,
                     a.DOCUMENT_NO,
                     a.DOCUMENT_REFF_NO,
@@ -183,6 +184,8 @@ class So_kny extends Back_Controller
                         ON a.PERSON_ID = psn.PERSON_ID
                     JOIN warehouse w
                         ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                    JOIN erp_lookup_value s
+                        ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                 WHERE a.ENTERED_QTY > 0
                     AND a.BASE_QTY > 0
                     AND COALESCE(a.RECEIVED_ENTERED_QTY, 0) < a.ENTERED_QTY * a.BASE_QTY
@@ -200,7 +203,8 @@ class So_kny extends Back_Controller
                     b.BUILD_DETAIL_ID,
                     a.DOCUMENT_TYPE_ID,
                     a.STATUS_ID,
-                    FN_GET_VAR_NAME (a.STATUS_ID) AS STATUS_NAME,
+                    s.DISPLAY_NAME as STATUS_NAME,
+                    s.MENU_ICON,
                     a.DOCUMENT_DATE,
                     a.DOCUMENT_NO,
                     a.DOCUMENT_REFF_NO,
@@ -233,6 +237,8 @@ class So_kny extends Back_Controller
                         ON a.PERSON_ID = psn.PERSON_ID
                     JOIN warehouse w
                         ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                    JOIN erp_lookup_value s
+                        ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                 WHERE COALESCE(a.ITEM_ID, 0) = 0
                     AND b.ENTERED_QTY > 0
                     AND b.BASE_QTY > 0
@@ -318,7 +324,7 @@ class So_kny extends Back_Controller
     {
         $so_id = $this->encrypt->decode($this->input->post('so_id'));
 
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM so a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.SO_ID = {$so_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM so a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.SO_ID = {$so_id}");
 
         if ($data->num_rows() > 0) {
             $result = array(
@@ -482,7 +488,7 @@ class So_kny extends Back_Controller
                     'PPH_CODE'              => 'NO PPH',
                     'PPH_PERCEN'            => '0',
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
-                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT'],
+                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT_HIDDEN'],
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
                     'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
                     'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
@@ -729,7 +735,7 @@ class So_kny extends Back_Controller
                     'PPH_CODE'              => 'NO PPH',
                     'PPH_PERCEN'            => '0',
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
-                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT'],
+                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT_HIDDEN'],
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
                     'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
                     'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
@@ -884,7 +890,7 @@ class So_kny extends Back_Controller
             'where' => ['b.SO_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -919,7 +925,7 @@ class So_kny extends Back_Controller
                 ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
             ],
             'where' => ['b.SO_DETAIL_ID' => $detail_id],
-            'order' => ['b.SO_DETAIL_ID' => 'asc'],
+            // 'order' => ['b.SO_DETAIL_ID' => 'asc'],
             'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
             'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];

@@ -132,6 +132,32 @@
             font-weight: bolder;
             color: #1DAA61;
         }
+        table.dataTable.table-sm thead .sorting:before,
+        table.dataTable.table-sm thead .sorting:after,
+        table.dataTable.table-sm thead .sorting_asc:before,
+        table.dataTable.table-sm thead .sorting_asc:after,
+        table.dataTable.table-sm thead .sorting_desc:before,
+        table.dataTable.table-sm thead .sorting_desc:after {
+            right: 9px !important;
+        }
+
+        table.dataTable.table-sm thead .sorting:before,
+        table.dataTable.table-sm thead .sorting_asc:before,
+        table.dataTable.table-sm thead .sorting_desc:before {
+            margin-top: -6px;
+        }
+        table.dataTable.table-sm thead .sorting:after,
+        table.dataTable.table-sm thead .sorting_asc:after,
+        table.dataTable.table-sm thead .sorting_desc:after {
+            margin-top: 0px;
+        }
+
+        .dataTable tbody td {
+            font-family: monospace;
+        }
+        .dataTable thead th, .dataTables_length, .dataTables_filter, .dataTables_paginate, .dataTables_info {
+            font-family: Tahoma !important;
+        }
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
@@ -370,6 +396,7 @@
     <script src="<?= base_url() ?>assets/admin/libs/select2/js/select2.min.js"></script>
 
     <script src="<?= base_url() ?>assets/admin/js/app.js"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.1"></script>
 
     <script>
         $(document).ready(function() {

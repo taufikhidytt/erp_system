@@ -31,8 +31,8 @@ class Po_kny extends Back_Controller
         foreach ($list as $po_kny) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $po_kny->STATUS ? $po_kny->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($po_kny->STATUS, $po_kny->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('po_kny/detail/' . base64url_encode($this->encrypt->encode($po_kny->INVOICE_ID))) . '">
                 ' . ($po_kny->No_Transaksi ? $po_kny->No_Transaksi : '-') . '
@@ -150,7 +150,8 @@ class Po_kny extends Back_Controller
                 i.COA_SUSPEND_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME ( a.STATUS_ID ) AS STATUS_NAME,
+                s.DISPLAY_NAME as STATUS_NAME,
+                s.MENU_ICON,
                 bl.DOCUMENT_NO,
                 bl.DOCUMENT_DATE,
                 bl.DOCUMENT_REFF_NO,
@@ -184,7 +185,8 @@ class Po_kny extends Back_Controller
                     JOIN build bl ON pd.BUILD_ID = bl.BUILD_ID
                     JOIN item i ON b.ITEM_ID = i.ITEM_ID
                     JOIN person psn ON a.PERSON_ID = psn.PERSON_ID
-                    JOIN warehouse w ON b.WAREHOUSE_ID = w.WAREHOUSE_ID 
+                    JOIN warehouse w ON b.WAREHOUSE_ID = w.WAREHOUSE_ID
+                    JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                 WHERE
                     b.ENTERED_QTY > 0 
                     AND b.BASE_QTY > 0 
@@ -269,7 +271,7 @@ class Po_kny extends Back_Controller
     {
         $invoice_id = $this->encrypt->decode($this->input->post('invoice_id'));
 
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM invoice a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.INVOICE_ID = {$invoice_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM invoice a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.INVOICE_ID = {$invoice_id}");
 
         if ($data->num_rows() > 0) {
             $result = array(
@@ -789,10 +791,11 @@ class Po_kny extends Back_Controller
             ]));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $po    = $this->po_kny->get_po_detail($id)->row();
-        if($po){
+        if ($po) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'po_kny/pdf',
@@ -800,10 +803,10 @@ class Po_kny extends Back_Controller
                     'po' => $po,
                     'po_detail' => $this->po_kny->get_detail_by_po_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $po->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $po->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $po->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $po->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

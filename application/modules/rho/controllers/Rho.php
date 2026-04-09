@@ -33,8 +33,8 @@ class Rho extends Back_Controller
         foreach ($list as $rho) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $rho->STATUS ? $rho->STATUS : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($rho->STATUS,$rho->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rho/detail/' . base64url_encode($this->encrypt->encode($rho->REQUEST_QTY_ID))) . '">
                 ' . ($rho->No_Transaksi ? $rho->No_Transaksi : '-') . '
@@ -113,7 +113,8 @@ class Rho extends Back_Controller
                 b.TAG_KONSI_DETAIL_ID,
                 a.DOCUMENT_TYPE_ID,
                 a.STATUS_ID,
-                FN_GET_VAR_NAME ( a.STATUS_ID ) STATUS_NAME,
+                s.DISPLAY_NAME as STATUS_NAME,
+                s.MENU_ICON,
                 a.DOCUMENT_DATE,
                 a.DOCUMENT_NO,
                 a.DOCUMENT_REFF_NO,
@@ -135,7 +136,8 @@ class Rho extends Back_Controller
                 tag a
                 JOIN tag_detail b ON a.TAG_ID = b.TAG_ID
                 JOIN item i ON b.ITEM_ID = i.ITEM_ID
-                JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID 
+                JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
+                JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
             WHERE
                 ( b.ENTERED_QTY * b.BASE_QTY ) > 0 
                 AND ( b.DELIVERED_ENTERED_QTY * b.DELIVERED_BASE_QTY ) < ( b.ENTERED_QTY * b.BASE_QTY ) 
@@ -168,7 +170,7 @@ class Rho extends Back_Controller
     public function getStatus()
     {
         $request_qty_id = $this->encrypt->decode($this->input->post('request_qty_id'));
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM request_qty a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.REQUEST_QTY_ID = {$request_qty_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM request_qty a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.REQUEST_QTY_ID = {$request_qty_id}");
         if ($data->num_rows() > 0) {
             $result = array(
                 'status' => 'sukses',
@@ -594,7 +596,7 @@ class Rho extends Back_Controller
             'where' => ['b.REQUEST_QTY_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVER_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVER_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function($row, $no) {
@@ -629,7 +631,7 @@ class Rho extends Back_Controller
                 ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
             ],
             'where' => ['b.REQUEST_QTY_DETAIL_ID' => $detail_id],
-            'order' => ['b.REQUEST_QTY_DETAIL_ID' => 'asc'],
+            // 'order' => ['b.REQUEST_QTY_DETAIL_ID' => 'asc'],
             'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
             'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];

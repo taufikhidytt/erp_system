@@ -31,8 +31,8 @@ class Mrq extends Back_Controller
         foreach ($list as $mrq) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
-            $row['status'] = $mrq->Status ? $mrq->Status : '-';
+            $row['no'] = $no;
+            $row['status'] = badge_status($mrq->Status,$mrq->WarnaStatus);
             $row['no_transaksi'] = '
             <a href="' . base_url('mrq/detail/' . base64url_encode($this->encrypt->encode($mrq->BUILD_ID))) . '">
                 ' . ($mrq->No_Transaksi ? $mrq->No_Transaksi : '-') . '
@@ -195,7 +195,8 @@ class Mrq extends Back_Controller
                 TAG_DETAIL_ID,
                 DOCUMENT_TYPE_ID,
                 STATUS_ID,
-                FN_GET_VAR_NAME (STATUS_ID) STATUS_NAME,
+                s.DISPLAY_NAME as STATUS_NAME,
+                s.MENU_ICON,
                 DOCUMENT_DATE,
                 DOCUMENT_NO,
                 DOCUMENT_REFF_NO,
@@ -255,6 +256,7 @@ class Mrq extends Back_Controller
                         ON b.GUDANG_ID = w.WAREHOUSE_ID
                     JOIN person p
                         ON i.PERSON_ID = p.PERSON_ID
+                    
                 WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
                     AND (
                         b.RECEIVED_ENTERED_QTY * b.RECEIVED_BASE_QTY
@@ -310,7 +312,8 @@ class Mrq extends Back_Controller
                     )
                     AND a.DOCUMENT_TYPE_ID IN (3, 5)
                     AND b.TO_WH_ID = '{$storage}'
-                    ) tmp
+            ) tmp
+            JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = tmp.STATUS_ID
             ORDER BY PO_DETAIL_ID;
             ");
 
@@ -335,7 +338,7 @@ class Mrq extends Back_Controller
     {
         $build_id = $this->encrypt->decode($this->input->post('build_id'));
 
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM build a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.BUILD_ID = {$build_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM build a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.BUILD_ID = {$build_id}");
 
         if ($data->num_rows() > 0) {
             $result = array(
@@ -792,7 +795,7 @@ class Mrq extends Back_Controller
             'where' => ['b.BUILD_ID' => $id],
             'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -828,7 +831,7 @@ class Mrq extends Back_Controller
                 ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
             ],
             'where' => ['b.BUILD_DETAIL_ID' => $detail_id],
-            'order' => ['b.BUILD_DETAIL_ID' => 'asc'],
+            // 'order' => ['b.BUILD_DETAIL_ID' => 'asc'],
             'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
             'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];
