@@ -539,39 +539,6 @@
             }
         });
 
-        // var tableSummary = $('#table-summary').DataTable({
-        //     processing: true,
-        //     serverSide: true,
-        //     autoWidth: false,
-        //     order: [],
-        //     ajax: {
-        //         url: "<?= site_url('stk_kny/get_data_summary'); ?>",
-        //         type: "POST",
-        //     },
-        //     drawCallback: function(settings) {
-        //         var json = settings.json;
-        //         if (json && json.summary) {
-        //             // Dynamic update footer
-        //             for (const key in json.summary) {
-        //                 $('#' + key).text(json.summary[key]);
-        //             }
-        //         }
-        //     },
-        //     columnDefs: [{
-        //         className: 'text-end',
-        //         targets: "_all" // semua kolom numeric akan rata kanan, bisa sesuaikan jika perlu
-        //     }]
-        // });
-
-        // --------------------------
-        // Column search
-        // --------------------------
-
-        // $('#table-summary thead').on('keyup change', '.column_search', function() {
-        //     let index = $(this).parent().index();
-        //     tableSummary.column(index).search(this.value).draw();
-        // });
-
         $('#export_excel_summary_stok').on('click', function() {
             window.location.href = "<?= site_url('stk_kny/export_excel_summary_stok') ?>";
         });
