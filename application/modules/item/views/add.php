@@ -173,7 +173,7 @@
                                                         <option
                                                             value="<?= $um->UOM_CODE ?>"
                                                             <?= set_value('satuan') ==  $um->UOM_CODE ? 'selected' : ($defaultValue == $um->UOM_CODE ? 'selected' : '') ?>>
-                                                            <?= strtoupper($um->DESCRIPTION) ?>
+                                                            <?= strtoupper($um->UOM_CODE) ?>
                                                         </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -469,7 +469,7 @@
                                                     <div class="input-group">
                                                         <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
                                                             <?php foreach ($uom->result() as $um): ?>
-                                                                <option value="<?= $um->UOM_CODE ?>" <?= set_value('satuan2') == $um->UOM_CODE ? 'selected' : null ?>><?= strtoupper($um->DESCRIPTION) ?></option>
+                                                                <option value="<?= $um->UOM_CODE ?>" <?= set_value('satuan2') == $um->UOM_CODE ? 'selected' : null ?>><?= strtoupper($um->UOM_CODE) ?></option>
                                                             <?php endforeach; ?>
                                                         </select>
                                                     </div>
@@ -644,33 +644,6 @@
                                                                     </td>
                                                                 </tr>
                                                             <?php endforeach; ?>
-                                                        <?php else: ?>
-                                                            <tr>
-                                                                <td class="text-center">
-                                                                    <input type="checkbox" class="chkRow">
-                                                                </td>
-
-                                                                <td class="rowNo text-center">1</td>
-
-                                                                <td>
-                                                                    <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                                                                        <option value=""></option>
-                                                                        <?php foreach ($uom->result() as $um): ?>
-                                                                            <option value="<?= $um->UOM_CODE ?>">
-                                                                                <?= $um->DESCRIPTION ?>
-                                                                            </option>
-                                                                        <?php endforeach; ?>
-                                                                    </select>
-                                                                </td>
-
-                                                                <td>
-                                                                    <input type="number" name="konversi[]" class="form-control auto-save">
-                                                                </td>
-
-                                                                <td>
-                                                                    <input type="text" name="keterangan[]" class="form-control auto-save" disabled>
-                                                                </td>
-                                                            </tr>
                                                         <?php endif; ?>
                                                     </tbody>
                                                 </table>
@@ -948,6 +921,8 @@
 <!-- End Page-content -->
 
 <script>
+    let xhr = null;
+    let temp_uom = {};
     $(document).ready(function() {
         var length = $('#length').val();
         var width = $('#width').val();
@@ -982,6 +957,9 @@
         $('#satuan').on('change', function() {
             let value = $(this).val();
             $('#satuan2').val(value).trigger('change');
+
+            $('#tableSatuan tbody').empty();
+            getKonversiUom();
         });
 
         //Initialize Select2 Elements
@@ -1196,27 +1174,40 @@
 
         // Tambah baris baru
         $("#addRow").click(function() {
-            <?php
-            $option_uom = "";
-            foreach ($uom->result() as $um) {
-                $option_uom .= '<option value="' . $um->UOM_CODE . '">' . strtoupper($um->DESCRIPTION) . '</option>';
-            }
-            ?>
+            let option_uom = '<option value="">&nbsp;</option>';
+            $.each(temp_uom, function(k, uom){
+                const to_qty = parseFloat(uom.TO_QTY) || 0;
+                option_uom += `<option value="${uom.UOM_CODE}" class="text-uppercase" data-to_qty="${to_qty}">${uom.UOM_CODE}</option>`;
+            });
+
             var rowCount = $("#tableSatuan tbody tr").length + 1;
             var newRow = `<tr>
             <td class="text-center"><input type="checkbox" class="chkRow"></td>
             <td class="rowNo text-center">${rowCount}</td>
             <td>
-                <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                    <?= $option_uom; ?>
-                </select>
+                <select name="satuan_lain[]" class="form-select select-uom auto-save">${option_uom}</select>
             </td>
             <td><input type="number" name="konversi[]" class="form-control auto-save"></td>
             <td><input type="text" name="keterangan[]" class="form-control auto-save" disabled></td>
         </tr>`;
             $("#tableSatuan tbody").append(newRow);
             $(".select-uom").select2({
-                width: '100%'
+                width: '100%',
+                templateResult: function(data) {
+                    var to_qty = parseFloat($(data.element).data('to_qty')) || 0;
+                    if (!data.element || to_qty === 0) { return data.text; }
+
+                    
+                    const to_qty_format = new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                        }).format(to_qty);
+                    
+                    return $('<span>' + data.text.toUpperCase() + ' - [' + to_qty_format + ']</span>');
+                },
+                templateSelection: function(data) {
+                    return data.text; 
+                }
             });
         });
 
@@ -1277,6 +1268,9 @@
                     }
                 });
             }
+
+            checkKonversiUom();
+            $('#chkAll').prop('checked', false);
         });
 
         // Blok input & format tampilan
@@ -1321,4 +1315,68 @@
             $(this).find(".rowNo").text((index + 1));
         });
     }
+
+    $(document).ready(function(){
+        getKonversiUom();
+    })
+    function getKonversiUom(){
+        $('#loading').show();
+        if(xhr){
+            xhr.abort();
+        }
+        xhr = $.ajax({
+            url: "<?= site_url('item/get_konversi_uom'); ?>",
+            type: "POST",
+            data: {
+                uom : $('#satuan option:selected').val()
+            },
+            dataType: "json",
+            success: function(res) {
+                $('#loading').hide();
+                temp_uom = res.result;
+                if($('#tableSatuan tbody tr').length===0){
+                    $('#addRow').trigger('click');
+                }
+            }
+        });
+    }
+
+    
+    $(document).on('change', '#tableSatuan tbody select', function(){
+        checkKonversiUom();
+        const e_opt     = $(this).find('option:selected');
+        const to_qty    = parseFloat(e_opt.attr('data-to_qty')) || 0;
+        $(this).closest('tr').find('[name="konversi[]"]').val(to_qty);
+    });
+    $(document).on('input change', '#tableSatuan tbody select, #tableSatuan tbody [name="konversi[]"]', function(){
+        const tr        = $(this).closest('tr');
+
+        const to_uom    = $('#satuan option:selected').val();
+
+        const from_opt  = tr.find('select option:selected');
+        const to_qty    = parseFloat(tr.find('[name="konversi[]"]').val()) || 0;
+        const from_uom  = from_opt.val();
+        
+        const to_qty_format = new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+            }).format(to_qty);
+        tr.find('[name="keterangan[]"]').val(`1 ${from_uom} = ${to_qty_format} ${to_uom}`);
+    });
+    // cek apakah konversi satuan sudah ada data yang dipilih, jika ada read only di #satuan
+    function checkKonversiUom(){
+        let is_disabled = false;
+        $.each($(document).find('#tableSatuan tbody select'), function(){
+            const val = $(this).find('option:selected').val();
+            if(val){
+                is_disabled = true;
+            }
+        });
+        $('#satuan').attr('disabled',is_disabled);
+    }
+
+    $('form').on('submit', function(e){
+        $('#satuan').prop('disabled', false);
+        this.submit();
+    });
 </script>

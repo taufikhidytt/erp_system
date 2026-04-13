@@ -350,7 +350,7 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('location_id', 'location', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('payment_term', 'payment term', 'trim|required');
-            $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
+            // $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
             $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
@@ -481,7 +481,7 @@ class So_kny extends Back_Controller
                     'PERSON_SITE_ID'        => $post['person_site_id'],
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PAYMENT_TERM_ID'       => $post['payment_term'],
-                    'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
+                    // 'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
                     'KARYAWAN_ID'           => $post['sales'],
                     'PPN_CODE'              => $post['PPN_CODE'],
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
@@ -555,7 +555,7 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('location_id', 'location', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('payment_term', 'payment term', 'trim|required');
-            $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
+            // $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
             $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
@@ -728,7 +728,7 @@ class So_kny extends Back_Controller
                     'PERSON_SITE_ID'        => $post['person_site_id'],
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PAYMENT_TERM_ID'       => $post['payment_term'],
-                    'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
+                    // 'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
                     'KARYAWAN_ID'           => $post['sales'],
                     'PPN_CODE'              => $post['PPN_CODE'],
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],

@@ -836,7 +836,8 @@ class Mrq extends Back_Controller
             'queries' => [
                 // Query 1: inventory_in_detail (PO Kny)
                 [
-                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, (a.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, a.INVENTORY_IN_ID AS HEADER_ID, a.INVENTORY_IN_DETAIL_ID, "PO_Kny" AS Erp_Menu_Name',
+                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, (a.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, 
+                        d.INVOICE_ID AS HEADER_ID, d.INVOICE_DETAIL_ID, "PO_Kny" AS Erp_Menu_Name',
                     'table'  => 'build_detail b',
                     'join'   => [
                         ['inventory_in_detail a', 'b.BUILD_DETAIL_ID = a.BUILD_DETAIL_ID', 'inner'],

@@ -349,7 +349,8 @@ class Mrq_model extends CI_Model
             ps.SITE_NAME,ps.ADDRESS1,ps.ADDRESS2,ps.ADDRESS3,ps.CITY,
             i.ITEM_NAME,
         ");
-        $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SHIP_TO",true);
+        // $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SHIP_TO",true);
+        $this->db->select("p.PERSON_NAME as SHIP_TO",true);
         $this->db->from('build a');
         $this->db->join('person p','a.PERSON_ID = p.PERSON_ID');
         $this->db->join('person_site ps','a.PERSON_SITE_ID = ps.PERSON_SITE_ID');

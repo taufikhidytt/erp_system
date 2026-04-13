@@ -801,4 +801,19 @@ class Item_model extends CI_Model
             'affected' => $this->db->affected_rows()
         ];
     }
+
+    public function get_konversi_uom($uom)
+    {
+        $this->db->select('
+            COALESCE(b.FROM_UOM, a.UOM_CODE) AS UOM_CODE,
+            a.DESCRIPTION AS UOM_DESCRIPTION,
+            b.FROM_UOM AS A,
+            COALESCE(B.TO_QTY, 1) AS TO_QTY,
+            b.TO_UOM
+        ');
+        $this->db->from('uom a');
+        $this->db->join('item_convertion b',"a.UOM_CODE = b.FROM_UOM AND AND b.TO_UOM = '{$uom}'", 'left');
+        $this->db->where("a.UOM_CODE <>",$uom);
+        return $this->db->get()->result();
+    }
 }

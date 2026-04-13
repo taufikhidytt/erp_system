@@ -293,7 +293,7 @@
                                 <th>Assy Kode</th>
                                 <th>Kategori</th>
                                 <th>Satuan</th>
-                                <th>Jumlah</th>
+                                <th>Stok</th>
                                 <th>Brand</th>
                                 <th>Tipe</th>
                             </tr>
@@ -410,11 +410,11 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center"
+                    className: "text-center"
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -1052,6 +1052,34 @@
         });
     });
 
+    $(document).on('change', '.uom-select', function() {
+        let selected = $(this).find('option:selected');
+
+        $(this).closest('td')
+            .find('input[name="detail[to_qty][]"]')
+            .val(selected.data('to_qty') || '');
+    });
+
+    // dropdown ditutup
+    $(document).on('click', function() {
+        if (!openedSelect) return;
+
+        setTimeout(() => {
+            if (isOpening) {
+                isOpening = false;
+                return;
+            }
+
+            let $select = $(openedSelect);
+
+            $select.find('option').each(function() {
+                $(this).text($(this).data('code'));
+            });
+
+            openedSelect = null;
+        }, 0);
+    });
+
     let activeKeteranganInput = null;
 
     $('#table-detail tbody').on(
@@ -1116,7 +1144,7 @@
                 $.each(res.data, function(i, v) {
                     html += `
                     <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-base_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
-                        ${v.UOM_CODE} (${v.TO_QTY})
+                        ${v.UOM_CODE}
                     </option>
                 `;
                 });
@@ -1201,7 +1229,7 @@
 
         if (item) {
             $.ajax({
-                url: "<?= base_url('mrq/get_item_uom') ?>",
+                url: "<?= base_url('formula/get_item_uom') ?>",
                 type: "POST",
                 data: {
                     item_id: item

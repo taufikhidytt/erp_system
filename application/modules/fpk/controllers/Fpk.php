@@ -38,7 +38,7 @@ class Fpk extends Back_Controller
             </a>';
             $row['no_referensi'] = $fpk->No_Referensi ? $fpk->No_Referensi : '-';
             $row['tanggal'] = $fpk->Tanggal ? date('Y-m-d H:i', strtotime($fpk->Tanggal)) : '-';
-            $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('Y-m-d H:i', strtotime($fpk->Dibutuhkan)) : '-';
+            // $row['tanggal_dibutuhkan'] = $fpk->Dibutuhkan ? date('Y-m-d H:i', strtotime($fpk->Dibutuhkan)) : '-';
             $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
             $row['sales'] = $fpk->Sales ? $fpk->Sales : '-';
             $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
@@ -241,7 +241,7 @@ class Fpk extends Back_Controller
 
             $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
-            $this->form_validation->set_rules('tanggal_dibutuhkan', 'tanggal dibutuhkan', 'trim|required');
+            // $this->form_validation->set_rules('tanggal_dibutuhkan', 'tanggal dibutuhkan', 'trim|required');
             $this->form_validation->set_rules('gudang', 'gudang', 'trim|required');
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
 
@@ -329,7 +329,7 @@ class Fpk extends Back_Controller
                     'PERSON_ID'             => $post['supplier'],
                     'WAREHOUSE_ID'          => $post['gudang'],
                     'KARYAWAN_ID'           => $post['sales'],
-                    'NEED_DATE'             => $post['tanggal_dibutuhkan'],
+                    // 'NEED_DATE'             => $post['tanggal_dibutuhkan'],
                     'NOTE'                  => $post['keterangan'],
                     'TIPE_ID'               => 4,
                     'PO_SUPP'               => 1,
@@ -374,7 +374,7 @@ class Fpk extends Back_Controller
 
             $this->form_validation->set_rules('supplier', 'supplier', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
-            $this->form_validation->set_rules('tanggal_dibutuhkan', 'tanggal dibutuhkan', 'trim|required');
+            // $this->form_validation->set_rules('tanggal_dibutuhkan', 'tanggal dibutuhkan', 'trim|required');
             $this->form_validation->set_rules('gudang', 'gudang', 'trim|required');
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
 
@@ -518,7 +518,7 @@ class Fpk extends Back_Controller
                     'PERSON_ID'        => $post['supplier'],
                     'WAREHOUSE_ID'     => $post['gudang'],
                     'KARYAWAN_ID'      => $post['sales'],
-                    'NEED_DATE'        => $post['tanggal_dibutuhkan'],
+                    // 'NEED_DATE'        => $post['tanggal_dibutuhkan'],
                     'NOTE'             => $post['keterangan'],
                     'LAST_UPDATE_BY'   => $this->session->userdata('id'),
                     'LAST_UPDATE_DATE' => date('Y-m-d H:i:s'),

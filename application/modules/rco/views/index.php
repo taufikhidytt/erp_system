@@ -100,8 +100,8 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Main Storage</th>
                                             <th>Site Storage</th>
+                                            <th>Main Storage</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -172,14 +172,6 @@
                     "className" : "text-center"
                 },
                 {
-                    "data": "main_storage",
-                    "width": "15%",
-                    "render": function(data) {
-                        if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
-                    }
-                },
-                {
                     "data": "site_storage",
                     "width": "15%",
                     "render": function(data) {
@@ -187,6 +179,15 @@
                         return `<span title="${data}">${data}</span>`;
                     }
                 },
+                {
+                    "data": "main_storage",
+                    "width": "15%",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                
             ]
         });
 

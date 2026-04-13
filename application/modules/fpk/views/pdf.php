@@ -6,9 +6,9 @@
     <tr>
         <td class="info-card">
             <table width="100%" class="info-row">
-                <tr><td>No Transaksi</td><td class="info-dots">:</td><td><?= $fpk->DOCUMENT_NO ?></td></tr>
-                <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $fpk->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
+                <tr><td style="min-width: 80px;">No Transaksi</td><td class="info-dots">:</td><td><?= $fpk->DOCUMENT_NO ?></td></tr>
                 <tr><td>Supplier</td><td class="info-dots">:</td><td><?= $fpk->SUPPLIER ?? '-' ?></td></tr>
+                <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $fpk->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
             </table>
         </td>
         <td width="4%"></td>

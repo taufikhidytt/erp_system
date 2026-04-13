@@ -7,7 +7,7 @@
     }
 </style>
 
-<div class="section-title">
+<div class="section-title" style="margin-top: 30px;">
     <h1 class="report-title"><?= strtoupper('PURCHASE ORDER') ?></h1>
 </div>
 
@@ -27,6 +27,7 @@
                 <tr><td style="width: 70px !important;">Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($po->DOCUMENT_DATE)) ?></td></tr>
                 <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $po->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
                 <tr><td>Payment Term</td><td class="info-dots">:</td><td><?= $po->PAYMENT_TERM_NAME ?? '-' ?></td></tr>
+                <tr><td>Jatuh Tempo</td><td class="info-dots">:</td><td><?= $po->JTEMPO?date('d-m-Y H:i', strtotime($po->JTEMPO)):'-' ?></td></tr>
                 <tr><td>Storage</td><td class="info-dots">:</td><td><?= $po->WAREHOUSE_NAME ?? '-' ?></td></tr>
                 </table>
         </td>

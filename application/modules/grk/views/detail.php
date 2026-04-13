@@ -116,16 +116,6 @@
                                             <div class="text-danger"><?= form_error('no_transaksi') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="no_referensi">No Referensi:</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-pantone-line"></i>
-                                                </span>
-                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi') ?? $data->DOCUMENT_REFF_NO; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
-                                        </div>
-                                        <div class="mb-3">
                                             <label for="supplier">Supplier:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
@@ -144,6 +134,17 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="no_referensi">No Referensi:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-pantone-line"></i>
+                                                </span>
+                                                <input type="text" name="no_referensi" id="no_referensi" class="form-control <?= form_error('no_referensi') ? 'is-invalid' : null; ?>" placeholder="Enter No Referensi" value="<?= $this->input->post('no_referensi') ?? $data->DOCUMENT_REFF_NO; ?>">
+                                            </div>
+                                            <div class="text-danger"><?= form_error('no_referensi') ?></div>
+                                        </div>
+                                        
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">

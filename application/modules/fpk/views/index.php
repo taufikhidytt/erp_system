@@ -88,10 +88,8 @@
                                 <table class="table text-center table-sm" id="table">
                                     <thead>
                                         <tr>
-                                            <th>
-                                            </th>
-                                            <th>
-                                            </th>
+                                            <th></th>
+                                            <th></th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
@@ -105,7 +103,7 @@
                                                 <input type="date" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
-                                                <input type="date" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
@@ -116,9 +114,6 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th></th>
@@ -127,7 +122,6 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Dibutuhkan</th>
                                             <th>Supplier</th>
                                             <th>Sales</th>
                                             <th>Gudang</th>
@@ -193,10 +187,6 @@
                 },
                 {
                     "data": "tanggal",
-                    "className" : "text-center",
-                },
-                {
-                    "data": "tanggal_dibutuhkan",
                     "className" : "text-center",
                 },
                 {

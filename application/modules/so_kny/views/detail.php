@@ -185,7 +185,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
+                                                <!-- <div class="mb-3">
                                                     <label for="jatuh_tempo">Jatuh Tempo:</label>
                                                     <span class="text-danger">*</span>
                                                     <div class="input-group">
@@ -196,6 +196,17 @@
                                                         <input type="datetime-local" name="jatuh_tempo" id="jatuh_tempo" class="form-control <?= form_error('jatuh_tempo') ? 'is-invalid' : null; ?>" placeholder="Enter Jatuh Tempo" value="<?= $this->input->post('jatuh_tempo') ?? $data->JTEMPO ?>" readonly>
                                                     </div>
                                                     <div class="text-danger"><?= form_error('jatuh_tempo') ?></div>
+                                                </div> -->
+                                                <div class="mb-3">
+                                                    <label for="po_customer">PO Customer:</label>
+                                                    <span class="text-danger">*</span>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text">
+                                                            <i class="ri ri-profile-fill"></i>
+                                                        </span>
+                                                        <input type="text" name="po_customer" id="po_customer" class="form-control <?= form_error('po_customer') ? 'is-invalid' : null; ?>" placeholder="Enter PO Customer" value="<?= $this->input->post('po_customer') ?? $data->PO_NO; ?>">
+                                                    </div>
+                                                    <div class="text-danger"><?= form_error('po_customer') ?></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -212,6 +223,23 @@
                                                 <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? $data->DOCUMENT_DATE ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sales">Sales:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-user-2-fill"></i>
+                                                </span>
+                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
+                                                    <option value="">-- Selected Sales --</option>
+                                                    <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
+                                                    <?php foreach ($sales->result() as $sl): ?>
+                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $param == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " - [" . $sl->LAST_NAME . "]" ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('sales') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="storage">Storage:</label>
@@ -244,34 +272,6 @@
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('storage') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="sales">Sales:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-user-2-fill"></i>
-                                                </span>
-                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Sales --</option>
-                                                    <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
-                                                    <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= $param == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " - [" . $sl->LAST_NAME . "]" ?></option>
-                                                    <?php endforeach; ?>
-                                                </select>
-                                            </div>
-                                            <div class="text-danger"><?= form_error('sales') ?></div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="po_customer">PO Customer:</label>
-                                            <span class="text-danger">*</span>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="ri ri-profile-fill"></i>
-                                                </span>
-                                                <input type="text" name="po_customer" id="po_customer" class="form-control <?= form_error('po_customer') ? 'is-invalid' : null; ?>" placeholder="Enter PO Customer" value="<?= $this->input->post('po_customer') ?? $data->PO_NO; ?>">
-                                            </div>
-                                            <div class="text-danger"><?= form_error('po_customer') ?></div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="no_reff">No Reff:</label>

@@ -311,7 +311,7 @@ class Po_kny_model extends CI_Model
 
     public function get_po_detail($id){
         $this->db->select("
-            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
+            a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,a.JTEMPO,
             w.WAREHOUSE_NAME,
             ps.SITE_NAME, ps.ADDRESS1, ps.ADDRESS2, ps.ADDRESS3, ps.CITY,
             py.PAYMENT_TERM_NAME,

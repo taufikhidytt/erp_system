@@ -7,7 +7,7 @@
     }
 </style>
 
-<div class="section-title">
+<div class="section-title" style="margin-top:30px">
     <h1 class="report-title"><?= strtoupper('SALES ORDER') ?></h1>
 </div>
 
@@ -26,10 +26,10 @@
         <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($so->DOCUMENT_DATE)) ?></td></tr>
-                <tr><td>Storage</td><td class="info-dots">:</td><td><?= $so->WAREHOUSE_NAME ?? '-' ?></td></tr>
                 <tr><td>Sales</td><td class="info-dots">:</td><td><?= ($so->SALES ?? '-').($so->SALES_LAST_NAME?' ['.$so->SALES_LAST_NAME.']':'') ?></td></tr>
                 <tr><td>PO Customer</td><td class="info-dots">:</td><td><?= $so->PO_Customer ?? '-' ?></td></tr>
                 <tr><td>No Referensi</td><td class="info-dots">:</td><td><?= $so->DOCUMENT_REFF_NO ?? '-' ?></td></tr>
+                <tr><td>Storage</td><td class="info-dots">:</td><td><?= $so->WAREHOUSE_NAME ?? '-' ?></td></tr>
             </table>
         </td>
     </tr>

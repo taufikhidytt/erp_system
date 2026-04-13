@@ -363,7 +363,7 @@
                                                                             $param = $this->input->post('detail[uom][]') ?? $dd->ENTERED_UOM;
                                                                             foreach ($data_uom_selected->result() as $dus): ?>
                                                                                 <option value="<?= $dus->UOM_CODE ?>" data-code="<?= $dus->UOM_CODE ?>" data-to_qty="<?= $dus->TO_QTY ?>" data-label="<?= $dus->UOM_CODE ?> (<?= $dus->TO_QTY ?>)" <?= $param == $dus->UOM_CODE ? 'selected' : NULL ?>>
-                                                                                    <?= $dus->UOM_CODE . " (" . $dus->TO_QTY . ")" ?>
+                                                                                    <?= $dus->UOM_CODE ?>
                                                                                 </option>
                                                                             <?php endforeach; ?>
                                                                         </select>
@@ -379,26 +379,6 @@
                                                 </table>
                                             </div>
                                         </div>
-
-                                        <!-- <div class="tab-pane" id="info-detail" role="tabpanel">
-                                            <div class="table-responsive">
-                                                <table class="table table-striped w-100" id="table-info" data-url=" <?= site_url('mrq/get_info/' . base64url_encode($this->encrypt->encode($data->BUILD_ID))) ?>">
-                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
-                                                        <tr>
-                                                            <th></th>
-                                                            <th>No</th>
-                                                            <th>Nama Item</th>
-                                                            <th>Kode Item</th>
-                                                            <th>Satuan</th>
-                                                            <th>MR</th>
-                                                            <th>PO</th>
-                                                            <th>SISA</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
-                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -436,7 +416,7 @@
                                 <th>Assy Kode</th>
                                 <th>Kategori</th>
                                 <th>Satuan</th>
-                                <th>Jumlah</th>
+                                <th>Stok</th>
                                 <th>Brand</th>
                                 <th>Tipe</th>
                             </tr>
@@ -513,7 +493,7 @@
                 bom_id: bom_id,
             },
             success: function(response) {
-                $('#statusFromulaId').html(badgeStatus(response.data[0].DISPLAY_NAME,response.data[0].MENU_ICON));
+                $('#statusFromulaId').html(badgeStatus(response.data[0].DISPLAY_NAME, response.data[0].MENU_ICON));
                 $('#readonlyFormulaId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
@@ -556,8 +536,6 @@
 
                     let initialItem = $('#item_finish_goods').val();
                     let oldSatuan = "<?= set_value('satuan') ?>";
-
-                    console.log(isReadOnly);
 
                     if (initialItem) {
                         loadSatuan(initialItem, oldSatuan, isReadOnly);
@@ -634,11 +612,11 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center"
+                    className: "text-center"
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -814,7 +792,7 @@
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
                     <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any">`,
 
-                    `<select class="form-control form-control-sm uom-select border-0 ellipsis" name="detail[satuan][]" title="${satuan}">
+                    `<select class="form-control form-control-sm uom-select border-0" name="detail[satuan][]">
                         <option value="">Loading...</option>
                     </select>
                     <input type="hidden" class="form-control form-control-sm" name="detail[base_qty][]">`,
@@ -863,6 +841,66 @@
                 text: flasherror,
             })
         }
+
+        if ($('#tanggal').val()) {
+            let tgl = $('#tanggal').val();
+
+            if (!$('#start_date').val()) {
+                $('#start_date').val(tgl);
+            }
+            $('#start_date').attr('min', tgl);
+
+            if (!$('#end_date').val()) {
+                $('#end_date').val(addOneYear($('#start_date').val()));
+            }
+            $('#end_date').attr('min', $('#start_date').val());
+        }
+
+        $('#tanggal').on('change', function() {
+            let tgl = $(this).val();
+
+            $('#start_date').val(tgl);
+            $('#start_date').attr('min', tgl);
+
+            $('#end_date').val(addOneYear(tgl));
+            $('#end_date').attr('min', tgl);
+        });
+
+        $('#start_date').on('blur', function() {
+            let start = $(this).val();
+            let tgl = $('#tanggal').val();
+            if (start < tgl) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Start Date tidak boleh lebih kecil dari Tanggal',
+                })
+                $(this).val(tgl);
+                start = tgl;
+            }
+            $('#end_date').attr('min', start);
+            if ($('#end_date').val() < start) {
+                $('#end_date').val(addOneYear(start));
+            }
+        });
+
+        $('#end_date').on('blur', function() {
+            let start = $('#start_date').val();
+            let end = $(this).val();
+
+            if (end < start) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'End Date tidak boleh lebih kecil dari Start Date',
+                })
+                $(this).val(tgl);
+                start = tgl;
+
+
+                $(this).val(addOneYear(start));
+            }
+        });
 
         $('#satuan').prop('disabled', true);
 
@@ -1041,7 +1079,7 @@
                     `<span class="view-mode qty-view">1.00</span>
                     <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none" name="detail[jumlah][]" value="1" min="0" step="any">`,
 
-                    `<select class="form-control form-control-sm uom-select border-0 ellipsis" name="detail[satuan][]" title="${satuan}">
+                    `<select class="form-control form-control-sm uom-select border-0" name="detail[satuan][]">
                         <option value="">Loading...</option>
                     </select>
                     <input type="hidden" class="form-control form-control-sm" name="detail[base_qty][]">`,
@@ -1384,12 +1422,41 @@
     let openedSelect = null;
     let isOpening = false;
 
+    $(document).on('mousedown', '.uom-select', function() {
+        openedSelect = this;
+        isOpening = true;
+
+        $(this).find('option').each(function() {
+            $(this).text($(this).data('label'));
+        });
+    });
+
     $(document).on('change', '.uom-select', function() {
         let selected = $(this).find('option:selected');
 
         $(this).closest('td')
             .find('input[name="detail[to_qty][]"]')
             .val(selected.data('to_qty') || '');
+    });
+
+    // dropdown ditutup
+    $(document).on('click', function() {
+        if (!openedSelect) return;
+
+        setTimeout(() => {
+            if (isOpening) {
+                isOpening = false;
+                return;
+            }
+
+            let $select = $(openedSelect);
+
+            $select.find('option').each(function() {
+                $(this).text($(this).data('code'));
+            });
+
+            openedSelect = null;
+        }, 0);
     });
 
     let activeKeteranganInput = null;
@@ -1517,7 +1584,7 @@
                 $.each(res.data, function(i, v) {
                     html += `
                     <option value="${v.UOM_CODE}" data-code="${v.UOM_CODE}" data-base_qty="${v.TO_QTY}" data-label="${v.UOM_CODE} (${v.TO_QTY})">
-                        ${v.UOM_CODE} (${v.TO_QTY})
+                        ${v.UOM_CODE}
                     </option>
                 `;
                 });

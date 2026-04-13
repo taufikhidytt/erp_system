@@ -298,6 +298,7 @@ class Item extends Back_Controller
                     $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
                     $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
                     $data['uomChild'] = $this->item->getUomChild($id);
+                    $data['uom_konversi'] = $this->item->get_konversi_uom($data['data']->UOM_CODE);
                     $this->template->load('template', 'item/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -572,5 +573,16 @@ class Item extends Back_Controller
         } catch (Exception $err) {
             return sendError('Server error', $err->getMessage());
         }
+    }
+
+    public function get_konversi_uom()
+    {
+        $uom = (string) $this->input->post('uom');
+        $res = [];
+        if($uom){
+            $res = $this->item->get_konversi_uom($uom);
+        }
+        sendSuccess($res,'');
+        
     }
 }

@@ -6,7 +6,7 @@
     <tr>
         <td class="info-card">
             <table width="100%" class="info-row">
-                <tr><td>No Transaksi</td><td class="info-dots">:</td><td><?= $mrq->DOCUMENT_NO ?></td></tr>
+                <tr><td style="min-width: 80px;">No Transaksi</td><td class="info-dots">:</td><td><?= $mrq->DOCUMENT_NO ?></td></tr>
                 <tr><td>Ship To</td><td class="info-dots">:</td><td><?= $mrq->SHIP_TO ?? '-' ?></td></tr>
                 <tr><td>Location</td><td class="info-dots">:</td><td><?= $mrq->SITE_NAME ?? '-' ?></td></tr>
                 <tr><td>&nbsp;</td><td class="info-dots"></td><td><?= $mrq->ADDRESS1 ?? '-' ?><?= '. '.$mrq->CITY ?? '-' ?></td></tr>

@@ -6,7 +6,7 @@
   $this->db->from('setup s');
   $this->db->join('address a','s.ADDRESS_ID = a.ADDRESS_ID');
   $company = $this->db->get()->row_array();
-  $company['logo'] = img_to_base64('./assets/logo/logo.png');
+  $company['logo']  = img_to_base64('./assets/logo/'.($company['LOGO_FILENAME'] ?? 'logo.png'));
   date_default_timezone_set('Asia/Jakarta');
 ?>
 <!DOCTYPE html>
@@ -38,13 +38,11 @@
           border-bottom: 1px solid #dde4de;
           background-color: #faf8f4;
           padding: 10px 30px;
+          vertical-align: top;
         }
 
         .logo-box {
-            width: 60px;
-            height: 60px;
-            background-color: #8a9e8c;
-            text-align: center;
+            width: 100%;
             border-radius: 10px;
         }
 
@@ -229,9 +227,9 @@
 <table class="header-table">
   <tr>
       <?php if(isset($company['logo']) && $company['logo']){?>
-      <td width="70">
+      <td style="width: 87px;">
           <div class="logo-box">
-              <img src="<?= $company['logo'] ?>" style="width:100%" />
+              <img src="<?= $company['logo'] ?>" style="width:100%;display: block;height:87px;margin-top:5px" />
           </div>
       </td>
       <?php } ?>

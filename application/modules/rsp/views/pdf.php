@@ -6,7 +6,7 @@
     <tr>
         <td class="info-card">
             <table width="100%" class="info-row">
-                <tr><td>No Transaksi</td><td class="info-dots">:</td><td><?= $rsp->DOCUMENT_NO ?></td></tr>
+                <tr><td style="min-width: 80px;">No Transaksi</td><td class="info-dots">:</td><td><?= $rsp->DOCUMENT_NO ?></td></tr>
                 <tr><td>Supplier</td><td class="info-dots">:</td><td><?= $rsp->SUPPLIER ?? '-' ?></td></tr>
                 <tr><td>Main Storage</td><td class="info-dots">:</td><td><?= $rsp->WAREHOUSE_NAME ?? '-' ?></td></tr>
             </table>

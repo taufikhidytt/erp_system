@@ -16,7 +16,7 @@ class Fpk_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "a.NEED_DATE",
+        // "a.NEED_DATE",
         "Supplier",
         "k.FIRST_NAME",
         "w.WAREHOUSE_NAME",
@@ -29,7 +29,7 @@ class Fpk_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
-        "a.NEED_DATE",
+        // "a.NEED_DATE",
         "CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' )",
         "k.FIRST_NAME",
         "w.WAREHOUSE_NAME",
@@ -49,7 +49,6 @@ class Fpk_model extends CI_Model
             a.DOCUMENT_NO No_Transaksi,
             a.DOCUMENT_REFF_NO No_Referensi,
             a.DOCUMENT_DATE Tanggal,
-            a.NEED_DATE Dibutuhkan,
             a.TOTAL_AMOUNT Total,
             CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) Supplier,
             w.WAREHOUSE_NAME Gudang,
@@ -208,7 +207,8 @@ class Fpk_model extends CI_Model
             k.FIRST_NAME as SALES_FIRST_NAME,
             k.LAST_NAME as SALES_LAST_NAME,
         ");
-        $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER",true);
+        // $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER",true);
+        $this->db->select("p.PERSON_NAME as SUPPLIER",true);
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');

@@ -233,7 +233,8 @@ class Rsp_model extends CI_Model
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
         ");
-        $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER");
+        // $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER");
+        $this->db->select("p.PERSON_NAME as SUPPLIER");
         $this->db->from('tag_pinjam a');
         $this->db->join('warehouse w', 'a.DEST_WH_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');

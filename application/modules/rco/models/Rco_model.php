@@ -16,8 +16,8 @@ class Rco_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
+        "w.WAREHOUSE_NAME",
         "wh.WAREHOUSE_NAME",
-        "w.WAREHOUSE_NAME"
     );
 
     var $column_search = array(
@@ -26,8 +26,8 @@ class Rco_model extends CI_Model
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
+        "w.WAREHOUSE_NAME",
         "wh.WAREHOUSE_NAME",
-        "w.WAREHOUSE_NAME"
     );
 
     var $order = array('a.DOCUMENT_DATE' => 'DESC');

@@ -1,9 +1,12 @@
+<?php
+$logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . $this->session->logo : 'assets/logo/logo.png';
+?>
 <!DOCTYPE html>
 
 <head>
     <meta charset="utf-8" />
     <title><?= $title; ?> | <?= $this->session->userdata('name_ub'); ?></title>
-    <link rel="icon" type="image/png" href="<?= base_url('assets/logo/logo.png') ?>">
+    <link rel="icon" type="image/png" href="<?= base_url($logo) ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- DataTables -->
@@ -125,13 +128,15 @@
             resize: vertical;
         }
 
-        .nav-tabs .nav-link.active{
+        .nav-tabs .nav-link.active {
             background-color: #e9ecef;
         }
-        .details-control{
+
+        .details-control {
             font-weight: bolder;
             color: #1DAA61;
         }
+
         table.dataTable.table-sm thead .sorting:before,
         table.dataTable.table-sm thead .sorting:after,
         table.dataTable.table-sm thead .sorting_asc:before,
@@ -146,6 +151,7 @@
         table.dataTable.table-sm thead .sorting_desc:before {
             margin-top: -6px;
         }
+
         table.dataTable.table-sm thead .sorting:after,
         table.dataTable.table-sm thead .sorting_asc:after,
         table.dataTable.table-sm thead .sorting_desc:after {
@@ -155,7 +161,12 @@
         .dataTable tbody td {
             font-family: monospace;
         }
-        .dataTable thead th, .dataTables_length, .dataTables_filter, .dataTables_paginate, .dataTables_info {
+
+        .dataTable thead th,
+        .dataTables_length,
+        .dataTables_filter,
+        .dataTables_paginate,
+        .dataTables_info {
             font-family: Tahoma !important;
         }
     </style>
@@ -182,10 +193,10 @@
                     <div class="navbar-brand-box align-content-center">
                         <a href="<?= base_url('dashboard') ?>" class="logo logo-light">
                             <span class="logo-sm">
-                                <img src="<?= base_url('assets/logo/logo.png') ?>" alt="logo" height="30">
+                                <!-- <img src="<?= base_url('assets/logo/logo.png') ?>" alt="logo" height="30"> -->
 
 
-                                <!-- <img src="<?= base_url('assets/logo/' . $this->session->userdata('logo')) ?>" alt="logo" height="30"> -->
+                                <img src="<?= base_url($logo) ?>" alt="logo" height="30">
                             </span>
                             <span class="logo-lg">
                                 <h5 class="text-white"><?= strtoupper($this->session->userdata('name_ub')) ?></h5>
@@ -428,6 +439,32 @@
 
         // Update setiap 1 detik
         setInterval(updateJam, 1000);
+
+        function enableDataTableSearch() {
+
+            $('.dataTables_wrapper').each(function() {
+
+                let wrapper = $(this);
+
+                wrapper.find('input[type="search"]')
+                    .prop('disabled', false)
+                    .removeAttr('disabled');
+
+                wrapper.find('.dataTables_filter')
+                    .css('pointer-events', 'auto');
+            });
+        }
+
+        $(document).ready(function() {
+            enableDataTableSearch();
+        });
+
+        $(document).ajaxComplete(function() {
+            enableDataTableSearch();
+        });
+
+        setTimeout(enableDataTableSearch, 300);
+        setTimeout(enableDataTableSearch, 800);
     </script>
 
     <script src="<?= base_url() ?>assets/admin/js/pages/aos.js"></script>
