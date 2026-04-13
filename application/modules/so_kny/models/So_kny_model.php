@@ -361,7 +361,8 @@ class So_kny_model extends CI_Model
             py.PAYMENT_TERM_NAME,
             k.FIRST_NAME SALES,k.LAST_NAME SALES_LAST_NAME,
         ");
-        $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        // $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        $this->db->select("p.PERSON_NAME Customer", true);
         $this->db->from('so a');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');

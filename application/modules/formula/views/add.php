@@ -230,7 +230,7 @@
                                     <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
                                         <div class="tab-pane active" id="detail" role="tabpanel">
-                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;">
+                                            <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;height:29.89px">
                                                 <i class="fa fa-trash"></i> Del
                                             </button>
                                             <button type="button" id="btn-modalMrq" class="btn btn-success btn-sm">
@@ -239,7 +239,7 @@
                                         </div>
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
-                                        <table class="table table-striped table-bordered" id="table-detail">
+                                        <table class="table table-striped table-bordered table-sm" id="table-detail">
                                             <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
                                                 <tr>
                                                     <th>No</th>
@@ -273,7 +273,7 @@
 
 <!-- modal -->
 <div id="modalMrq" class="modal fade" style="font-size: 12px;">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title mt-0" id="modalTitleForm"></h5>
@@ -281,8 +281,8 @@
             </div>
             <div class="modal-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped" id="table-item">
-                        <thead>
+                    <table class="table table-bordered table-striped table-sm" id="table-item">
+                        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                             <tr class="text-nowrap">
                                 <th>
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
@@ -372,7 +372,7 @@
                 {
                     targets: 3,
                     width: "15%",
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -410,16 +410,18 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
+                    className : "text-center"
                 }, // checkbox
                 {
                     targets: 1,
+                    className : "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
                 }, // no
                 {
                     targets: 2,
-                    className: "ellipsis",
+                    className: "ellipsis text-center",
                     render: function(data) {
                         if (!data) return '-';
                         let limit = 20;

@@ -11,17 +11,16 @@ class Out_kny_model extends CI_Model
 
     var $column_order = array(
         null,
-        null,
         "a.DOCUMENT_DATE",
         "bd.DOCUMENT_NO",
         "bd.DOCUMENT_REFF_NO",
         "W.WAREHOUSE_NAME",
-        "CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE)",
+        "supplier",
         "i.ITEM_DESCRIPTION",
         "i.ITEM_CODE",
         "b.ENTERED_QTY",
-        "b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)",
-        "b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0))",
+        "QTY_PO",
+        "QTY_SISA",
         "b.ENTERED_UOM",
     );
 
@@ -40,7 +39,7 @@ class Out_kny_model extends CI_Model
         "b.ENTERED_UOM",
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array('a.DOCUMENT_DATE' => 'ASC');
 
     private function _get_datatables_query()
     {
@@ -57,6 +56,7 @@ class Out_kny_model extends CI_Model
             p.PERSON_ID,
             p.PERSON_CODE,
             p.PERSON_NAME,
+            CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE) as supplier,
             a.WAREHOUSE_ID,
             w.WAREHOUSE_NAME,
             i.ITEM_ID,
@@ -150,6 +150,7 @@ class Out_kny_model extends CI_Model
             p.PERSON_ID,
             p.PERSON_CODE,
             p.PERSON_NAME,
+            CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE) as supplier,
             a.WAREHOUSE_ID,
             w.WAREHOUSE_NAME,
             i.ITEM_ID,

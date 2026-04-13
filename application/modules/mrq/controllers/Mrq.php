@@ -45,7 +45,8 @@ class Mrq extends Back_Controller
             $row['nama_item'] = $mrq->Nama_Item ? $mrq->Nama_Item : '-';
             $row['satuan'] = $mrq->UoM ? $mrq->UoM : '-';
 
-            $row['build_id'] = $this->encrypt->encode($mrq->BUILD_ID);
+            $row['build_id']    = $this->encrypt->encode($mrq->BUILD_ID);
+            $row['flag']        = $mrq->APPROVED_FLAG == 'Y' ? '<i class="text-success fa fa-check" title="Approved" data-bs-toggle="tooltip" data-bs-placement="left"></i>' : '<i class="text-danger fa fa-times" title="Unapproved" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
             $data[] = $row;
         }
 
@@ -781,24 +782,38 @@ class Mrq extends Back_Controller
     public function get_info($id)
     {
         $id = (int) $this->encrypt->decode(base64url_decode($id));
-        $this->load->model('M_datatables', 'datatables');
+        $this->load->model('M_union_datatables','union_datatables');
         $params = [
-            'table' => 'build_detail b',
-            'select' => [
-                'b.BUILD_DETAIL_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY MR',
-                ['(b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS PO', FALSE],
-                ['(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
+            'queries' => [
+                // Query pertama: build table
+                [
+                    'select' => 'b.BUILD_ID, b.BUILD_ID AS BUILD_DETAIL_ID, i.ITEM_ID, i.ITEM_DESCRIPTION AS Nama_Item, i.ITEM_CODE AS Kode_Item, b.ENTERED_UOM AS Satuan, b.ENTERED_QTY AS MR, (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS `PO/SO`, (b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA',
+                    'table'  => 'build b',
+                    'join'   => ['item i', 'b.ITEM_ID = i.ITEM_ID'],
+                    'where'  => 'b.BUILD_ID = ' . $id,
+                ],
+                // Query kedua: build_detail table
+                [
+                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, i.ITEM_ID, i.ITEM_DESCRIPTION AS Nama_Item, i.ITEM_CODE AS Kode_Item, b.ENTERED_UOM AS Satuan, b.ENTERED_QTY AS MR, (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS `PO/SO`, (b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA',
+                    'table'  => 'build_detail b',
+                    'join'   => ['item i', 'b.ITEM_ID = i.ITEM_ID'],
+                    'where'  => 'b.BUILD_ID = ' . $id,
+                ],
             ],
-            'joins' => [
-                ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+            'search_columns' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'order_map' => [
+                0 => null,  // tombol +/- (tidak sortable)
+                1 => null,  // no (tidak sortable)
+                2 => 'Nama_Item',
+                3 => 'Kode_Item',
+                4 => 'Satuan',
+                5 => 'MR',
+                6 => '`PO/SO`',
+                7 => 'SISA',
             ],
-            'where' => ['b.BUILD_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
-
-        echo json_encode($this->datatables->generate($params, function ($row, $no) {
+ 
+        $result = $this->union_datatables->generate($params, function($row, $no) {
             return [
                 'no' => $no,
                 'build_detail_id' => base64url_encode($this->encrypt->encode($row->BUILD_DETAIL_ID)),
@@ -806,45 +821,91 @@ class Mrq extends Back_Controller
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
                 'mr' => number_format((float)$row->MR, 2, '.', ','),
-                'po' => number_format((float)$row->PO, 2, '.', ','),
+                'po' => number_format((float)$row->{'PO/SO'}, 2, '.', ','),
                 'sisa' => number_format((float)$row->SISA, 2, '.', ','),
             ];
-        }));
+        });
+        echo json_encode($result);
     }
 
     public function get_info_detail($detail_id)
     {
         $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
-        $this->load->model('M_datatables', 'datatables');
+        $this->load->model('M_union_datatables','union_datatables');
         $params = [
-            'table' => 'build_detail b',
-            'select' => [
-                'c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,
-                    b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,c.INVOICE_ID',
-                ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
-
+            'queries' => [
+                // Query 1: inventory_in_detail (PO Kny)
+                [
+                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, (a.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, a.INVENTORY_IN_ID AS HEADER_ID, a.INVENTORY_IN_DETAIL_ID, "PO_Kny" AS Erp_Menu_Name',
+                    'table'  => 'build_detail b',
+                    'join'   => [
+                        ['inventory_in_detail a', 'b.BUILD_DETAIL_ID = a.BUILD_DETAIL_ID', 'inner'],
+                        ['invoice_detail d', 'a.INVENTORY_IN_DETAIL_ID = d.INVENTORY_IN_DETAIL_ID', 'inner'],
+                        ['invoice c', 'd.INVOICE_ID = c.INVOICE_ID', 'inner'],
+                        ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
+                    ],
+                    'where'  => [
+                        'b.BUILD_DETAIL_ID' => $detail_id,
+                    ],
+                ],
+                // Query 2: so_detail (SO Kny) - build_detail
+                [
+                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, (a.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, a.SO_ID AS HEADER_ID, a.SO_DETAIL_ID, "SO_Kny" AS Erp_Menu_Name',
+                    'table'  => 'build_detail b',
+                    'join'   => [
+                        ['so_detail a', 'b.BUILD_DETAIL_ID = a.BUILD_DETAIL_ID', 'inner'],
+                        ['so c', 'a.SO_ID = c.SO_ID', 'inner'],
+                        ['warehouse w', 'a.GUDANG_ID = w.WAREHOUSE_ID', 'inner'],
+                    ],
+                    'where'  => [
+                        'b.BUILD_DETAIL_ID' => $detail_id,
+                    ],
+                ],
+                // Query 3: so_detail (SO Kny) - build
+                [
+                    'select' => 'b.BUILD_ID, b.BUILD_ID AS BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, (a.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, a.SO_ID AS HEADER_ID, a.SO_DETAIL_ID, "SO_Kny" AS Erp_Menu_Name',
+                    'table'  => 'build b',
+                    'join'   => [
+                        ['so_detail a', 'b.BUILD_ID = a.BUILD_ID', 'inner'],
+                        ['so c', 'a.SO_ID = c.SO_ID', 'inner'],
+                        ['warehouse w', 'a.GUDANG_ID = w.WAREHOUSE_ID', 'inner'],
+                        ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
+                    ],
+                    'where'  => [
+                        'b.BUILD_ID' => $detail_id,
+                    ],
+                ],
             ],
-            'joins' => [
-                ['inventory_in_detail a', 'b.BUILD_DETAIL_ID = a.BUILD_DETAIL_ID', 'inner'],
-                ['invoice_detail d', 'a.INVENTORY_IN_DETAIL_ID = d.INVENTORY_IN_DETAIL_ID', 'inner'],
-                ['invoice c', 'd.INVOICE_ID = c.INVOICE_ID', 'inner'],
-                ['warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID', 'inner'],
+            'search_columns' => [
+                'c.DOCUMENT_NO',
+                'c.DOCUMENT_DATE',
+                'b.ENTERED_UOM',
+                'w.WAREHOUSE_NAME',
             ],
-            'where' => ['b.BUILD_DETAIL_ID' => $detail_id],
-            // 'order' => ['b.BUILD_DETAIL_ID' => 'asc'],
-            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
-            'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'order_map' => [
+                0 => null,  // no (tidak sortable)
+                1 => 'No_Transaksi',
+                2 => 'Tanggal',
+                3 => 'Jumlah',
+                4 => 'Satuan',
+                5 => '`S.Loc`',
+            ],
         ];
-        echo json_encode($this->datatables->generate($params, function ($row, $no) {
+ 
+        $result = $this->union_datatables->generate($params, function($row, $no) {
+            $link = site_url(strtolower($row->Erp_Menu_Name).'/detail/' . base64url_encode($this->encrypt->encode($row->HEADER_ID)));
+
             return [
                 'no' => $no,
-                'no_transaksi' => '<a href="' . site_url('po_kny/detail/' . base64url_encode($this->encrypt->encode($row->INVOICE_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
+                'no_transaksi' => '<a href="' . $link . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
-                'satuan' => $row->Satuan,
                 'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
-                's_loc' => $row->S_Loc,
+                'satuan' => $row->Satuan,
+                's_loc' => $row->{'S.Loc'},
             ];
-        }));
+        });
+ 
+        echo json_encode($result);
     }
 
     public function print($id)

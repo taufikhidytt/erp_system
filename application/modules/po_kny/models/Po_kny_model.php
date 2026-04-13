@@ -153,7 +153,8 @@ class Po_kny_model extends CI_Model
             a.INVOICE_DETAIL_ID,
             a.INVOICE_ID,
             a.INVENTORY_IN_DETAIL_ID,
-            w.WAREHOUSE_ID 
+            w.WAREHOUSE_ID ,
+            a.KET DESKRIPSI
         FROM
             invoice_detail a
             JOIN item i ON a.ITEM_ID = i.ITEM_ID
@@ -315,7 +316,8 @@ class Po_kny_model extends CI_Model
             ps.SITE_NAME, ps.ADDRESS1, ps.ADDRESS2, ps.ADDRESS3, ps.CITY,
             py.PAYMENT_TERM_NAME,
         ");
-        $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        // $this->db->select("CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']',' - ',ps.SITE_NAME) Customer", true);
+        $this->db->select("p.PERSON_NAME Customer", true);
         $this->db->from('invoice a');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');

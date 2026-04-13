@@ -216,8 +216,8 @@ class So_kny extends Back_Controller
                     i.ITEM_ID,
                     i.ITEM_CODE,
                     i.ITEM_DESCRIPTION,
-                    a.ENTERED_QTY,
-                    a.BASE_QTY,
+                    b.ENTERED_QTY,
+                    b.BASE_QTY,
                     CASE
                         WHEN b.BASE_QTY IS NULL
                         OR b.BASE_QTY = 0
@@ -251,7 +251,7 @@ class So_kny extends Back_Controller
                     AND w.WAREHOUSE_ID = $storage
                     AND psn.PERSON_ID = $customer
                 ORDER BY DOCUMENT_DATE DESC,
-                    BUILD_ID"
+                    BUILD_ID, BUILD_DETAIL_ID"
             );
             if ($data->num_rows() > 0) {
                 $result = array(

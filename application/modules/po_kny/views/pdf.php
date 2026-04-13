@@ -17,7 +17,8 @@
             <table width="100%" class="info-row">
                 <tr><td style="min-width: 70px !important;">No Transaksi</td><td class="info-dots">:</td><td><?= $po->DOCUMENT_NO ?></td></tr>
                 <tr><td>Supplier</td><td class="info-dots">:</td><td><?= $po->Customer ?? '-' ?></td></tr>
-                <tr><td>Location</td><td class="info-dots">:</td><td><?= ($po->ADDRESS1 ?? '-').($po->CITY?' '.$po->CITY:'') ?></td></tr>
+                <tr><td>Location</td><td class="info-dots">:</td><td><?= $po->SITE_NAME ?? '-' ?></td></tr>
+                <tr><td></td><td class="info-dots"></td><td><?= ($po->ADDRESS1 ?? '-').($po->CITY?' '.$po->CITY:'') ?></td></tr>
             </table>
         </td>
         <td width="4%"></td>
@@ -48,8 +49,7 @@
         <tr>
             <th width="5%">No</th>
             <th width="12%">No MR</th>
-            <th width="18%">Nama Item</th>
-            <th width="15%">Memo</th>
+            <th width="33%">Nama Item</th>
             <th width="8%" style="text-align:right !important">Jumlah</th>
             <th width="7%">Satuan</th>
             <th width="10%" style="text-align:right !important">Harga</th>
@@ -60,13 +60,13 @@
     </thead>
     <tbody>
         <?php foreach ($po_detail as $k => $v) {
-            $diskon = (float) $v->Diskon;
+            $diskon     = (float) $v->Diskon;
+            $deskripsi  = trim($v->DESKRIPSI);
             ?>
             <tr>
                 <td><?=  $k+1 ?></td>
                 <td><?= $v->No_MR ?></td>
-                <td><?= $v->Nama_Item ?></td>
-                <td><?= $v->DESKRIPSI ?? '-' ?></td>
+                <td><?= $deskripsi?: $v->Nama_Item ?></td>
                 <td style="text-align:right !important"><?= number_format($v->Qty,2,'.',',') ?></td>
                 <td><?= $v->UoM ?></td>
                 <td style="text-align:right !important"><?= number_format($v->Harga,2,'.',',') ?></td>
@@ -78,19 +78,19 @@
     </tbody>
     <tfoot>
         <tr class="total-row">
-            <td colspan="8" style="text-align:right !important">TOTAL</td>
+            <td colspan="7" style="text-align:right !important">TOTAL</td>
             <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_AMOUNT,2,'.',',') ?></td>
         </tr>
         <tr class="total-row">
-            <td colspan="8" style="text-align:right !important">Diskon</td>
+            <td colspan="7" style="text-align:right !important">Diskon</td>
             <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_DISCOUNT,2,'.',',') ?></td>
         </tr>
         <tr class="total-row">
-            <td colspan="8" style="text-align:right !important">PPN</td>
+            <td colspan="7" style="text-align:right !important">PPN</td>
             <td colspan="2" style="text-align:right !important"><?= number_format($po->PPN_AMOUNT,2,'.',',') ?></td>
         </tr>
         <tr class="total-row">
-            <td colspan="8" style="text-align:right !important">GRAND TOTAL</td>
+            <td colspan="7" style="text-align:right !important">GRAND TOTAL</td>
             <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_NET,2,'.',',') ?></td>
         </tr>
     </tfoot>

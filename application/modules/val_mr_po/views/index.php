@@ -1,3 +1,11 @@
+<style>
+    #result table tbody td{
+        font-family: monospace !important;
+    }
+    #result table thead th{
+        font-family: Tahoma !important;
+    }
+</style>
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
 <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
@@ -106,23 +114,6 @@
                 },
                 cache: true
             }
-        });
-
-        $(document).on('mouseenter', '[data-bs-toggle="tooltip"]', function() {
-            $('.tooltip').remove();
-
-            var tooltip = new bootstrap.Tooltip(this, {
-                container: 'body',
-                trigger: 'manual',
-                boundary: 'viewport'
-            });
-
-            tooltip.show();
-
-            $(this).one('mouseleave click', function() {
-                tooltip.dispose();
-                $('.tooltip').remove();
-            });
         });
     });
     $(document).on('change','#so_id', function(){

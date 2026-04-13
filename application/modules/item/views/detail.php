@@ -1,3 +1,8 @@
+<style>
+    #tableSatuan tbody td{
+        font-family: monospace !important;
+    }
+</style>
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
 <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
@@ -536,27 +541,27 @@
                                             <button type="button" id="addRow" class="btn btn-success btn-sm" style="width: 30px;">+</button>
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                             <div class="table-responsive">
-                                                <table id="tableSatuan" class="table mt-3 w-100">
-                                                    <thead>
+                                                <table id="tableSatuan" class="table mt-3 w-100 table-sm align-middle">
+                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr>
-                                                            <th><input type="checkbox" id="chkAll"></th>
-                                                            <th>No</th>
+                                                            <th class="text-center"><input type="checkbox" id="chkAll"></th>
+                                                            <th class="text-center">No</th>
                                                             <th>Satuan Lain</th>
                                                             <th>Konversi</th>
                                                             <th>Keterangan</th>
-                                                            <th>Default</th>
+                                                            <th class="text-center">Default</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <?php if (!empty($uomChild)): ?>
                                                             <?php foreach ($uomChild->result_array() as $index => $row): ?>
                                                                 <tr>
-                                                                    <td>
+                                                                    <td class="text-center">
                                                                         <input type="checkbox" class="chkRow">
                                                                         <input type="hidden" name="id_satuan_uom_detail[]" value="<?= $row['ITEM_UOM_ID']; ?>">
                                                                     </td>
 
-                                                                    <td class="rowNo"><?= $index + 1; ?>.</td>
+                                                                    <td class="rowNo text-center"><?= $index + 1; ?></td>
 
                                                                     <td>
                                                                         <select name="satuan_lain[]" class="form-select select-uom auto-save">
@@ -575,7 +580,7 @@
                                                                         <input type="text" name="keterangan[]" class="form-control" value="1 <?= $row['UOM_CODE'] . ' = ' . $row['TO_QTY'] . ' ' . $data->UOM_CODE ?>" readonly>
                                                                     </td>
 
-                                                                    <td>
+                                                                    <td class="text-center">
                                                                         <input type="checkbox" name="status_satuan_detail[]" <?= set_value('status_satuan_detail', $row['BASE_UOM_FLAG']) === 'Y' ? 'checked' : '' ?> value="Y" class="auto-save">
                                                                     </td>
                                                                 </tr>
@@ -1110,8 +1115,8 @@
             ?>
             var rowCount = $("#tableSatuan tbody tr").length + 1;
             var newRow = `<tr>
-            <td><input type="checkbox" class="chkRow"></td>
-            <td class="rowNo">${rowCount}.</td>
+            <td class="text-center"><input type="checkbox" class="chkRow"></td>
+            <td class="rowNo text-center">${rowCount}</td>
             <td>
                 <input type="hidden" name="id_satuan_uom_detail[]" value="0">
                 <select name="satuan_lain[]" class="form-select select-uom auto-save">
@@ -1575,7 +1580,7 @@
     // Update nomor urut
     function updateRowNumber() {
         $("#tableSatuan tbody tr").each(function(index) {
-            $(this).find(".rowNo").text((index + 1) + ".");
+            $(this).find(".rowNo").text((index + 1));
         });
     }
 </script>

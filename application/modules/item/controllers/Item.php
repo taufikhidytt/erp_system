@@ -30,7 +30,7 @@ class Item extends Back_Controller
         foreach ($list as $item) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
+            $row['no'] = $no;
             $row['kode_item'] = '
             <a href="' . base_url('item/detail/' . $this->encrypt->encode($item->ID)) . '">
                 ' . ($item->KODE_ITEM ? $item->KODE_ITEM : '-') . '
@@ -48,16 +48,16 @@ class Item extends Back_Controller
             $row['price_last_sell'] = $item->PRICE_LAST_SELL ? number_format($item->PRICE_LAST_SELL, 2) : '-';
             $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Weeks" : '-';
             if ($item->KONSY == 'Y') {
-                $returnKonsy = '<i class="text-success fa fa-check"></i>';
+                $returnKonsy = '<i class="text-success fa fa-check" title="Yes" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
             } elseif ($item->KONSY == 'N') {
-                $returnKonsy = '<i class="text-danger fa fa-times"></i>';
+                $returnKonsy = '<i class="text-danger fa fa-times" title="No" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
             } else {
                 $returnKonsy = '-';
             }
             $row['konsy'] = $returnKonsy;
-            $item->KONSY == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
-            $row['approved'] = $item->APPROVED == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
-            $row['status'] = $item->OBSOLETE == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
+            $item->KONSY == 'Y' ? '<i class="text-success fa fa-check" title="Yes" data-bs-toggle="tooltip" data-bs-placement="left"></i>' : '<i class="text-danger fa fa-times" title="No" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
+            $row['approved'] = $item->APPROVED == 'Y' ? '<i class="text-success fa fa-check" title="Approved" data-bs-toggle="tooltip" data-bs-placement="left"></i>' : '<i class="text-danger fa fa-times" title="Unapproved" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
+            $row['status'] = $item->OBSOLETE == 'Y' ? '<i class="text-success fa fa-check" title="Yes" data-bs-toggle="tooltip" data-bs-placement="left"></i>' : '<i class="text-danger fa fa-times" title="No" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
             $data[] = $row;
         }
 

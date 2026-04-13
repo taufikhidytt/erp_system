@@ -90,7 +90,7 @@ class Val_mr_po_model extends CI_Model
                     i.ITEM_DESCRIPTION as MR_Nama_Item,
                     IF(sd.DESKRIPSI IS NULL, sd.ITEM_DESCRIPTION, sd.DESKRIPSI) AS SO_Nama_Item,
                     sd.ENTERED_QTY as PO_Qty,
-                    (sd.ENTERED_QTY - b.ENTERED_QTY) AS Qty_Difference,
+                    (sd.ENTERED_QTY - bd.ENTERED_QTY) AS Qty_Difference,
                     CASE 
                         WHEN sd.ITEM_ID = bd.ITEM_ID AND sd.ENTERED_QTY = bd.ENTERED_QTY THEN 'MATCH' 
                         WHEN sd.ITEM_ID = bd.ITEM_ID AND sd.ENTERED_QTY != bd.ENTERED_QTY THEN 

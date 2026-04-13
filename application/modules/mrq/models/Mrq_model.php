@@ -21,6 +21,7 @@ class Mrq_model extends CI_Model
         "a.UNIT",
         "i.ITEM_DESCRIPTION",
         "a.ENTERED_UOM",
+        "a.APPROVED_FLAG",
     );
 
     var $column_search = array(
@@ -40,6 +41,7 @@ class Mrq_model extends CI_Model
         "a.UNIT",
         "i.ITEM_DESCRIPTION",
         "a.ENTERED_UOM",
+        "a.APPROVED_FLAG",
     );
 
     var $order = array('a.DOCUMENT_DATE' => 'DESC');
@@ -49,7 +51,7 @@ class Mrq_model extends CI_Model
         $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON (a.TABLE_NAME = b.TABLE_NAME) WHERE b.ERP_MENU_NAME = '{$this->uri->segment(1)}'")->row_array();
 
         $this->db->select("
-            a.BUILD_ID,
+            a.BUILD_ID, a.APPROVED_FLAG,
             b.DISPLAY_NAME AS Status, b.MENU_ICON AS WarnaStatus,
             a.DOCUMENT_NO AS No_Transaksi,
             a.DOCUMENT_REFF_NO AS No_Referensi,

@@ -1318,7 +1318,7 @@
                 let harga_input = $(this).data('harga_input') ?? '0';
                 let harga = $(this).data('harga') ?? '0';
                 let diskon_input = $(this).data('diskon_input') ?? '0';
-                let diskon_percen = $(this).data('diskon_percen') ?? '0';
+                let diskon_percen = $(this).data('diskon_percen') ?? '';
                 let subtotal = $(this).data('subtotal') ?? '0';
 
                 let status = $(this).data("status");
@@ -1418,6 +1418,9 @@
                 rowsAdded = true;
             });
 
+            setTimeout(() => {
+                calculateGrandTotal();
+            }, 300);
 
             if (rowsAdded) {
                 tableDetail.draw(false);

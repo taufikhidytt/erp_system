@@ -31,7 +31,8 @@ class Formula extends Back_Controller
         foreach ($list as $formula) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
+            $row['no'] = $no;
+            $row['status'] = badge_status($formula->Status, $formula->Warna_Status);
             $row['no_transaksi'] = '
             <a href="' . base_url('formula/detail/' . base64url_encode($this->encrypt->encode($formula->BOM_ID))) . '">
                 ' . ($formula->No_Transaksi ? $formula->No_Transaksi : '-') . '
@@ -43,7 +44,7 @@ class Formula extends Back_Controller
             $row['lokasi'] = $formula->Code ? $formula->Code : '-';
             $row['tanggal_mulai'] = $formula->Start_Date ? date('Y-m-d H:i', strtotime($formula->Start_Date)) : '-';
             $row['tanggal_selesai'] = $formula->End_Date ? date('Y-m-d H:i', strtotime($formula->End_Date)) : '-';
-            $row['active_flag'] = $formula->ACTIVE_FLAG == 'Y' ? '<i class="text-success fa fa-check"></i>' : '<i class="text-danger fa fa-times"></i>';
+            $row['active_flag'] = $formula->ACTIVE_FLAG == 'Y' ? '<i class="text-success fa fa-check" title="Active" data-bs-toggle="tooltip" data-bs-placement="left"></i>' : '<i class="text-danger fa fa-times" title="Inactive" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
 
             $row['bom_id'] = $this->encrypt->encode($formula->BOM_ID);
             $data[] = $row;
@@ -256,7 +257,7 @@ class Formula extends Back_Controller
     {
         $bom_id = $this->encrypt->decode($this->input->post('bom_id'));
 
-        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME FROM bom a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.BOM_ID = {$bom_id}");
+        $data = $this->db->query("SELECT a.STATUS_ID, b.ITEM_FLAG, b.DISPLAY_NAME, b.MENU_ICON FROM bom a JOIN erp_lookup_value as b ON b.erp_lookup_value_id = a.STATUS_ID WHERE b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET ('STATUS_ORDER') AND a.BOM_ID = {$bom_id}");
 
         if ($data->num_rows() > 0) {
             $result = array(

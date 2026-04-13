@@ -31,7 +31,7 @@ class Out_so extends Back_Controller
         foreach ($list as $outkny) {
             $no++;
             $row = array();
-            $row['no'] = $no . '.';
+            $row['no'] = $no;
             $row['tanggal'] = $outkny->DOCUMENT_DATE ? date('Y-m-d H:i', strtotime($outkny->DOCUMENT_DATE)) : '-';
             $row['no_transaksi'] = $outkny->DOCUMENT_NO ? $outkny->DOCUMENT_NO : '-';
             $row['no_referensi'] = $outkny->DOCUMENT_REFF_NO ? $outkny->DOCUMENT_REFF_NO : '-';

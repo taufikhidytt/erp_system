@@ -12,6 +12,7 @@ class Formula_model extends CI_Model
     var $column_order = array(
         null,
         null,
+        "b.DISPLAY_NAME",
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "i.ITEM_DESCRIPTION",
@@ -25,6 +26,7 @@ class Formula_model extends CI_Model
 
     var $column_search = array(
         null,
+        "b.DISPLAY_NAME",
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "i.ITEM_DESCRIPTION",
@@ -53,9 +55,11 @@ class Formula_model extends CI_Model
             a.LOKASI AS Code,
             a.START_DATE AS Start_Date,
             a.END_DATE AS End_Date,
-            a.ACTIVE_FLAG
+            a.ACTIVE_FLAG,
+            b.DISPLAY_NAME Status, b.MENU_ICON Warna_Status,
         ");
         $this->db->from('bom a');
+        $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
         $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
 

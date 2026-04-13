@@ -16,8 +16,8 @@
                         <th class="text-end">QTY MR</th>
                         <th class="text-end">QTY PO</th>
                         <th class="text-end">Selisih</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th class="text-center">Status</th>
+                        <th>Approval</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -41,16 +41,16 @@
                             <td class="text-end"><?= number_format($item['MR_Qty'],2,'.',',') ?></td>
                             <td class="text-end"><?= number_format($item['PO_Qty'],2,'.',',') ?></td>
                             <td class="text-end"><?= number_format($item['Qty_Difference'],2,'.',',') ?></td>
-                            <td>
+                            <td class="text-center">
                                 <span class="badge bg-<?= $item['Match_Status']=='MATCH'?'success':($item['Match_Status']=='OVER_QTY'?'warning':'danger') ?>">
                                     <?= str_replace('_',' ',$item['Match_Status']) ?>
                                 </span>
-                                <?php if($item['APPROVED_FLAG'] == 'Y'){
-                                    echo '<br/> <span class="badge bg-success">Approved</span>';
-                                } ?>
                             </td>
                             <?php if($is_rowspan){ ?>
                                 <td rowspan="<?= $mrq_count[$item['BUILD_ID']] ?>" class="text-center align-middle">
+                                    <?php if($item['APPROVED_FLAG'] == 'Y'){
+                                        echo '<div class="mb-1"><span class="badge bg-success">Approved</span></div>';
+                                    } ?>
                                     <?php if($item['APPROVED_FLAG'] == 'Y' && ((float) $item['RECEIVED_ENTERED_QTY'])==0){ ?>
                                         <button class="btn btn-sm btn-danger btn-approve" title="Unapprove" data-bs-toggle="tooltip" data-bs-placement="top" data-value="N" data-id="<?= base64url_encode($this->encrypt->encode($item['BUILD_ID'])) ?>"><i class="fa fa-times"></i></button>
                                     <?php } else if($item['APPROVED_FLAG'] != 'Y'){ ?>

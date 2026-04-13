@@ -110,6 +110,9 @@
             font-size: 8pt;
             margin-bottom: 4px;
         }
+        .info-row td{
+            vertical-align: top !important;
+        }
 
         .info-dots {
             border-bottom: 1px dotted #dde4de;

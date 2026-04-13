@@ -1210,7 +1210,7 @@
                     <input type="hidden" name="detail[harga][]" value="">`,
                     // harga
 
-                    `<span class="view-mode harga-view diskon-harga-view"></span>
+                    `<span class="view-mode harga-view diskon-harga-view">0.00</span>
                     <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="">`,
                     // diskon rp
 

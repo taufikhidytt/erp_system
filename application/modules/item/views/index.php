@@ -28,10 +28,6 @@
 
     #table td {
         white-space: nowrap;
-        height: 30px !important;
-        min-height: 30px !important;
-        padding-top: 12px !important;
-        padding-bottom: 1px !important;
         padding-right: 6px !important;
         padding-left: 6px !important;
         font-size: 0.75rem !important;
@@ -73,15 +69,18 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-striped text-center" id="table">
+                                <table class="table table-striped text-center table-sm" id="table">
                                     <thead>
                                         <tr>
                                             <th>
                                             </th>
                                             <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="2" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th style="width: 80%;">
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="2" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
+                                            <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="3" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
@@ -95,6 +94,9 @@
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
@@ -111,23 +113,29 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="13" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="14" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="14" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
                                             </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="15" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
                                             </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="15" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="16" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="17" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="16" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center">
+                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th>No</th>
                                             <th>Kode Item</th>
                                             <th>Nama Item</th>
@@ -176,7 +184,7 @@
             "searching": true,
             "processing": true,
             "serverSide": true,
-            "ordering": false,
+            "ordering": true,
             "order": [],
             "ajax": {
                 "url": "<?= site_url('item/get_data'); ?>",
@@ -194,9 +202,11 @@
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
+                    "className": "text-center"
                 },
                 {
-                    "data": "kode_item"
+                    "data": "kode_item",
+                    "className": "text-center"
                 },
                 {
                     "data": "nama_item"

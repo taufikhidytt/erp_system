@@ -1,11 +1,4 @@
 <style>
-    .dt-buttons .btn {
-        background-color: #0d6efd;
-        /* warna biru Bootstrap primary */
-        border-color: #0d6efd;
-        color: white;
-    }
-
     .table-striped>tbody>tr:nth-of-type(odd) {
         --bs-table-accent-bg: #eff2f7;
     }
@@ -22,10 +15,6 @@
 
     #table td {
         white-space: nowrap;
-        height: 30px !important;
-        min-height: 30px !important;
-        padding-top: 12px !important;
-        padding-bottom: 1px !important;
         padding-right: 6px !important;
         padding-left: 6px !important;
         font-size: 0.75rem !important;
@@ -71,7 +60,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-striped text-center w-100" id="table">
+                                <table class="table table-striped text-center w-100 table-sm" id="table">
                                     <thead>
                                         <tr>
                                             <th></th>
@@ -109,7 +98,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="11" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center">
+                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th>No</th>
                                             <th>Tanggal</th>
                                             <th>No Transaksi</th>
@@ -155,11 +144,13 @@
                 "<'row'<'col-md-12'tr>>" +
                 "<'row'<'col-md-5'i><'col-md-7'p>>",
             "buttons": [{
-                text: 'Export Excel',
-                className: 'btn btn-success',
+                text: '<i class="fas fa-file-excel me-1"></i> Export Excel',
                 action: function(e, dt, node, config) {
                     var params = dt.ajax.params();
                     window.open("<?= site_url('out_kny/export?') ?>" + $.param(params), '_blank');
+                },
+                attr: {
+                    class: 'btn btn-primary btn-sm'
                 }
             }],
             "columns": [{
@@ -167,10 +158,12 @@
                     "orderable": false,
                     "searchable": false,
                     "width": "5%",
+                    "className" : "text-center"
                 },
                 {
                     "data": "tanggal",
                     "width": "10%",
+                    "className" : "text-center"
                 },
                 {
                     "data": "no_transaksi",
@@ -251,6 +244,7 @@
                 {
                     "data": "kode_item",
                     "width": "10%",
+                    "className" : "text-center",
                     "render": function(data, type, row) {
                         if (!data) return '';
 

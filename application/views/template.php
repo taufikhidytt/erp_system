@@ -396,7 +396,7 @@
     <script src="<?= base_url() ?>assets/admin/libs/select2/js/select2.min.js"></script>
 
     <script src="<?= base_url() ?>assets/admin/js/app.js"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.1"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.3"></script>
 
     <script>
         $(document).ready(function() {

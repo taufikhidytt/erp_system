@@ -49,7 +49,7 @@ class Stk_kny extends Back_Controller
             6 => 'NILAI'
         ];
 
-        $order_column = 'NAMA_ITEM';
+        $order_column = 'KODE_ITEM';
         $order_dir    = 'asc';
         if (!empty($order) && isset($order[0]['column'])) {
             $col_index = $order[0]['column'];
@@ -120,7 +120,7 @@ class Stk_kny extends Back_Controller
         foreach ($paged_data as $row) {
             $no++;
             $data[] = [
-                $no . ".",
+                $no,
                 $row->NAMA_ITEM,
                 $row->KODE_ITEM,
                 number_format($row->STOK, 2, '.', ','),
@@ -164,6 +164,7 @@ class Stk_kny extends Back_Controller
     // Ambil data untuk DataTable
     public function get_data_summary()
     {
+        $param = $this->input->post('param');
         $draw    = $this->input->post('draw') ?? 1;
         $start   = $this->input->post('start') ?? 0;
         $length  = $this->input->post('length') ?? 10;
@@ -205,14 +206,14 @@ class Stk_kny extends Back_Controller
             return true;
         });
 
-        $order_column = 'NAMA_ITEM';
+        $order_column = $param;
         $order_dir = 'asc';
 
         if (!empty($order)) {
             $col_index = $order[0]['column'];
 
             if ($col_index > 0) {
-                $order_column = $column_map[$col_index] ?? 'NAMA_ITEM';
+                $order_column = $column_map[$col_index] ?? $param;
             }
 
             $order_dir = $order[0]['dir'] ?? 'asc';
@@ -240,7 +241,7 @@ class Stk_kny extends Back_Controller
         foreach ($paged_data as $row) {
             $no++;
 
-            $row_obj = ['NO' => $no . '.'];
+            $row_obj = ['NO' => $no];
 
             foreach ($all_columns as $col) {
                 $val = $row->$col;
@@ -378,7 +379,7 @@ class Stk_kny extends Back_Controller
         foreach ($paged_data as $row) {
             $no++;
             $data[] = [
-                $no . ".",
+                $no,
                 $row->DOCUMENT_DATE ?? "-",
                 $row->DOCUMENT_NO ?? "-",
                 $row->DOCUMENT_REFF_NO ?? "-",

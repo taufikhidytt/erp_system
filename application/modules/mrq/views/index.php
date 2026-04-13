@@ -101,6 +101,13 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <select class="column_search" data-column="10" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
+                                            </th>
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th></th>
@@ -114,6 +121,7 @@
                                             <th>Unit</th>
                                             <th>Nama Item</th>
                                             <th>Satuan</th>
+                                            <th>Flag</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -222,6 +230,11 @@
                         if (!data) return '-';
                         return `<span title="${data}">${data}</span>`;
                     }
+                },
+                {
+                    "data": "flag",
+                    "width": "10%",
+                    "className" : "text-center",
                 },
             ]
         });

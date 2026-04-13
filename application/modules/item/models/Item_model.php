@@ -11,23 +11,22 @@ class Item_model extends CI_Model
 
     var $column_order = array(
         'null',
-        'null',
-        'i.ITEM_CODE',
-        'i.ITEM_DESCRIPTION',
+        'KODE_ITEM',
+        'NAMA_ITEM',
         'i.PART_NUMBER',
-        'i.UOM_CODE',
-        'a.DISPLAY_NAME',
-        'b.DISPLAY_NAME',
-        'c.DISPLAY_NAME',
-        'd.DISPLAY_NAME',
-        'e.DISPLAY_NAME',
-        'f.DISPLAY_NAME',
+        'UOM',
+        'JENIS',
+        'KATEGORY',
+        'KOMODITI',
+        'BRAND',
+        'TRADE',
         'i.PRICE_LAST_BUY',
         'i.PRICE_LAST_SELL',
         'i.LEAD_TIME',
-        'i.ITEM_KMS',
-        'i.APPROVE_FLAG',
-        'i.OBSOLETE_FLAG'
+        'MADE_IN',
+        'KONSY',
+        'APPROVED',
+        'OBSOLETE'
     );
 
     var $column_search = array(
@@ -85,7 +84,7 @@ class Item_model extends CI_Model
         foreach ($this->column_search as $i => $item) {
             if ($item === 'null') continue;
 
-            $search_value = $_POST['columns'][$i + 1]['search']['value'] ?? '';
+            $search_value = $_POST['columns'][$i]['search']['value'] ?? '';
             if ($search_value != '') {
                 $lower = strtolower(trim($search_value));
                 $search_value_db = $search_value;

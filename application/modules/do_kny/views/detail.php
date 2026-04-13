@@ -37,7 +37,7 @@
         border: 1px solid #dee2e6 !important;
     }
 
-    .table-sub tbody td{
+    .table-sub tbody td {
         font-family: monospace;
     }
 
@@ -92,7 +92,7 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
-                                    <a href="<?= site_url('do_kny/print/'.base64url_encode($this->encrypt->encode($data->INVENTORY_OUT_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                    <a href="<?= site_url('do_kny/print/' . base64url_encode($this->encrypt->encode($data->INVENTORY_OUT_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
                                         <i class="ri ri-printer-fill"></i>
                                     </a>
                                 </div>
@@ -406,7 +406,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                             </div>
                             <hr>
@@ -547,7 +547,7 @@
                 inventory_out_id: inventory_out_id,
             },
             success: function(response) {
-                $('#statusDoKnyId').html(badgeStatus(response.data[0].DISPLAY_NAME,response.data[0].MENU_ICON));
+                $('#statusDoKnyId').html(badgeStatus(response.data[0].DISPLAY_NAME, response.data[0].MENU_ICON));
                 $('#readonlyDoKnyId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
@@ -678,7 +678,7 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 1,
@@ -687,7 +687,7 @@
                 }, // expand child
                 {
                     targets: 2,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -1077,7 +1077,7 @@
                                 checkbox,
                                 expand,
                                 i + 1,
-                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
+                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
@@ -2004,7 +2004,7 @@
                 },
                 {
                     "data": "nama_item",
-                    className : "ellipsis",
+                    className: "ellipsis",
                     render: function(data, type, row) {
                         // if (type === 'display' && data && data.length > 20) {
                         //     let cleanData = data.replace(/"/g, '&quot;'); 
@@ -2020,7 +2020,7 @@
                 },
                 {
                     "data": "kode_item",
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -2237,6 +2237,8 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
+        const inventory_out_detail_id = input.dataset.inventory_out_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
         const balance = parseFloat(input.dataset.balance);
         let value = parseFloat(input.value);
 
@@ -2250,18 +2252,38 @@
         }
 
         // Tidak boleh lebih dari balance
-        if (value > balance) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jumlah melebihi balance',
-                text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = balance;
-                input.focus();
-                updateSpan(balance);
-            });
-            return;
+        if (inventory_out_detail_id) {
+            // UPDATE
+            const maxAllowed = balance + value_old;
+
+            if (value > maxAllowed) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+        } else {
+            // ADD
+            if (value > balance) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
         }
 
         updateSpan(value);
@@ -2272,6 +2294,8 @@
         if (!e.target.classList.contains('qty-edit')) return;
 
         const input = e.target;
+        const inventory_out_detail_id = input.dataset.inventory_out_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
         const row = $(input).closest("tr");
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
@@ -2282,35 +2306,73 @@
 
         const balance = parseFloat(input.dataset.balance);
 
-        // Tidak boleh minus atau nol
-        if (input.value <= 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Jumlah tidak valid',
-                text: 'Jumlah harus lebih dari 0',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = input.dataset.balance;
-                input.focus();
-                updateSpan(balance);
-            });
-            return;
-        }
+        if (inventory_out_detail_id) {
+            // UPDATE
 
-        if (input.value === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Input kosong',
-                text: 'Jumlah tidak boleh kosong',
-                confirmButtonText: 'OK'
-            }).then(() => {
-                input.value = input.dataset.balance;
-                input.focus();
-                updateSpan(balance);
-            });
-            return;
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+            updateSpan(balance);
+        } else {
+            // ADD
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = input.dataset.balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+            updateSpan(balance);
         }
-        updateSpan(balance);
     }, true);
 
     function formatNumber(value, decimal = 2) {
@@ -2424,9 +2486,9 @@
             }
         });
     }
-    $(document).on('click','#btn-print', function(){
-        setTimeout(function(){
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
             $('#loading').hide();
-        },300);
+        }, 300);
     });
 </script>

@@ -39,3 +39,40 @@ const getBadgeStyle = (hexColor, opacity = 0.2) => {
         border: hexColor
     };
 };
+
+$(document).on('mouseenter', '[data-bs-toggle="tooltip"]', function() {
+    $('.tooltip').remove();
+
+    var tooltip = new bootstrap.Tooltip(this, {
+        container: 'body',
+        trigger: 'manual',
+        boundary: 'viewport'
+    });
+
+    tooltip.show();
+
+    $(this).one('mouseleave click', function() {
+        tooltip.dispose();
+        $('.tooltip').remove();
+    });
+});
+
+// untuk resize width status
+function equalizeBadgeWidth() {
+    let maxWidth = 100;
+    
+    $('.label-status h5').css('width', 'auto');
+    
+    $('.label-status h5').each(function() {
+        if ($(this).outerWidth() > maxWidth) {
+            maxWidth = $(this).outerWidth();
+        }
+    });
+    
+    $('.label-status h5').css('width', maxWidth + 'px');
+}
+$(document).on('ajaxComplete', function(event, xhr, settings) {
+    if (settings.url.includes('getStatus')) {
+        equalizeBadgeWidth();
+    }
+});
