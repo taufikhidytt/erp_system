@@ -42,6 +42,7 @@
     .keterangan-view {
         white-space: pre-line;
     }
+
     .label-status span {
         font-size: 1rem !important;
         width: 100% !important;
@@ -93,7 +94,7 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
-                                    <a href="<?= site_url('fpk/print/'.base64url_encode($this->encrypt->encode($data->PR_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                    <a href="<?= site_url('fpk/print/' . base64url_encode($this->encrypt->encode($data->PR_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
                                         <i class="ri ri-printer-fill"></i>
                                     </a>
                                 </div>
@@ -206,7 +207,7 @@
                                                 </div>
                                                 <div class="text-danger"><?= form_error('sales') ?></div>
                                             </div>
-                                            
+
                                         </div>
                                         <div class="mb-3">
                                             <label for="keterangan">Keterangan:</label>
@@ -298,7 +299,7 @@
                                                                     </td>
                                                                     <td style="width: 8%" class="ellipsis text-end">
                                                                         <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
-                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" data-pr_detail_id="<?= $this->encrypt->encode($dd->PR_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" step="any">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis">
                                                                         <?php $data_uom_selected = $this->db->query("SELECT
@@ -375,10 +376,11 @@
 
                                         <div class="tab-pane" id="info-detail" role="tabpanel">
                                             <div class="table-responsive">
-                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?=  site_url('fpk/get_info/' . base64url_encode($this->encrypt->encode($data->PR_ID))) ?>">
+                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?= site_url('fpk/get_info/' . base64url_encode($this->encrypt->encode($data->PR_ID))) ?>">
                                                     <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr>
-                                                            <th></th> <th>No</th>
+                                                            <th></th>
+                                                            <th>No</th>
                                                             <th>Nama Item</th>
                                                             <th>Kode Item</th>
                                                             <th>Satuan</th>
@@ -534,7 +536,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
-                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
+                    $('#table-info_wrapper').find('input,select').prop('disabled', false);
                     $('#table-detail td').css('pointer-events', 'none');
 
                     $('#submit').replaceWith(
@@ -652,13 +654,13 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : 'text-center',
+                    className: 'text-center',
                     width: "5%"
                 }, // checkbox
                 {
                     targets: 1,
                     width: "5%",
-                    className : 'text-center',
+                    className: 'text-center',
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -835,7 +837,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view ellipsis">${formatNumber(qty)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="${uom}" selected>${uom}</option>
@@ -1066,7 +1068,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view ellipsis">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="">Loading...</option>
@@ -1093,9 +1095,9 @@
 
                 rowsAdded = true;
                 loadUom($(rowNode), id_item);
-                setTimeout(function(){
+                setTimeout(function() {
                     $(document).find('.qty').trigger('input');
-                },300);
+                }, 300);
 
                 if (rowsAdded) {
                     tableDetail.draw(false);
@@ -1259,7 +1261,7 @@
             }
         });
 
-        $(document).on('input change', '.qty, .harga-input', function() {
+        $(document).on('input change', 'harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1314,7 +1316,7 @@
                 },
                 {
                     "data": "nama_item",
-                    "className" : "ellipsis",
+                    "className": "ellipsis",
                     render: function(data, type, row) {
                         // if (type === 'display' && data && data.length > 20) {
                         //     let cleanData = data.replace(/"/g, '&quot;'); 
@@ -1331,7 +1333,7 @@
                 {
                     "data": "kode_item",
                     width: "15%",
-                    "className" : "ellipsis text-center",
+                    "className": "ellipsis text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -1339,7 +1341,7 @@
                 {
                     "data": "satuan",
                     width: "13%",
-                    "className" : "ellipsis",
+                    "className": "ellipsis",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -1371,15 +1373,15 @@
             ]
         });
         $('#table-info tbody').on('click', 'td.details-control', function() {
-            const tr    = $(this).closest('tr');
-            const row   = tableInfo.row(tr);
+            const tr = $(this).closest('tr');
+            const row = tableInfo.row(tr);
             const prDetailId = tr.data('pr_detail_id');
-            let icon    = $(this).find('i');
+            let icon = $(this).find('i');
 
             if (row.child.isShown()) {
                 row.child.hide();
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
-            }else{
+            } else {
                 const childTableId = 'child-' + prDetailId;
                 const childHtml = $($('#table-info-detail').html());
                 childHtml.attr('id', childTableId);
@@ -1394,9 +1396,8 @@
                         "url": $('#table-info-detail').data('url') + prDetailId,
                         "type": "POST",
                     },
-                    "order" : [],
-                    "columns": [
-                        {
+                    "order": [],
+                    "columns": [{
                             "data": "no",
                             "orderable": false,
                             "className": 'text-center',
@@ -1412,7 +1413,7 @@
                         },
                         {
                             "data": "tanggal",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -1567,6 +1568,90 @@
         activeKeteranganInput = null;
         $('#modalKeteranganText').val('');
     });
+
+    // // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const pr_detail_id = input.dataset.pr_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = 1.00;
+
+        if (pr_detail_id) {
+            // UPDATE
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+        } else {
+            // ADD
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+        }
+    }, true);
 
     $(document).on('click', '#del-submit', function() {
         let id = $(this).data('id_del');
@@ -1741,9 +1826,9 @@
             .prop('disabled', false);
     }
 
-    $(document).on('click','#btn-print', function(){
-        setTimeout(function(){
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
             $('#loading').hide();
-        },300);
+        }, 300);
     });
 </script>

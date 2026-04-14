@@ -94,7 +94,7 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
-                                    <a href="<?= site_url('rsp/print/'.base64url_encode($this->encrypt->encode($data->TAG_PINJAM_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                    <a href="<?= site_url('rsp/print/' . base64url_encode($this->encrypt->encode($data->TAG_PINJAM_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
                                         <i class="ri ri-printer-fill"></i>
                                     </a>
                                 </div>
@@ -439,7 +439,7 @@
                 tag_pinjam_id: tag_pinjam_id,
             },
             success: function(response) {
-                $('#statusRcoId').html(badgeStatus(response.data[0].DISPLAY_NAME,response.data[0].MENU_ICON));
+                $('#statusRcoId').html(badgeStatus(response.data[0].DISPLAY_NAME, response.data[0].MENU_ICON));
                 $('#readonlyRcoId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
@@ -559,14 +559,13 @@
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
-            columnDefs: [
-                {
+            columnDefs: [{
                     targets: 0,
-                    className : "text-center",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -785,7 +784,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -958,7 +957,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 no++,
-                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
+                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
                                 item.No_Reff_1,
                                 item.No_Reff_2,
                                 item.DOCUMENT_REFF_NO,
@@ -1082,7 +1081,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1669,9 +1668,9 @@
             text;
     }
 
-    $(document).on('click','#btn-print', function(){
-        setTimeout(function(){
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
             $('#loading').hide();
-        },300);
+        }, 300);
     });
 </script>

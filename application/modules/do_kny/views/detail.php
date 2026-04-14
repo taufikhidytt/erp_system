@@ -888,7 +888,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1725,7 +1725,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
 
                     `<span class="view-mode qty-view">${formatNumber(sisa)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(sisa))}" min="0" step="any" data-balance="${Math.floor(Number(sisa))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(sisa)}" min="0" step="any" data-balance="${Number(sisa)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}

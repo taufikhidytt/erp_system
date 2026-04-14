@@ -337,7 +337,7 @@
                                         </div>
 
                                         <div class="tab-pane" id="tab-material" role="tabpanel" data-url="<?= site_url('mrq/get_material/') ?>" data-url_detail="<?= site_url('mrq/get_material_detail/') ?>">
-                                            
+
                                         </div>
                                     </div>
                                 </div>
@@ -501,11 +501,11 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -708,7 +708,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -921,7 +921,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 i + 1,
-                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
+                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
@@ -1049,7 +1049,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1193,7 +1193,7 @@
             }
         });
 
-        $(document).on('input change', '.jumlah, .harga-input', function() {
+        $(document).on('input change', '.harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 

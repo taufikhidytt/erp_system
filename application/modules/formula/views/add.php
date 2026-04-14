@@ -591,7 +591,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none jumlah" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none jumlah" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0 ellipsis" name="detail[satuan][]" title="${satuan}">
                         <option value="">Loading...</option>
@@ -879,7 +879,7 @@
                     `,
 
                     `<span class="view-mode qty-view">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none jumlah" name="detail[jumlah][]" value="" min="0" step="any">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none jumlah" name="detail[jumlah][]" value="1" min="1" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0 ellipsis" name="detail[satuan][]" title="${satuan}">
                         <option value="">Loading...</option>
@@ -1022,15 +1022,15 @@
             }
         });
 
-        $(document).on('input change', '.jumlah', function() {
-            let val = $(this).val();
-            if (val === '') return;
+        // $(document).on('input change', '.jumlah', function() {
+        //     let val = $(this).val();
+        //     if (val === '') return;
 
-            val = parseFloat(val);
-            if (val < 1) {
-                $(this).val(1);
-            }
-        });
+        //     val = parseFloat(val);
+        //     if (val < 1) {
+        //         $(this).val(1);
+        //     }
+        // });
 
         $(document).on('change', '.uom-select', function() {
             let toQty = $(this).find(':selected').data('base_qty') || 1;
@@ -1110,6 +1110,51 @@
         activeKeteranganInput = null;
         $('#modalKeteranganText').val('');
     });
+
+    // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = 1.00;
+
+        if (input.value === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Input kosong',
+                text: 'Jumlah tidak boleh kosong',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+
+        // Tidak boleh minus atau nol
+        if (input.value <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jumlah tidak valid',
+                text: 'Jumlah harus lebih dari 0',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+    }, true);
 
     const $switch = $('#customSwitch1');
     const $label = $('label[for="customSwitch1"]');

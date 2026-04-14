@@ -43,7 +43,7 @@
         white-space: pre-line;
     }
 
-    .table-sub tbody td{
+    .table-sub tbody td {
         font-family: monospace;
     }
 
@@ -99,7 +99,7 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
-                                    <a href="<?= site_url('sts/print/'.base64url_encode($this->encrypt->encode($data->TAG_KONSI_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                    <a href="<?= site_url('sts/print/' . base64url_encode($this->encrypt->encode($data->TAG_KONSI_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
                                         <i class="ri ri-printer-fill"></i>
                                     </a>
                                 </div>
@@ -359,10 +359,11 @@
 
                                         <div class="tab-pane" id="info-detail" role="tabpanel">
                                             <div class="table-responsive">
-                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?=  site_url('sts/get_info/' . base64url_encode($this->encrypt->encode($data->TAG_KONSI_ID))) ?>">
+                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?= site_url('sts/get_info/' . base64url_encode($this->encrypt->encode($data->TAG_KONSI_ID))) ?>">
                                                     <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr>
-                                                            <th></th> <th>No</th>
+                                                            <th></th>
+                                                            <th>No</th>
                                                             <th>Nama Item</th>
                                                             <th>Kode Item</th>
                                                             <th>Satuan</th>
@@ -489,7 +490,7 @@
                 tag_konsi_id: tag_konsi_id,
             },
             success: function(response) {
-                $('#statusTagKonsiId').html(badgeStatus(response.data[0].DISPLAY_NAME,response.data[0].MENU_ICON));
+                $('#statusTagKonsiId').html(badgeStatus(response.data[0].DISPLAY_NAME, response.data[0].MENU_ICON));
                 $('#readonlyTagKonsiId').hide();
 
                 if (response.data[0].ITEM_FLAG === 'N') {
@@ -498,7 +499,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
-                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
+                    $('#table-info_wrapper').find('input,select').prop('disabled', false);
 
                     $('#table-detail td').css('pointer-events', 'none');
 
@@ -604,11 +605,11 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -817,7 +818,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="1" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -985,7 +986,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 no++,
-                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
+                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
@@ -1096,7 +1097,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="1" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1340,7 +1341,7 @@
                 },
                 {
                     "data": "kode_item",
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -1375,15 +1376,15 @@
             ]
         });
         $('#table-info tbody').on('click', 'td.details-control', function() {
-            const tr    = $(this).closest('tr');
-            const row   = tableInfo.row(tr);
+            const tr = $(this).closest('tr');
+            const row = tableInfo.row(tr);
             const infoDetailID = tr.data('tag_konsi_detail_id');
-            let icon    = $(this).find('i');
+            let icon = $(this).find('i');
 
             if (row.child.isShown()) {
                 row.child.hide();
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
-            }else{
+            } else {
                 const childTableId = 'child-' + infoDetailID;
                 const childHtml = $($('#table-info-detail').html());
                 childHtml.attr('id', childTableId);
@@ -1398,8 +1399,7 @@
                         "url": $('#table-info-detail').data('url') + infoDetailID,
                         "type": "POST",
                     },
-                    "columns": [
-                        {
+                    "columns": [{
                             "data": "no",
                             "orderable": false,
                             "className": 'text-center',
@@ -1409,7 +1409,7 @@
                         },
                         {
                             "data": "tanggal",
-                            className : "text-center",
+                            className: "text-center",
                         },
                         {
                             "data": "jumlah",
@@ -1427,7 +1427,7 @@
                     "ordering": true,
                     "info": true,
                     "autoWidth": true,
-                    "order" : []
+                    "order": []
                 });
             }
         });
@@ -1827,9 +1827,9 @@
             text;
     }
 
-    $(document).on('click','#btn-print', function(){
-        setTimeout(function(){
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
             $('#loading').hide();
-        },300);
+        }, 300);
     });
 </script>

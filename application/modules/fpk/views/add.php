@@ -439,12 +439,12 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : 'text-center',
+                    className: 'text-center',
                     width: "5%"
                 }, // checkbox
                 {
                     targets: 1,
-                    className : 'text-center',
+                    className: 'text-center',
                     width: "5%",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -615,7 +615,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(qty)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="${uom}" selected>${uom}</option>
@@ -838,7 +838,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="">Loading...</option>
@@ -861,9 +861,9 @@
 
                 rowsAdded = true;
                 loadUom($(rowNode), id_item);
-                setTimeout(function(){
+                setTimeout(function() {
                     $(document).find('.qty').trigger('input');
-                },300);
+                }, 300);
             });
 
 
@@ -1024,7 +1024,7 @@
             }
         });
 
-        $(document).on('input change', '.qty, .harga-input', function() {
+        $(document).on('input change', '.harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1133,6 +1133,52 @@
         activeKeteranganInput = null;
         $('#modalKeteranganText').val('');
     });
+
+    // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = 1.00;
+
+        // Tidak boleh minus atau nol
+        if (input.value <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Jumlah tidak valid',
+                text: 'Jumlah harus lebih dari 0',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+
+        if (input.value === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Input kosong',
+                text: 'Jumlah tidak boleh kosong',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                input.value = balance;
+                input.focus();
+                updateSpan(balance);
+            });
+            return;
+        }
+        updateSpan(balance);
+    }, true);
 
     function hitungTotal() {
         let total = 0;

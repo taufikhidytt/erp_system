@@ -324,7 +324,7 @@
                                                                         <span class="view-mode qty-view ellipsis align-middle">
                                                                             <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none jumlah" min="0" step="any" name="detail[jumlah][]" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none jumlah" min="0" step="any" name="detail[jumlah][]" data-bom_detail_id="<?= $this->encrypt->encode($dd->BOM_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                                     </td>
                                                                     <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                         <?php $data_uom_selected = $this->db->query("SELECT
@@ -790,7 +790,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[satuan][]">
                         <option value="">Loading...</option>
@@ -896,8 +896,6 @@
                 })
                 $(this).val(tgl);
                 start = tgl;
-
-
                 $(this).val(addOneYear(start));
             }
         });
@@ -1255,7 +1253,7 @@
             }
         });
 
-        $(document).on('input change', '.jumlah, .harga-input', function() {
+        $(document).on('input change', '.harga-input', function() {
             let val = $(this).val();
             if (val === '') return;
 
@@ -1489,6 +1487,90 @@
         activeKeteranganInput = null;
         $('#modalKeteranganText').val('');
     });
+
+    // // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('qty-edit')) return;
+
+        const input = e.target;
+        const bom_detail_id = input.dataset.bom_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            if (span) {
+                span.textContent = val.toFixed(2).replace('.', ',');
+            }
+        }
+
+        const balance = 1.00;
+
+        if (bom_detail_id) {
+            // UPDATE
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+        } else {
+            // ADD
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+        }
+    }, true);
 
     $(document).on('click', '#del-submit', function() {
         let id = $(this).data('id_del');

@@ -114,7 +114,7 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
-                                        
+
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
@@ -432,11 +432,11 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -673,7 +673,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${formatNumber(jumlah)}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${formatNumber(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -681,13 +681,13 @@
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
                     `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}">`,
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}" step="any">`,
 
                     `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${unit_price}">`,
+                    <input type="hidden" name="detail[harga][]" value="${unit_price}" step="any">`,
 
                     `<span class="subtotal ellipsis">${formatNumber(balance * harga_input)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}">`,
+                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}" step="any">`,
 
                     `<span class="ellipsis" title="${nama_sales}">
                         ${ellipsis(nama_sales)}
@@ -846,7 +846,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 i + 1,
-                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
+                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
@@ -942,7 +942,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -950,7 +950,7 @@
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
                     `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}">`,
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}" step="any">`,
 
                     `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
                     <input type="hidden" name="detail[harga][]" value="${unit_price}">`,

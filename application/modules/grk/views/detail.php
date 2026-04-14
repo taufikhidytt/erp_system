@@ -42,9 +42,11 @@
     .keterangan-view {
         white-space: pre-line;
     }
-    .table-sub tbody td{
+
+    .table-sub tbody td {
         font-family: monospace;
     }
+
     .label-status span {
         font-size: 1rem !important;
         width: 100% !important;
@@ -96,7 +98,7 @@
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>
-                                    <a href="<?= site_url('grk/print/'.base64url_encode($this->encrypt->encode($data->PO_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
+                                    <a href="<?= site_url('grk/print/' . base64url_encode($this->encrypt->encode($data->PO_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
                                         <i class="ri ri-printer-fill"></i>
                                     </a>
                                 </div>
@@ -144,7 +146,7 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('no_referensi') ?></div>
                                         </div>
-                                        
+
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
@@ -313,19 +315,19 @@
                                                                         <input type="number"
                                                                             class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
                                                                             name="detail[harga_input][]"
-                                                                            value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
+                                                                            value="<?= rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>" step="any">
                                                                     </td>
                                                                     <td class="ellipsis text-end">
                                                                         <span class="harga-input-b ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
                                                                             <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                        <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>" step="any">
                                                                     </td>
                                                                     <td class="ellipsis text-end">
                                                                         <span class="subtotal-text ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
                                                                             <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                        <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>" step="any">
                                                                     </td>
                                                                     <td class="ellipsis">
                                                                         <span class="sales ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->FIRST_NAME ?>">
@@ -346,10 +348,11 @@
                                         </div>
                                         <div class="tab-pane" id="info-detail" role="tabpanel">
                                             <div class="table-responsive">
-                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?=  site_url('grk/get_info/' . base64url_encode($this->encrypt->encode($data->PO_ID))) ?>">
+                                                <table class="table w-100 table-sm" id="table-info" data-url=" <?= site_url('grk/get_info/' . base64url_encode($this->encrypt->encode($data->PO_ID))) ?>">
                                                     <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                         <tr>
-                                                            <th></th> <th>No</th>
+                                                            <th></th>
+                                                            <th>No</th>
                                                             <th>Nama Item</th>
                                                             <th>Kode Item</th>
                                                             <th>Satuan</th>
@@ -507,7 +510,7 @@
                     $('#myForm')
                         .find('input, select, textarea, #removeRow, #btn-modalFPK, td input')
                         .prop('disabled', true);
-                    $('#table-info_wrapper').find('input,select').prop('disabled',false);
+                    $('#table-info_wrapper').find('input,select').prop('disabled', false);
 
                     $('#table-detail td').css('pointer-events', 'none');
 
@@ -634,11 +637,11 @@
             autoWidth: false,
             columnDefs: [{
                     targets: 0,
-                    className : "text-center",
+                    className: "text-center",
                 }, // checkbox
                 {
                     targets: 1,
-                    className : "text-center",
+                    className: "text-center",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
                     }
@@ -859,8 +862,8 @@
                     <input type="hidden" name="detail[pr_detail_id][]" value="${pr_detail_id}">
                     <input type="hidden" name="detail[no_fpk][]" value="${no_fpk}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[balance][]" value="${Math.floor(Number(balance))}">
-                    <input type="hidden" name="detail[base_qty][]" value="${Math.floor(Number(base_qty))}">
+                    <input type="hidden" name="detail[balance][]" value="${Number(balance)}">
+                    <input type="hidden" name="detail[base_qty][]" value="${Number(base_qty)}">
                     <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
                     <input type="hidden" name="detail[lead_time][]" value="${lead_time}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -883,7 +886,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Math.floor(Number(balance))}" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Number(balance)}" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -891,13 +894,13 @@
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
                     `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}">`,
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}" step="any">`,
 
                     `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${unit_price}">`,
+                    <input type="hidden" name="detail[harga][]" value="${unit_price}" step="any">`,
 
                     `<span class="subtotal-text ellipsis">${formatNumber(balance * harga_input)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}">`,
+                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}" step="any">`,
 
                     `<span class="ellipsis" title="${nama_sales}">
                         ${ellipsis(nama_sales)}
@@ -1058,7 +1061,7 @@
                             tableItem.row.add([
                                 checkbox,
                                 no++,
-                                badgeStatus(item.STATUS_NAME,item.MENU_ICON),
+                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
                                 item.DOCUMENT_DATE,
                                 item.DOCUMENT_NO,
                                 item.DOCUMENT_REFF_NO,
@@ -1137,8 +1140,8 @@
                     <input type="hidden" name="detail[pr_detail_id][]" value="${pr_detail_id}">
                     <input type="hidden" name="detail[no_fpk][]" value="${no_fpk}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[balance][]" value="${Math.floor(Number(balance))}">
-                    <input type="hidden" name="detail[base_qty][]" value="${Math.floor(Number(base_qty))}">
+                    <input type="hidden" name="detail[balance][]" value="${Number(balance)}">
+                    <input type="hidden" name="detail[base_qty][]" value="${Number(base_qty)}">
                     <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
                     <input type="hidden" name="detail[lead_time][]" value="${lead_time}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
@@ -1161,7 +1164,7 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Math.floor(Number(balance))}" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" data-balance="${Number(balance)}" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1428,7 +1431,7 @@
                 },
                 {
                     "data": "kode_item",
-                    className : "text-center",
+                    className: "text-center",
                     width: "15%",
                     createdCell: function(td) {
                         td.style.fontFamily = 'monospace';
@@ -1469,10 +1472,10 @@
         });
 
         $('#table-info tbody').on('click', 'td.details-control', function() {
-            const tr    = $(this).closest('tr');
-            const row   = tableInfo.row(tr);
+            const tr = $(this).closest('tr');
+            const row = tableInfo.row(tr);
             const poDetailId = tr.data('po_detail_id');
-            let icon    = $(this).find('i');
+            let icon = $(this).find('i');
 
             if (row.child.isShown()) {
                 const childTableId = 'child-' + poDetailId;
@@ -1483,17 +1486,17 @@
                 icon.removeClass('ri-subtract-line').addClass('ri-add-line');
             } else {
                 const childTableId = 'child-' + poDetailId;
-                const childHtml = $($('#table-info-detail').html()); 
+                const childHtml = $($('#table-info-detail').html());
                 childHtml.attr('id', childTableId);
 
                 row.child(childHtml).show();
                 icon.removeClass('ri-add-line').addClass('ri-subtract-line');
-                
+
                 $('#loading').show();
 
                 $.getJSON($('#table-info-detail').data('url') + poDetailId, function(res) {
                     let html = '';
-                    
+
                     if (res && res.length > 0) {
                         res.forEach((data, i) => {
                             html += `
@@ -1519,7 +1522,7 @@
                             "searching": true,
                             "info": false,
                             "destroy": true,
-                            "order" : [],
+                            "order": [],
                             "columnDefs": [{
                                 "targets": 0,
                                 "orderable": false,
@@ -1961,9 +1964,9 @@
             text.substring(0, limit) + '...' :
             text;
     }
-    $(document).on('click','#btn-print', function(){
-        setTimeout(function(){
+    $(document).on('click', '#btn-print', function() {
+        setTimeout(function() {
             $('#loading').hide();
-        },300);
+        }, 300);
     });
 </script>

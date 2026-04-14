@@ -40,10 +40,6 @@
     }
 </style>
 
-<div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
-<div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
-<div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
-
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
@@ -266,34 +262,6 @@
                 .search(this.value)
                 .draw();
         });
-
-        var flashsuccess = $('#flashSuccess').data('success');
-        var flashwarning = $('#flashWarning').data('warning');
-        var flasherror = $('#flashError').data('error');
-
-        if (flashsuccess) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: flashsuccess,
-            })
-        }
-
-        if (flashwarning) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: flashwarning,
-            })
-        }
-
-        if (flasherror) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: flasherror,
-            })
-        }
 
         $(document).on('click', '#btn-approve', function(e) {
             e.preventDefault();

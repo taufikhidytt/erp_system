@@ -169,13 +169,25 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
         .dataTables_info {
             font-family: Tahoma !important;
         }
+
+        .swal2-popup pre{
+            font-family: inherit;
+            font-size: 1em;
+            color: #545454;
+            white-space: pre-wrap;
+            text-align: center;
+            margin: 0;
+            font-weight: 400;
+        }
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
 </head>
 
 <body data-sidebar="dark">
-
+    <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
+    <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
+    <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
     <div id="loading" style="display: none;">
         <div class="spinner-border text-primary" role="status">
             <span class="sr-only">Loading...</span>
@@ -407,6 +419,7 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
     <script src="<?= base_url() ?>assets/admin/libs/select2/js/select2.min.js"></script>
 
     <script src="<?= base_url() ?>assets/admin/js/app.js"></script>
+    <script src="<?= base_url() ?>assets/admin/js/input_number.js"></script>
     <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.3"></script>
 
     <script>
@@ -420,6 +433,33 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
             $("form").on("submit", function() {
                 $('#loading').show();
             });
+
+            const flashsuccess = $('#flashSuccess').data('success');
+            const flashwarning = $('#flashWarning').data('warning');
+            const flasherror = $('#flashError').data('error');
+            if (flashsuccess) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    html: `<pre>${flashsuccess}</pre>`,
+                })
+            }
+
+            if (flashwarning) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    html: `<pre>${flashwarning}</pre>`,
+                })
+            }
+
+            if (flasherror) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: `<pre>${flasherror}</pre>`,
+                })
+            }
         });
     </script>
 

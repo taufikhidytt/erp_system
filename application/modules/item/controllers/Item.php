@@ -32,7 +32,7 @@ class Item extends Back_Controller
             $row = array();
             $row['no'] = $no;
             $row['kode_item'] = '
-            <a href="' . base_url('item/detail/' . $this->encrypt->encode($item->ID)) . '">
+            <a href="' . base_url('item/detail/' . base64url_encode($this->encrypt->encode($item->ID))) . '">
                 ' . ($item->KODE_ITEM ? $item->KODE_ITEM : '-') . '
             </a>';
             $row['nama_item'] = $item->NAMA_ITEM ? $item->NAMA_ITEM : '-';
@@ -46,7 +46,7 @@ class Item extends Back_Controller
             $row['trade'] = $item->TRADE ? $item->TRADE : '-';
             $row['price_last_buy'] = $item->PRICE_LAST_BUY ? number_format($item->PRICE_LAST_BUY, 2) : '-';
             $row['price_last_sell'] = $item->PRICE_LAST_SELL ? number_format($item->PRICE_LAST_SELL, 2) : '-';
-            $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Weeks" : '-';
+            $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Week" : '-';
             if ($item->KONSY == 'Y') {
                 $returnKonsy = '<i class="text-success fa fa-check" title="Yes" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
             } elseif ($item->KONSY == 'N') {
@@ -176,15 +176,15 @@ class Item extends Back_Controller
                         $this->item->insert_batch($dataToInsert);
                         if ($this->db->affected_rows() > 0) {
                             $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
-                            redirect('item/detail/' . $this->encrypt->encode($idItem));
+                            redirect('item/detail/' . base64url_encode($this->encrypt->encode($idItem)));
                         } else {
                             $error = $this->db->error();
                             $this->session->set_flashdata('warning', "Error DB: " . $error['code'] . " ~ " . $error['message']);
-                            redirect('item/detail/' . $this->encrypt->encode($idItem));
+                            redirect('item/detail/' . base64url_encode($this->encrypt->encode($idItem)));
                         }
                     } else {
                         $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data baru!');
-                        redirect('item/detail/' . $this->encrypt->encode($idItem));
+                        redirect('item/detail/' . base64url_encode($this->encrypt->encode($idItem)));
                     }
                 } else {
                     $error = $this->db->error();
@@ -268,7 +268,7 @@ class Item extends Back_Controller
             }
 
             if ($this->form_validation->run() == FALSE) {
-                $id = $this->encrypt->decode($id);
+                $id = $this->encrypt->decode(base64url_decode($id));
                 $query = $this->item->getItemId($id);
                 if ($query->num_rows() > 0) {
                     $data['title'] = 'Detail';
@@ -325,16 +325,16 @@ class Item extends Back_Controller
 
                 if ($result['status'] === 'error') {
                     $this->session->set_flashdata('warning', $result['message']);
-                    redirect('item/detail/' . $idInput);
+                    redirect('item/detail/' . base64url_encode($idInput));
                 }
 
                 if ($result['affected'] == 0) {
                     $this->session->set_flashdata('warning', 'Gagal ubah data item!');
-                    redirect('item/detail/' . $idInput);
+                    redirect('item/detail/' . base64url_encode($idInput));
                 }
 
                 $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data!');
-                redirect('item/detail/' . $idInput);
+                redirect('item/detail/' . base64url_encode($idInput));
             }
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

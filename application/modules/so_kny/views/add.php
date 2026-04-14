@@ -870,7 +870,7 @@
                     // memo
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(jumlah))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -883,7 +883,7 @@
                     // harga input
 
                     `<span class="harga-input-b">${formatNumber(harga)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
+                    <input type="hidden" name="detail[harga][]" value="${harga}" step="any">`,
                     // harga
 
                     `<span class="view-mode harga-view diskon-harga-view">${formatNumber(diskon_harga)}</span>
@@ -895,7 +895,7 @@
                     // diskon %
 
                     `<span class="subtotal">${formatNumber(subtotal)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}" step="any">`,
                     // subtotal
 
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
@@ -1194,7 +1194,7 @@
                     // memo
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Math.floor(Number(balance))}" min="0" step="any" data-balance="${Math.floor(Number(balance))}">`,
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1203,11 +1203,11 @@
                     `,
 
                     `<span class="view-mode harga-view">0.00</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="">`,
+                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="" step="any">`,
                     // harga input
 
                     `<span class="harga-input-b">0.00</span>
-                    <input type="hidden" name="detail[harga][]" value="">`,
+                    <input type="hidden" name="detail[harga][]" value="" step="any">`,
                     // harga
 
                     `<span class="view-mode harga-view diskon-harga-view">0.00</span>
@@ -1219,7 +1219,7 @@
                     // diskon %
 
                     `<span class="subtotal">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]" value="">`,
+                    <input type="hidden" name="detail[subtotal][]" value="" step="any">`,
                     // subtotal
 
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`,
