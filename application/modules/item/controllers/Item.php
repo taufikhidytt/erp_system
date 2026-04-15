@@ -99,16 +99,6 @@ class Item extends Back_Controller
             if ($this->form_validation->run() == false) {
                 $data['title'] = 'Tambah Item';
                 $data['breadcrumb'] = 'Tambah Item';
-                $data['brand'] = $this->item->getBrand();
-                $data['category'] = $this->item->getCategory();
-                $data['uom'] = $this->item->getUom();
-                $data['type'] = $this->item->getType();
-                $data['rak'] = $this->item->getRak();
-                $data['made_in'] = $this->item->getMadeIn();
-                $data['komoditi'] = $this->item->getKomoditi();
-                $data['jenis'] = $this->item->getJenis();
-                $data['grade'] = $this->item->getGrade();
-                $data['supplier'] = $this->item->getSupplier();
                 $data['account'] = $this->item->getAccount();
                 $data['acc_persediaan'] = $this->item->getAccPersediaan()->row();
                 $data['acc_utang_suspend'] = $this->item->getAccUtangSuspend()->row();
@@ -273,16 +263,6 @@ class Item extends Back_Controller
                 if ($query->num_rows() > 0) {
                     $data['title'] = 'Detail';
                     $data['breadcrumb'] = 'Detail';
-                    $data['brand'] = $this->item->getBrand();
-                    $data['category'] = $this->item->getCategory();
-                    $data['uom'] = $this->item->getUom();
-                    $data['type'] = $this->item->getType();
-                    $data['rak'] = $this->item->getRak();
-                    $data['made_in'] = $this->item->getMadeIn();
-                    $data['komoditi'] = $this->item->getKomoditi();
-                    $data['jenis'] = $this->item->getJenis();
-                    $data['grade'] = $this->item->getGrade();
-                    $data['supplier'] = $this->item->getSupplier();
                     $data['data'] = $query->row();
                     $data['account'] = $this->item->getAccount();
                     $data['acc_persediaan'] = $this->item->getAccPersediaan()->row();

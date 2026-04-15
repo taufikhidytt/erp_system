@@ -121,16 +121,7 @@
                                                     <i class="ri ri-stack-fill"></i>
                                                 </span>
                                                 <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Item Finish Goods --</option>
-                                                    <?php $param = $this->input->post('item_finish_goods') ?? $data->ITEM_ID; ?>
-                                                    <?php foreach ($item_finish_goods->result() as $ifg): ?>
-                                                        <option
-                                                            value="<?= $ifg->ITEM_ID ?>"
-                                                            data-description="<?= htmlspecialchars($ifg->ITEM_DESCRIPTION) ?>"
-                                                            <?= $ifg->ITEM_ID == $param ? 'selected' : null ?>>
-                                                            <?= strtoupper($ifg->ITEM_DESCRIPTION . " ~ " . $ifg->ITEM_CODE) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+
                                                 </select>
                                                 <input type="hidden" name="item_description" id="item_description" value="">
                                             </div>
@@ -138,7 +129,6 @@
                                         </div>
                                         <div class="mb-3">
                                             <label for="satuan" id="label_satuan">Satuan:</label>
-                                            <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-paint-fill"></i>
@@ -814,6 +804,63 @@
             });
         });
 
+        $('#item_finish_goods').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Select Item Finish Goods --',
+            allowClear: true,
+            minimumInputLength: 2,
+            ajax: {
+                url: '<?= base_url("formula/get_item_finish_goods_ajax") ?>',
+                dataType: 'json',
+                delay: 250,
+
+                data: function(params) {
+                    return {
+                        search: params.term
+                    };
+                },
+
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
+        });
+
+        let selectedId = '<?= $this->input->post("item_finish_goods") ?? $data->ITEM_ID ?>';
+
+        if (selectedId) {
+            $.ajax({
+                url: '<?= base_url("formula/get_item_by_id") ?>',
+                type: 'GET',
+                data: {
+                    id: selectedId
+                },
+                dataType: 'json'
+            }).then(function(data) {
+
+                let option = new Option(data.text, data.id, true, true);
+                $('#item_finish_goods').append(option).trigger('change');
+
+                $('#item_description').val(data.description);
+                $('#item_note').val(data.note);
+            });
+        }
+
+        $('#item_finish_goods').on('select2:select', function(e) {
+            let data = e.params.data;
+
+            $('#item_description').val(data.description);
+            $('#item_note').val(data.note);
+        });
+
+        $('#item_finish_goods').on('select2:clear', function() {
+            $('#item_description').val('');
+            $('#item_note').val('');
+        });
+
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
         var flasherror = $('#flashError').data('error');
@@ -911,7 +958,9 @@
 
         $('#item_finish_goods').on('change', function() {
             let description = $(this).find(':selected').data('description');
+            let note = $(this).find(':selected').data('note');
             $('#item_description').val(description);
+            $('#keterangan').val(note);
 
             let itemId = $(this).val();
             var label = $('#label_satuan');

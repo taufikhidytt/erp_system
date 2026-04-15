@@ -60,27 +60,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-database-2-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($brand->result() as $br) {
-                                                    if ($br->Default_Flag == 'Y') {
-                                                        $defaultValue = $br->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="brand" id="brand" class="form-control select2 <?= form_error('brand') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Brand --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($brand->result() as $br): ?>
-                                                        <option
-                                                            value="<?= $br->ERP_LOOKUP_VALUE_ID ?>"
-                                                            data-name="<?= strtoupper($br->Brand_Name) ?>"
-                                                            <?= set_value('brand') ==  $br->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $br->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($br->Brand_Name) . ' - [' . strtoupper($br->Brand_Code) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="brand" id="brand" 
+                                                    data-url="api/get_brand"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('brand','') ?>"
+                                                    class="form-control select2 <?= form_error('brand') ? 'is-invalid' : null; ?>">
+                                                    
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('brand') ?></div>
@@ -92,27 +77,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-server-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($category->result() as $ct) {
-                                                    if ($ct->Default_Flag == 'Y') {
-                                                        $defaultValue = $ct->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="category" id="category" class="form-control select2 <?= form_error('category') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Category --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($category->result() as $ct): ?>
-                                                        <option
-                                                            value="<?= $ct->ERP_LOOKUP_VALUE_ID ?>"
-                                                            data-name="<?= strtoupper($ct->Category_Name) ?>"
-                                                            <?= set_value('category') ==  $ct->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $ct->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ct->Category_Name) . ' - [' . strtoupper($ct->Category_Code) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="category" id="category" class="form-control select2 <?= form_error('category') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_category"
+                                                    data-default="Y"
+                                                    placeholder="Select Category"
+                                                    data-selected-id="<?= set_value('category','') ?>"
+                                                >
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('category') ?></div>
@@ -124,7 +94,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-barcode-box-line"></i>
                                                 </span>
-                                                <input type="text" name="part_number" id="part_number" class="form-control <?= form_error('part_number') ? 'is-invalid' : null; ?>" placeholder="Enter Part Number" value="<?= $this->input->post('part_number'); ?>">
+                                                <input type="text" name="part_number" id="part_number" class="form-control <?= form_error('part_number') ? 'is-invalid' : null; ?>" placeholder="Enter Part Number" data-value="<?= $this->input->post('part_number'); ?>" value="<?= $this->input->post('part_number'); ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('part_number') ?></div>
                                         </div>
@@ -155,26 +125,13 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-quill-pen-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($uom->result() as $um) {
-                                                    if ($um->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $um->UOM_CODE;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="satuan" id="satuan" class="form-control select2 <?= form_error('satuan') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Satuan --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($uom->result() as $um): ?>
-                                                        <option
-                                                            value="<?= $um->UOM_CODE ?>"
-                                                            <?= set_value('satuan') ==  $um->UOM_CODE ? 'selected' : ($defaultValue == $um->UOM_CODE ? 'selected' : '') ?>>
-                                                            <?= strtoupper($um->UOM_CODE) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                    
+                                                <select name="satuan" id="satuan" class="form-control select2 <?= form_error('satuan') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_uom"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('satuan','') ?>"
+                                                    placeholder="Select Satuan"
+                                                    >
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('satuan') ?></div>
@@ -186,27 +143,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-swap-fill"></i>
                                                 </span>
-
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($type->result() as $tp) {
-                                                    if ($tp->Default_Flag == 'Y') {
-                                                        $defaultValue = $tp->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="type" id="type" class="form-control select2 <?= form_error('type') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Type --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($type->result() as $tp): ?>
-                                                        <option
-                                                            value="<?= $tp->ERP_LOOKUP_VALUE_ID ?>"
-                                                            <?= set_value('type') ==  $tp->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $tp->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($tp->Trade_Type) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="type" id="type" class="form-control select2 <?= form_error('type') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_type"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('type','') ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('type') ?></div>
@@ -252,26 +192,11 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-archive-drawer-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($rak->result() as $rk) {
-                                                    if ($rk->Default_Flag == 'Y') {
-                                                        $defaultValue = $rk->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="rak" id="rak" class="form-control select2 <?= form_error('rak') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Rak --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($rak->result() as $rk): ?>
-                                                        <option
-                                                            value="<?= $rk->ERP_LOOKUP_VALUE_ID ?>"
-                                                            <?= set_value('jenis') ==  $rk->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $rk->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($rk->Grade) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="rak" id="rak" class="form-control select2 <?= form_error('rak') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_rak"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('rak','') ?>"
+                                                    placeholder="Select Rak">
                                                 </select>
                                             </div>
                                         </div>
@@ -360,26 +285,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-arrow-up-down-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($jenis->result() as $js) {
-                                                    if ($js->Default_Flag == 'Y') {
-                                                        $defaultValue = $js->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="jenis" id="jenis" class="form-control select2 <?= form_error('jenis') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Jenis --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($jenis->result() as $js): ?>
-                                                        <option
-                                                            value="<?= $js->ERP_LOOKUP_VALUE_ID ?>"
-                                                            <?= set_value('jenis') ==  $js->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $js->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?> data-name="<?= strtolower($js->Jenis_Item) ?>">
-                                                            <?= strtoupper($js->Jenis_Item) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="jenis" id="jenis" class="form-control select2 <?= form_error('jenis') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_jenis"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('jenis','') ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('jenis') ?></div>
@@ -391,26 +300,11 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-arrow-up-down-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($grade->result() as $gd) {
-                                                    if ($gd->Default_Flag == 'Y') {
-                                                        $defaultValue = $gd->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="grade" id="grade" class="form-control select2 <?= form_error('grade') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Grade --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($grade->result() as $gd): ?>
-                                                        <option
-                                                            value="<?= $gd->ERP_LOOKUP_VALUE_ID ?>"
-                                                            <?= set_value('grade') ==  $gd->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $gd->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($gd->Grade) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="grade" id="grade" class="form-control select2 <?= form_error('grade') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_grade"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('grade','') ?>"
+                                                    placeholder="Select Grade">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('grade') ?></div>
@@ -466,9 +360,6 @@
                                                     <label class="mb-4"></label>
                                                     <div class="input-group">
                                                         <select name="satuan2" id="satuan2" class="form-control select2 <?= form_error('satuan2') ? 'is-invalid' : null; ?>" disabled>
-                                                            <?php foreach ($uom->result() as $um): ?>
-                                                                <option value="<?= $um->UOM_CODE ?>" <?= set_value('satuan2') == $um->UOM_CODE ? 'selected' : null ?>><?= strtoupper($um->UOM_CODE) ?></option>
-                                                            <?php endforeach; ?>
                                                         </select>
                                                     </div>
                                                     <div class="text-danger"><?= form_error('satuan2') ?></div>
@@ -481,26 +372,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-swap-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($made_in->result() as $mi) {
-                                                    if ($mi->Default_Flag == 'Y') {
-                                                        $defaultValue = $mi->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Made In --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($made_in->result() as $mi): ?>
-                                                        <option
-                                                            value="<?= $mi->ERP_LOOKUP_VALUE_ID ?>"
-                                                            <?= set_value('made_in') ==  $mi->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $mi->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($mi->Made_In) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="made_in" id="made_in" class="form-control select2 <?= form_error('made_in') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_made_in"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('made_in','') ?>"
+                                                    placeholder="Select Made In"
+                                                >
                                                 </select>
                                             </div>
                                         </div>
@@ -511,26 +388,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pen-nib-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($komoditi->result() as $kd) {
-                                                    if ($kd->Default_Flag == 'Y') {
-                                                        $defaultValue = $kd->ERP_LOOKUP_VALUE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Komoditi --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($komoditi->result() as $kd): ?>
-                                                        <option
-                                                            value="<?= $kd->ERP_LOOKUP_VALUE_ID ?>"
-                                                            <?= set_value('komoditi') ==  $kd->ERP_LOOKUP_VALUE_ID ? 'selected' : ($defaultValue == $kd->ERP_LOOKUP_VALUE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($kd->Note) . ' - [' . strtoupper($kd->Komoditi) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="komoditi" id="komoditi" class="form-control select2 <?= form_error('komoditi') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_komoditi"
+                                                    data-default="Y"
+                                                    data-selected-id="<?= set_value('komoditi','') ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('komoditi') ?></div>
@@ -542,11 +403,9 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-arrow-up-down-fill"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') == $sp->PERSON_ID ? 'selected' : null ?>><?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?></option>
-                                                    <?php endforeach; ?>
+                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>" 
+                                                    data-url="api/get_supplier"
+                                                    data-selected-id="<?= set_value('supplier','') ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
@@ -975,22 +834,38 @@
 
         $('#satuan').on('change', function() {
             let value = $(this).val();
-            $('#satuan2').val(value).trigger('change');
+            $('#satuan2').empty().append($(this).find('option:selected').clone()).val(value).trigger('change');
+
 
             $('#tableSatuan tbody').empty();
             getKonversiUom();
         });
 
         //Initialize Select2 Elements
-        $('.select2, .select-uom').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2, .select-uom').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         $(".select-uom").select2({
-            width: '100%'
+            width: '100%',
+            templateResult: function(data) {
+                var to_qty = parseFloat($(data.element).data('to_qty')) || 0;
+                if (!data.element || to_qty === 0) { return data.text; }
+
+                
+                const to_qty_format = new Intl.NumberFormat('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                    }).format(to_qty);
+                
+                return $('<span>' + data.text.toUpperCase() + ' - [' + to_qty_format + ']</span>');
+            },
+            templateSelection: function(data) {
+                return data.text; 
+            }
         });
 
         const input = $('#part_number');
@@ -1173,7 +1048,8 @@
             <td><input type="text" name="note[]" class="form-control auto-save" disabled></td>
         </tr>`;
             $("#tableSatuan tbody").append(newRow);
-            $(".select-uom").select2({
+            const last_tr = $("#tableSatuan tbody tr:last");
+            last_tr.find(".select-uom").select2({
                 width: '100%',
                 templateResult: function(data) {
                     var to_qty = parseFloat($(data.element).data('to_qty')) || 0;
@@ -1278,18 +1154,37 @@
         $label.text($switch.is(':checked') ? 'Yes' : 'No');
     }
 
+    let descriptionTimeout = null;
+    let select2LoadCount = 0;
+    const select2Total = 2;
+
     function updateDescription() {
-        let brandText = $('#brand option:selected').data('name') || '';
-        let categoryText = $('#category option:selected').data('name') || '';
-        let partNumber = $('#part_number').val().trim();
+        clearTimeout(descriptionTimeout);
+        descriptionTimeout = setTimeout(function() {
+            const d_brand       = $('#brand').attr('data-selected-id') || '';
+            const d_category    = $('#category').attr('data-selected-id') || '';
+            const d_part_number = $('#part_number').attr('data-value') || '';
 
-        let parts = [brandText, categoryText, partNumber].filter(function(val) {
-            return val !== "" && val !== "-- Selected Brand --" && val !== "-- Selected Category --";
-        });
+            const o_brand       = $('#brand option:selected').val() || '';
+            const o_category    = $('#category option:selected').val() || '';
+            const o_part_number = $('#part_number').val() || '';
 
-        let description = parts.join(' ');
+            // Jika semua masih sama dengan default, skip (masih load awal)
+            if (o_brand === '' && o_category === '') return;
 
-        $('#description').val(description);
+            if (
+                d_brand     !== o_brand     ||
+                d_category  !== o_category  ||
+                d_part_number !== o_part_number
+            ) {
+                let brandText    = $('#brand option:selected').data('name') || '';
+                let categoryText = $('#category option:selected').data('name') || '';
+                let partNumber   = o_part_number;
+
+                let parts = [brandText, categoryText, partNumber].filter(val => val !== '');
+                $('#description').val(parts.join(' '));
+            }
+        }, 300);
     }
 
     // Update nomor urut

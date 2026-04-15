@@ -18,6 +18,13 @@ function belum_login()
         $ci->session->set_flashdata('toastWarning', 'anda belum login!! silahkan login telebih dahulu dengan username dan password anda!');
         redirect('auth');
     }
+
+    //ambil config setup
+    $ci->db->select('COMPANY_CODE,NAME,LOGO_FILENAME,CUSTOM2,PEMBULATAN_PPN');
+    $setup = $ci->db->get('setup')->row();
+    $ci->session->set_userdata([
+        'setup' => $setup
+    ]);
 }
 
 function rules()

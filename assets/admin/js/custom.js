@@ -76,3 +76,138 @@ $(document).on('ajaxComplete', function(event, xhr, settings) {
         equalizeBadgeWidth();
     }
 });
+
+function initSelect2(element) {
+    const $select = $(element);
+    if ($select.hasClass('select2-hidden-accessible')) return;
+
+    const url = $select.data('url');
+    const parentsAttr = $select.data('parent');
+    const selectedId = $select.data('selected-id');
+    const selectedText = $select.data('selected-text');
+    const dropdownParent = $select.data('dropdown-parent');
+    const dataDefault = $select.data('default');
+
+    const getParentObj = (selector) => {
+        selector = selector.trim();
+        if (selector.startsWith('.')) {
+            return $select.closest('.row-item').find(selector);
+        }
+        return $(selector.startsWith('#') ? selector : '#' + selector);
+    };
+
+    const placeholder_txt = `-- ${($select.attr('placeholder') || 'Select...')} --`;
+    const config = {
+        theme: 'bootstrap-5',
+        placeholder: placeholder_txt,
+        allowClear: true,
+        dropdownParent: dropdownParent ? $select.closest(dropdownParent) : ($select.closest('.modal').length ? $select.closest('.modal') : $select.parent()),
+        ajax: url ? {
+            url: config_app.url+url,
+            type: ($select.data('method') || 'GET').toUpperCase(),
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                const req = { q: params.term};
+                if (parentsAttr) {
+                    parentsAttr.split(',').forEach(p => {
+                        const key = p.trim().replace(/[.#]/g, '');
+                        req[key] = getParentObj(p).val();
+                    });
+                }
+                return req;
+            },
+            processResults: function(data) {
+                const results = data.results || data || [];
+                
+                results.unshift({ id: '__empty__', text: placeholder_txt });
+                
+                return { results };
+            },
+            cache: true
+        } : null
+    };
+
+    $select.select2(config);
+    $select.on('select2:select', function(e) {
+        const data = e.params.data;
+        const $option = $(data.element);
+        
+        // Jika pilih placeholder, reset value ke kosong
+        if (data.id === '__empty__') {
+            $select.val(null).trigger('change');
+            return;
+        }
+
+        const fullData = $.extend({}, $option.data(), data);
+
+        const ignoredKeys = ['element', 'selected', 'disabled', '_resultId','id','text'];
+
+        $.each(fullData, function(key, value) {
+            if (!ignoredKeys.includes(key) && typeof value !== 'object') {
+                const attrName = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+                
+                $select.find('option:selected').attr('data-' + attrName, value);
+            }
+        });
+        // $select.data('_select2_selecting', true);
+        // $select.trigger('change');
+    });
+
+    $select.on('select2:unselect', function() {
+        const currentData = $select.data();
+        $.each(currentData, function(key) {
+            if (key !== 'select2') $select.removeAttr('data-' + key.toLowerCase());
+        });
+    });
+
+    // --- HANDLE EDIT MODE ---
+    if (selectedId) {
+        if (selectedText) {
+            const newOption = new Option(selectedText, selectedId, true, true);
+            $select.append(newOption).trigger('change');
+        } else if (url) {
+            $.ajax({ url: config_app.url+url, data: { id: selectedId }, dataType: 'json' }).done(function(data) {
+                const item = Array.isArray(data) ? data[0] : data;
+                if (item) {
+                    const newOption = new Option(item.text, item.id, true, true);
+                    $select.append(newOption).trigger('change');
+                    $select.trigger({ type: 'select2:select', params: { data: item } });
+                }
+            });
+        }
+    }else if(dataDefault){
+        $.ajax({ url: config_app.url+url, data: { default: dataDefault }, dataType: 'json' }).done(function(data) {
+            const item = Array.isArray(data) ? data[0] : data;
+            if (item) {
+                const newOption = new Option(item.text, item.id, true, true);
+                $select.append(newOption).trigger('change');
+                $select.trigger({ type: 'select2:select', params: { data: item } });
+            }
+        });
+    }
+
+    if (parentsAttr) {
+        const parentList = parentsAttr.split(',');
+        parentList.forEach(p => {
+            const $parentObj = getParentObj(p);
+            $parentObj.on('change', function() {
+                $select.val(null).trigger('change');
+                let allFilled = true;
+                parentList.forEach(sp => { if (!getParentObj(sp).val()) allFilled = false; });
+                $select.prop('disabled', !allFilled);
+            });
+        });
+        let initialFilled = true;
+        parentList.forEach(p => { if (!getParentObj(p).val()) initialFilled = false; });
+        $select.prop('disabled', !initialFilled);
+    }
+}
+
+$(document).ready(function(){
+    if($('select').hasClass('select2')){
+        $.each($('.select2'), function(){
+            initSelect2(this);
+        })
+    }
+});

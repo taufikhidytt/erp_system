@@ -273,6 +273,43 @@ class Formula extends Back_Controller
         echo json_encode($result);
     }
 
+    public function get_item_finish_goods_ajax()
+    {
+        $search = $this->input->get('search');
+        $data = $this->formula->search_item_finish_goods($search);
+        $result = [];
+        foreach ($data as $row) {
+            $result[] = [
+                'id' => $row->ITEM_ID,
+                'text' => "[" . $row->ITEM_CODE . "] - " . $row->ITEM_DESCRIPTION,
+                'description' => $row->ITEM_DESCRIPTION,
+                'note' => $row->NOTE ? $row->NOTE : ''
+            ];
+        }
+        echo json_encode($result);
+    }
+
+    public function get_item_by_id()
+    {
+        $id = $this->input->get('id');
+        $data = $this->db->query("
+                SELECT 
+                    ITEM_ID,
+                    ITEM_CODE,
+                    ITEM_DESCRIPTION,
+                    NOTE
+                FROM item
+                WHERE ITEM_ID = ?
+            ", [$id])->row();
+
+        echo json_encode([
+            'id' => $data->ITEM_ID,
+            'text' => "[" . $data->ITEM_CODE . "] - " . $data->ITEM_DESCRIPTION,
+            'description' => $data->ITEM_DESCRIPTION,
+            'note' => $data->NOTE
+        ]);
+    }
+
     public function add()
     {
         try {
@@ -290,7 +327,6 @@ class Formula extends Back_Controller
             if ($this->form_validation->run() == false) {
                 $data['title'] = 'Tambah Formula';
                 $data['breadcrumb'] = 'Tambah Formula';
-                $data['item_finish_goods'] = $this->formula->get_item_finish_goods();
                 $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'formula/add', $data);
             } else {
@@ -438,7 +474,6 @@ class Formula extends Back_Controller
                 if ($query->num_rows() > 0) {
                     $data['title'] = 'Detail';
                     $data['breadcrumb'] = 'Detail';
-                    $data['item_finish_goods'] = $this->formula->get_item_finish_goods();
                     $data['data'] = $query->row();
                     $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'formula/detail', $data);

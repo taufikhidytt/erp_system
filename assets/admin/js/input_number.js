@@ -34,9 +34,12 @@
 
 ; (function ($) {
 
+    //setup dari aplikasi
+    const setup_decimal = parseInt(config_app?.decimal) ?? 2;
+
     // --- Default Config ---
     var DEFAULTS = {
-        decimal: 2,
+        decimal: setup_decimal,
         thousand: ',',
         decimalSep: '.',
         min: null,

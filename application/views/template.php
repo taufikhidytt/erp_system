@@ -1,11 +1,11 @@
 <?php
-$logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . $this->session->logo : 'assets/logo/logo.png';
+$logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? 'assets/logo/' . $this->session->setup->LOGO_FILENAME : 'assets/logo/logo.png';
 ?>
 <!DOCTYPE html>
 
 <head>
     <meta charset="utf-8" />
-    <title><?= $title; ?> | <?= $this->session->userdata('name_ub'); ?></title>
+    <title><?= $title; ?> | <?= $this->session->setup->NAME; ?></title>
     <link rel="icon" type="image/png" href="<?= base_url($logo) ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -170,7 +170,7 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
             font-family: Tahoma !important;
         }
 
-        .swal2-popup pre{
+        .swal2-popup pre {
             font-family: inherit;
             font-size: 1em;
             color: #545454;
@@ -182,6 +182,14 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
+    <script>
+        var config_app = {
+            decimal: <?= $this->session->setup->CUSTOM2 ?? 2; ?>,
+            url: '<?= site_url() ?>'
+        }
+    </script>
+    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.0"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.7"></script>
 </head>
 
 <body data-sidebar="dark">
@@ -211,7 +219,7 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
                                 <img src="<?= base_url($logo) ?>" alt="logo" height="30">
                             </span>
                             <span class="logo-lg">
-                                <h5 class="text-white"><?= strtoupper($this->session->userdata('name_ub')) ?></h5>
+                                <h5 class="text-white"><?= strtoupper($this->session->setup->NAME) ?></h5>
                             </span>
                         </a>
                     </div>
@@ -366,11 +374,11 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-sm-6 fw-bold">
-                            &copy; <?= date('Y') ?> &middot; PT INTINUSA SEJAHTERA INTERNATIONAL.
+                            &copy; <?= date('Y') ?> &middot; PT INTINUSA SEJAHTERA INTERNASIONAL.
                         </div>
                         <div class="col-sm-6">
                             <div class="text-sm-end d-none d-sm-block fw-bold">
-                                <?= $this->lang->line('createdBy'); ?> <a href="https://taufikhidytt.github.io/" target="_blank" class="bold">Taufik Hidayat.</a>
+                                Created by <span class="bold text-primary font-size-15">Team IT.</span>
                             </div>
                         </div>
                     </div>
@@ -419,8 +427,6 @@ $logo = file_exists('./assets/logo/' . $this->session->logo) ? 'assets/logo/' . 
     <script src="<?= base_url() ?>assets/admin/libs/select2/js/select2.min.js"></script>
 
     <script src="<?= base_url() ?>assets/admin/js/app.js"></script>
-    <script src="<?= base_url() ?>assets/admin/js/input_number.js"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.3"></script>
 
     <script>
         $(document).ready(function() {

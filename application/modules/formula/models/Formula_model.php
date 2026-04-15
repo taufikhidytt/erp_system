@@ -175,7 +175,8 @@ class Formula_model extends CI_Model
             COALESCE ( s.STOK, 0 ) AS STOK,
             mr.DISPLAY_NAME AS BRAND,
             tipe.DISPLAY_NAME AS TIPE,
-            i.JENIS_ID 
+            i.JENIS_ID,
+            i.NOTE
         FROM
             item i
             JOIN erp_lookup_value e ON e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID
@@ -190,6 +191,39 @@ class Formula_model extends CI_Model
             AND i.ITEM_KMS = 'N' 
         ORDER BY
             i.ITEM_CODE");
+    }
+
+    public function search_item_finish_goods($search = '')
+    {
+        $sql = "
+            SELECT DISTINCT
+                i.ITEM_ID,
+                i.ITEM_CODE,
+                LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION,
+                i.NOTE
+            FROM item i
+            JOIN erp_lookup_value e ON e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID
+            JOIN erp_lookup_value tipe ON i.TYPE_ID = tipe.ERP_LOOKUP_VALUE_ID
+            JOIN erp_lookup_value mr ON i.MEREK_ID = mr.ERP_LOOKUP_VALUE_ID
+            WHERE
+                i.ACTIVE_FLAG = 'Y'
+                AND i.APPROVE_FLAG = 'Y'
+                AND i.TYPE_ID = FN_GET_VAR_VALUE('INV')
+                AND i.JENIS_ID = FN_GET_VAR_VALUE('GOODS')
+                AND i.ITEM_KMS = 'N'
+        ";
+
+        // 🔍 FILTER SEARCH
+        if (!empty($search)) {
+            $sql .= " AND (
+                i.ITEM_CODE LIKE '%" . $this->db->escape_like_str($search) . "%' 
+                OR i.ITEM_DESCRIPTION LIKE '%" . $this->db->escape_like_str($search) . "%'
+            )";
+        }
+
+        $sql .= " ORDER BY i.ITEM_CODE ASC LIMIT 50";
+
+        return $this->db->query($sql)->result();
     }
 
     public function get_bom_id($id)

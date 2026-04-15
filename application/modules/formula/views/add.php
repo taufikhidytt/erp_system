@@ -94,15 +94,7 @@
                                                     <i class="ri ri-stack-fill"></i>
                                                 </span>
                                                 <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Item Finish Goods --</option>
-                                                    <?php foreach ($item_finish_goods->result() as $ifg): ?>
-                                                        <option
-                                                            value="<?= $ifg->ITEM_ID ?>"
-                                                            data-description="<?= htmlspecialchars($ifg->ITEM_DESCRIPTION) ?>"
-                                                            <?= set_value('item_finish_goods') ==  $ifg->ITEM_ID ? 'selected' :  '' ?>>
-                                                            <?= strtoupper($ifg->ITEM_DESCRIPTION . " ~ " . $ifg->ITEM_CODE) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+
                                                 </select>
                                                 <input type="hidden" name="item_description" id="item_description" value="">
                                             </div>
@@ -615,6 +607,38 @@
             });
         });
 
+        $('#item_finish_goods').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Select Item Finish Goods --',
+            minimumInputLength: 2,
+            allowClear: true,
+            ajax: {
+                url: '<?= base_url("formula/get_item_finish_goods_ajax") ?>',
+                dataType: 'json',
+                delay: 250,
+
+                data: function(params) {
+                    return {
+                        search: params.term
+                    };
+                },
+
+                processResults: function(data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            }
+        });
+
+        $('#item_finish_goods').on('select2:select', function(e) {
+            let data = e.params.data;
+
+            $('#item_description').val(data.description);
+            $('#item_note').val(data.note);
+        });
+
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
         var flasherror = $('#flashError').data('error');
@@ -709,7 +733,9 @@
         }
         $('#item_finish_goods').on('change', function() {
             let description = $(this).find(':selected').data('description');
+            let note = $(this).find(':selected').data('note');
             $('#item_description').val(description);
+            $('#keterangan').val(note);
 
             let itemId = $(this).val();
             var label = $('#label_satuan');
