@@ -167,7 +167,7 @@
                             </div>
                             <div class="tab-pane" id="summary-stok" role="tabpanel">
                                 <div class="d-flex justify-content-end mb-2">
-                                    <button id="export_excel_summary_stok" class="btn btn-primary btn-sm">Export Summary Stok</button>
+                                    <button id="export_excel_summary_stok" class="btn btn-primary btn-sm"><i class="fa fa-file-excel me-1"></i>Export Summary Stok</button>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-striped text-center w-100 text-nowrap table-sm" id="table-summary">

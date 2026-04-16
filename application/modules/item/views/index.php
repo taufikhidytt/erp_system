@@ -65,11 +65,11 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-striped text-center table-sm" id="table">
+                                <table class="table text-center table-sm" id="table">
                                     <thead>
                                         <tr>
-                                            <th>
-                                            </th>
+                                            <th></th>
+                                            <th></th>
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
@@ -132,6 +132,7 @@
                                             </th>
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                            <th></th>
                                             <th>No</th>
                                             <th>Kode Item</th>
                                             <th>Nama Item</th>
@@ -188,13 +189,20 @@
             },
             "columnDefs": [{
                 "width": "500px",
-                "targets": [2, 3],
+                "targets": [3, 4],
             }, {
-                "targets": [0],
+                "targets": [0,1],
                 "orderable": false,
                 "searchable": false
             }],
-            "columns": [{
+            "columns": [
+                {
+                    "className": 'details-control',
+                    "orderable": false,
+                    "data": null,
+                    "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>'
+                },
+                {
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
@@ -253,6 +261,78 @@
                     "className": "text-center",
                 }
             ]
+        });
+
+        $('#table tbody').on('click', 'td.details-control', function() {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+            var icon = $(this).find('i');
+
+            var rowData = row.data();
+            var item_id = rowData.item_id;
+
+            if (row.child.isShown()) {
+                // Close row
+                row.child.hide();
+                icon.removeClass('ri-subtract-line').addClass('ri-add-line');
+            } else {
+                // Open row dengan child row datatable
+                var childTableId = 'child-' + item_id;
+                var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
+                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                <tr class="align-middle">
+                                    <th>No</th>
+                                    <th>Satuan Lain</th>
+                                    <th>Konversi</th>
+                                    <th>Keterangan</th>
+                                    <th>Default</th>
+                                </tr>
+                            </thead>
+                        </table>`;
+                row.child(childHtml).show();
+                icon.removeClass('ri-add-line').addClass('ri-subtract-line');
+
+                // Init DataTable pada child row
+                $('#' + $.escapeSelector(childTableId)).DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": "<?= site_url('item/get_detail'); ?>",
+                        "type": "POST",
+                        "data": {
+                            item_id: item_id,
+                            uom : rowData.uom
+                        }
+                    },
+                    "columns": [{
+                            "data": "no",
+                            width: "30",
+                            className : "text-center",
+                        },
+                        {
+                            "data": "satuan_lain",
+                        },
+                        {
+                            "data": "konversi",
+                            width: "100",
+                            className : "text-end",
+                        },
+                        {
+                            "data": "keterangan",
+                        },
+                        {
+                            "data": "flag_default",
+                            width: "100",
+                            "className": "text-center",
+                        }
+                    ],
+                    "paging": true,
+                    "searching": false,
+                    "ordering": false,
+                    "info": true,
+                    "autoWidth": true
+                });
+            }
         });
 
         $('.column_search').on('keyup change', function() {

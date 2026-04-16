@@ -17,30 +17,16 @@ class Auth_model extends CI_Model
         return $this->db->get();
     }
 
-    public function insertLogSignin($post)
+    public function insertLogSignin($data)
     {
         date_default_timezone_set('Asia/Jakarta');
         $params = [
-            'id_users' => $post->id,
+            'user_id' => $data->ERP_USER_ID,
             'ip' => $this->input->ip_address(),
             'os' => $this->agent->platform(),
             'browser' => $this->agent->browser() . '-' . $this->agent->version(),
             'log_date' => date('Y-m-d H:i:s'),
         ];
-        $this->db->insert('tb_log_sign_in', $params);
-    }
-
-    public function updateLogSignin($post)
-    {
-        date_default_timezone_set('Asia/Jakarta');
-        $params = [
-            'id_users' => $post->id,
-            'ip' => $this->input->ip_address(),
-            'os' => $this->agent->platform(),
-            'browser' => $this->agent->browser() . '-' . $this->agent->version(),
-            'log_date' => date('Y-m-d H:i:s'),
-        ];
-        $this->db->where('id_users', $post->id);
-        $this->db->update('tb_log_sign_in', $params);
+        $this->db->insert('log_sign_in', $params);
     }
 }

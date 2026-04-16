@@ -31,6 +31,7 @@ class Item extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
+            $row['item_id'] = base64url_encode($this->encrypt->encode($item->ID));
             $row['kode_item'] = '
             <a href="' . base_url('item/detail/' . base64url_encode($this->encrypt->encode($item->ID))) . '">
                 ' . ($item->KODE_ITEM ? $item->KODE_ITEM : '-') . '
@@ -564,5 +565,35 @@ class Item extends Back_Controller
         }
         sendSuccess($res,'');
         
+    }
+
+    public function get_detail()
+    {
+        try {
+            $item_id = (int) $this->encrypt->decode(base64url_decode($this->input->post('item_id')));
+            $this->load->model('M_datatables', 'datatables');
+            $params = [
+                'table' => 'item_uom a',
+                'select' => [
+                    'a.UOM_CODE AS Satuan_lain,  a.TO_QTY AS Konversi,  a.BASE_UOM_FLAG AS `Default`',
+                ],
+                'where' => ['a.ITEM_ID' => $item_id],
+                'column_search' => ['a.UOM_CODE', 'a.TO_QTY','a.BASE_UOM_FLAG'],
+                'column_order'  => [null,'a.UOM_CODE', 'a.TO_QTY',null,'a.BASE_UOM_FLAG'],
+            ];
+            echo json_encode($this->datatables->generate($params, function($row, $no) {
+                $uom        = $this->input->post('uom');
+                $konversi   = number_format((float)$row->Konversi, 2, '.', ',');
+                return [
+                    'no' => $no,
+                    'satuan_lain' => $row->Satuan_lain,
+                    'konversi' => $konversi,
+                    'keterangan' => "1 {$row->Satuan_lain} = {$konversi} {$uom}",
+                    'flag_default' => $row->Default == 'Y' ? '<i class="text-success fa fa-check" title="Active" data-bs-toggle="tooltip" data-bs-placement="left"></i>' : '<i class="text-danger fa fa-times" title="Inactive" data-bs-toggle="tooltip" data-bs-placement="left"></i>'
+                ];
+            }));
+        } catch (Exception $err) {
+            return sendError('Server Error', $err->getMessage());
+        }
     }
 }

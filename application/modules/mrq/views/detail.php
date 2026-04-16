@@ -187,17 +187,13 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-stack-fill"></i>
                                                 </span>
-                                                <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Item Finish Goods --</option>
-                                                    <?php $param = $this->input->post('item_finish_goods') ?? $data->ITEM_ID; ?>
-                                                    <?php foreach ($item_finish_goods->result() as $ifg): ?>
-                                                        <option
-                                                            value="<?= $ifg->ITEM_ID ?>"
-                                                            data-description="<?= htmlspecialchars($ifg->ITEM_DESCRIPTION) ?>"
-                                                            <?= $ifg->ITEM_ID == $param ? 'selected' : null ?>>
-                                                            <?= strtoupper($ifg->ITEM_DESCRIPTION . " ~ " . $ifg->ITEM_CODE) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>"
+                                                    data-url="mrq/get_item_finish_goods"
+                                                    placeholder="Select Item Finish Goods"
+                                                    data-selected-id="<?= set_value('item_finish_goods',$data->ITEM_ID) ?>"
+                                                    data-clear="true"
+                                                    data-min-input-length="2"
+                                                    >
                                                 </select>
                                                 <input type="hidden" name="item_description" id="item_description" value="">
                                             </div>
@@ -951,12 +947,12 @@
 
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -1014,20 +1010,22 @@
             loadSatuan(initialItem, oldSatuan);
         }
         $('#item_finish_goods').on('change', function() {
-            let description = $(this).find(':selected').data('description');
-            $('#item_description').val(description);
+            setTimeout(function(){
+                let description = $('#item_finish_goods').find('option:selected').data('description');
+                $('#item_description').val(description);
 
-            let itemId = $(this).val();
-            var label = $('#label_satuan');
+                let itemId = $('#item_finish_goods').val();
+                var label = $('#label_satuan');
 
-            // hapus dulu *
-            label.find('span.text-danger').remove();
+                // hapus dulu *
+                label.find('span.text-danger').remove();
 
-            // jika ada value, tambahkan *
-            if (itemId) {
-                label.append(' <span class="text-danger">*</span>');
-            }
-            loadSatuan(itemId);
+                // jika ada value, tambahkan *
+                if (itemId) {
+                    label.append(' <span class="text-danger">*</span>');
+                }
+                loadSatuan(itemId);
+            },0);
         });
 
         $("#storage").data("prev", $("#storage").val());
@@ -1169,6 +1167,9 @@
                     $('#modalMrq').modal('show');
                 }
             });
+        });
+        $('#modalMrq').on('shown.bs.modal', function () {
+            $(this).find('.dataTables_filter input').focus();
         });
 
         // Centang semua

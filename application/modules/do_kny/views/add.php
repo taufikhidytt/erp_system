@@ -903,6 +903,9 @@
                 }
             });
         });
+        $('#modalMrq').on('shown.bs.modal', function () {
+            $(this).find('.dataTables_filter input').focus();
+        });
 
         // Add event listener for opening and closing details
         $('#table-item tbody').on('click', 'td.details-control', function() {

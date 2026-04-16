@@ -1004,6 +1004,9 @@
                 }
             });
         });
+        $('#modalGRK').on('shown.bs.modal', function () {
+            $(this).find('.dataTables_filter input').focus();
+        });
 
         // Centang semua
         $("#checkAllParent").change(function() {

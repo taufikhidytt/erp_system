@@ -87,6 +87,8 @@ function initSelect2(element) {
     const selectedText = $select.data('selected-text');
     const dropdownParent = $select.data('dropdown-parent');
     const dataDefault = $select.data('default');
+    const allow_clear = $select.data('clear') === true
+    const min_input_length = parseInt($select.data('min-input-length')) || 0;
 
     const getParentObj = (selector) => {
         selector = selector.trim();
@@ -100,7 +102,8 @@ function initSelect2(element) {
     const config = {
         theme: 'bootstrap-5',
         placeholder: placeholder_txt,
-        allowClear: true,
+        allowClear: allow_clear,
+        minimumInputLength: min_input_length,
         dropdownParent: dropdownParent ? $select.closest(dropdownParent) : ($select.closest('.modal').length ? $select.closest('.modal') : $select.parent()),
         ajax: url ? {
             url: config_app.url+url,
@@ -150,7 +153,7 @@ function initSelect2(element) {
                 $select.find('option:selected').attr('data-' + attrName, value);
             }
         });
-        // $select.data('_select2_selecting', true);
+        $select.data('_select2_selecting', true);
         // $select.trigger('change');
     });
 

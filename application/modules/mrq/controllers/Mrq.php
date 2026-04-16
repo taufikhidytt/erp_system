@@ -374,7 +374,7 @@ class Mrq extends Back_Controller
                 $data['breadcrumb'] = 'Tambah MRQ';
                 $data['ship_to'] = $this->mrq->get_ship_to();
                 $data['storage'] = $this->mrq->get_storage();
-                $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();
+                // $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();
                 $data['detail'] = $this->input->post('detail');
                 $this->template->load('template', 'mrq/add', $data);
             } else {
@@ -553,7 +553,7 @@ class Mrq extends Back_Controller
                     $data['breadcrumb'] = 'Detail';
                     $data['ship_to'] = $this->mrq->get_ship_to();
                     $data['storage'] = $this->mrq->get_storage();
-                    $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();
+                    // $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();
                     $data['data'] = $query->row();
                     $data['detail'] = $this->input->post('detail');
                     $this->template->load('template', 'mrq/detail', $data);
@@ -996,5 +996,10 @@ class Mrq extends Back_Controller
                 'note' => $row->NOTE,
             ];
         }));
+    }
+
+    public function get_item_finish_goods(){
+        $result = $this->mrq->api_get_item_finish_goods()->result();
+        echo json_encode($result);
     }
 }

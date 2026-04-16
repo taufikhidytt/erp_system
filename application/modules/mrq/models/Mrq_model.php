@@ -359,4 +359,49 @@ class Mrq_model extends CI_Model
         $this->db->where('a.BUILD_ID',$id);
         return $this->db->get();
     }
+
+    public function api_get_item_finish_goods()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db->select('ITEM_ID, SUM(QTY_AWAL + QTY_MASUK - QTY_KELUAR) AS STOK');
+        $this->db->from('item_stok');
+        $this->db->group_by('ITEM_ID');
+        $subquery = $this->db->get_compiled_select();
+
+        $this->db
+            ->distinct()
+            ->select("
+                i.ITEM_ID as id, 
+                CONCAT('[',i.ITEM_CODE,'] - ', LEFT(i.ITEM_DESCRIPTION, 40)) as text,
+                i.ITEM_CODE,
+                LEFT(i.ITEM_DESCRIPTION, 40) AS DESCRIPTION,
+            ")
+            ->from('item i')
+            ->join('erp_lookup_value e', 'e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID')
+            ->join('erp_lookup_value tipe', 'i.TYPE_ID = tipe.ERP_LOOKUP_VALUE_ID')
+            ->join('erp_lookup_value mr', 'i.MEREK_ID = mr.ERP_LOOKUP_VALUE_ID')
+            ->join("($subquery) s", 'i.ITEM_ID = s.ITEM_ID', 'left')
+            ->where('i.ACTIVE_FLAG', 'Y')
+            ->where('i.APPROVE_FLAG', 'Y')
+            ->where('i.TYPE_ID', "FN_GET_VAR_VALUE('INV')", FALSE)
+            ->where('i.JENIS_ID', "FN_GET_VAR_VALUE('GOODS')", FALSE)
+            ->where('i.ITEM_KMS', 'N');
+
+        if ($id) {
+            $this->db->where('i.ITEM_ID', $id)->limit(1);
+        } else {
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('i.ITEM_CODE', $searchTerm)
+                    ->or_like('i.ITEM_DESCRIPTION', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->order_by('i.ITEM_CODE', 'ASC');
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
 }

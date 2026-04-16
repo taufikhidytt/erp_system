@@ -81,6 +81,7 @@ class Auth extends MX_Controller
                             ];
 
                             $this->session->set_userdata($sessionUser);
+                            $this->auth->insertLogSignin($data);
 
                             $this->session->set_flashdata('toastSuccess', 'congratulations, you have successfully logged in!');
                             redirect('dashboard');
@@ -112,6 +113,17 @@ class Auth extends MX_Controller
             'port',
             'db',
             'id',
+            'group',
+            'nama',
+            'admin_flag',
+            'template_flag',
+            'protect_flag',
+            'view_flag',
+            'print_flag',
+            'name_ub',
+            'logo',
+            'logged_in',
+            'setup',
             'id_access_users',
             'site_lang',
         ];
