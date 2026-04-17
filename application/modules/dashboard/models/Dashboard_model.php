@@ -34,25 +34,41 @@ class Dashboard_model extends CI_Model
         $this->db->from('log_sign_in a');
         $this->db->join('erp_user b', 'a.user_id = b.ERP_USER_ID');
 
-        $i = 0;
-        foreach ($this->column_search as $item) {
-            $global_search_value = $this->input->post('search')['value'] ?? '';
-            $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
+        $global_search_value = $this->input->post('search')['value'] ?? '';
 
-            if ($column_search_value != '') {
-                $this->db->like($item, $column_search_value);
-            } elseif ($global_search_value != '') {
-                if ($i === 0) {
-                    $this->db->group_start();
+        // ✅ GLOBAL SEARCH
+        if (!empty($global_search_value)) {
+            $this->db->group_start();
+            $i = 0;
+            foreach ($this->column_search as $item) {
+                if (empty($item)) continue; // safety
+
+                if ($i == 0) {
                     $this->db->like($item, $global_search_value);
                 } else {
                     $this->db->or_like($item, $global_search_value);
                 }
-                if (count($this->column_search) - 1 == $i) $this->db->group_end();
+                $i++;
+            }
+            $this->db->group_end();
+        }
+
+        // ✅ COLUMN SEARCH
+        $i = 0;
+        foreach ($this->column_search as $item) {
+            if (empty($item)) {
+                $i++;
+                continue;
+            }
+
+            $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
+            if (!empty($column_search_value)) {
+                $this->db->like($item, $column_search_value);
             }
             $i++;
         }
 
+        // ORDER
         if (isset($_POST['order'])) {
             $this->db->order_by(
                 $this->column_order[$_POST['order']['0']['column']],
