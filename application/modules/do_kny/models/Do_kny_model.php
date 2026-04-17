@@ -222,7 +222,7 @@ class Do_kny_model extends CI_Model
                 ON a.SO_ID = b.SO_ID
             JOIN build bl
                 ON b.BUILD_ID = bl.BUILD_ID
-            JOIN build_detail bd
+            LEFT JOIN build_detail bd
                 ON b.BUILD_DETAIL_ID = bd.BUILD_DETAIL_ID
             JOIN item i
                 ON b.ITEM_ID = i.ITEM_ID
@@ -402,7 +402,8 @@ class Do_kny_model extends CI_Model
         return true;
     }
 
-    public function get_do_detail($id){
+    public function get_do_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
@@ -416,7 +417,7 @@ class Do_kny_model extends CI_Model
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('person_site ps', 'a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
-        $this->db->where('a.INVENTORY_OUT_ID',$id);
+        $this->db->where('a.INVENTORY_OUT_ID', $id);
         return $this->db->get();
     }
 

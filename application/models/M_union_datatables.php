@@ -188,7 +188,9 @@ class M_union_datatables extends CI_Model {
                     // Array WHERE - convert ke string
                     $where_parts = [];
                     foreach ($where as $col => $val) {
-                        if (is_int($val) || is_float($val)) {
+                        if (is_int($col)) {
+                            $where_parts[] = $val;
+                        } elseif (is_int($val) || is_float($val)) {
                             $where_parts[] = "$col = " . $val;
                         } else {
                             $val = $this->db->escape($val);

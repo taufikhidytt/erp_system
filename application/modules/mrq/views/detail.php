@@ -1558,7 +1558,9 @@
         $('#table-info tbody').on('click', 'td.details-control', function() {
             const tr = $(this).closest('tr');
             const row = tableInfo.row(tr);
-            const infoDetailID = tr.data('build_detail_id');
+            const infoDetailID  = tr.data('build_detail_id');
+            const buildID       = row.data().build_id;
+            const infoItemID    = row.data().item_id;
             let icon = $(this).find('i');
 
             if (row.child.isShown()) {
@@ -1576,7 +1578,12 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": $('#table-info-detail').data('url') + infoDetailID,
+                        "url": $('#table-info-detail').data('url'),
+                        "data" : {
+                            "build_id" : buildID,
+                            "detail_id" : infoDetailID,
+                            "item_id" : infoItemID,
+                        },
                         "type": "POST",
                     },
                     "columns": [{

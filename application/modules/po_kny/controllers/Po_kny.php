@@ -191,7 +191,6 @@ class Po_kny extends Back_Controller
                     b.ENTERED_QTY > 0 
                     AND b.BASE_QTY > 0 
                     AND b.INVOICE_ENTERED_QTY < b.ENTERED_QTY * b.BASE_QTY / NULLIF( b.INVOICE_BASE_QTY, 0 ) 
-                    AND bl.APPROVED_FLAG = 'Y' 
                     AND bl.DOCUMENT_TYPE_ID = 3
                     AND w.WAREHOUSE_ID = {$storage}
                     AND psn.PERSON_ID = {$supplier}

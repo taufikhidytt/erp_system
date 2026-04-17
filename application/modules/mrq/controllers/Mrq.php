@@ -816,7 +816,9 @@ class Mrq extends Back_Controller
         $result = $this->union_datatables->generate($params, function($row, $no) {
             return [
                 'no' => $no,
+                'build_id' => base64url_encode($this->encrypt->encode($row->BUILD_ID)),
                 'build_detail_id' => base64url_encode($this->encrypt->encode($row->BUILD_DETAIL_ID)),
+                'item_id' => base64url_encode($this->encrypt->encode($row->ITEM_ID)),
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
@@ -828,9 +830,12 @@ class Mrq extends Back_Controller
         echo json_encode($result);
     }
 
-    public function get_info_detail($detail_id)
+    public function get_info_detail()
     {
-        $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
+        $detail_id  = (int) $this->encrypt->decode(base64url_decode($this->input->post('detail_id')));
+        $build_id   = (int) $this->encrypt->decode(base64url_decode($this->input->post('build_id')));
+        $item_id    = (int) $this->encrypt->decode(base64url_decode($this->input->post('item_id')));
+
         $this->load->model('M_union_datatables','union_datatables');
         $params = [
             'queries' => [
@@ -847,6 +852,8 @@ class Mrq extends Back_Controller
                     ],
                     'where'  => [
                         'b.BUILD_DETAIL_ID' => $detail_id,
+                        'b.BUILD_ID'        => $build_id,
+                        'b.ITEM_ID'         => $item_id
                     ],
                 ],
                 // Query 2: so_detail (SO Kny) - build_detail
@@ -860,6 +867,8 @@ class Mrq extends Back_Controller
                     ],
                     'where'  => [
                         'b.BUILD_DETAIL_ID' => $detail_id,
+                        'b.BUILD_ID'        => $build_id,
+                        'b.ITEM_ID'         => $item_id
                     ],
                 ],
                 // Query 3: so_detail (SO Kny) - build
@@ -873,7 +882,10 @@ class Mrq extends Back_Controller
                         ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
                     ],
                     'where'  => [
-                        'b.BUILD_ID' => $detail_id,
+                        'COALESCE(b.ITEM_ID, 0) <> 0',
+                        'b.BUILD_ID'    => $detail_id,
+                        'b.ITEM_ID'     => $item_id
+
                     ],
                 ],
             ],
