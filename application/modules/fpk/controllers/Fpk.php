@@ -31,7 +31,7 @@ class Fpk extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($fpk->Status,$fpk->Warna_Status);
+            $row['status'] = badge_status($fpk->Status, $fpk->Warna_Status);
             $row['no_transaksi'] = '
             <a href="' . base_url('fpk/detail/' . base64url_encode($this->encrypt->encode($fpk->PR_ID))) . '">
                 ' . ($fpk->No_Transaksi ? $fpk->No_Transaksi : '-') . '
@@ -218,7 +218,9 @@ class Fpk extends Back_Controller
         if ($data->num_rows() > 0) {
             $rows = $data->result();
             foreach ($rows as $row) {
-                $row->badge_status = badge_status($row->DISPLAY_NAME,$row->MENU_ICON);
+                $status_code = $this->db->query("SELECT FN_GET_VAR_CODE ($row->STATUS_ID) as status_code")->row();
+                $row->status_code = $status_code->status_code;
+                $row->badge_status = badge_status($row->DISPLAY_NAME, $row->MENU_ICON);
             }
             $result = array(
                 'status' => 'sukses',
@@ -581,6 +583,43 @@ class Fpk extends Back_Controller
             ->set_output(json_encode($result));
     }
 
+    public function close()
+    {
+        $id = $this->encrypt->decode($this->input->post('id'));
+        $status_flag = $this->input->post('status');
+        $this->db->query("CALL SET_VAR()");
+        $this->db->close();
+        $this->db->initialize();
+        if ($status_flag == "close_true") {
+            $new = $this->db->query("SELECT FN_GET_VAR_VALUE ('NEW') AS new")->row();
+            $status = $new->new;
+        } else {
+            $close = $this->db->query("SELECT FN_GET_VAR_VALUE ('CLOSE') AS close")->row();
+            $status = $close->close;
+        }
+
+        $this->db->trans_start();
+
+        $this->fpk->updateStatus($id, $status);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $result = [
+                'status'    =>  false,
+                'message'   => 'Gagal menghapus FPK, transaksi dibatalkan!'
+            ];
+        } else {
+            $result = [
+                'status'    =>  true,
+                'message'   => 'FPK berhasil dihapus!',
+            ];
+        }
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($result));
+    }
+
     public function get_info($id)
     {
         $id = (int) $this->encrypt->decode(base64url_decode($id));
@@ -596,12 +635,12 @@ class Fpk extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.PR_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['b.PR_DETAIL_ID' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'pr_detail_id' => base64url_encode($this->encrypt->encode($row->PR_DETAIL_ID)),
@@ -615,7 +654,8 @@ class Fpk extends Back_Controller
         }));
     }
 
-    public function get_info_detail($detail_id){
+    public function get_info_detail($detail_id)
+    {
         $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
         $this->load->model('M_datatables', 'datatables');
         $params = [
@@ -623,7 +663,7 @@ class Fpk extends Back_Controller
             'select' => [
                 'b.PR_DETAIL_ID,b.ITEM_ID,c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,a.PO_ID',
                 ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
-                
+
             ],
             'joins' => [
                 ['po_detail a', 'b.PR_DETAIL_ID = a.PR_DETAIL_ID', 'inner'],
@@ -632,13 +672,13 @@ class Fpk extends Back_Controller
             ],
             'where' => ['b.PR_DETAIL_ID' => $detail_id],
             // 'order' => ['b.PR_DETAIL_ID' => 'asc'],
-            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
-            'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
-                'no_transaksi' => '<a href="'.site_url('grk/detail/'.base64url_encode($this->encrypt->encode($row->PO_ID))).'" target="_blank">'.$row->No_Transaksi.'</a>',
+                'no_transaksi' => '<a href="' . site_url('grk/detail/' . base64url_encode($this->encrypt->encode($row->PO_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
                 'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
@@ -647,10 +687,11 @@ class Fpk extends Back_Controller
         }));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $fpk    = $this->fpk->get_fpk_detail($id)->row();
-        if($fpk){
+        if ($fpk) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'fpk/pdf',
@@ -658,10 +699,10 @@ class Fpk extends Back_Controller
                     'fpk' => $fpk,
                     'fpk_detail' => $this->fpk->get_detail_by_pr_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $fpk->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $fpk->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $fpk->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $fpk->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

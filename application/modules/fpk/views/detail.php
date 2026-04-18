@@ -88,6 +88,9 @@
                                     <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
                                         <i class="ri ri-save-3-fill"></i>
                                     </button>
+                                    <span class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                                        <i class="ri  ri-close-circle-fill"></i>
+                                    </span>
                                     <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->PR_ID); ?>">
                                         <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
@@ -549,6 +552,26 @@
                         `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
+                    );
+
+                    $('#btn-close-header').replaceWith(
+                        `<span class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                            <i class="ri  ri-close-circle-fill"></i>
+                        </span>`
+                    );
+                }
+
+                if (response.data[0].status_code === "NEW" || response.data[0].status_code === "PARTIAL") {
+                    $('#btn-close-header').replaceWith(
+                        `<button type="button" class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" data-id_close="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                            <i class="ri  ri-close-circle-fill"></i>
+                        </button>`
+                    );
+                } else if (response.data[0].status_code === "CLOSE") {
+                    $('#btn-close-header').replaceWith(
+                        `<button type="button" class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" data-status="close_true" data-id_close="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                            <i class="ri  ri-close-circle-fill"></i>
+                        </button>`
                     );
                 }
             }
@@ -1014,7 +1037,7 @@
                 }
             });
         });
-        $('#modalItem').on('shown.bs.modal', function () {
+        $('#modalItem').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 
@@ -1707,6 +1730,65 @@
                     },
                     error: function() {
                         Swal.fire('Error', 'Gagal menghapus data!', 'error');
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on('click', '#btn-close-header', function() {
+        let id = $(this).data('id_close');
+        let status = $(this).data('status');
+
+        Swal.fire({
+            title: 'Yakin mau diubah?',
+            text: 'Data yang diubah masih bisa dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#252525',
+            cancelButtonColor: '#ff4545',
+            confirmButtonText: 'Ya, ubah data!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '<?= base_url() ?>fpk/close',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        id: id,
+                        status: status,
+                    },
+                    beforeSend: function() {
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    success: function(res) {
+                        if (res.status) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Data berhasil diubah status.',
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Warning!',
+                                text: 'Data gagal diubah status.',
+                                icon: 'warning'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Gagal ubah status data!', 'error');
                     }
                 });
             }
