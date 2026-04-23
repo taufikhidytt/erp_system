@@ -1069,8 +1069,7 @@
         $('#acc_penjualan_uang_muka').change();
 
         $('#jenis').on('change', function() {
-
-            let formName = $(this).find(':selected').data('name');
+            let formName = $(this).find('option:selected').text().toLowerCase();
 
             // sembunyikan form & hapus name input
             $('.form-box').hide().find('input, select, textarea').each(function() {
