@@ -31,7 +31,7 @@ class Rcv extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($rcv->STATUS,$rcv->Warna_STATUS);
+            $row['status'] = badge_status($rcv->STATUS, $rcv->Warna_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rcv/detail/' . base64url_encode($this->encrypt->encode($rcv->TAG_ID))) . '">
                 ' . ($rcv->No_Transaksi ? $rcv->No_Transaksi : '-') . '
@@ -611,12 +611,12 @@ class Rcv extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.TAG_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'tag_detail_id' => base64url_encode($this->encrypt->encode($row->TAG_DETAIL_ID)),
@@ -684,16 +684,16 @@ class Rcv extends Back_Controller
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
             $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
-            $d->link = site_url(strtolower($d->Erp_Menu_Name).'/'.'detail/'.base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            
+            $d->link = site_url(strtolower($d->Erp_Menu_Name) . '/' . 'detail/' . base64url_encode($this->encrypt->encode($d->HEADER_ID)));
         }
         echo json_encode($data);
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rcv    = $this->rcv->get_rcv_detail($id)->row();
-        if($rcv){
+        if ($rcv) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'rcv/pdf',
@@ -701,10 +701,10 @@ class Rcv extends Back_Controller
                     'rcv' => $rcv,
                     'rcv_detail' => $this->rcv->get_detail_by_tag_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $rcv->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $rcv->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $rcv->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $rcv->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

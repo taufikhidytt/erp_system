@@ -97,6 +97,13 @@ class Item extends Back_Controller
                 $this->form_validation->set_rules('supplier', 'Supplier', 'trim|required');
             }
 
+            $input_satuan = $this->input->post('satuan_lain');
+            if (!empty($input_satuan)) {
+                foreach ($input_satuan as $index => $val) {
+                    $this->form_validation->set_rules("satuan_lain[$index]", 'Satuan Lain', 'callback_check_satuan_lain');
+                }
+            }
+
             if ($this->form_validation->run() == false) {
                 $data['title'] = 'Tambah Item';
                 $data['breadcrumb'] = 'Tambah Item';
@@ -153,7 +160,7 @@ class Item extends Back_Controller
                                         'ITEM_ID'           => $idItem,
                                         'UOM_CODE'          => $post['satuan_lain'][$i],
                                         'TO_QTY'            => floatval($post['konversi'][$i]),
-                                        'BASE_UOM_FLAG'     => 'N',
+                                        'BASE_UOM_FLAG'     => $post['status_satuan_detail'][$i] == 'Y'?'Y':'N',
                                         'CREATED_BY'        => $this->session->userdata('id'),
                                         'CREATED_DATE'      => date('Y-m-d H:i:s'),
                                         'LAST_UPDATE_BY'    => $this->session->userdata('id'),
@@ -250,6 +257,14 @@ class Item extends Back_Controller
             $this->form_validation->set_rules('jenis', 'Jenis', 'trim|required');
             $this->form_validation->set_rules('grade', 'Grade', 'trim|required');
 
+            $input_satuan = $this->input->post('satuan_lain');
+            if (!empty($input_satuan)) {
+                foreach ($input_satuan as $index => $val) {
+                    $this->form_validation->set_rules("satuan_lain[$index]", 'Satuan Lain', 'callback_check_satuan_lain');
+                }
+            }
+        
+
             if ($this->input->post('obsolete')) {
                 $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
             }
@@ -279,7 +294,6 @@ class Item extends Back_Controller
                     $data['acc_pembelian_uang_muka'] = $this->item->getPembelianUangMuka()->row();
                     $data['acc_penjualan_uang_muka'] = $this->item->getPenjualanUangMuka()->row();
                     $data['uomChild'] = $this->item->getUomChild($id);
-                    $data['uom_konversi'] = $this->item->get_konversi_uom($data['data']->UOM_CODE);
                     $this->template->load('template', 'item/detail', $data);
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
@@ -302,20 +316,74 @@ class Item extends Back_Controller
                 }
                 $post['kubikasi'] = $post['length'] * $post['width'] * $post['height'];
 
+                $this->db->trans_begin();
                 $result = $this->item->update($post);
+                
+                //konversi satuan
+                $i_satuan_uom   = $this->input->post('id_satuan_uom_detail');
+                $i_satuan_lain  = $this->input->post('satuan_lain');
+                $i_konversi     = $this->input->post('konversi');
+                $i_status_satuan_detail     = $this->input->post('status_satuan_detail');
+                $arr_insert_konversi = [];
+                foreach ($i_satuan_lain as $i => $v) {
+                    $idx        = (int) $i_satuan_uom[$i];
+                    $konversi   = (float) $i_konversi[$i];
+                    if($v && $konversi>0){
+                        $params = [
+                            'ITEM_ID'   => (int) $post['id'],
+                            'UOM_CODE'  => $v,
+                            'TO_QTY'    => $konversi,
+                            'BASE_UOM_FLAG'     => $i_status_satuan_detail[$i] == 'Y'?'Y':'N',
+                        ];
+                        if($idx){
+                            $this->db->where('ITEM_UOM_ID', $idx);
+                            $this->db->where('ITEM_ID', (int) $post['id']);
+                            $this->db->update('item_uom', $params);
+                            $error = $this->db->error();
+                            if ($error['code'] != 0) {
+                                $this->db->trans_rollback();
+                                $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                                redirect('item/detail/' . base64url_encode($idInput));
+                            }
+                        }else{
+                            $arr_insert_konversi[] = $params;
+                        }
+                    }
+                }
+                if(count($arr_insert_konversi)>0){
+                    $this->db->insert_batch('item_uom',$arr_insert_konversi);
+                    $error = $this->db->error();
+                    if ($error['code'] != 0) {
+                        $this->db->trans_rollback();
+                        $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                        redirect('item/detail/' . base64url_encode($idInput));
+                    }
+                }
 
                 if ($result['status'] === 'error') {
+                    $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', $result['message']);
                     redirect('item/detail/' . base64url_encode($idInput));
                 }
 
                 if ($result['affected'] == 0) {
+                    $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal ubah data item!');
                     redirect('item/detail/' . base64url_encode($idInput));
                 }
 
-                $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data!');
-                redirect('item/detail/' . base64url_encode($idInput));
+                // ======================
+                // TRANSACTION CHECK
+                // ======================
+                if ($this->db->trans_status() === FALSE) {
+                    $this->db->trans_rollback();
+                    $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
+                     redirect('item/detail/' . base64url_encode($idInput));
+                } else {
+                    $this->db->trans_commit();
+                    $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data!');
+                    redirect('item/detail/' . base64url_encode($idInput));
+                }
             }
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -386,6 +454,31 @@ class Item extends Back_Controller
         } else {
             return true;
         }
+    }
+
+    function check_satuan_lain($value)
+    {
+        static $idx = 0; 
+
+        $input_konversi = $this->input->post('konversi');
+        $konversi = (isset($input_konversi[$idx])) ? (float)$input_konversi[$idx] : 0;
+        
+        $satuan = $value;
+
+        if (!$satuan && $konversi > 0) {
+            $this->form_validation->set_message('check_satuan_lain', 'Satuan harus dipilih.');
+            $idx++; 
+            return FALSE;
+        } 
+        
+        if ($satuan && $konversi <= 0) {
+            $this->form_validation->set_message('check_satuan_lain', 'Qty harus lebih dari 0.');
+            $idx++; 
+            return FALSE;
+        }
+
+        $idx++;
+        return TRUE;
     }
 
     public function approve()
@@ -481,7 +574,8 @@ class Item extends Back_Controller
 
         $post = $this->input->post();
 
-        $dataToInsert = [];
+        $dataToInsert   = [];
+        $is_status      = false;
         if (!empty($post['satuan_lain'])) {
             $count = count($post['satuan_lain']);
             for ($i = 0; $i < $count; $i++) {
@@ -496,6 +590,9 @@ class Item extends Back_Controller
                     } else if ($validate->num_rows() > 0) {
                         return sendWarning('Uom sudah tersedia!');
                     } else {
+                        if($post['status_satuan_detail'][$i] == 'Y'){
+                            $is_status = true;
+                        }
                         $dataToInsert[] = [
                             'ITEM_UOM_ID'       => $id,
                             'ITEM_ID'           => $this->encrypt->decode($post['id_item']),
@@ -513,6 +610,10 @@ class Item extends Back_Controller
         }
 
         if (!empty($dataToInsert)) {
+            if($is_status){
+                $this->db->where('ITEM_ID', (int) $this->encrypt->decode($post['id_item']));
+                $this->db->update('item_uom',['BASE_UOM_FLAG' => 'N']);
+            }
             $this->item->updateSatuanUomDetail($dataToInsert);
             echo json_encode(['status' => 'success']);
         } else {
@@ -563,7 +664,7 @@ class Item extends Back_Controller
         if($uom){
             $res = $this->item->get_konversi_uom($uom);
         }
-        sendSuccess($res,'');
+        echo json_encode($res);
         
     }
 

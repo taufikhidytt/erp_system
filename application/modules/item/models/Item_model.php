@@ -804,16 +804,28 @@ class Item_model extends CI_Model
 
     public function get_konversi_uom($uom)
     {
+        $searchTerm  = trim($this->input->post('q') ?? '');
+        $uom         = $this->input->post('uom');
+
         $this->db->select('
-            COALESCE(b.FROM_UOM, a.UOM_CODE) AS UOM_CODE,
-            a.DESCRIPTION AS UOM_DESCRIPTION,
-            b.FROM_UOM AS A,
-            COALESCE(B.TO_QTY, 1) AS TO_QTY,
-            b.TO_UOM
+            COALESCE(b.FROM_UOM, a.UOM_CODE) AS id,
+            COALESCE(b.FROM_UOM, a.UOM_CODE) AS text,
+            a.DESCRIPTION AS uom_description,
+            b.FROM_UOM AS a,
+            COALESCE(B.TO_QTY, 1) AS to_qty,
+            b.TO_UOM as to_uom
         ');
         $this->db->from('uom a');
         $this->db->join('item_convertion b',"a.UOM_CODE = b.FROM_UOM AND AND b.TO_UOM = '{$uom}'", 'left');
         $this->db->where("a.UOM_CODE <>",$uom);
+        $this->db->where("a.ACTIVE_FLAG",'Y');
+        if ($searchTerm) {
+            $this->db->group_start()
+                ->like('a.UOM_CODE', $searchTerm)
+                ->or_like('b.FROM_UOM', $searchTerm)
+                ->group_end();
+        }
+        $this->db->limit(50);
         return $this->db->get()->result();
     }
 }

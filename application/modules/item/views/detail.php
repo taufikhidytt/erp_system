@@ -2,6 +2,40 @@
     #tableSatuan tbody td{
         font-family: monospace !important;
     }
+    /* Container Utama */
+    .hint-left {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Kotak Tooltip */
+    .hint-left::after {
+        content: attr(data-hint);
+        position: absolute;
+        /* Posisi di sebelah kiri */
+        right: 120%; 
+        top: 50%;
+        transform: translateY(-50%);
+        
+        background: #333;
+        color: white;
+        padding: 4px 8px;
+        font-size: 11px;
+        border-radius: 4px;
+        white-space: nowrap;
+        
+        /* Sembunyikan default */
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 9999;
+    }
+
+    /* Tampilkan saat Hover */
+    .hint-left:hover::after {
+        visibility: visible;
+        opacity: 1;
+    }
 </style>
 
 <div class="page-content" data-aos="zoom-in">
@@ -554,8 +588,10 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <?php if (!empty($uomChild)): ?>
-                                                            <?php foreach ($uomChild->result_array() as $index => $row): ?>
+                                                        <?php
+                                                            if (empty($this->input->post('satuan_lain')) && !empty($uomChild)): ?>
+                                                            <?php foreach ($uomChild->result_array() as $index => $row):
+                                                                ?>
                                                                 <tr>
                                                                     <td class="text-center">
                                                                         <input type="checkbox" class="chkRow">
@@ -566,10 +602,8 @@
 
                                                                     <td>
                                                                         <select name="satuan_lain[]" class="form-select select-uom auto-save">
-                                                                            <?php $param = $this->input->post('satuan_lain') ?? $row['UOM_CODE']; ?>
-                                                                            <?php foreach ($uom_konversi as $um): ?>
-                                                                                <option value="<?= $um->UOM_CODE ?>" data-to_qty="<?= $um->TO_QTY ?>" <?= $um->UOM_CODE == $param ? 'selected' : null ?>><?= strtoupper($um->UOM_CODE) ?></option>
-                                                                            <?php endforeach; ?>
+                                                                            <?php $param = $row['UOM_CODE']; ?>
+                                                                            <option value="<?= $param ?>"><?= $param ?></option>
                                                                         </select>
                                                                     </td>
 
@@ -582,11 +616,48 @@
                                                                     </td>
 
                                                                     <td class="text-center">
-                                                                        <input type="checkbox" name="status_satuan_detail[]" <?= set_value('status_satuan_detail', $row['BASE_UOM_FLAG']) === 'Y' ? 'checked' : '' ?> value="Y" class="auto-save">
+                                                                        <input type="checkbox" class="chk-default" name="status_satuan_detail[]" <?= $row['BASE_UOM_FLAG'] == 'Y' ? 'checked' : '' ?> value="Y" class="auto-save">
+                                                                        <?php echo form_error("satuan_lain[$index]", '<span class="badge bg-danger rounded-pill hint-left" data-hint="', '"><i class="fa fa-info"></i></span>'); ?>
                                                                     </td>
                                                                 </tr>
                                                             <?php endforeach; ?>
                                                         <?php endif; ?>
+                                                        
+                                                        <?php 
+                                                            $i_satuan_uom   = $this->input->post('id_satuan_uom_detail');
+                                                            $i_satuan_lain  = $this->input->post('satuan_lain');
+                                                            $i_konversi     = $this->input->post('konversi');
+                                                            $i_status_satuan_detail     = $this->input->post('status_satuan_detail');
+                                                            foreach ($this->input->post('satuan_lain') ?? [] as $index => $d):
+                                                            ?>
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="chkRow">
+                                                                    <input type="hidden" name="id_satuan_uom_detail[]" value="<?= htmlspecialchars($i_satuan_uom[$index]) ?>">
+                                                                </td>
+
+                                                                <td class="rowNo text-center"><?= $index + 1; ?></td>
+
+                                                                <td>
+                                                                    <select name="satuan_lain[]" class="form-select select-uom auto-save">
+                                                                        <option value="<?= htmlspecialchars($i_satuan_lain[$index]) ?>"><?= htmlspecialchars($i_satuan_lain[$index]) ?></option>
+                                                                    </select>
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="text" name="konversi[]" class="input-number form-control auto-save" step="0.01" value="<?= htmlspecialchars($i_konversi[$index]); ?>">
+                                                                </td>
+
+                                                                <td>
+                                                                    <input type="text" name="note[]" class="form-control" value="1 <?= htmlspecialchars($i_satuan_lain[$index]) . ' = ' . number_format($i_konversi[$index],2) . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                </td>
+
+                                                                <td class="text-center">
+                                                                    <input type="checkbox" class="chk-default" name="status_satuan_detail[]" <?= $i_status_satuan_detail[$index] == 'Y' ? 'checked' : '' ?> value="Y" class="auto-save">
+                                                                    <?php echo form_error("satuan_lain[$index]", '<span class="badge bg-danger rounded-pill hint-left" data-hint="', '"><i class="fa fa-info"></i></span>'); ?>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -864,7 +935,6 @@
 
 <script>
     let xhr = null;
-    let temp_uom = JSON.parse('<?= json_encode($uom_konversi,true) ?>');
     $(document).ready(function() {
         var length = $('#length').inputNumber('getValue') || 0;
         var width = $('#width').inputNumber('getValue') || 0;
@@ -899,7 +969,6 @@
         $('#satuan').on('change', function() {
             let value = $(this).val();
             $('#satuan2').empty().append($(this).find('option:selected').clone()).val(value).trigger('change');
-            getKonversiUom();
         });
 
         //Initialize Select2 Elements
@@ -909,25 +978,6 @@
         //         dropdownParent: $(this).parent(),
         //     });
         // });
-
-        $(".select-uom").select2({
-            width: '100%',
-            templateResult: function(data) {
-                var to_qty = parseFloat($(data.element).data('to_qty')) || 0;
-                if (!data.element || to_qty === 0) { return data.text; }
-
-                
-                const to_qty_format = new Intl.NumberFormat('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    }).format(to_qty);
-                
-                return $('<span>' + data.text.toUpperCase() + ' - [' + to_qty_format + ']</span>');
-            },
-            templateSelection: function(data) {
-                return data.text; 
-            }
-        });
 
         const input = $('#part_number');
         input.on('input', function(e) {
@@ -1087,36 +1137,89 @@
         $('#jenis').trigger('change');
 
         // Tambah baris baru
-        $("#addRow").click(function() {
-            let option_uom = '<option value="">&nbsp;</option>';
-            $.each(temp_uom, function(k, uom){
-                const to_qty = parseFloat(uom.TO_QTY) || 0;
-                option_uom += `<option value="${uom.UOM_CODE}" class="text-uppercase" data-to_qty="${to_qty}">${uom.UOM_CODE}</option>`;
-            });
+        $('.select-uom').each(function(k,v){
+            $(this).select2({
+                width: '100%',
+                theme: 'bootstrap-5',
+                placeholder: "-- Pilih Satuan Lain --",
+                allowClear: false,
+                dropdownParent: $('body'),
+                ajax: {
+                    url: config_app.url+'item/get_konversi_uom',
+                    type: 'POST',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        const req   = { q: params.term};
+                        req['uom']  = $('#satuan option:selected').val();
+                        return req;
+                    },
+                    processResults: function(data) {
+                        const results = data.results || data || [];
+                        return { results };
+                    },
+                    cache: true
+                },
+                templateResult: function(data) {
+                    var to_qty = parseFloat(data.to_qty) || 0;
+                    if (!data || to_qty === 0) { return data.text; }
 
+                    const to_qty_format = new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: config_app.decimal,
+                        maximumFractionDigits: config_app.decimal,
+                        }).format(to_qty);
+                    
+                    return $('<span>' + data.text.toUpperCase() + ' - [' + to_qty_format + ']</span>');
+                },
+                templateSelection: function(data) {
+                    return data.text; 
+                }
+            });
+        });
+        $("#addRow").click(function() {
             var rowCount = $("#tableSatuan tbody tr").length + 1;
             var newRow = `<tr>
             <td class="text-center"><input type="checkbox" class="chkRow"></td>
             <td class="rowNo text-center">${rowCount}</td>
             <td>
                 <input type="hidden" name="id_satuan_uom_detail[]" value="0">
-                <select name="satuan_lain[]" class="form-select select-uom auto-save">${option_uom}</select>
+                <select name="satuan_lain[]" class="form-select select-uom auto-save"><option value=""></option></select>
             </td>
             <td><input type="text" name="konversi[]" class="input-number form-control auto-save"></td>
             <td><input type="text" name="note[]" class="form-control auto-save" disabled></td>
+            <td class="text-center"><input type="checkbox" class="chk-default" name="status_satuan_detail[]" value="Y"></td>
         </tr>`;
             $("#tableSatuan tbody").append(newRow);
             const last_tr = $("#tableSatuan tbody tr:last");
             last_tr.find(".select-uom").select2({
                 width: '100%',
+                theme: 'bootstrap-5',
+                placeholder: "-- Pilih Satuan Lain --",
+                allowClear: false,
+                dropdownParent: $('body'),
+                ajax: {
+                    url: config_app.url+'item/get_konversi_uom',
+                    type: 'POST',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        const req   = { q: params.term};
+                        req['uom']  = $('#satuan option:selected').val();
+                        return req;
+                    },
+                    processResults: function(data) {
+                        const results = data.results || data || [];
+                        return { results };
+                    },
+                    cache: true
+                },
                 templateResult: function(data) {
-                    var to_qty = parseFloat($(data.element).data('to_qty')) || 0;
-                    if (!data.element || to_qty === 0) { return data.text; }
+                    var to_qty = parseFloat(data.to_qty) || 0;
+                    if (!data || to_qty === 0) { return data.text; }
 
-                    
                     const to_qty_format = new Intl.NumberFormat('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
+                        minimumFractionDigits: config_app.decimal,
+                        maximumFractionDigits: config_app.decimal,
                         }).format(to_qty);
                     
                     return $('<span>' + data.text.toUpperCase() + ' - [' + to_qty_format + ']</span>');
@@ -1129,7 +1232,9 @@
         });
 
         // Auto save baris baru saat blur
-        $(document).on("blur", ".auto-save", function() {
+        $(document).on("blur", ".auto-save", function(e) {
+            e.preventDefault();
+            return false;
             var row = $(this).closest("tr");
             var id = row.find('input[name="id_satuan_uom_detail[]"]').val();
             var idItem = $('#id').val();
@@ -1605,34 +1710,16 @@
         checkKonversiUom();
         $('#obsolete').trigger('change');
     });
-    function getKonversiUom(){
-        $('#loading').show();
-        if(xhr){
-            xhr.abort();
-        }
-        xhr = $.ajax({
-            url: "<?= site_url('item/get_konversi_uom'); ?>",
-            type: "POST",
-            data: {
-                uom : $('#satuan option:selected').val()
-            },
-            dataType: "json",
-            success: function(res) {
-                $('#loading').hide();
-                temp_uom = res.result;
-                if($('#tableSatuan tbody tr').length===0){
-                    $('#addRow').trigger('click');
-                }
-            }
-        });
-    }
-    $(document).on('change', '#tableSatuan tbody select', function(){
+
+    $(document).on('select2:select', '.select-uom', function (e) {
+        const data = e.params.data;
+        
         checkKonversiUom();
-        const e_opt     = $(this).find('option:selected');
-        const to_qty    = parseFloat(e_opt.attr('data-to_qty')) || 0;
-        $(this).closest('tr').find('[name="konversi[]"]').inputNumber('setValue', to_qty).trigger('blur');
+        const to_qty    = parseFloat(data.to_qty) || 0;
+        $(this).closest('tr').find('[name="konversi[]"]').inputNumber('setValue', to_qty).trigger('change');
+        $(this).trigger('blur');
     });
-    $(document).on('input change', '#tableSatuan tbody select, #tableSatuan tbody [name="konversi[]"]', function(){
+    $(document).on('input change', '#tableSatuan tbody [name="konversi[]"]', function(){
         const tr        = $(this).closest('tr');
 
         const to_uom    = $('#satuan option:selected').val();
@@ -1651,13 +1738,29 @@
     // cek apakah konversi satuan sudah ada data yang dipilih, jika ada read only di #satuan
     function checkKonversiUom(){
         let is_disabled = false;
+        let is_duplicate = false;
+        let seen = new Set();
         $.each($(document).find('#tableSatuan tbody select'), function(){
             const val = $(this).find('option:selected').val();
             if(val){
                 is_disabled = true;
+                if (seen.has(val)) {
+                    is_duplicate = true;
+                    $(this).val('').trigger('change');
+                }
+                seen.add(val);
             }
         });
         $('#satuan').attr('disabled',is_disabled);
+        if(is_duplicate){
+            Swal.fire({
+                title: 'Warning',
+                text: 'Uom sudah tersedia!',
+                icon: 'warning',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok'
+            });
+        }
     }
     
     $('form').on('submit', function(e){
@@ -1668,10 +1771,21 @@
             $(this).val($(this).inputNumber('getValue'));
         });
 
+        $('#tableSatuan').find('input[type="checkbox"]').each(function() {
+            if (!$(this).is(':checked')) {
+                // Buat input hidden sementara untuk mengirimkan nilai 
+                $(this).after('<input type="hidden" name="' + $(this).attr('name') + '" value="N">');
+            }
+        });
+
         HTMLFormElement.prototype.submit.call(this);
     });
 
     $(document).on('change', '#obsolete', function(){
         $('label[for="obsolete-text"]').text($(this).is(':checked') ? 'Yes' : 'No');
+    });
+    $(document).on('change', '.chk-default', function(){
+        var $context = $(this).closest('tbody');
+        $context.find('.chk-default').not(this).prop('checked', false);
     });
 </script>

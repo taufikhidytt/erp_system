@@ -182,7 +182,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-calendar-2-fill"></i>
                                                 </span>
-                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ?? $data->DOCUMENT_DATE; ?>">
+                                                <input type="datetime-local" name="tanggal" id="tanggal" class="form-control <?= form_error('tanggal') ? 'is-invalid' : null; ?>" placeholder="Enter Tanggal" value="<?= $this->input->post('tanggal') ? $this->input->post('tanggal') : date('Y-m-d\TH:i', strtotime($data->DOCUMENT_DATE)); ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
@@ -193,7 +193,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-calendar-2-fill"></i>
                                                 </span>
-                                                <input type="datetime-local" name="start_date" id="start_date" class="form-control <?= form_error('start_date') ? 'is-invalid' : null; ?>" placeholder="Enter Start Date" value="<?= $this->input->post('start_date') ?? $data->START_DATE; ?>">
+                                                <input type="datetime-local" name="start_date" id="start_date" class="form-control <?= form_error('start_date') ? 'is-invalid' : null; ?>" placeholder="Enter Start Date" value="<?= $this->input->post('start_date') ? $this->input->post('start_date') : date('Y-m-d\TH:i:s', strtotime($data->START_DATE)); ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('start_date') ?></div>
                                         </div>
@@ -204,7 +204,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-calendar-2-fill"></i>
                                                 </span>
-                                                <input type="datetime-local" name="end_date" id="end_date" class="form-control <?= form_error('end_date') ? 'is-invalid' : null; ?>" placeholder="Enter END Date" value="<?= $this->input->post('end_date') ?? $data->END_DATE; ?>">
+                                                <input type="datetime-local" name="end_date" id="end_date" class="form-control <?= form_error('end_date') ? 'is-invalid' : null; ?>" placeholder="Enter END Date" value="<?= $this->input->post('end_date') ?  $this->input->post('end_date') : date('Y-m-d\TH:i:s', strtotime($data->END_DATE)); ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('start_date') ?></div>
                                         </div>
@@ -890,17 +890,22 @@
         }
 
         if ($('#tanggal').val()) {
-            let tgl = $('#tanggal').val();
+            // buang detik biar sesuai step default
+            let tgl = $('#tanggal').val().slice(0, 16);
 
             if (!$('#start_date').val()) {
                 $('#start_date').val(tgl);
             }
+
             $('#start_date').attr('min', tgl);
 
+            let startDate = $('#start_date').val();
+
             if (!$('#end_date').val()) {
-                $('#end_date').val(addOneYear($('#start_date').val()));
+                $('#end_date').val(addOneYear(startDate));
             }
-            $('#end_date').attr('min', $('#start_date').val());
+
+            $('#end_date').attr('min', startDate);
         }
 
         $('#tanggal').on('change', function() {
@@ -1055,7 +1060,7 @@
                 }
             });
         });
-        $('#modalMrq').on('shown.bs.modal', function () {
+        $('#modalMrq').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 
@@ -1759,22 +1764,12 @@
         if (hasDetail) {
             $item_finish_goods.prop('disabled', true).trigger('change.select2');
 
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#item_finish_goods-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'item_finish_goods-hidden',
-                    name: $item_finish_goods.attr('name'),
-                    value: $item_finish_goods.val()
-                }).appendTo('form');
+            if (hasDetail) {
+                $item_finish_goods.prop('disabled', true).trigger('change.select2');
             } else {
-                $('#item_finish_goods-hidden').val($item_finish_goods.val());
+                $item_finish_goods.prop('disabled', false).trigger('change.select2');
             }
-        } else {
-            $item_finish_goods.prop('disabled', false).trigger('change.select2');
-            $('#item_finish_goods-hidden').remove();
         }
-        $item_finish_goods.trigger('change.select2');
     }
 
     function resetmodalMrq() {
@@ -1847,4 +1842,26 @@
             $('#loading').hide();
         }, 300);
     });
+
+    $('form').on('submit', function(e) {
+        $('#item_finish_goods').prop('disabled', false);
+    });
+
+    function addOneYear(dateString) {
+        let date = new Date(dateString);
+
+        // tambah 1 tahun
+        date.setFullYear(date.getFullYear() + 1);
+
+        // format ke datetime-local (LOCAL TIME, bukan UTC)
+        const pad = (n) => String(n).padStart(2, '0');
+
+        let year = date.getFullYear();
+        let month = pad(date.getMonth() + 1);
+        let day = pad(date.getDate());
+        let hours = pad(date.getHours());
+        let minutes = pad(date.getMinutes());
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
 </script>
