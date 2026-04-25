@@ -290,6 +290,22 @@ class Fpk extends Back_Controller
                     $subtotal = $qty * $harga;
                     $total += $subtotal;
 
+                    // Tidak boleh <= 0
+                    if ($harga <= 0) {
+                        $this->db->trans_rollback();
+
+                        $data['title'] = 'Tambah FPK';
+                        $data['breadcrumb'] = 'Tambah FPK';
+                        $data['supplier'] = $this->fpk->getSupplier();
+                        $data['gudang'] = $this->fpk->getGudang();
+                        $data['sales'] = $this->fpk->getSales();
+                        $data['detail'] = $this->input->post('detail');
+                        $this->session->set_flashdata('warning', 'Harga ' . $detail['nama_item'][$i] . ' harus lebih dari 0');
+                        $this->session->keep_flashdata('warning');
+                        $this->template->load('template', 'fpk/add', $data);
+                        return;
+                    }
+
                     $dataDetail = [
                         'PR_ID'             => $post['seq'],
                         'ITEM_ID'           => $detail['id_item'][$i],
@@ -452,14 +468,42 @@ class Fpk extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    $qty = str_replace([','], '', $detail['qty'][$i]);
-                    $harga = str_replace([','], '', $detail['harga_input'][$i]);
+                    $qty = (int) str_replace(',', '', $detail['qty'][$i]);
+
+                    $harga = (int) str_replace(',', '', ($detail['harga_input'][$i] ?? 0));
+
+                    // paksa isi balik ke array agar tidak kosong lagi
+                    $detail['harga_input'][$i] = $harga;
+
                     $subtotal = $qty * $harga;
                     $total += $subtotal;
 
                     $prDetailId = !empty($detail['pr_detail'][$i])
                         ? $this->encrypt->decode($detail['pr_detail'][$i])
                         : null;
+
+                    // Tidak boleh <= 0
+                    if ($harga <= 0) {
+                        $this->db->trans_rollback();
+                        $id = $this->encrypt->decode(base64url_decode($id));
+                        $query = $this->fpk->getPrId($id);
+                        if ($query->num_rows() > 0) {
+                            $data['title'] = 'Detail';
+                            $data['breadcrumb'] = 'Detail';
+                            $data['supplier'] = $this->fpk->getSupplier();
+                            $data['gudang'] = $this->fpk->getGudang();
+                            $data['sales'] = $this->fpk->getSales();
+                            $data['data'] = $query->row();
+                            $data['detail'] = $this->input->post('detail');
+                            $this->session->set_flashdata('warning', 'Harga ' . $detail['nama_item'][$i] . ' harus lebih dari 0');
+                            $this->session->keep_flashdata('warning');
+                            $this->template->load('template', 'fpk/detail', $data);
+                            return;
+                        } else {
+                            $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
+                            redirect('fpk');
+                        }
+                    }
 
                     $dataDetail = [
                         'ITEM_ID'          => $detail['id_item'][$i],

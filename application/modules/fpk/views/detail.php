@@ -348,7 +348,12 @@
                                                                         <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis text-end">
-                                                                        <span class="view-mode harga-view ellipsis"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
+                                                                        <span class="view-mode harga-view ellipsis">
+                                                                            <?php
+                                                                            $value = $postDetail['harga_input'][$i] ?? $dd->HARGA_INPUT ?? 0;
+                                                                            ?>
+                                                                            <?= number_format((float)$value, 2, '.', ','); ?>
+                                                                        </span>
                                                                         <input type="number"
                                                                             class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
                                                                             name="detail[harga_input][]" min="0" step="any"
@@ -356,13 +361,19 @@
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis text-end">
                                                                         <span class="harga-input-b ellipsis">
-                                                                            <?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>
+                                                                            <?php
+                                                                            $value = $postDetail['harga'][$i] ?? $dd->UNIT_PRICE ?? 0;
+                                                                            ?>
+                                                                            <?= number_format((float)$value, 2, '.', ','); ?>
                                                                         </span>
                                                                         <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis text-end">
                                                                         <span class="subtotal-text ellipsis">
-                                                                            <?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>
+                                                                            <?php
+                                                                            $value = $postDetail['subtotal'][$i] ?? $dd->SUBTOTAL ?? 0;
+                                                                            ?>
+                                                                            <?= number_format((float)$value, 2, '.', ','); ?>
                                                                         </span>
                                                                         <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                                     </td>
@@ -840,10 +851,11 @@
                 let qty = oldDetail.qty[i] ?? 1;
                 let uom = oldDetail.uom[i] ?? '';
                 let to_qty = oldDetail.to_qty[i] ?? 1;
-                let hargaInput = oldDetail.harga_input[i] ?? 0;
+                let hargaInput = oldDetail.harga_input[i] || 0;
                 let harga = oldDetail.harga[i] ?? 0;
                 let subtotal = oldDetail.subtotal[i] ?? 0;
                 let keterangan = oldDetail.keterangan[i] ?? '';
+                console.log(hargaInput);
 
                 let rowNode = tableDetail.row.add([
                     nomor,
@@ -1611,6 +1623,95 @@
         }
 
         const balance = 1.00;
+
+        if (pr_detail_id) {
+            // UPDATE
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = value_old;
+                    input.focus();
+                    updateSpan(value_old);
+                });
+                return;
+            }
+        } else {
+            // ADD
+
+            // Tidak boleh minus atau nol
+            if (input.value <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+
+            // Tidak boleh kosong
+            if (input.value === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input kosong',
+                    text: 'Jumlah tidak boleh kosong',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    input.value = balance;
+                    input.focus();
+                    updateSpan(balance);
+                });
+                return;
+            }
+        }
+    }, true);
+
+    // // jika jumlah kosong
+    document.addEventListener('blur', function(e) {
+        if (!e.target.classList.contains('harga-input')) return;
+
+        const input = e.target;
+        const pr_detail_id = input.dataset.pr_detail_id;
+        const value_old = parseFloat(input.dataset.value_old);
+        const row = $(input).closest("tr");
+        const updateSpan = (val) => {
+            const span = input.closest('td').querySelector('.qty-view');
+            const inputField = input.closest('td').querySelector('.harga-input');
+            if (span) {
+                span.textContent = val.toFixed(2).replace(',', '.');
+            }
+
+            if (inputField) {
+                inputField.value = val;
+            }
+        }
+
+        const balance = 0.00;
 
         if (pr_detail_id) {
             // UPDATE
