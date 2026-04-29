@@ -2,12 +2,14 @@
 
 class Back_Controller extends MX_Controller
 {
+    public $access = [];
     public function __construct()
     {
         parent::__construct();
 
         //check cache validation
         $this->refreshCache();
+        $this->checkAccessUser();
     }
 
     /**
@@ -70,5 +72,42 @@ class Back_Controller extends MX_Controller
         }
 
         return call_user_func_array(array($this, $method), $params);
+    }
+
+    /**
+     * cara pakai 
+     * di view gunakan $access contoh $access['view']
+     * di controller gunakan $this->access contoh $this->access['view']
+     * di helper/library gunakan
+     *      $ci = &get_instance();
+     *      $ci->load->get_var('access')
+     * di model gunakan $this->load->get_var('access')
+     */
+    private function checkAccessUser(){
+        $this->access = get_access();
+        $this->load->vars(['access' => $this->access]);
+        $current_url = $this->uri->segment(1);
+        $p1          = $this->uri->segment(2);
+        if(!in_array($current_url,['dashboard','api','management_menu'])){
+
+            // pengecekan akses view
+            if (empty($this->access) || (isset($this->access['view']) && $this->access['view'] === false)) {
+                $this->session->set_flashdata('warning', 'Anda tidak ada akses untuk menu ini, silahkan hubungi administrator untuk mendapatkan akses tersebut!');
+                redirect('dashboard');
+            }
+            // pengecekan akses add/insert
+            else if ($p1 == 'add' && (empty($this->access) || (isset($this->access['insert']) && $this->access['insert'] === false))) {
+                $this->session->set_flashdata('warning', 'Anda tidak ada akses untuk menu ini, silahkan hubungi administrator untuk mendapatkan akses tersebut!');
+                redirect('dashboard');
+            }
+            //pengeceka akses update ketika submit
+            else if ($p1 == 'detail' && (empty($this->access) || (isset($this->access['update']) && $this->access['update'] === false))) {
+                $id_post = $this->input->post('id');
+                if($id_post){
+                    $this->session->set_flashdata('warning', 'Anda tidak ada akses untuk menu ini, silahkan hubungi administrator untuk mendapatkan akses tersebut!');
+                    redirect($current_url);
+                }
+            }
+        }
     }
 }

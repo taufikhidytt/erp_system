@@ -93,24 +93,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-user-3-fill"></i>
                                                 </span>
-                                                <select name="customer" id="customer" class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Customer --</option>
-                                                    <?php $old_location = set_value('location_id'); ?>
-
-                                                    <?php foreach ($customer->result() as $cs): ?>
-                                                        <?php
-                                                        $selected = '';
-                                                        if ($old_location && $old_location == $cs->PERSON_SITE_ID) {
-                                                            $selected = 'selected';
-                                                        }
-                                                        ?>
-                                                        <option value="<?= $cs->PERSON_ID ?>"
-                                                            <?= $selected ?>
-                                                            data-person_site_id="<?= $cs->PERSON_SITE_ID ?>">
-
-                                                            <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="customer" id="customer"
+                                                    data-url="do_kny/get_customer"
+                                                    data-selected-id="<?= set_value('customer', '') ?>"
+                                                    class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('customer') ?></div>
@@ -180,26 +166,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($storage->result() as $st) {
-                                                    if ($st->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $st->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($storage->result() as $ms): ?>
-                                                        <option
-                                                            value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="storage" id="storage"
+                                                    data-url="do_kny/get_storage"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('storage', '') ?>"
+                                                    class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('storage') ?></div>
@@ -680,12 +652,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         <?php if (isset($warning)): ?>
             Swal.fire({
@@ -738,8 +710,10 @@
         }
 
         $('#customer').on('change', function() {
-            let initialCustomer = $(this).find(':selected').data('person_site_id');
-            loadLocation(initialCustomer);
+            setTimeout(function() {
+                let initialCustomer = $('#customer').find(':selected').data('person_site_id');
+                loadLocation(initialCustomer);
+            }, 100)
         });
 
         $("#storage").data("prev", $("#storage").val());
@@ -903,7 +877,7 @@
                 }
             });
         });
-        $('#modalMrq').on('shown.bs.modal', function () {
+        $('#modalMrq').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 

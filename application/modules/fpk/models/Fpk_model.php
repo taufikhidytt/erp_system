@@ -200,7 +200,8 @@ class Fpk_model extends CI_Model
         return ($this->db->error()['code'] == 0);
     }
 
-    public function get_fpk_detail($id){
+    public function get_fpk_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
@@ -208,12 +209,12 @@ class Fpk_model extends CI_Model
             k.LAST_NAME as SALES_LAST_NAME,
         ");
         // $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER",true);
-        $this->db->select("p.PERSON_NAME as SUPPLIER",true);
+        $this->db->select("p.PERSON_NAME as SUPPLIER", true);
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
         $this->db->from('pr a');
-        $this->db->where('a.PR_ID',$id);
+        $this->db->where('a.PR_ID', $id);
         return $this->db->get();
     }
 }

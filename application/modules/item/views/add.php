@@ -63,15 +63,7 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
+                                    <?= button_actions(['insert','save','reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -586,7 +578,7 @@
                                                                 </td>
 
                                                                 <td>
-                                                                    <input type="text" name="note[]" class="form-control" value="1 <?= htmlspecialchars($i_satuan_lain[$index]) . ' = ' . number_format($i_konversi[$index],2) . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                    <input type="text" name="note[]" class="form-control" value="1 <?= htmlspecialchars($i_satuan_lain[$index]) . ' = ' . numb_format($i_konversi[$index],2) . ' ' . $data->UOM_CODE ?>" readonly>
                                                                 </td>
 
                                                                 <td class="text-center">

@@ -45,7 +45,7 @@ class Item_inquiry extends Back_Controller
             2 => 'KODE_ITEM',
             3 => 'STOK',
             4 => 'SATUAN',
-            5 => 'PRICE',
+            5 => 'HARGA',
             6 => 'NILAI'
         ];
 
@@ -125,7 +125,7 @@ class Item_inquiry extends Back_Controller
                 $row->KODE_ITEM,
                 number_format($row->STOK, 2, '.', ','),
                 $row->SATUAN,
-                number_format($row->PRICE, 2, '.', ','),
+                number_format($row->HARGA, 2, '.', ','),
                 number_format($row->NILAI, 2, '.', ','),
             ];
         }
@@ -298,7 +298,7 @@ class Item_inquiry extends Back_Controller
             2 => 'DOCUMENT_NO',
             3 => 'DOCUMENT_REFF_NO',
             4 => 'PERSON_NAME',
-            5 => 'JENIS_TRANSAKSI',
+            5 => 'DOCUMENT_CLASS_CODE',
             6 => 'MASUK',
             7 => 'KELUAR',
             8 => 'SALDO',
@@ -384,7 +384,7 @@ class Item_inquiry extends Back_Controller
                 $row->DOCUMENT_NO ?? "-",
                 $row->DOCUMENT_REFF_NO ?? "-",
                 $row->PERSON_NAME ?? "-",
-                $row->JENIS_TRANSAKSI ?? "-",
+                $row->DOCUMENT_CLASS_CODE ?? "-",
                 number_format($row->MASUK, 2, '.', ',') ?? "-",
                 number_format($row->KELUAR, 2, '.', ',') ?? "-",
                 number_format($row->SALDO, 2, '.', ',') ?? "-",
@@ -437,7 +437,7 @@ class Item_inquiry extends Back_Controller
 
         // Header Excel
         $sheet->fromArray([
-            ['No', 'Nama Item', 'Kode Item', 'Stok', 'Satuan', 'Price', 'Nilai']
+            ['No', 'Nama Item', 'Kode Item', 'Stok', 'Satuan', 'Harga', 'Nilai']
         ], null, 'A1');
 
         // Data
@@ -450,7 +450,7 @@ class Item_inquiry extends Back_Controller
                 $row->KODE_ITEM,
                 number_format($row->STOK, 2, '.', ','),
                 $row->SATUAN,
-                number_format($row->PRICE, 2, '.', ','),
+                number_format($row->HARGA, 2, '.', ','),
                 number_format($row->NILAI, 2, '.', ','),
             ], null, 'A' . $rowNum);
             $rowNum++;
@@ -575,7 +575,7 @@ class Item_inquiry extends Back_Controller
                 $row->DOCUMENT_NO ?? "-",
                 $row->DOCUMENT_REFF_NO ?? "-",
                 $row->PERSON_NAME ?? "-",
-                $row->JENIS_TRANSAKSI ?? "-",
+                $row->DOCUMENT_CLASS_CODE ?? "-",
                 number_format($row->MASUK, 2, '.', ',') ?? "-",
                 number_format($row->KELUAR, 2, '.', ',') ?? "-",
                 number_format($row->SALDO, 2, '.', ',') ?? "-",

@@ -45,8 +45,8 @@ class Item extends Back_Controller
             $row['komoditi'] = $item->KOMODITI ? $item->KOMODITI : '-';
             $row['brand'] = $item->BRAND ? $item->BRAND : '-';
             $row['trade'] = $item->TRADE ? $item->TRADE : '-';
-            $row['price_last_buy'] = $item->PRICE_LAST_BUY ? number_format($item->PRICE_LAST_BUY, 2) : '-';
-            $row['price_last_sell'] = $item->PRICE_LAST_SELL ? number_format($item->PRICE_LAST_SELL, 2) : '-';
+            $row['price_last_buy'] = $item->PRICE_LAST_BUY ? numb_format($item->PRICE_LAST_BUY) : '-';
+            $row['price_last_sell'] = $item->PRICE_LAST_SELL ? numb_format($item->PRICE_LAST_SELL) : '-';
             $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Week" : '-';
             if ($item->KONSY == 'Y') {
                 $returnKonsy = '<i class="text-success fa fa-check" title="Yes" data-bs-toggle="tooltip" data-bs-placement="left"></i>';
@@ -640,6 +640,7 @@ class Item extends Back_Controller
     public function deleteItem()
     {
         try {
+            checkAccess('delete');
             $id = $this->encrypt->decode($this->input->post('id'));
             $result = $this->item->deleteItem($id);
 
@@ -684,7 +685,7 @@ class Item extends Back_Controller
             ];
             echo json_encode($this->datatables->generate($params, function($row, $no) {
                 $uom        = $this->input->post('uom');
-                $konversi   = number_format((float)$row->Konversi, 2, '.', ',');
+                $konversi   = numb_format((float)$row->Konversi);
                 return [
                     'no' => $no,
                     'satuan_lain' => $row->Satuan_lain,

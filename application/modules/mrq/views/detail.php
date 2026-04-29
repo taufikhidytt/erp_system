@@ -120,14 +120,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="ship_to" id="ship_to" class="form-control select2 <?= form_error('ship_to') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Ship To --</option>
-                                                    <?php $param = $this->input->post('ship_to') ?? $data->PERSON_SITE_ID; ?>
-                                                    <?php foreach ($ship_to->result() as $st): ?>
-                                                        <option value="<?= $st->PERSON_ID ?>" <?= $st->PERSON_SITE_ID == $param ? 'selected' : null ?> data-person_site_id="<?= $st->PERSON_SITE_ID ?>">
-                                                            <?= strtoupper($st->PERSON_NAME) . ' - [' . strtoupper($st->PERSON_CODE) . '] - ' . strtoupper($st->SITE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="ship_to" id="ship_to"
+                                                    data-url="api/get_ship_to"
+                                                    data-selected-id="<?= set_value('ship_to', $data->PERSON_ID) ?>"
+                                                    class="form-control select2 <?= form_error('ship_to') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('ship_to') ?></div>
@@ -155,27 +151,11 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($storage->result() as $st) {
-                                                    if ($st->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $st->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php $param = $this->input->post('storage') ?? $data->WAREHOUSE_ID; ?>
-                                                    <?php foreach ($storage->result() as $st): ?>
-                                                        <option
-                                                            value="<?= $st->WAREHOUSE_ID ?>"
-                                                            <?= $st->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $st->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($st->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>"
+                                                    data-url="mrq/get_storage"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('storage', $data->WAREHOUSE_ID) ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('storage') ?></div>
@@ -190,10 +170,9 @@
                                                 <select name="item_finish_goods" id="item_finish_goods" class="form-control select2 <?= form_error('item_finish_goods') ? 'is-invalid' : null; ?>"
                                                     data-url="mrq/get_item_finish_goods"
                                                     placeholder="Select Item Finish Goods"
-                                                    data-selected-id="<?= set_value('item_finish_goods',$data->ITEM_ID) ?>"
+                                                    data-selected-id="<?= set_value('item_finish_goods', $data->ITEM_ID) ?>"
                                                     data-clear="true"
-                                                    data-min-input-length="2"
-                                                    >
+                                                    data-min-input-length="2">
                                                 </select>
                                                 <input type="hidden" name="item_description" id="item_description" value="">
                                             </div>
@@ -997,8 +976,10 @@
         }
 
         $('#ship_to').on('change', function() {
-            let initialShipTo = $(this).find(':selected').data('person_site_id');
-            loadLocation(initialShipTo);
+            setTimeout(function() {
+                let initialShipTo = $('#ship_to').find(':selected').data('person_site_id');
+                loadLocation(initialShipTo);
+            }, 100);
         });
 
         $('#satuan').prop('disabled', true);
@@ -1010,7 +991,7 @@
             loadSatuan(initialItem, oldSatuan);
         }
         $('#item_finish_goods').on('change', function() {
-            setTimeout(function(){
+            setTimeout(function() {
                 let description = $('#item_finish_goods').find('option:selected').data('description');
                 $('#item_description').val(description);
 
@@ -1025,7 +1006,7 @@
                     label.append(' <span class="text-danger">*</span>');
                 }
                 loadSatuan(itemId);
-            },0);
+            }, 0);
         });
 
         $("#storage").data("prev", $("#storage").val());
@@ -1168,7 +1149,7 @@
                 }
             });
         });
-        $('#modalMrq').on('shown.bs.modal', function () {
+        $('#modalMrq').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 
@@ -1558,9 +1539,9 @@
         $('#table-info tbody').on('click', 'td.details-control', function() {
             const tr = $(this).closest('tr');
             const row = tableInfo.row(tr);
-            const infoDetailID  = tr.data('build_detail_id');
-            const buildID       = row.data().build_id;
-            const infoItemID    = row.data().item_id;
+            const infoDetailID = tr.data('build_detail_id');
+            const buildID = row.data().build_id;
+            const infoItemID = row.data().item_id;
             let icon = $(this).find('i');
 
             if (row.child.isShown()) {
@@ -1579,10 +1560,10 @@
                     "serverSide": true,
                     "ajax": {
                         "url": $('#table-info-detail').data('url'),
-                        "data" : {
-                            "build_id" : buildID,
-                            "detail_id" : infoDetailID,
-                            "item_id" : infoItemID,
+                        "data": {
+                            "build_id": buildID,
+                            "detail_id": infoDetailID,
+                            "item_id": infoItemID,
                         },
                         "type": "POST",
                     },
@@ -1979,22 +1960,12 @@
         if (hasDetail) {
             $storage.prop('disabled', true).trigger('change.select2');
 
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'storage-hidden',
-                    name: $storage.attr('name'),
-                    value: $storage.val()
-                }).appendTo('form');
+            if (hasDetail) {
+                $storage.prop('disabled', true).trigger('change.select2');
             } else {
-                $('#storage-hidden').val($storage.val());
+                $storage.prop('disabled', false).trigger('change.select2');
             }
-        } else {
-            $storage.prop('disabled', false).trigger('change.select2');
-            $('#storage-hidden').remove();
         }
-        $storage.trigger('change.select2');
     }
 
     function toggleShipToDisabled() {
@@ -2006,22 +1977,12 @@
         if (hasDetail) {
             $ship_to.prop('disabled', true).trigger('change.select2');
 
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#ship_to-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'ship_to-hidden',
-                    name: $ship_to.attr('name'),
-                    value: $ship_to.val()
-                }).appendTo('form');
+            if (hasDetail) {
+                $ship_to.prop('disabled', true).trigger('change.select2');
             } else {
-                $('#ship_to-hidden').val($ship_to.val());
+                $ship_to.prop('disabled', false).trigger('change.select2');
             }
-        } else {
-            $ship_to.prop('disabled', false).trigger('change.select2');
-            $('#ship_to-hidden').remove();
         }
-        $ship_to.trigger('change.select2');
     }
 
     function resetmodalMrq() {
@@ -2139,6 +2100,11 @@
         setTimeout(function() {
             $('#loading').hide();
         }, 300);
+    });
+
+    $('form').on('submit', function(e) {
+        $('#ship_to').prop('disabled', false);
+        $('#storage').prop('disabled', false);
     });
 </script>
 <?php $this->load->view('mrq/tab_material'); ?>

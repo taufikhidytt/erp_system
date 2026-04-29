@@ -202,6 +202,48 @@ class So_kny_model extends CI_Model
             ->count_all_results('so_detail');
     }
 
+    public function getStorage()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id    = $this->encrypt->decode('user_id');
+
+        $this->db
+            ->distinct()
+            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text, g.PRIMARY_FLAG AS USER_PRIMARY_FLAG")
+            ->from('warehouse a')
+            ->join('erp_warehouse g', "a.WAREHOUSE_ID = g.WAREHOUSE_ID", 'left')
+            ->where('a.ACTIVE_FLAG', 'Y')
+            ->order_by("
+                CASE
+                    WHEN g.PRIMARY_FLAG IS NOT NULL THEN g.PRIMARY_FLAG
+                    ELSE a.PRIMARY_FLAG
+                END
+            ", "DESC", false)
+            ->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
+        } elseif ($user_id) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('g.ERP_USER_ID', $user_id);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.WAREHOUSE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
     public function get_storage()
     {
         return $this->db->query("SELECT DISTINCT
@@ -260,6 +302,73 @@ class So_kny_model extends CI_Model
                 PRIMARY_FLAG DESC,
                 P.NUMBER_DAYS";
         return $this->db->query($sql);
+    }
+
+    public function getCustomer()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select(
+                "a.POINT,
+                a.PERSON_ID as id,
+                a.PERSON_CODE,
+                a.PERSON_NAME,
+                CONCAT(a.PERSON_NAME,' - [',a.PERSON_CODE,'] - ',ps.SITE_NAME) as text,
+                a.LIMIT_PIUTANG,
+                a.TUNAI_FLAG,
+                b.PAYMENT_TERM_ID,
+                COALESCE ( COALESCE ( b.NUMBER_DAYS, 0 ) + COALESCE ( pp.LIMIT_DAY, 0 ), a.CUSTOM1 ) AS CUSTOM1,
+                a.CUSTOM2,
+                a.TIPE_HARGA_JUAL,
+                b.PAYMENT_TERM_NAME,
+                b.NUMBER_DAYS,
+                k.FIRST_NAME,
+                k.LAST_NAME,
+                a.KARYAWAN_ID,
+                a.MATA_UANG_ID,
+                m.MATA_UANG_NAME,
+                COALESCE ( a.PERSON_NAME2, a.PERSON_NAME ) AS PERSON_NAME2,
+                ps.ADDRESS1,
+                ps.SITE_NAME,
+                ps.PERSON_SITE_ID,
+                CASE
+                WHEN ti.DESCRIPTION IS NULL OR ti.DESCRIPTION = '' THEN 0
+                WHEN ti.DESCRIPTION REGEXP '^[0-9]+\\.?[0-9]*$'
+                    THEN CAST(ti.DESCRIPTION AS DECIMAL(19,4))
+                ELSE 0
+                END AS cb,
+                ps.TAX_NAME,
+                a.PPN_CODE,
+                a.APPROVE_FLAG ",
+                false
+            )
+            ->from('person a')
+            ->join('payment_term b', 'a.DEFAULT_TERM_ID = b.PAYMENT_TERM_ID')
+            ->join('person_site ps', 'a.PERSON_ID = ps.PERSON_ID')
+            ->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID', 'left')
+            ->join('mata_uang m', 'm.MATA_UANG_ID = a.MATA_UANG_ID', 'left')
+            ->join('erp_lookup_value ti', 'a.TIPE_CUSTOMER_ID = ti.ERP_LOOKUP_VALUE_ID', 'left')
+            ->join('person_day pp', 'a.PERSON_ID = pp.PERSON_ID AND pp.MEREK_ID IS NULL AND pp.GROUP_ID IS NULL', 'left')
+            ->where('a.FLAG_SUPP', 0)
+            ->order_by('a.PERSON_NAME', 'ASC');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->or_like('ps.SITE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
     }
 
     public function get_customer()
@@ -352,7 +461,8 @@ class So_kny_model extends CI_Model
         return true;
     }
 
-    public function get_so_detail($id){
+    public function get_so_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,a.JTEMPO,
             a.PO_NO PO_Customer, a.TOTAL_DISCOUNT,a.PPN_AMOUNT,a.TOTAL_NET,
@@ -369,7 +479,7 @@ class So_kny_model extends CI_Model
         $this->db->join('person_site ps', 'a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
         $this->db->join('payment_term py', 'a.PAYMENT_TERM_ID = py.PAYMENT_TERM_ID');
         $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
-        $this->db->where('a.SO_ID',$id);
+        $this->db->where('a.SO_ID', $id);
         return $this->db->get();
     }
 }

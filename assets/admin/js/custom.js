@@ -213,4 +213,51 @@ $(document).ready(function(){
             initSelect2(this);
         })
     }
+
+    checkForm();
+});
+
+
+function getButtons(config) {
+    if (!Array.isArray(config)) return [];
+    
+    return config.map(btn => {
+        if (btn.url) {
+            btn.action = function() {
+                window.location.href = btn.url;
+            };
+        }
+        return btn;
+    });
+}
+
+function checkForm(){
+    const url   = window.location.href.replace(config_app.url,'').split('/');
+    const p1    = url[1] ?? '';
+    console.log($('body').attr('data-update'), 'data-update');
+    console.log(p1, 'p1');
+    console.log($('body').attr('data-update') !== "1" && p1=='detail', 'condition');
+    if($('body').attr('data-update') !== "1" && p1=='detail'){
+        $('.page-content form').find('input, select, textarea').prop('disabled',true);
+        $.each($('.page-content form .tab-content button'), function() {
+            const text      = $(this).html();
+            const className = $(this).attr('class');
+            const styles    = $(this).attr('style');
+            const span = $('<span></span>')
+                .html(text)
+                .addClass(className)
+                .attr('aria-disabled', 'true')
+                .attr('style', styles+' pointer-events: none; opacity: 0.6; cursor: not-allowed;');
+
+            $(this).replaceWith(span);
+        });
+    }
+}
+
+$(document).on('click', '.show-password', function() {
+    const $input = $(this).closest('.input-group').find('input');
+    const $icon = $(this);
+    const type = $input.attr('type') === 'password' ? 'text' : 'password';
+    $input.attr('type', type);
+    $icon.toggleClass('ri-eye-close-fill ri-eye-fill');
 });

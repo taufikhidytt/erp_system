@@ -294,6 +294,47 @@ class Do_kny_model extends CI_Model
         return $this->db->query($sql)->row()->total;
     }
 
+    public function getStorage()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id    = $this->encrypt->decode('user_id');
+
+        $this->db
+            ->distinct()
+            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text, g.PRIMARY_FLAG AS USER_PRIMARY_FLAG")
+            ->from('warehouse a')
+            ->join('erp_warehouse g', 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left')
+            ->order_by("
+                CASE
+                    WHEN g.PRIMARY_FLAG IS NOT NULL THEN g.PRIMARY_FLAG
+                    ELSE a.PRIMARY_FLAG
+                END
+            ", "DESC", false)
+            ->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
+        } elseif ($user_id) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('g.ERP_USER_ID', $user_id);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.WAREHOUSE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
     public function get_storage()
     {
         return $this->db->query("SELECT DISTINCT
@@ -314,6 +355,71 @@ class Do_kny_model extends CI_Model
                         g.PRIMARY_FLAG ELSE a.PRIMARY_FLAG 
                     END DESC,
                     a.WAREHOUSE_NAME");
+    }
+
+    public function getCustomer()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select(
+                "a.POINT,
+                a.PERSON_ID as id,
+                a.PERSON_CODE,
+                CONCAT(a.PERSON_NAME, ' - [', a.PERSON_CODE, '] - ', ps.SITE_NAME) as text,
+                a.PERSON_NAME,
+                a.LIMIT_PIUTANG,
+                a.TUNAI_FLAG,
+                b.PAYMENT_TERM_ID,
+                COALESCE(COALESCE(b.NUMBER_DAYS, 0) + COALESCE(pp.LIMIT_DAY, 0), a.CUSTOM1) AS CUSTOM1,
+                a.CUSTOM2,
+                a.TIPE_HARGA_JUAL,
+                b.PAYMENT_TERM_NAME,
+                b.NUMBER_DAYS,
+                k.FIRST_NAME,
+                a.KARYAWAN_ID,
+                a.MATA_UANG_ID,
+                m.MATA_UANG_NAME,
+                COALESCE(a.PERSON_NAME2, a.PERSON_NAME) AS PERSON_NAME2,
+                ps.ADDRESS1,
+                ps.SITE_NAME,
+                ps.PERSON_SITE_ID,
+                CASE 
+                    WHEN ti.DESCRIPTION IS NULL OR ti.DESCRIPTION = '' THEN 0
+                    WHEN ti.DESCRIPTION REGEXP '^[0-9]+\\.?[0-9]*$' THEN CAST(ti.DESCRIPTION AS DECIMAL(19,4))
+                    ELSE 0
+                END AS cb,
+                ps.TAX_NAME,
+                a.PPN_CODE,
+                a.APPROVE_FLAG"
+            )
+            ->from('person a')
+            ->join('payment_term b', 'a.DEFAULT_TERM_ID = b.PAYMENT_TERM_ID')
+            ->join('person_site ps', 'a.PERSON_ID = ps.PERSON_ID')
+            ->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID', 'left')
+            ->join('mata_uang m', 'm.MATA_UANG_ID = a.MATA_UANG_ID', 'left')
+            ->join('erp_lookup_value ti', 'a.TIPE_CUSTOMER_ID = ti.ERP_LOOKUP_VALUE_ID', 'left')
+            ->join('person_day pp', 'a.PERSON_ID = pp.PERSON_ID AND pp.MEREK_ID IS NULL AND pp.GROUP_ID IS NULL', 'left')
+            ->where('a.ACTIVE_FLAG', 'Y')
+            ->where('a.FLAG_SUPP', 0)
+            ->order_by('a.PERSON_NAME', 'ASC');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->or_like('ps.SITE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
     }
 
     public function get_customer()

@@ -959,4 +959,16 @@ class So_kny extends Back_Controller
             $this->pdf->generate($html, str_replace('/', ' ', $so->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
+
+    public function get_customer()
+    {
+        $result = $this->so_kny->getCustomer()->result();
+        echo json_encode($result);
+    }
+
+    public function get_storage()
+    {
+        $result = $this->so_kny->getStorage()->result();
+        echo json_encode($result);
+    }
 }

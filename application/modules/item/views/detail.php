@@ -78,18 +78,9 @@
                                     <?php } ?>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('item/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm btn-delete" data-id="<?= $this->encrypt->encode($data->ITEM_ID) ?>" title="Hapus">
-                                        <i class="ri ri-delete-bin-5-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
+                                    <?= button_actions(['insert','save',
+                                        ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->ITEM_ID)],
+                                        'reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -471,7 +462,7 @@
                                                     <div class="text-danger"><?= form_error('konsinyasi') ?></div>
                                                 </div>
                                             </div>
-                                            <?php if ($data->APPROVE_FLAG == 'N'): ?>
+                                            <?php if ((isset($access['approval']) && $access['approval']) && $data->APPROVE_FLAG == 'N'): ?>
                                                 <div class="col-lg-3 col-md-3 col-sm-12">
                                                     <div class="mb-3">
                                                         <label for="approve">Approve:</label>
@@ -612,7 +603,7 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <input type="text" name="note[]" class="form-control" value="1 <?= $row['UOM_CODE'] . ' = ' . number_format($row['TO_QTY'],2) . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                        <input type="text" name="note[]" class="form-control" value="1 <?= $row['UOM_CODE'] . ' = ' . numb_format($row['TO_QTY']) . ' ' . $data->UOM_CODE ?>" readonly>
                                                                     </td>
 
                                                                     <td class="text-center">
@@ -649,7 +640,7 @@
                                                                 </td>
 
                                                                 <td>
-                                                                    <input type="text" name="note[]" class="form-control" value="1 <?= htmlspecialchars($i_satuan_lain[$index]) . ' = ' . number_format($i_konversi[$index],2) . ' ' . $data->UOM_CODE ?>" readonly>
+                                                                    <input type="text" name="note[]" class="form-control" value="1 <?= htmlspecialchars($i_satuan_lain[$index]) . ' = ' . numb_format($i_konversi[$index]) . ' ' . $data->UOM_CODE ?>" readonly>
                                                                 </td>
 
                                                                 <td class="text-center">

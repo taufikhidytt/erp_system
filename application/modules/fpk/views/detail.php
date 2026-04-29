@@ -123,14 +123,9 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php $params = $this->input->post('supplier') ?? $data->PERSON_ID; ?>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= $sp->PERSON_ID == $params ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_supplier"
+                                                    data-selected-id="<?= set_value('supplier', $data->PERSON_ID) ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
@@ -166,27 +161,11 @@
                                                     <span class="input-group-text">
                                                         <i class="ri ri-home-gear-fill"></i>
                                                     </span>
-                                                    <?php
-                                                    $defaultValue = null;
-                                                    foreach ($gudang->result() as $gd) {
-                                                        if ($gd->PRIMARY_FLAG == 'Y') {
-                                                            $defaultValue = $gd->WAREHOUSE_ID;
-                                                            break;
-                                                        }
-                                                    }
-                                                    ?>
-                                                    <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
-                                                        <?php if (!$defaultValue): ?>
-                                                            <option value="">-- Selected Gudang --</option>
-                                                        <?php endif; ?>
-                                                        <?php $param = $this->input->post('gudang') ?? $data->WAREHOUSE_ID; ?>
-                                                        <?php foreach ($gudang->result() as $gd): ?>
-                                                            <option
-                                                                value="<?= $gd->WAREHOUSE_ID ?>"
-                                                                <?= $gd->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                                <?= strtoupper($gd->WAREHOUSE_NAME) ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
+                                                    <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>"
+                                                        data-url="api/get_gudang"
+                                                        data-default="Y"
+                                                        data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                        data-selected-id="<?= set_value('gudang', $data->WAREHOUSE_ID) ?>">
                                                     </select>
                                                 </div>
                                                 <div class="text-danger"><?= form_error('gudang') ?></div>
@@ -198,14 +177,9 @@
                                                     <span class="input-group-text">
                                                         <i class="ri ri-user-2-fill"></i>
                                                     </span>
-                                                    <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                        <option value="">-- Selected Sales --</option>
-                                                        <?php $param = $this->input->post('sales') ?? $data->KARYAWAN_ID; ?>
-                                                        <?php foreach ($sales->result() as $sl): ?>
-                                                            <option value="<?= $sl->KARYAWAN_ID ?>" <?= $sl->KARYAWAN_ID == $param ? 'selected' : null ?>>
-                                                                <?= strtoupper($sl->FIRST_NAME) . ' - [' . strtoupper($sl->LAST_NAME) . ']' ?>
-                                                            </option>
-                                                        <?php endforeach; ?>
+                                                    <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>"
+                                                        data-url="api/get_sales"
+                                                        data-selected-id="<?= set_value('sales', $data->KARYAWAN_ID) ?>">
                                                     </select>
                                                 </div>
                                                 <div class="text-danger"><?= form_error('sales') ?></div>
@@ -904,12 +878,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -1982,24 +1956,14 @@
         let $supplier = $('#supplier');
 
         if (hasDetail) {
-            $supplier.prop('disabled', true); // blok UI
-            // buat hidden input agar value dikirim ke server
-            if ($('#supplier-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'supplier-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
-                }).appendTo('form');
-            } else {
-                $('#supplier-hidden').val($supplier.val());
-            }
-        } else {
-            $supplier.prop('disabled', false);
-            $('#supplier-hidden').remove();
-        }
+            $supplier.prop('disabled', true).trigger('change.select2');
 
-        $supplier.trigger('change.select2');
+            if (hasDetail) {
+                $supplier.prop('disabled', true).trigger('change.select2');
+            } else {
+                $supplier.prop('disabled', false).trigger('change.select2');
+            }
+        }
     }
 
     function resetModalItem() {
@@ -2016,5 +1980,9 @@
         setTimeout(function() {
             $('#loading').hide();
         }, 300);
+    });
+
+    $('form').on('submit', function(e) {
+        $('#supplier').prop('disabled', false);
     });
 </script>

@@ -32,7 +32,7 @@ class Mrq extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($mrq->Status,$mrq->WarnaStatus);
+            $row['status'] = badge_status($mrq->Status, $mrq->WarnaStatus);
             $row['no_transaksi'] = '
             <a href="' . base_url('mrq/detail/' . base64url_encode($this->encrypt->encode($mrq->BUILD_ID))) . '">
                 ' . ($mrq->No_Transaksi ? $mrq->No_Transaksi : '-') . '
@@ -782,7 +782,7 @@ class Mrq extends Back_Controller
     public function get_info($id)
     {
         $id = (int) $this->encrypt->decode(base64url_decode($id));
-        $this->load->model('M_union_datatables','union_datatables');
+        $this->load->model('M_union_datatables', 'union_datatables');
         $params = [
             'queries' => [
                 // Query pertama: build table
@@ -812,8 +812,8 @@ class Mrq extends Back_Controller
                 7 => 'SISA',
             ],
         ];
- 
-        $result = $this->union_datatables->generate($params, function($row, $no) {
+
+        $result = $this->union_datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'build_id' => base64url_encode($this->encrypt->encode($row->BUILD_ID)),
@@ -836,7 +836,7 @@ class Mrq extends Back_Controller
         $build_id   = (int) $this->encrypt->decode(base64url_decode($this->input->post('build_id')));
         $item_id    = (int) $this->encrypt->decode(base64url_decode($this->input->post('item_id')));
 
-        $this->load->model('M_union_datatables','union_datatables');
+        $this->load->model('M_union_datatables', 'union_datatables');
         $params = [
             'queries' => [
                 // Query 1: inventory_in_detail (PO Kny)
@@ -904,9 +904,9 @@ class Mrq extends Back_Controller
                 5 => '`S.Loc`',
             ],
         ];
- 
-        $result = $this->union_datatables->generate($params, function($row, $no) {
-            $link = site_url(strtolower($row->Erp_Menu_Name).'/detail/' . base64url_encode($this->encrypt->encode($row->HEADER_ID)));
+
+        $result = $this->union_datatables->generate($params, function ($row, $no) {
+            $link = site_url(strtolower($row->Erp_Menu_Name) . '/detail/' . base64url_encode($this->encrypt->encode($row->HEADER_ID)));
 
             return [
                 'no' => $no,
@@ -917,7 +917,7 @@ class Mrq extends Back_Controller
                 's_loc' => $row->{'S.Loc'},
             ];
         });
- 
+
         echo json_encode($result);
     }
 
@@ -1010,8 +1010,15 @@ class Mrq extends Back_Controller
         }));
     }
 
-    public function get_item_finish_goods(){
+    public function get_item_finish_goods()
+    {
         $result = $this->mrq->api_get_item_finish_goods()->result();
+        echo json_encode($result);
+    }
+
+    public function get_storage()
+    {
+        $result = $this->mrq->get_storage()->result();
         echo json_encode($result);
     }
 }

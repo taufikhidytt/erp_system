@@ -125,27 +125,11 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($main_storage->result() as $ms) {
-                                                    if ($ms->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ms->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Main Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php $param = $this->input->post('main_storage') ?? $data->WAREHOUSE_ID; ?>
-                                                    <?php foreach ($main_storage->result() as $ms): ?>
-                                                        <option
-                                                            value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= $ms->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_gudang"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('main_storage', $data->WAREHOUSE_ID) ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('main_storage') ?></div>
@@ -157,27 +141,11 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-2-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($site_storage->result() as $ss) {
-                                                    if ($ss->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ss->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Site Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php $param = $this->input->post('site_storage') ?? $data->TO_WH_ID; ?>
-                                                    <?php foreach ($site_storage->result() as $ss): ?>
-                                                        <option
-                                                            value="<?= $ss->WAREHOUSE_ID ?>"
-                                                            <?= $ss->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ss->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>"
+                                                    data-url="api/get_site_storage"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('site_storage', $data->TO_WH_ID) ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('site_storage') ?></div>
@@ -1004,7 +972,7 @@
                 }
             });
         });
-        $('#modalGRK').on('shown.bs.modal', function () {
+        $('#modalGRK').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 
@@ -1780,37 +1748,14 @@
             $main_storage.prop('disabled', true).trigger('change.select2');
             $site_storage.prop('disabled', true).trigger('change.select2');
 
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#main_storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'main_storage-hidden',
-                    name: $main_storage.attr('name'),
-                    value: $main_storage.val()
-                }).appendTo('form');
+            if (hasDetail) {
+                $main_storage.prop('disabled', true).trigger('change.select2');
+                $site_storage.prop('disabled', true).trigger('change.select2');
             } else {
-                $('#main_storage-hidden').val($main_storage.val());
+                $main_storage.prop('disabled', false).trigger('change.select2');
+                $site_storage.prop('disabled', false).trigger('change.select2');
             }
-
-            if ($('#site_storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'site_storage-hidden',
-                    name: $site_storage.attr('name'),
-                    value: $site_storage.val()
-                }).appendTo('form');
-            } else {
-                $('#site_storage-hidden').val($site_storage.val());
-            }
-        } else {
-            $main_storage.prop('disabled', false).trigger('change.select2');
-            $site_storage.prop('disabled', false).trigger('change.select2');
-            $('#main_storage-hidden').remove();
-            $('#site_storage-hidden').remove();
         }
-
-        $main_storage.trigger('change.select2');
-        $site_storage.trigger('change.select2');
     }
 
     function resetmodalGRK() {
@@ -1834,5 +1779,10 @@
         setTimeout(function() {
             $('#loading').hide();
         }, 300);
+    });
+
+    $('form').on('submit', function(e) {
+        $('#main_storage').prop('disabled', false);
+        $('#site_storage').prop('disabled', false);
     });
 </script>

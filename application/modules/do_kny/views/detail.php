@@ -118,14 +118,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-user-3-fill"></i>
                                                 </span>
-                                                <select name="customer" id="customer" class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Customer --</option>
-                                                    <?php $param = $this->input->post('location_id') ?? $data->PERSON_SITE_ID; ?>
-                                                    <?php foreach ($customer->result() as $cs): ?>
-                                                        <option value="<?= $cs->PERSON_ID ?>" <?= $cs->PERSON_SITE_ID == $param ? 'selected' : null ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>">
-                                                            <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="customer" id="customer"
+                                                    data-url="do_kny/get_customer"
+                                                    data-selected-id="<?= set_value('customer', $data->PERSON_ID) ?>"
+                                                    class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('customer') ?></div>
@@ -194,27 +190,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($storage->result() as $st) {
-                                                    if ($st->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $st->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php $param = $this->input->post('storage') ?? $data->WAREHOUSE_ID; ?>
-                                                    <?php foreach ($storage->result() as $st): ?>
-                                                        <option
-                                                            value="<?= $st->WAREHOUSE_ID ?>"
-                                                            <?= $st->WAREHOUSE_ID == $param ? 'selected' : ($defaultValue == $st->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($st->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="storage" id="storage"
+                                                    data-url="do_kny/get_storage"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('storage', $data->WAREHOUSE_ID) ?>"
+                                                    class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('storage') ?></div>
@@ -904,12 +885,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         <?php if (isset($warning)): ?>
             Swal.fire({
@@ -962,8 +943,10 @@
         }
 
         $('#customer').on('change', function() {
-            let initialCustomer = $(this).find(':selected').data('person_site_id');
-            loadLocation(initialCustomer);
+            setTimeout(function() {
+                let initialCustomer = $('#customer').find(':selected').data('person_site_id');
+                loadLocation(initialCustomer);
+            }, 100);
         });
 
         $("#storage").data("prev", $("#storage").val());
@@ -1110,7 +1093,7 @@
                 }
             });
         });
-        $('#modalMrq').on('shown.bs.modal', function () {
+        $('#modalMrq').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 
@@ -2397,36 +2380,14 @@
             $customer.prop('disabled', true).trigger('change.select2');
             $storage.prop('disabled', true).trigger('change.select2');
 
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#customer-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'customer-hidden',
-                    name: $customer.attr('name'),
-                    value: $customer.val()
-                }).appendTo('form');
+            if (hasDetail) {
+                $customer.prop('disabled', true).trigger('change.select2');
+                $storage.prop('disabled', true).trigger('change.select2');
             } else {
-                $('#customer-hidden').val($customer.val());
+                $customer.prop('disabled', false).trigger('change.select2');
+                $customer.prop('disabled', false).trigger('change.select2');
             }
-
-            if ($('#storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'storage-hidden',
-                    name: $storage.attr('name'),
-                    value: $storage.val()
-                }).appendTo('form');
-            } else {
-                $('#storage-hidden').val($storage.val());
-            }
-        } else {
-            $customer.prop('disabled', false).trigger('change.select2');
-            $storage.prop('disabled', false).trigger('change.select2');
-            $('#customer-hidden').remove();
-            $('#storage-hidden').remove();
         }
-        $customer.trigger('change.select2');
-        $storage.trigger('change.select2');
     }
 
     function resetModalItem() {
@@ -2493,5 +2454,10 @@
         setTimeout(function() {
             $('#loading').hide();
         }, 300);
+    });
+
+    $('form').on('submit', function(e) {
+        $('#customer').prop('disabled', false);
+        $('#storage').prop('disabled', false);
     });
 </script>

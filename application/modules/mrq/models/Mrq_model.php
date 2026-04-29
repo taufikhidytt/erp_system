@@ -210,26 +210,100 @@ class Mrq_model extends CI_Model
             ->count_all_results('build_detail');
     }
 
+    public function getGudang()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id    = $this->encrypt->decode('user_id');
+
+        $this->db
+            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text ")
+            ->from('warehouse a')
+            ->join('erp_warehouse g', 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left')
+            ->where('a.JENIS_ID = FN_GET_VAR_VALUE("PST")', null, false)
+            ->group_by('a.WAREHOUSE_ID')
+            ->order_by('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG)', 'DESC', false)
+            ->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
+        } elseif ($user_id) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.ERP_USER_ID', $user_id);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.WAREHOUSE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+        return $this->db->get();
+    }
+
     public function get_storage()
     {
-        return $this->db->query("SELECT DISTINCT
-                    a.WAREHOUSE_ID,
-                    a.ADDRESS_ID,
-                    a.PRIMARY_FLAG,
-                    a.WAREHOUSE_NAME,
-                    g.PRIMARY_FLAG AS USER_PRIMARY_FLAG 
-                FROM
-                    warehouse a
-                    LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID 
-                    AND g.ERP_USER_ID = '{$this->session->userdata('id')}'
-                WHERE
-                    a.ACTIVE_FLAG = 'Y' 
-                ORDER BY
-                CASE
-                        WHEN g.PRIMARY_FLAG IS NOT NULL THEN
-                        g.PRIMARY_FLAG ELSE a.PRIMARY_FLAG 
-                    END DESC,
-                    a.WAREHOUSE_NAME");
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id    = $this->encrypt->decode('user_id');
+
+        $this->db
+            ->distinct()
+            ->select('a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text, g.PRIMARY_FLAG AS USER_PRIMARY_FLAG')
+            ->from('warehouse a')
+            ->join('erp_warehouse g', 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left')
+            ->order_by('CASE 
+                    WHEN g.PRIMARY_FLAG IS NOT NULL THEN g.PRIMARY_FLAG
+                    ELSE a.PRIMARY_FLAG
+                    END
+                    ', 'DESC', false)
+            ->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
+        } elseif ($user_id) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.ERP_USER_ID', $user_id);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.WAREHOUSE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+
+
+        // return $this->db->query("SELECT DISTINCT
+        //             a.WAREHOUSE_ID,
+        //             a.ADDRESS_ID,
+        //             a.PRIMARY_FLAG,
+        //             a.WAREHOUSE_NAME,
+        //             g.PRIMARY_FLAG AS USER_PRIMARY_FLAG 
+        //         FROM
+        //             warehouse a
+        //             LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID 
+        //             AND g.ERP_USER_ID = '{$this->session->userdata('id')}'
+        //         WHERE
+        //             a.ACTIVE_FLAG = 'Y' 
+        //         ORDER BY
+        //         CASE
+        //                 WHEN g.PRIMARY_FLAG IS NOT NULL THEN
+        //                 g.PRIMARY_FLAG ELSE a.PRIMARY_FLAG 
+        //             END DESC,
+        //             a.WAREHOUSE_NAME");
     }
 
     public function get_item_finish_goods()
@@ -341,7 +415,8 @@ class Mrq_model extends CI_Model
         return true;
     }
 
-    public function get_mrq_detail($id){
+    public function get_mrq_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             a.ENTERED_QTY,a.ENTERED_UOM,a.HOUR_MINUTES,a.SHIP_DATE,a.REFF_PR,a.UNIT,a.LOKASI,
@@ -350,13 +425,13 @@ class Mrq_model extends CI_Model
             i.ITEM_NAME,
         ");
         // $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SHIP_TO",true);
-        $this->db->select("p.PERSON_NAME as SHIP_TO",true);
+        $this->db->select("p.PERSON_NAME as SHIP_TO", true);
         $this->db->from('build a');
-        $this->db->join('person p','a.PERSON_ID = p.PERSON_ID');
-        $this->db->join('person_site ps','a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('person_site ps', 'a.PERSON_SITE_ID = ps.PERSON_SITE_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID', 'left');
-        $this->db->where('a.BUILD_ID',$id);
+        $this->db->where('a.BUILD_ID', $id);
         return $this->db->get();
     }
 
@@ -383,7 +458,6 @@ class Mrq_model extends CI_Model
             ->join('erp_lookup_value tipe', 'i.TYPE_ID = tipe.ERP_LOOKUP_VALUE_ID')
             ->join('erp_lookup_value mr', 'i.MEREK_ID = mr.ERP_LOOKUP_VALUE_ID')
             ->join("($subquery) s", 'i.ITEM_ID = s.ITEM_ID', 'left')
-            ->where('i.ACTIVE_FLAG', 'Y')
             ->where('i.APPROVE_FLAG', 'Y')
             ->where('i.TYPE_ID', "FN_GET_VAR_VALUE('INV')", FALSE)
             ->where('i.JENIS_ID', "FN_GET_VAR_VALUE('GOODS')", FALSE)
@@ -392,6 +466,7 @@ class Mrq_model extends CI_Model
         if ($id) {
             $this->db->where('i.ITEM_ID', $id)->limit(1);
         } else {
+            $this->db->where('i.ACTIVE_FLAG', 'Y');
             if ($searchTerm) {
                 $this->db->group_start()
                     ->like('i.ITEM_CODE', $searchTerm)

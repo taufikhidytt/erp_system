@@ -32,7 +32,7 @@ class Do_kny extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($do_kny->STATUS,$do_kny->WARNA_STATUS);
+            $row['status'] = badge_status($do_kny->STATUS, $do_kny->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('do_kny/detail/' . base64url_encode($this->encrypt->encode($do_kny->INVENTORY_OUT_ID))) . '">
                 ' . ($do_kny->No_Transaksi ? $do_kny->No_Transaksi : '-') . '
@@ -767,10 +767,11 @@ class Do_kny extends Back_Controller
         }));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $do    = $this->do_kny->get_do_detail($id)->row();
-        if($do){
+        if ($do) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'do_kny/pdf',
@@ -778,10 +779,22 @@ class Do_kny extends Back_Controller
                     'do' => $do,
                     'do_detail' => $this->do_kny->get_do_detail_by_inventory_out_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $do->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $do->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $do->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $do->DOCUMENT_NO), 'A4', 'portrait');
         }
+    }
+
+    public function get_customer()
+    {
+        $result = $this->do_kny->getCustomer()->result();
+        echo json_encode($result);
+    }
+
+    public function get_storage()
+    {
+        $result = $this->do_kny->getStorage()->result();
+        echo json_encode($result);
     }
 }

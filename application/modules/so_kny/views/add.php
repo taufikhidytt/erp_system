@@ -93,15 +93,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-user-2-fill"></i>
                                                 </span>
-                                                <select name="customer" id="customer" class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Customer --</option>
-                                                    <?php foreach ($customer->result() as $cs): ?>
-                                                        <option value="<?= $cs->PERSON_ID ?>" <?= set_value('person_site_id') == $cs->PERSON_SITE_ID ? 'selected' : '' ?> data-person_site_id="<?= $cs->PERSON_SITE_ID ?>" data-payment_term_id="<?= $cs->PAYMENT_TERM_ID ?>" data-karyawan_id="<?= $cs->KARYAWAN_ID ?>">
-                                                            <?= strtoupper($cs->PERSON_NAME) . ' - [' . strtoupper($cs->PERSON_CODE) . '] - ' . strtoupper($cs->SITE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
                                                 <input type="hidden" name="person_site_id" id="person_site_id" value="<?= set_value('person_site_id') ?>">
+                                                <select name="customer" id="customer"
+                                                    data-url="so_kny/get_customer"
+                                                    data-selected-id="<?= set_value('customer', '') ?>"
+                                                    class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
+                                                </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('customer') ?></div>
                                         </div>
@@ -129,26 +126,11 @@
                                                         <span class="input-group-text">
                                                             <i class="ri ri-money-dollar-box-fill"></i>
                                                         </span>
-                                                        <?php
-                                                        $defaultPaymentTerm = null;
-                                                        foreach ($payment_term->result() as $pt) {
-                                                            if ($pt->PRIMARY_FLAG == 'Y') {
-                                                                $defaultPaymentTerm = $pt->PAYMENT_TERM_ID;
-                                                                break;
-                                                            }
-                                                        }
-                                                        ?>
-                                                        <select name="payment_term" id="payment_term" class="form-control select2 <?= form_error('payment_term') ? 'is-invalid' : null; ?>">
-                                                            <?php if (!$defaultPaymentTerm): ?>
-                                                                <option value="">-- Selected payment_term --</option>
-                                                            <?php endif; ?>
-                                                            <?php foreach ($payment_term->result() as $pt): ?>
-                                                                <option
-                                                                    value="<?= $pt->PAYMENT_TERM_ID ?>"
-                                                                    <?= set_value('payment_term') ==  $pt->PAYMENT_TERM_ID ? 'selected' : ($defaultPaymentTerm == $pt->PAYMENT_TERM_ID ? 'selected' : '') ?> data-number="<?= $pt->NUMBER_DAYS ?>">
-                                                                    <?= $pt->PAYMENT_TERM_NAME ?>
-                                                                </option>
-                                                            <?php endforeach; ?>
+                                                        <select name="payment_term" id="payment_term"
+                                                            data-url="api/get_payment"
+                                                            data-default="Y"
+                                                            data-selected-id="<?= set_value('payment_term', '') ?>"
+                                                            class="form-control select2 <?= form_error('payment_term') ? 'is-invalid' : null; ?>">
                                                         </select>
                                                     </div>
                                                     <div class="text-danger"><?= form_error('payment_term') ?></div>
@@ -201,11 +183,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-user-2-fill"></i>
                                                 </span>
-                                                <select name="sales" id="sales" class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Sales --</option>
-                                                    <?php foreach ($sales->result() as $sl): ?>
-                                                        <option value="<?= $sl->KARYAWAN_ID ?>" <?= set_value('sales') == $sl->KARYAWAN_ID ? 'selected' : null ?>><?= $sl->FIRST_NAME . " - [" . $sl->LAST_NAME . "]" ?></option>
-                                                    <?php endforeach; ?>
+                                                <select name="sales" id="sales"
+                                                    data-url="api/get_sales"
+                                                    data-selected-id="<?= set_value('sales', '') ?>"
+                                                    class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('sales') ?></div>
@@ -217,26 +198,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($storage->result() as $st) {
-                                                    if ($st->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $st->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="storage" id="storage" class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($storage->result() as $ms): ?>
-                                                        <option
-                                                            value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="storage" id="storage"
+                                                    data-url="so_kny/get_storage"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('storage', '') ?>"
+                                                    class="form-control select2 <?= form_error('storage') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('storage') ?></div>
@@ -907,12 +874,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -956,30 +923,43 @@
             loadLocation(initialCustomer, oldLocation);
         }
 
-        var defaultPaymentTerm = "<?= $defaultPaymentTerm ?>";
-
         $('#customer').on('change', function() {
-            let initialCustomer = $('#customer option:selected').data('person_site_id');
-            $('#person_site_id').val(initialCustomer);
-            loadLocation(initialCustomer);
+            setTimeout(function() {
+                var defaultPaymentTerm = $("#payment_term").val();
+                let initialCustomer = $('#customer option:selected').data('person_site_id');
+                $('#person_site_id').val(initialCustomer);
+                loadLocation(initialCustomer);
 
-            var paymentTermId = $(this).find(':selected').data('payment_term_id');
-            if (paymentTermId) {
-                $('#payment_term').val(paymentTermId).trigger('change');
-            } else {
-                $('#payment_term').val(defaultPaymentTerm).trigger('change');
-            }
+                var paymentTermId = $('#customer').find(':selected').data('payment_term_id');
+                if (paymentTermId) {
+                    var paymentTermName = $('#customer').find(':selected').data('payment_term_name');
 
-            var karyawan_id = $(this).find(':selected').data('karyawan_id');
-            if (karyawan_id) {
-                $('#sales').val(karyawan_id).trigger('change');
-            } else {
-                $('#sales').val('').trigger('change');
-            }
+                    var newOption = new Option(paymentTermName, paymentTermId, true, true);
+                    $('#payment_term').append(newOption).trigger('change');
+                } else {
+                    $('#payment_term').val(defaultPaymentTerm).trigger('change');
+                }
+
+                var karyawan_id = $('#customer').find(':selected').data('karyawan_id');
+                var first_name = $('#customer').find(':selected').data('first_name');
+                var last_name = $('#customer').find(':selected').data('last_name');
+                if (karyawan_id) {
+                    // $('#sales').val(karyawan_id).trigger('change');
+
+                    var newOption = new Option(first_name + ' - [' + last_name + ']', karyawan_id, true, true);
+                    $('#sales').append(newOption).trigger('change');
+                } else {
+                    $('#sales').val('').trigger('change');
+                }
+            }, 100)
         });
 
         // Event untuk input normal
-        $('#tanggal').on('change', updateJatuhTempo);
+        $('#tanggal').on('change', function() {
+            setTimeout(function() {
+                updateJatuhTempo;
+            }, 100);
+        });
 
         // Event untuk Select2
         $('#payment_term').on('change.select2', updateJatuhTempo);
@@ -1116,7 +1096,7 @@
                 }
             });
         });
-        $('#modalMrq').on('shown.bs.modal', function () {
+        $('#modalMrq').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 
@@ -2233,7 +2213,7 @@
         if (!tanggal) return;
 
         // Ambil jumlah hari dari payment term yang dipilih
-        let days = parseInt($('#payment_term option:selected').data('number')) || 0;
+        let days = parseInt($('#payment_term option:selected').data('number_days')) || 0;
 
         // Buat object Date dari tanggal
         let dateObj = new Date(tanggal);

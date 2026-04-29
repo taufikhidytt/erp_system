@@ -93,13 +93,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') ==  $sp->PERSON_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="supplier" id="supplier"
+                                                    data-url="api/get_supplier"
+                                                    data-selected-id="<?= set_value('supplier', '') ?>"
+                                                    class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
@@ -136,26 +133,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-home-gear-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($gudang->result() as $gd) {
-                                                    if ($gd->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $gd->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Gudang --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($gudang->result() as $gd): ?>
-                                                        <option
-                                                            value="<?= $gd->WAREHOUSE_ID ?>"
-                                                            <?= set_value('gudang') ==  $gd->WAREHOUSE_ID ? 'selected' : ($defaultValue == $gd->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($gd->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="gudang" id="gudang"
+                                                    data-url="api/get_gudang"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('gudang', '') ?>"
+                                                    class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('gudang') ?></div>
@@ -712,12 +695,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -867,7 +850,7 @@
                 }
             });
         });
-        $('#modalFPK').on('shown.bs.modal', function () {
+        $('#modalFPK').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 

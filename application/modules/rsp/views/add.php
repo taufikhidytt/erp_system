@@ -93,13 +93,10 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-pantone-line"></i>
                                                 </span>
-                                                <select name="supplier" id="supplier" class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
-                                                    <option value="">-- Selected Supplier --</option>
-                                                    <?php foreach ($supplier->result() as $sp): ?>
-                                                        <option value="<?= $sp->PERSON_ID ?>" <?= set_value('supplier') ==  $sp->PERSON_ID ? 'selected' : null ?>>
-                                                            <?= strtoupper($sp->Supplier) . ' - [' . strtoupper($sp->Kode) . ']' ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="supplier" id="supplier"
+                                                    data-url="api/get_supplier"
+                                                    data-selected-id="<?= set_value('supplier', '') ?>"
+                                                    class="form-control select2 <?= form_error('supplier') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('supplier') ?></div>
@@ -111,26 +108,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($main_storage->result() as $ms) {
-                                                    if ($ms->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ms->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Main Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($main_storage->result() as $ms): ?>
-                                                        <option
-                                                            value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="main_storage" id="main_storage"
+                                                    data-url="api/get_gudang"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('main_storage', '') ?>"
+                                                    class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('main_storage') ?></div>
@@ -613,12 +596,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -786,7 +769,7 @@
                 }
             });
         });
-        $('#modalRSP').on('shown.bs.modal', function () {
+        $('#modalRSP').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 

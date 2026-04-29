@@ -148,7 +148,7 @@
                                                     <th>Kode Item</th>
                                                     <th>Stok</th>
                                                     <th>Satuan</th>
-                                                    <th>Price</th>
+                                                    <th>Harga</th>
                                                     <th>Nilai</th>
                                                 </tr>
                                             </thead>
@@ -261,16 +261,16 @@
                                             <thead>
                                                 <tr>
                                                     <th></th>
-                                                    <th><input type="date" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
-                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
+                                                    <th><input type="date" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="1"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="2"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="3"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="4"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="5"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="6"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="7"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="8"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="9"></th>
+                                                    <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;" data-col="10"></th>
                                                 </tr>
                                                 <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                                     <th>No</th>
@@ -354,10 +354,10 @@
             ]
         });
 
-        $('#table thead').on('keyup change', '.column_search', function() {
+        $('#table thead').on('keyup change', '.column_search', debounce(function() {
             let index = $(this).parent().index();
             table.column(index).search(this.value).draw();
-        });
+        }, 1500));
 
         $('#gudang, #check_gudang').change(function() {
             table.ajax.reload();
@@ -474,10 +474,10 @@
                 });
 
                 // SEARCH PER COLUMN
-                $('#table-summary thead').on('keyup change', '.column_search', function() {
+                $('#table-summary thead').on('keyup change', '.column_search', debounce(function() {
                     let index = $(this).parent().index();
                     tableSummary.column(index).search(this.value).draw();
-                });
+                }, 1500));
             }
         });
 
@@ -509,13 +509,22 @@
             } else {
                 resetSummary();
 
-                tableKartuStok
-                    .search('')
-                    .columns().search('');
-
                 tableKartuStok.ajax.reload(null, true); // reset paging
             }
         });
+
+        $('#table-kartu-stok thead').on('keyup change', '.column_search', debounce(function() {
+
+            let colIndex = $(this).data('col');
+            let value = this.value;
+
+            if (tableKartuStok) {
+                tableKartuStok
+                    .column(colIndex)
+                    .search(value)
+                    .draw();
+            }
+        }, 1500));
 
         $("#check_gudang_kartu_stok").change(function() {
             $("#gudang_kartu_stok").prop("disabled", this.checked);
@@ -635,5 +644,15 @@
     function isFilterValid() {
         let f = getFilter();
         return f.item && f.period;
+    }
+
+    function debounce(func, delay) {
+        let timer;
+        return function() {
+            let context = this,
+                args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(context, args), delay);
+        };
     }
 </script>

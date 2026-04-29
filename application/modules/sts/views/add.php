@@ -93,26 +93,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($main_storage->result() as $ms) {
-                                                    if ($ms->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ms->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Main Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($main_storage->result() as $ms): ?>
-                                                        <option
-                                                            value="<?= $ms->WAREHOUSE_ID ?>"
-                                                            <?= set_value('main_storage') ==  $ms->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ms->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ms->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="main_storage" id="main_storage"
+                                                    data-url="api/get_gudang"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('main_storage', '') ?>"
+                                                    class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('main_storage') ?></div>
@@ -124,26 +110,12 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-2-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($site_storage->result() as $ss) {
-                                                    if ($ss->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ss->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
-                                                <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
-                                                    <?php if (!$defaultValue): ?>
-                                                        <option value="">-- Selected Site Storage --</option>
-                                                    <?php endif; ?>
-                                                    <?php foreach ($site_storage->result() as $ss): ?>
-                                                        <option
-                                                            value="<?= $ss->WAREHOUSE_ID ?>"
-                                                            <?= set_value('site_storage') ==  $ss->WAREHOUSE_ID ? 'selected' : ($defaultValue == $ss->WAREHOUSE_ID ? 'selected' : '') ?>>
-                                                            <?= strtoupper($ss->WAREHOUSE_NAME) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <select name="site_storage" id="site_storage"
+                                                    data-url="api/get_site_storage"
+                                                    data-default="Y"
+                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
+                                                    data-selected-id="<?= set_value('site_storage', '') ?>"
+                                                    class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
                                             <div class="text-danger"><?= form_error('site_storage') ?></div>
@@ -617,12 +589,12 @@
         }
 
         //Initialize Select2 Elements
-        $('.select2').each(function() {
-            $(this).select2({
-                theme: 'bootstrap-5',
-                dropdownParent: $(this).parent(),
-            });
-        });
+        // $('.select2').each(function() {
+        //     $(this).select2({
+        //         theme: 'bootstrap-5',
+        //         dropdownParent: $(this).parent(),
+        //     });
+        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
@@ -787,7 +759,7 @@
                 }
             });
         });
-        $('#modalGRK').on('shown.bs.modal', function () {
+        $('#modalGRK').on('shown.bs.modal', function() {
             $(this).find('.dataTables_filter input').focus();
         });
 

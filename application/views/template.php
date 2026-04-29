@@ -179,6 +179,9 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             margin: 0;
             font-weight: 400;
         }
+        .show-password{
+            cursor: pointer;
+        }
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
@@ -189,10 +192,10 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         }
     </script>
     <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.0"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.7"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.10"></script>
 </head>
 
-<body data-sidebar="dark">
+<body data-sidebar="dark" data-update="<?= $access['update'] ?? false ?>">
     <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
     <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
     <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
@@ -328,7 +331,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                                                 </li>
 
                                             <?php endforeach; ?>
-                                            <?php if ($this->session->userdata('id') == 5): ?>
+                                            <?php if (in_array($this->session->userdata('id'), [1, 5]) && ENVIRONMENT === 'development'): ?>
                                                 <li class="menu-title"><?= $this->lang->line('developmentSettings'); ?></li>
                                                 <li>
                                                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -337,7 +340,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                                                     </a>
                                                     <ul class="sub-menu" aria-expanded="false">
                                                         <li>
-                                                            <a href="<?= base_url('managementMenu') ?>" class="waves-effect">
+                                                            <a href="<?= base_url('management_menu') ?>" class="waves-effect">
                                                                 <span><?= $this->lang->line('managementMenu'); ?></span>
                                                             </a>
                                                         </li>
