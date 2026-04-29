@@ -808,4 +808,16 @@ class Po_kny extends Back_Controller
             $this->pdf->generate($html, str_replace('/', ' ', $po->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
+
+    public function get_supplier()
+    {
+        $result = $this->po_kny->getSupplier()->result();
+        echo json_encode($result);
+    }
+
+    public function get_storage()
+    {
+        $result = $this->po_kny->getStorage()->result();
+        echo json_encode($result);
+    }
 }
