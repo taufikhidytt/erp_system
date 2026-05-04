@@ -160,7 +160,7 @@ class Item extends Back_Controller
                                         'ITEM_ID'           => $idItem,
                                         'UOM_CODE'          => $post['satuan_lain'][$i],
                                         'TO_QTY'            => floatval($post['konversi'][$i]),
-                                        'BASE_UOM_FLAG'     => $post['status_satuan_detail'][$i] == 'Y'?'Y':'N',
+                                        'BASE_UOM_FLAG'     => $post['status_satuan_detail'][$i] == 'Y' ? 'Y' : 'N',
                                         'CREATED_BY'        => $this->session->userdata('id'),
                                         'CREATED_DATE'      => date('Y-m-d H:i:s'),
                                         'LAST_UPDATE_BY'    => $this->session->userdata('id'),
@@ -263,7 +263,7 @@ class Item extends Back_Controller
                     $this->form_validation->set_rules("satuan_lain[$index]", 'Satuan Lain', 'callback_check_satuan_lain');
                 }
             }
-        
+
 
             if ($this->input->post('obsolete')) {
                 $this->form_validation->set_rules('new_product_name', 'New product name', 'trim|required');
@@ -318,7 +318,7 @@ class Item extends Back_Controller
 
                 $this->db->trans_begin();
                 $result = $this->item->update($post);
-                
+
                 //konversi satuan
                 $i_satuan_uom   = $this->input->post('id_satuan_uom_detail');
                 $i_satuan_lain  = $this->input->post('satuan_lain');
@@ -328,14 +328,14 @@ class Item extends Back_Controller
                 foreach ($i_satuan_lain as $i => $v) {
                     $idx        = (int) $i_satuan_uom[$i];
                     $konversi   = (float) $i_konversi[$i];
-                    if($v && $konversi>0){
+                    if ($v && $konversi > 0) {
                         $params = [
                             'ITEM_ID'   => (int) $post['id'],
                             'UOM_CODE'  => $v,
                             'TO_QTY'    => $konversi,
-                            'BASE_UOM_FLAG'     => $i_status_satuan_detail[$i] == 'Y'?'Y':'N',
+                            'BASE_UOM_FLAG'     => $i_status_satuan_detail[$i] == 'Y' ? 'Y' : 'N',
                         ];
-                        if($idx){
+                        if ($idx) {
                             $this->db->where('ITEM_UOM_ID', $idx);
                             $this->db->where('ITEM_ID', (int) $post['id']);
                             $this->db->update('item_uom', $params);
@@ -345,13 +345,13 @@ class Item extends Back_Controller
                                 $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
                                 redirect('item/detail/' . base64url_encode($idInput));
                             }
-                        }else{
+                        } else {
                             $arr_insert_konversi[] = $params;
                         }
                     }
                 }
-                if(count($arr_insert_konversi)>0){
-                    $this->db->insert_batch('item_uom',$arr_insert_konversi);
+                if (count($arr_insert_konversi) > 0) {
+                    $this->db->insert_batch('item_uom', $arr_insert_konversi);
                     $error = $this->db->error();
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
@@ -378,7 +378,7 @@ class Item extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                     redirect('item/detail/' . base64url_encode($idInput));
+                    redirect('item/detail/' . base64url_encode($idInput));
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data!');
@@ -458,22 +458,22 @@ class Item extends Back_Controller
 
     function check_satuan_lain($value)
     {
-        static $idx = 0; 
+        static $idx = 0;
 
         $input_konversi = $this->input->post('konversi');
         $konversi = (isset($input_konversi[$idx])) ? (float)$input_konversi[$idx] : 0;
-        
+
         $satuan = $value;
 
         if (!$satuan && $konversi > 0) {
             $this->form_validation->set_message('check_satuan_lain', 'Satuan harus dipilih.');
-            $idx++; 
+            $idx++;
             return FALSE;
-        } 
-        
+        }
+
         if ($satuan && $konversi <= 0) {
             $this->form_validation->set_message('check_satuan_lain', 'Qty harus lebih dari 0.');
-            $idx++; 
+            $idx++;
             return FALSE;
         }
 
@@ -590,7 +590,7 @@ class Item extends Back_Controller
                     } else if ($validate->num_rows() > 0) {
                         return sendWarning('Uom sudah tersedia!');
                     } else {
-                        if($post['status_satuan_detail'][$i] == 'Y'){
+                        if ($post['status_satuan_detail'][$i] == 'Y') {
                             $is_status = true;
                         }
                         $dataToInsert[] = [
@@ -610,9 +610,9 @@ class Item extends Back_Controller
         }
 
         if (!empty($dataToInsert)) {
-            if($is_status){
+            if ($is_status) {
                 $this->db->where('ITEM_ID', (int) $this->encrypt->decode($post['id_item']));
-                $this->db->update('item_uom',['BASE_UOM_FLAG' => 'N']);
+                $this->db->update('item_uom', ['BASE_UOM_FLAG' => 'N']);
             }
             $this->item->updateSatuanUomDetail($dataToInsert);
             echo json_encode(['status' => 'success']);
@@ -662,11 +662,10 @@ class Item extends Back_Controller
     {
         $uom = (string) $this->input->post('uom');
         $res = [];
-        if($uom){
+        if ($uom) {
             $res = $this->item->get_konversi_uom($uom);
         }
         echo json_encode($res);
-        
     }
 
     public function get_detail()
@@ -680,10 +679,10 @@ class Item extends Back_Controller
                     'a.UOM_CODE AS Satuan_lain,  a.TO_QTY AS Konversi,  a.BASE_UOM_FLAG AS `Default`',
                 ],
                 'where' => ['a.ITEM_ID' => $item_id],
-                'column_search' => ['a.UOM_CODE', 'a.TO_QTY','a.BASE_UOM_FLAG'],
-                'column_order'  => [null,'a.UOM_CODE', 'a.TO_QTY',null,'a.BASE_UOM_FLAG'],
+                'column_search' => ['a.UOM_CODE', 'a.TO_QTY', 'a.BASE_UOM_FLAG'],
+                'column_order'  => [null, 'a.UOM_CODE', 'a.TO_QTY', null, 'a.BASE_UOM_FLAG'],
             ];
-            echo json_encode($this->datatables->generate($params, function($row, $no) {
+            echo json_encode($this->datatables->generate($params, function ($row, $no) {
                 $uom        = $this->input->post('uom');
                 $konversi   = numb_format((float)$row->Konversi);
                 return [
