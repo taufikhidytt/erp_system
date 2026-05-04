@@ -12,7 +12,7 @@
                 <tr><td>&nbsp;</td><td class="info-dots"></td><td><?= $mrq->ADDRESS1 ?? '-' ?><?= '. '.$mrq->CITY ?? '-' ?></td></tr>
                 <tr><td>Storage</td><td class="info-dots">:</td><td><?= $mrq->WAREHOUSE_NAME ?? '-' ?></td></tr>
                 <tr><td>Item Finish Goods</td><td class="info-dots">:</td><td><?= $mrq->ITEM_NAME ?? '-' ?></td></tr>
-                <tr><td>Jumlah</td><td class="info-dots">:</td><td><?= ($mrq->ITEM_NAME && $mrq->ENTERED_QTY)? number_format($mrq->ENTERED_QTY,2,'.',',') : '-' ?></td></tr>
+                <tr><td>Jumlah</td><td class="info-dots">:</td><td><?= ($mrq->ITEM_NAME && $mrq->ENTERED_QTY)? numb_format($mrq->ENTERED_QTY) : '-' ?></td></tr>
                 <tr><td>Satuan</td><td class="info-dots">:</td><td><?= $mrq->ENTERED_UOM ?? '-' ?></td></tr>
             </table>
         </td>
@@ -59,7 +59,7 @@
                 <td><?=  $k+1 ?></td>
                 <td><?= $v->Reff_Trx ?></td>
                 <td><?= $v->Nama_Item ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Qty,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Qty) ?></td>
                 <td><?= $v->UoM ?></td>
                 <td><?= $v->Note ?></td>
             </tr>

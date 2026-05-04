@@ -50,10 +50,10 @@
             <tr>
                 <td><?=  $k+1 ?></td>
                 <td><?= $v->Item_Name ?></td>
-                <td style="text-align:right !important"><?= number_format($v->QTY,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->QTY) ?></td>
                 <td><?= $v->ENTERED_UOM ?></td>
-                <td style="text-align:right !important"><?= number_format($v->PRICE,2,'.',',') ?></td>
-                <td style="text-align:right !important"><?= number_format($v->TOTAL,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->PRICE) ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->TOTAL) ?></td>
                 <td><?= $v->NOTE ?></td>
             </tr>
         <?php } ?>
@@ -61,7 +61,7 @@
     <tfoot>
         <tr class="total-row">
             <td colspan="5" style="text-align:right !important">TOTAL</td>
-            <td colspan="2" style="text-align:right !important"><?= number_format($fpk->TOTAL_AMOUNT,2,'.',',') ?></td>
+            <td colspan="2" style="text-align:right !important"><?= numb_format($fpk->TOTAL_AMOUNT) ?></td>
         </tr>
     </tfoot>
 </table>

@@ -53,10 +53,10 @@
                 <td><?=  $k+1 ?></td>
                 <td><?= $v->No_FPK ?></td>
                 <td><?= $v->Nama_Item ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Qty,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Qty) ?></td>
                 <td><?= $v->UoM ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Harga,2,'.',',') ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Subtotal,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Harga) ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Subtotal) ?></td>
                 <td><?= $v->Sales ?></td>
                 <td><?= $v->Note ?></td>
             </tr>
@@ -65,7 +65,7 @@
     <tfoot>
         <tr class="total-row">
             <td colspan="6" align="center">TOTAL</td>
-            <td colspan="3" style="text-align:right !important"><?= number_format($grk->TOTAL_AMOUNT,2,'.',',') ?></td>
+            <td colspan="3" style="text-align:right !important"><?= numb_format($grk->TOTAL_AMOUNT) ?></td>
         </tr>
     </tfoot>
 </table>

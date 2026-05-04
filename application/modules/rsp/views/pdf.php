@@ -49,7 +49,7 @@
                 <td><?=  $k+1 ?></td>
                 <td><?= $v->No_Reff_1 ?></td>
                 <td><?= $v->Nama_Item ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Qty,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Qty) ?></td>
                 <td><?= $v->UoM ?></td>
                 <td><?= $v->Note ?></td>
             </tr>

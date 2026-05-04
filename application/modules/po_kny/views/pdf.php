@@ -68,11 +68,11 @@
                 <td><?=  $k+1 ?></td>
                 <td><?= $v->No_MR ?></td>
                 <td><?= $deskripsi?: $v->Nama_Item ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Qty,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Qty) ?></td>
                 <td><?= $v->UoM ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Harga,2,'.',',') ?></td>
-                <td style="text-align:right !important"><?= $diskon?number_format($diskon,2,'.',','):'-' ?></td>
-                <td style="text-align:right !important"><?= number_format($v->Total,2,'.',',') ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Harga) ?></td>
+                <td style="text-align:right !important"><?= $diskon?numb_format($diskon):'-' ?></td>
+                <td style="text-align:right !important"><?= numb_format($v->Total) ?></td>
                 <td><?= $v->Note ?></td>
             </tr>
         <?php } ?>
@@ -80,19 +80,19 @@
     <tfoot>
         <tr class="total-row">
             <td colspan="7" style="text-align:right !important">TOTAL</td>
-            <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_AMOUNT,2,'.',',') ?></td>
+            <td colspan="2" style="text-align:right !important"><?= numb_format($po->TOTAL_AMOUNT) ?></td>
         </tr>
         <tr class="total-row">
             <td colspan="7" style="text-align:right !important">Diskon</td>
-            <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_DISCOUNT,2,'.',',') ?></td>
+            <td colspan="2" style="text-align:right !important"><?= numb_format($po->TOTAL_DISCOUNT) ?></td>
         </tr>
         <tr class="total-row">
             <td colspan="7" style="text-align:right !important">PPN</td>
-            <td colspan="2" style="text-align:right !important"><?= number_format($po->PPN_AMOUNT,2,'.',',') ?></td>
+            <td colspan="2" style="text-align:right !important"><?= numb_format($po->PPN_AMOUNT) ?></td>
         </tr>
         <tr class="total-row">
             <td colspan="7" style="text-align:right !important">GRAND TOTAL</td>
-            <td colspan="2" style="text-align:right !important"><?= number_format($po->TOTAL_NET,2,'.',',') ?></td>
+            <td colspan="2" style="text-align:right !important"><?= numb_format($po->TOTAL_NET) ?></td>
         </tr>
     </tfoot>
 </table>
