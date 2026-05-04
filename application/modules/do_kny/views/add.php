@@ -748,8 +748,9 @@
         $("#btn-modalMrq").on("click", function() {
             resetModalItem();
             $('#loading').show();
-            var customer = $('#customer').val();
             var storage = $('#storage').val();
+            let customerVal = $("#customer").val() || '';
+            let customer = customerVal.includes('_') ? customerVal.split('_')[0] : customerVal;
 
             if (!customer) {
                 $('#loading').hide();
@@ -892,8 +893,9 @@
 
             if (!so_id) return; // Exit jika so_id tidak ada
 
-            var customer = $('#customer').val();
             var storage = $('#storage').val();
+            let customerVal = $("#customer").val() || '';
+            let customer = customerVal.includes('_') ? customerVal.split('_')[0] : customerVal;
 
             // Ambil flag dari row data
             var shouldCheckAllChildren = tr.data('shouldCheckAllChildren') || false;
@@ -1902,43 +1904,16 @@
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $customer = $('#customer');
-        let $storage = $('#storage');
+        let $customer = $("#customer");
+        let $storage = $("#storage");
 
         if (hasDetail) {
-            $customer.prop('disabled', true).trigger('change.select2');
-            $storage.prop('disabled', true).trigger('change.select2');
-
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#customer-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'customer-hidden',
-                    name: $customer.attr('name'),
-                    value: $customer.val()
-                }).appendTo('form');
-            } else {
-                $('#customer-hidden').val($customer.val());
-            }
-
-            if ($('#storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'storage-hidden',
-                    name: $storage.attr('name'),
-                    value: $storage.val()
-                }).appendTo('form');
-            } else {
-                $('#storage-hidden').val($storage.val());
-            }
+            $customer.prop("disabled", true).trigger("change.select2");
+            $storage.prop("disabled", true).trigger("change.select2");
         } else {
-            $customer.prop('disabled', false).trigger('change.select2');
-            $storage.prop('disabled', false).trigger('change.select2');
-            $('#customer-hidden').remove();
-            $('#storage-hidden').remove();
+            $customer.prop("disabled", false).trigger("change.select2");
+            $storage.prop("disabled", false).trigger("change.select2");
         }
-        $customer.trigger('change.select2');
-        $storage.trigger('change.select2');
     }
 
     function resetModalItem() {
@@ -2001,4 +1976,9 @@
             }
         });
     }
+
+    $("form").on("submit", function(e) {
+        $("#customer").prop("disabled", false);
+        $("#storage").prop("disabled", false);
+    });
 </script>

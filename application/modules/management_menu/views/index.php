@@ -1,7 +1,6 @@
 <style>
-    .dt-buttons .btn {
+    .dt-buttons .btn-primary {
         background-color: #0d6efd;
-        /* warna biru Bootstrap primary */
         border-color: #0d6efd;
         color: white;
     }
@@ -73,8 +72,25 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="2" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search" data-column="3" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
                                             <th style="min-width: 50px;">
-                                                <select class="column_search" data-column="3" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <select class="column_search" data-column="4" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
+                                            </th>
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="5" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
+                                            </th>
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="6" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                                     <option value="">All</option>
                                                     <option value="Y">✔</option>
                                                     <option value="N">✖</option>
@@ -84,9 +100,12 @@
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th>No</th>
+                                            <th>SEQ</th>
                                             <th>Menu Name</th>
                                             <th>Prompt</th>
                                             <th>Active Flag</th>
+                                            <th>Document No</th>
+                                            <th>PPN</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -108,19 +127,20 @@
     $(document).ready(function() {
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: [{
-                text: '<i class="ri ri-add-circle-fill"></i> Tambah',
-                className: 'btn btn-sm btn-primary d-none',
-                action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('management_menu/add') ?>";
-                }
-            }],
+            buttons: getButtons(<?= json_encode(button_actions(['insert',[
+                    'key'      => 'urutan',
+                    'redirect' => site_url('management_menu/sort'),
+                    'class'    => 'btn-success',
+                    'title'    => 'Urutan',
+                    'icon'     => 'ri-sort-asc',
+                    'needs_auth'=> true,
+                ],], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,
             "serverSide": true,
             "ordering": true,
-            "order": [],
+            "order": [[ 1, "asc" ]],
             "ajax": {
                 "url": "<?= site_url('management_menu/get_data'); ?>",
                 "type": "POST"
@@ -134,6 +154,11 @@
                     "className" : "text-center",
                 },
                 {
+                    "data": "seq",
+                    "width": "5%",
+                    "className" : "text-center",
+                },
+                {
                     "data": "name",
                 },
                 {
@@ -141,6 +166,16 @@
                 },
                 {
                     "data": "active_flag",
+                    "className" : "text-center",
+                    "width": "5%",
+                },
+                {
+                    "data": "document_no",
+                    "className" : "text-center",
+                    "width": "5%",
+                },
+                {
+                    "data": "ppn",
                     "className" : "text-center",
                     "width": "5%",
                 },

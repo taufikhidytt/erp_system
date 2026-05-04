@@ -1911,12 +1911,8 @@
 
         if (hasDetail) {
             $supplier.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $supplier.prop('disabled', true).trigger('change.select2');
-            } else {
-                $supplier.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $supplier.prop('disabled', false).trigger('change.select2');
         }
     }
 

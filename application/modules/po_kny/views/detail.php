@@ -1156,7 +1156,8 @@
             $("#checkAll").prop('checked', false);
             $('#loading').show();
             var storage = $('#storage').val();
-            var supplier = $('#supplier').val();
+            let supplierVal = $("#supplier").val() || '';
+            let supplier = supplierVal.includes('_') ? supplierVal.split('_')[0] : supplierVal;
 
             if (!storage) {
                 $('#loading').hide();
@@ -2464,14 +2465,9 @@
         if (hasDetail) {
             $supplier.prop('disabled', true).trigger('change.select2');
             $storage.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $supplier.prop('disabled', true).trigger('change.select2');
-                $storage.prop('disabled', true).trigger('change.select2');
-            } else {
-                $supplier.prop('disabled', false).trigger('change.select2');
-                $storage.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $supplier.prop('disabled', false).trigger('change.select2');
+            $storage.prop('disabled', false).trigger('change.select2');
         }
     }
 

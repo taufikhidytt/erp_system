@@ -36,6 +36,7 @@
                                             'class'    => 'btn-success',
                                             'title'    => 'Tetapkan Database',
                                             'icon'     => 'ri-database-2-line',
+                                            'needs_auth' => true
                                         ],
                                         'reload']) ?>
                                 </div>
@@ -938,5 +939,40 @@
         });
 
         HTMLFormElement.prototype.submit.call(this);
+    });
+
+    $(document).on("keyup", '#search-menu', function() {
+        var value = $(this).val().toLowerCase();
+        if (value === "") {
+            $('.accordion-item').show();
+            $('.menu-leaf').show();
+            return; 
+        }
+
+        $('.accordion-item').each(function() {
+            var $item = $(this);
+            var hasMatch = false;
+
+            $item.find('.menu-leaf').each(function() {
+                var text = $(this).find('.text-truncate').text().toLowerCase();
+                if (text.indexOf(value) > -1) {
+                    $(this).show();
+                    hasMatch = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            if (hasMatch) {
+                $item.show();
+                var $collapse = $item.find('.accordion-collapse');
+                if (!$collapse.hasClass('show')) {
+                    $collapse.addClass('show');
+                    $item.find('.accordion-button').removeClass('collapsed').attr('aria-expanded', 'true');
+                }
+            } else {
+                $item.hide();
+            }
+        });
     });
 </script>

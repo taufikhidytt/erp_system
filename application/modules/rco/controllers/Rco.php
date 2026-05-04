@@ -32,7 +32,7 @@ class Rco extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($rco->STATUS,$rco->WARNA_STATUS);
+            $row['status'] = badge_status($rco->STATUS, $rco->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rco/detail/' . base64url_encode($this->encrypt->encode($rco->TAG_ID))) . '">
                 ' . ($rco->No_Transaksi ? $rco->No_Transaksi : '-') . '
@@ -303,7 +303,7 @@ class Rco extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('rco');
+                        redirect('rco/add');
                     }
                 }
 
@@ -334,8 +334,8 @@ class Rco extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('rco');
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('rco/add');
                 }
 
                 // ======================
@@ -344,7 +344,7 @@ class Rco extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('rco');
+                    redirect('rco/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
@@ -602,12 +602,12 @@ class Rco extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.TAG_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'tag_detail_id' => base64url_encode($this->encrypt->encode($row->TAG_DETAIL_ID)),
@@ -699,16 +699,16 @@ class Rco extends Back_Controller
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
             $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
-            $d->link = site_url(strtolower($d->Erp_Menu_Name)."/detail/".base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            
+            $d->link = site_url(strtolower($d->Erp_Menu_Name) . "/detail/" . base64url_encode($this->encrypt->encode($d->HEADER_ID)));
         }
         echo json_encode($data);
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rco    = $this->rco->get_rco_detail($id)->row();
-        if($rco){
+        if ($rco) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'rco/pdf',
@@ -716,10 +716,10 @@ class Rco extends Back_Controller
                     'rco' => $rco,
                     'rco_detail' => $this->rco->get_detail_by_tag_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $rco->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $rco->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $rco->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $rco->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

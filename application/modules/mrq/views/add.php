@@ -822,8 +822,9 @@
             resetModalItem();
             $("#checkAll").prop('checked', false);
             $('#loading').show();
-            var ship_to = $('#ship_to').val();
             var storage = $('#storage').val();
+            let ship_toVal = $("#ship_to").val() || '';
+            let ship_to = ship_toVal.includes('_') ? ship_toVal.split('_')[0] : ship_toVal;
 
             if (!ship_to) {
                 $('#loading').hide();
@@ -1381,54 +1382,26 @@
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $storage = $('#storage');
+        let $storage = $("#storage");
 
         if (hasDetail) {
-            $storage.prop('disabled', true).trigger('change.select2');
-
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'storage-hidden',
-                    name: $storage.attr('name'),
-                    value: $storage.val()
-                }).appendTo('form');
-            } else {
-                $('#storage-hidden').val($storage.val());
-            }
+            $storage.prop("disabled", true).trigger("change.select2");
         } else {
-            $storage.prop('disabled', false).trigger('change.select2');
-            $('#storage-hidden').remove();
+            $storage.prop("disabled", false).trigger("change.select2");
         }
-        $storage.trigger('change.select2');
     }
 
     function toggleShipToDisabled() {
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $ship_to = $('#ship_to');
+        let $ship_to = $("#ship_to");
 
         if (hasDetail) {
-            $ship_to.prop('disabled', true).trigger('change.select2');
-
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#ship_to-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'ship_to-hidden',
-                    name: $ship_to.attr('name'),
-                    value: $ship_to.val()
-                }).appendTo('form');
-            } else {
-                $('#ship_to-hidden').val($ship_to.val());
-            }
+            $ship_to.prop("disabled", true).trigger("change.select2");
         } else {
-            $ship_to.prop('disabled', false).trigger('change.select2');
-            $('#ship_to-hidden').remove();
+            $ship_to.prop("disabled", false).trigger("change.select2");
         }
-        $ship_to.trigger('change.select2');
     }
 
     function resetModalItem() {
@@ -1541,6 +1514,11 @@
             });
         }
     }
+
+    $("form").on("submit", function(e) {
+        $("#ship_to").prop("disabled", false);
+        $("#storage").prop("disabled", false);
+    });
 </script>
 
 <?php $this->load->view('mrq/tab_material'); ?>

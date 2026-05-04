@@ -1747,14 +1747,9 @@
         if (hasDetail) {
             $main_storage.prop('disabled', true).trigger('change.select2');
             $site_storage.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $main_storage.prop('disabled', true).trigger('change.select2');
-                $site_storage.prop('disabled', true).trigger('change.select2');
-            } else {
-                $main_storage.prop('disabled', false).trigger('change.select2');
-                $site_storage.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $main_storage.prop('disabled', false).trigger('change.select2');
+            $site_storage.prop('disabled', false).trigger('change.select2');
         }
     }
 

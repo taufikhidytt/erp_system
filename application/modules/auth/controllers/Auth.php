@@ -144,7 +144,7 @@ class Auth extends MX_Controller
             foreach ($query->result() as $row) {
                 $db_encrypt = base64url_encode($this->encrypt->encode($row->DB_NAME));
                 $data[$db_encrypt] = [
-                    'name' => strtoupper($row->DB_NAME),
+                    'name' => strtoupper($row->DB_ALIAS?:$row->DB_NAME),
                     'default' => $row->PRIMARY_FLAG == 'Y' ? true : false
                 ];
             }
@@ -206,7 +206,8 @@ class Auth extends MX_Controller
                 'print_flag'    => $data->PRINT_FLAG,
                 'name_ub'       => $infoUB->NAME,
                 'logo'          => $infoUB->LOGO,
-                'logged_in'     => TRUE
+                'logged_in'     => TRUE,
+                'db_alias'      => $dataServer->DB_ALIAS?:$dataServer->DB_NAME
             ];
 
             $this->session->set_userdata($sessionUser);

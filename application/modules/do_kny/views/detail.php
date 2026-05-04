@@ -981,8 +981,9 @@
         $("#btn-modalMrq").on("click", function() {
             resetModalItem();
             $('#loading').show();
-            var customer = $('#customer').val();
             var storage = $('#storage').val();
+            let customerVal = $("#customer").val() || '';
+            let customer = customerVal.includes('_') ? customerVal.split('_')[0] : customerVal;
 
             if (!customer) {
                 $('#loading').hide();
@@ -1108,8 +1109,9 @@
 
             if (!so_id) return; // Exit jika so_id tidak ada
 
-            var customer = $('#customer').val();
             var storage = $('#storage').val();
+            let customerVal = $("#customer").val() || '';
+            let customer = customerVal.includes('_') ? customerVal.split('_')[0] : customerVal;
 
             // Ambil flag dari row data
             var shouldCheckAllChildren = tr.data('shouldCheckAllChildren') || false;
@@ -2379,14 +2381,9 @@
         if (hasDetail) {
             $customer.prop('disabled', true).trigger('change.select2');
             $storage.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $customer.prop('disabled', true).trigger('change.select2');
-                $storage.prop('disabled', true).trigger('change.select2');
-            } else {
-                $customer.prop('disabled', false).trigger('change.select2');
-                $customer.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $customer.prop('disabled', false).trigger('change.select2');
+            $customer.prop('disabled', false).trigger('change.select2');
         }
     }
 

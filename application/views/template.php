@@ -254,17 +254,27 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img class="rounded-circle header-profile-user" src="<?= base_url() ?>assets/upload/photo-profile/default.jpg"
                                 alt="Header Avatar">
-                            <span class="d-none d-xl-inline-block ms-1"><?= $this->session->userdata('nama'); ?></span>
+                            <div class="d-none d-xl-inline-block ms-1">
+                                <div style="display: grid;text-align: start;">
+                                    <span><?= $this->session->userdata('nama'); ?></span>
+                                    <span class="text-muted" style="font-size:x-small"><i class="mdi mdi-circle-medium circle-dot text-success me-1"></i><?= $this->session->userdata('db_alias'); ?></span>
+                                </div>
+                            </div>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <!-- item-->
+                            <div class="d-md-none d-sm-block bg-dark border rounded-2 me-2 ms-2 mb-1 px-2 py-1" style="display: grid;">
+                                <span class="text-light"><?= $this->session->userdata('nama'); ?></span>
+                                <span class="text-muted" style="font-size:x-small"><i class="mdi mdi-circle-medium circle-dot text-success me-1"></i><?= $this->session->userdata('db_alias'); ?></span>
+                            </div>
                             <a class="dropdown-item" href="<?= base_url('profile') ?>">
                                 <i class="ri-user-line align-middle me-1"></i> Profile
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-danger" href="<?= base_url('auth/logout') ?>">
-                                    <i class="ri-shut-down-line align-middle me-1 text-danger"></i> Keluar
-                                </a>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="<?= base_url('auth/logout') ?>">
+                                <i class="ri-shut-down-line align-middle me-1 text-danger"></i> Keluar
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -331,22 +341,6 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                                                 </li>
 
                                             <?php endforeach; ?>
-                                            <?php if (in_array($this->session->userdata('id'), [1, 5]) && ENVIRONMENT === 'development'): ?>
-                                                <li class="menu-title"><?= $this->lang->line('developmentSettings'); ?></li>
-                                                <li>
-                                                    <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                                        <i class="ri-code-box-line"></i>
-                                                        <span><?= $this->lang->line('developmentCode'); ?></span>
-                                                    </a>
-                                                    <ul class="sub-menu" aria-expanded="false">
-                                                        <li>
-                                                            <a href="<?= base_url('management_menu') ?>" class="waves-effect">
-                                                                <span><?= $this->lang->line('managementMenu'); ?></span>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                            <?php endif; ?>
                                         </ul>
                                     </div>
                                     <!-- Sidebar -->

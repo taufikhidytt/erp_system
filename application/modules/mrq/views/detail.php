@@ -1047,8 +1047,9 @@
 
             $("#checkAll").prop('checked', false);
             $('#loading').show();
-            var ship_to = $('#ship_to').val();
             var storage = $('#storage').val();
+            let ship_toVal = $("#ship_to").val() || '';
+            let ship_to = ship_toVal.includes('_') ? ship_toVal.split('_')[0] : ship_toVal;
 
             if (!ship_to) {
                 $('#loading').hide();
@@ -1959,12 +1960,8 @@
 
         if (hasDetail) {
             $storage.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $storage.prop('disabled', true).trigger('change.select2');
-            } else {
-                $storage.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $storage.prop('disabled', false).trigger('change.select2');
         }
     }
 
@@ -1976,12 +1973,8 @@
 
         if (hasDetail) {
             $ship_to.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $ship_to.prop('disabled', true).trigger('change.select2');
-            } else {
-                $ship_to.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $ship_to.prop('disabled', false).trigger('change.select2');
         }
     }
 

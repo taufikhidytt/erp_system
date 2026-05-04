@@ -32,7 +32,7 @@ class Rsp extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($rsp->STATUS,$rsp->WARNA_STATUS);
+            $row['status'] = badge_status($rsp->STATUS, $rsp->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rsp/detail/' . base64url_encode($this->encrypt->encode($rsp->TAG_PINJAM_ID))) . '">
                 ' . ($rsp->No_Transaksi ? $rsp->No_Transaksi : '-') . '
@@ -366,7 +366,7 @@ class Rsp extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('rsp');
+                        redirect('rsp/add');
                     }
                 }
 
@@ -397,8 +397,8 @@ class Rsp extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('rsp');
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('rsp/add');
                 }
 
                 // ======================
@@ -407,7 +407,7 @@ class Rsp extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('rsp');
+                    redirect('rsp/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
@@ -649,10 +649,11 @@ class Rsp extends Back_Controller
             ]));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rsp    = $this->rsp->get_rsp_detail($id)->row();
-        if($rsp){
+        if ($rsp) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'rsp/pdf',
@@ -660,10 +661,10 @@ class Rsp extends Back_Controller
                     'rsp' => $rsp,
                     'rsp_detail' => $this->rsp->get_detail_by_tag_pinjam_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $rsp->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $rsp->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $rsp->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $rsp->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

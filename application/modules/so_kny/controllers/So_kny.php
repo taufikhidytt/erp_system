@@ -369,6 +369,7 @@ class So_kny extends Back_Controller
                 date_default_timezone_set('Asia/Jakarta');
                 $post = $this->input->post();
                 $detail = isset($post['detail']) ? $post['detail'] : [];
+                $post['customer'] = explode('_', $post['customer'])[0];
 
                 if (empty($detail) || empty($detail['nama_item']) || count(array_filter($detail['nama_item'])) == 0) {
                     $this->session->set_flashdata('warning', 'Detail wajib diisi!');
@@ -586,6 +587,7 @@ class So_kny extends Back_Controller
                 $post   = $this->input->post();
                 $so_id   = $this->encrypt->decode($post['so_id']);
                 $detail = $post['detail'] ?? [];
+                $post['customer'] = explode('_', $post['customer'])[0];
 
                 if (!$so_id || empty($detail['nama_item'])) {
                     $this->session->set_flashdata('warning', 'Detail tidak boleh kosong dan wajib diisi!');

@@ -1239,27 +1239,15 @@
     }
 
     function toggleSupplierDisabled() {
+        if (!tableDetail) return;
+
         let hasDetail = tableDetail.rows().count() > 0;
         let $supplier = $('#supplier');
 
         if (hasDetail) {
             $supplier.prop('disabled', true).trigger('change.select2');
-
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#supplier-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'supplier-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
-                }).appendTo('form');
-            } else {
-                $('#supplier-hidden').val($supplier.val());
-            }
-
         } else {
             $supplier.prop('disabled', false).trigger('change.select2');
-            $('#supplier-hidden').remove();
         }
     }
 
@@ -1279,4 +1267,8 @@
             text.substring(0, limit) + '...' :
             text;
     }
+
+    $("form").on("submit", function(e) {
+        $("#supplier").prop("disabled", false);
+    });
 </script>

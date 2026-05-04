@@ -1180,41 +1180,18 @@
     }
 
     function toggleStorageDisabled() {
+        if (!tableDetail) return;
+
         let hasDetail = tableDetail.rows().count() > 0;
-        let $main_storage = $('#main_storage');
-        let $site_storage = $('#site_storage');
+        let $main_storage = $("#main_storage");
+        let $site_storage = $("#site_storage");
 
         if (hasDetail) {
-            $main_storage.prop('disabled', true).trigger('change.select2');
-            $site_storage.prop('disabled', true).trigger('change.select2');
-
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#main_storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'main_storage-hidden',
-                    name: $main_storage.attr('name'),
-                    value: $main_storage.val()
-                }).appendTo('form');
-            } else {
-                $('#main_storage-hidden').val($main_storage.val());
-            }
-
-            if ($('#site_storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'site_storage-hidden',
-                    name: $site_storage.attr('name'),
-                    value: $site_storage.val()
-                }).appendTo('form');
-            } else {
-                $('#site_storage-hidden').val($site_storage.val());
-            }
+            $main_storage.prop("disabled", true).trigger("change.select2");
+            $site_storage.prop("disabled", true).trigger("change.select2");
         } else {
-            $main_storage.prop('disabled', false).trigger('change.select2');
-            $site_storage.prop('disabled', false).trigger('change.select2');
-            $('#main_storage-hidden').remove();
-            $('#site_storage-hidden').remove();
+            $main_storage.prop("disabled", false).trigger("change.select2");
+            $site_storage.prop("disabled", false).trigger("change.select2");
         }
     }
 
@@ -1234,4 +1211,9 @@
             text.substring(0, limit) + '...' :
             text;
     }
+
+    $("form").on("submit", function(e) {
+        $("#main_storage").prop("disabled", false);
+        $("#site_storage").prop("disabled", false);
+    });
 </script>

@@ -289,6 +289,7 @@ class Do_kny extends Back_Controller
                 date_default_timezone_set('Asia/Jakarta');
                 $post = $this->input->post();
                 $detail = isset($post['detail']) ? $post['detail'] : [];
+                $post['customer'] = explode('_', $post['customer'])[0];
 
                 if (empty($detail) || empty($detail['nama_item']) || count(array_filter($detail['nama_item'])) == 0) {
                     $this->session->set_flashdata('warning', 'Detail wajib diisi!');
@@ -383,7 +384,7 @@ class Do_kny extends Back_Controller
                         $data['customer'] = $this->do_kny->get_customer();
                         $data['storage'] = $this->do_kny->get_storage();
                         $data['detail'] = $this->input->post('detail');
-                        $data['warning'] =  $error['message'];
+                        $data['warning'] = "Error DB: " . $error['message'];
                         $this->template->load('template', 'do_kny/add', $data);
                         return;
 
@@ -429,7 +430,7 @@ class Do_kny extends Back_Controller
                     $data['customer'] = $this->do_kny->get_customer();
                     $data['storage'] = $this->do_kny->get_storage();
                     $data['detail'] = $this->input->post('detail');
-                    $data['warning'] =  $error['message'];
+                    $data['warning'] = "Error DB: " . $error['message'];
                     $this->template->load('template', 'do_kny/add', $data);
                     return;
 
@@ -488,6 +489,7 @@ class Do_kny extends Back_Controller
                 $post   = $this->input->post();
                 $inventory_out_id   = $this->encrypt->decode($post['inventory_out_id']);
                 $detail = $post['detail'] ?? [];
+                $post['customer'] = explode('_', $post['customer'])[0];
 
                 if (!$inventory_out_id || empty($detail['nama_item'])) {
                     $this->session->set_flashdata('warning', 'Detail tidak boleh kosong dan wajib diisi!');

@@ -187,7 +187,7 @@ class Grk extends Back_Controller
         if ($data->num_rows() > 0) {
             $rows = $data->result();
             foreach ($rows as $row) {
-                $row->badge_status = badge_status($row->DISPLAY_NAME,$row->MENU_ICON);
+                $row->badge_status = badge_status($row->DISPLAY_NAME, $row->MENU_ICON);
             }
             $result = array(
                 'status' => 'sukses',
@@ -309,7 +309,7 @@ class Grk extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('grk');
+                        redirect('grk/add');
                     }
                 }
 
@@ -341,8 +341,8 @@ class Grk extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('grk');
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('grk/add');
                 }
 
                 // ======================
@@ -351,7 +351,7 @@ class Grk extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('grk');
+                    redirect('grk/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
@@ -593,12 +593,12 @@ class Grk extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.PO_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['b.PO_DETAIL_ID' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'po_detail_id' => base64url_encode($this->encrypt->encode($row->PO_DETAIL_ID)),
@@ -612,7 +612,8 @@ class Grk extends Back_Controller
         }));
     }
 
-    public function get_info_detail($detail_id){
+    public function get_info_detail($detail_id)
+    {
         $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
         $this->load->model('M_datatables', 'datatables');
 
@@ -722,21 +723,21 @@ class Grk extends Back_Controller
                 WHERE b.PO_DETAIL_ID = $detail_id
             ) AS table_union
         ";
-    
+
         $data = $this->db->query($query)->result();
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
             $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
-            $d->link = site_url(strtolower($d->Erp_Menu_Name)."/detail/".base64url_encode($this->encrypt->encode($d->HEADER_ID)));
-            
+            $d->link = site_url(strtolower($d->Erp_Menu_Name) . "/detail/" . base64url_encode($this->encrypt->encode($d->HEADER_ID)));
         }
         echo json_encode($data);
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $grk    = $this->grk->get_grk_detail($id)->row();
-        if($grk){
+        if ($grk) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'grk/pdf',
@@ -744,10 +745,10 @@ class Grk extends Back_Controller
                     'grk' => $grk,
                     'grk_detail' => $this->grk->get_detail_by_pr_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $grk->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $grk->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $grk->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $grk->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

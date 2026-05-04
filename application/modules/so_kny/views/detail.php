@@ -1240,7 +1240,8 @@
             $("#checkAll").prop('checked', false);
             $('#loading').show();
             var storage = $('#storage').val();
-            var customer = $('#customer').val();
+            let customerVal = $("#customer").val() || '';
+            let customer = customerVal.includes('_') ? customerVal.split('_')[0] : customerVal;
 
             if (!storage) {
                 $('#loading').hide();
@@ -2658,14 +2659,9 @@
         if (hasDetail) {
             $customer.prop('disabled', true).trigger('change.select2');
             $storage.prop('disabled', true).trigger('change.select2');
-
-            if (hasDetail) {
-                $customer.prop('disabled', true).trigger('change.select2');
-                $storage.prop('disabled', true).trigger('change.select2');
-            } else {
-                $customer.prop('disabled', false).trigger('change.select2');
-                $storage.prop('disabled', false).trigger('change.select2');
-            }
+        } else {
+            $customer.prop('disabled', false).trigger('change.select2');
+            $storage.prop('disabled', false).trigger('change.select2');
         }
     }
 

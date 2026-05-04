@@ -327,7 +327,7 @@ class Fpk extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('fpk');
+                        redirect('fpk/add');
                     }
                 }
 
@@ -362,8 +362,8 @@ class Fpk extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('fpk');
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('fpk/add');
                 }
 
                 // ======================
@@ -372,7 +372,7 @@ class Fpk extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('fpk');
+                    redirect('fpk/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');

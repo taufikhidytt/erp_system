@@ -31,7 +31,7 @@ class Sts extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($sts->STATUS,$sts->Warna_STATUS);
+            $row['status'] = badge_status($sts->STATUS, $sts->Warna_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('sts/detail/' . base64url_encode($this->encrypt->encode($sts->TAG_KONSI_ID))) . '">
                 ' . ($sts->No_Transaksi ? $sts->No_Transaksi : '-') . '
@@ -347,7 +347,7 @@ class Sts extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('sts');
+                        redirect('sts/add');
                     }
                 }
 
@@ -378,8 +378,8 @@ class Sts extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('sts');
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('sts/add');
                 }
 
                 // ======================
@@ -388,7 +388,7 @@ class Sts extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('sts');
+                    redirect('sts/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
@@ -651,12 +651,12 @@ class Sts extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.TAG_KONSI_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['b.TAG_KONSI_DETAIL_ID' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'tag_konsi_detail_id' => base64url_encode($this->encrypt->encode($row->TAG_KONSI_DETAIL_ID)),
@@ -670,7 +670,8 @@ class Sts extends Back_Controller
         }));
     }
 
-    public function get_info_detail($detail_id){
+    public function get_info_detail($detail_id)
+    {
         $detail_id = (int) $this->encrypt->decode(base64url_decode($detail_id));
         $this->load->model('M_datatables', 'datatables');
         $params = [
@@ -679,7 +680,7 @@ class Sts extends Back_Controller
                 'c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,
                     b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,a.TAG_ID',
                 ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
-                
+
             ],
             'joins' => [
                 ['tag_detail a', 'b.TAG_KONSI_DETAIL_ID = a.TAG_KONSI_DETAIL_ID', 'inner'],
@@ -688,13 +689,13 @@ class Sts extends Back_Controller
             ],
             'where' => ['b.TAG_KONSI_DETAIL_ID' => $detail_id],
             // 'order' => ['b.TAG_KONSI_DETAIL_ID' => 'asc'],
-            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
-            'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
-                'no_transaksi' => '<a href="'.site_url('rcv/detail/'.base64url_encode($this->encrypt->encode($row->TAG_ID))).'" target="_blank">'.$row->No_Transaksi.'</a>',
+                'no_transaksi' => '<a href="' . site_url('rcv/detail/' . base64url_encode($this->encrypt->encode($row->TAG_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
                 'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
@@ -703,10 +704,11 @@ class Sts extends Back_Controller
         }));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $sts    = $this->sts->get_sts_detail($id)->row();
-        if($sts){
+        if ($sts) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'sts/pdf',
@@ -714,10 +716,10 @@ class Sts extends Back_Controller
                     'sts' => $sts,
                     'sts_detail' => $this->sts->get_detail_by_pr_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $sts->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $sts->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $sts->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $sts->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }

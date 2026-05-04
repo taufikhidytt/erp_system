@@ -57,6 +57,10 @@ class User extends Back_Controller
     }
 
     public function add(){
+        // add dimatikan sementara karena penambahan user akan dilakukan pada menu yang berbeda
+        $this->session->set_flashdata('warning', 'Halaman tidak ditemukan');
+        redirect('user');die();
+
         try {
             
             // untuk fungsi validation callback HMVC
@@ -189,6 +193,7 @@ class User extends Back_Controller
                     $data['sales']      = $this->_sales($id);
                     $data['old_menu']   = $this->input->post('menu') ?: [];
                     $this->template->load('template', 'user/detail', $data);
+                    $this->session->unset_userdata('warning');
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
                     redirect('user');
@@ -374,6 +379,10 @@ class User extends Back_Controller
     }
 
     public function assign_db($id){
+        // assign_db dimatikan sementara karena assign_db user akan dilakukan pada menu yang berbeda
+        $this->session->set_flashdata('warning', 'Halaman tidak ditemukan');
+        redirect('user');die();
+
         try {
             if(!isset($this->access['assign_database']) || !$this->access['assign_database']){
                 $this->session->set_flashdata('warning', 'Anda tidak ada akses untuk menu ini, silahkan hubungi administrator untuk mendapatkan akses tersebut!');
@@ -400,6 +409,7 @@ class User extends Back_Controller
                     $data['data']       = $query->row();
                     $data['servers']    = $this->server->getServerWithUser($data['data']->ERP_USER_NAME)->result();
                     $this->template->load('template', 'user/assign_db', $data);
+                    $this->session->unset_userdata('warning');
                 } else {
                     $this->session->set_flashdata('warning', 'Data tidak ditemukan!');
                     redirect('user');

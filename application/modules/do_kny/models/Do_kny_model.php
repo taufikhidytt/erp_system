@@ -365,7 +365,7 @@ class Do_kny_model extends CI_Model
         $this->db
             ->select(
                 "a.POINT,
-                a.PERSON_ID as id,
+                CONCAT(a.PERSON_ID, '_', ps.PERSON_SITE_ID) as id,
                 a.PERSON_CODE,
                 CONCAT(a.PERSON_NAME, ' - [', a.PERSON_CODE, '] - ', ps.SITE_NAME) as text,
                 a.PERSON_NAME,

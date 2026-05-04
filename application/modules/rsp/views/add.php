@@ -1225,44 +1225,16 @@
         if (!tableDetail) return;
 
         let hasDetail = tableDetail.rows().count() > 0;
-        let $main_storage = $('#main_storage');
-        let $supplier = $('#supplier');
+        let $supplier = $("#supplier");
+        let $main_storage = $("#main_storage");
 
         if (hasDetail) {
-            $main_storage.prop('disabled', true).trigger('change.select2');
-            $supplier.prop('disabled', true).trigger('change.select2');
-
-            // Buat hidden input agar value tetap dikirim ke server
-            if ($('#main_storage-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'main_storage-hidden',
-                    name: $main_storage.attr('name'),
-                    value: $main_storage.val()
-                }).appendTo('form');
-            } else {
-                $('#main_storage-hidden').val($main_storage.val());
-            }
-
-            if ($('#supplier-hidden').length === 0) {
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'site_storage-hidden',
-                    name: $supplier.attr('name'),
-                    value: $supplier.val()
-                }).appendTo('form');
-            } else {
-                $('#supplier-hidden').val($supplier.val());
-            }
+            $supplier.prop("disabled", true).trigger("change.select2");
+            $main_storage.prop("disabled", true).trigger("change.select2");
         } else {
-            $main_storage.prop('disabled', false).trigger('change.select2');
-            $supplier.prop('disabled', false).trigger('change.select2');
-            $('#main_storage-hidden').remove();
-            $('#supplier-hidden').remove();
+            $supplier.prop("disabled", false).trigger("change.select2");
+            $main_storage.prop("disabled", false).trigger("change.select2");
         }
-
-        $main_storage.trigger('change.select2');
-        $supplier.trigger('change.select2');
     }
 
     function resetModalItem() {
@@ -1281,4 +1253,9 @@
             text.substring(0, limit) + '...' :
             text;
     }
+
+    $("form").on("submit", function(e) {
+        $("#supplier").prop("disabled", false);
+        $("#main_storage").prop("disabled", false);
+    });
 </script>

@@ -77,6 +77,7 @@ if ( ! function_exists('get_access'))
                 $access = [
                     'ERP_MENU_NAME' => $row['ERP_MENU_NAME'],
                     'PROMPT'        => $row['PROMPT'],
+                    'url'           => strtolower($row['ERP_MENU_NAME']),
                     'view'          => $row['VIEW_FLAG'] == 'Y',
                     'insert'        => $row['INSERT_FLAG'] == 'Y',
                     'update'        => $row['UPDATE_FLAG'] == 'Y',
@@ -228,9 +229,6 @@ if ( ! function_exists('button_actions'))
             // ── Mode 3: Fully custom (key tidak ada di template) ─────────────
             elseif (isset($item['key']))
             {
-                $hasAccess = $access[$key] ?? false;
-                if ( ! $hasAccess) continue;
-                
                 $btn = [
                     'icon'         => $item['icon']         ?? 'ri-checkbox-circle-fill',
                     'class'        => $item['class']        ?? 'btn-secondary',

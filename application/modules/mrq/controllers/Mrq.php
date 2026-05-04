@@ -381,6 +381,7 @@ class Mrq extends Back_Controller
                 date_default_timezone_set('Asia/Jakarta');
                 $post = $this->input->post();
                 $detail = isset($post['detail']) ? $post['detail'] : [];
+                $post['ship_to'] = explode('_', $post['ship_to'])[0];
 
                 if (empty($detail) || empty($detail['nama_item']) || count(array_filter($detail['nama_item'])) == 0) {
                     $this->session->set_flashdata('warning', 'Detail wajib diisi!');
@@ -569,6 +570,7 @@ class Mrq extends Back_Controller
                 $post   = $this->input->post();
                 $build_id   = $this->encrypt->decode($post['build_id']);
                 $detail = $post['detail'] ?? [];
+                $post['ship_to'] = explode('_', $post['ship_to'])[0];
 
                 if (!$build_id || empty($detail['nama_item'])) {
                     $this->session->set_flashdata('warning', 'Detail tidak boleh kosong dan wajib diisi!');
@@ -841,7 +843,8 @@ class Mrq extends Back_Controller
             'queries' => [
                 // Query 1: inventory_in_detail (PO Kny)
                 [
-                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, (a.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, 
+                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, 
+                        (a.INVOICE_ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, 
                         d.INVOICE_ID AS HEADER_ID, d.INVOICE_DETAIL_ID, "PO_Kny" AS Erp_Menu_Name',
                     'table'  => 'build_detail b',
                     'join'   => [

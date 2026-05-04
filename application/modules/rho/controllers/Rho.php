@@ -34,7 +34,7 @@ class Rho extends Back_Controller
             $no++;
             $row = array();
             $row['no'] = $no;
-            $row['status'] = badge_status($rho->STATUS,$rho->WARNA_STATUS);
+            $row['status'] = badge_status($rho->STATUS, $rho->WARNA_STATUS);
             $row['no_transaksi'] = '
             <a href="' . base_url('rho/detail/' . base64url_encode($this->encrypt->encode($rho->REQUEST_QTY_ID))) . '">
                 ' . ($rho->No_Transaksi ? $rho->No_Transaksi : '-') . '
@@ -290,7 +290,7 @@ class Rho extends Back_Controller
                     if ($error['code'] != 0) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
-                        redirect('rho');
+                        redirect('rho/add');
                     }
                 }
 
@@ -321,8 +321,8 @@ class Rho extends Back_Controller
                 $error = $this->db->error();
                 if ($error['code'] != 0) {
                     $this->db->trans_rollback();
-                    $this->session->set_flashdata('warning', $error['message']);
-                    redirect('rho');
+                    $this->session->set_flashdata('warning', "Error DB: " . $error['message']);
+                    redirect('rho/add');
                 }
 
                 // ======================
@@ -331,7 +331,7 @@ class Rho extends Back_Controller
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     $this->session->set_flashdata('warning', 'Gagal menyimpan data!');
-                    redirect('rho');
+                    redirect('rho/add');
                 } else {
                     $this->db->trans_commit();
                     $this->session->set_flashdata('success', 'Selamat anda berhasil menyimpan data dan detail baru!');
@@ -594,12 +594,12 @@ class Rho extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.REQUEST_QTY_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE','b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null,null,'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVER_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVER_QTY / b.BASE_QTY))'],
+            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVER_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVER_QTY / b.BASE_QTY))'],
             // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
         ];
 
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
                 'request_qty_detail_id' => base64url_encode($this->encrypt->encode($row->REQUEST_QTY_DETAIL_ID)),
@@ -623,7 +623,7 @@ class Rho extends Back_Controller
                 'c.DOCUMENT_NO No_Transaksi,c.DOCUMENT_DATE Tanggal,
                     b.ENTERED_UOM Satuan,w.WAREHOUSE_NAME S_Loc,a.TAG_ID',
                 ['(a.ENTERED_QTY * b.BASE_QTY) Jumlah', FALSE],
-                
+
             ],
             'joins' => [
                 ['tag_detail a', 'b.REQUEST_QTY_DETAIL_ID = a.REQUEST_QTY_DETAIL_ID', 'inner'],
@@ -632,13 +632,13 @@ class Rho extends Back_Controller
             ],
             'where' => ['b.REQUEST_QTY_DETAIL_ID' => $detail_id],
             // 'order' => ['b.REQUEST_QTY_DETAIL_ID' => 'asc'],
-            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
-            'column_order'  => [null,'c.DOCUMENT_NO', 'c.DOCUMENT_DATE','(a.ENTERED_QTY * b.BASE_QTY)','b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_search' => ['c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
+            'column_order'  => [null, 'c.DOCUMENT_NO', 'c.DOCUMENT_DATE', '(a.ENTERED_QTY * b.BASE_QTY)', 'b.ENTERED_UOM', 'w.WAREHOUSE_NAME'],
         ];
-        echo json_encode($this->datatables->generate($params, function($row, $no) {
+        echo json_encode($this->datatables->generate($params, function ($row, $no) {
             return [
                 'no' => $no,
-                'no_transaksi' => '<a href="'.site_url('rco/detail/'.base64url_encode($this->encrypt->encode($row->TAG_ID))).'" target="_blank">'.$row->No_Transaksi.'</a>',
+                'no_transaksi' => '<a href="' . site_url('rco/detail/' . base64url_encode($this->encrypt->encode($row->TAG_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
                 'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
@@ -647,10 +647,11 @@ class Rho extends Back_Controller
         }));
     }
 
-    public function print($id){
+    public function print($id)
+    {
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rho    = $this->rho->get_rho_detail($id)->row();
-        if($rho){
+        if ($rho) {
             $this->load->library('pdf');
             $data = [
                 'dir_view' => 'rho/pdf',
@@ -658,10 +659,10 @@ class Rho extends Back_Controller
                     'rho' => $rho,
                     'rho_detail' => $this->rho->get_detail_by_request_qty_id($id)->result()
                 ],
-                'title' => str_replace('/',' ', $rho->DOCUMENT_NO),
+                'title' => str_replace('/', ' ', $rho->DOCUMENT_NO),
             ];
             $html = $this->load->view('template_pdf', $data, true);
-            $this->pdf->generate($html, str_replace('/',' ', $rho->DOCUMENT_NO), 'A4', 'portrait');
+            $this->pdf->generate($html, str_replace('/', ' ', $rho->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
 }
