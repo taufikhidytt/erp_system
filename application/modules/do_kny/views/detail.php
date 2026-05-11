@@ -80,21 +80,11 @@
                                     <h5 style="width: 100px;" id="readonlyDoKnyId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('do_kny/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->INVENTORY_OUT_ID); ?>">
-                                        <i class="ri ri-delete-bin-5-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
-                                    <a href="<?= site_url('do_kny/print/' . base64url_encode($this->encrypt->encode($data->INVENTORY_OUT_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
-                                        <i class="ri ri-printer-fill"></i>
-                                    </a>
+                                    <?= button_actions(['insert','save',
+                                        ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->INVENTORY_OUT_ID)],
+                                        'reload',
+                                        ['key' => 'print_out', 'redirect' => site_url('do_kny/print/' . base64url_encode($this->encrypt->encode($data->INVENTORY_OUT_ID)))]
+                                    ]) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -346,9 +336,9 @@
                                                                     </td>
                                                                     <td class="ellipsis text-end">
                                                                         <span class="view-mode qty-view ellipsis align-middle">
-                                                                            <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
+                                                                            <?= numb_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.')); ?>
                                                                         </span>
-                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab jumlah" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-inventory_out_detail_id="<?= $this->encrypt->encode($dd->INVENTORY_OUT_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                        <input type="text" class="input-number form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab jumlah text-end" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-inventory_out_detail_id="<?= $this->encrypt->encode($dd->INVENTORY_OUT_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                                     </td>
                                                                     <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                         <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -534,20 +524,20 @@
                 if (response.data[0].ITEM_FLAG === 'N') {
                     $('#readonlyDoKnyId').show();
                     $('#readonlyDoKnyId').html('<span class="badge bg-secondary">READ ONLY</span>');
-                    $('#myForm')
+                    $('form')
                         .find('input, select, textarea, #removeRow, #btn-modalItem, td input')
                         .prop('disabled', true);
                     $('#table-info_wrapper').find('input,select').prop('disabled', false);
 
                     $('#table-detail td').css('pointer-events', 'none');
 
-                    $('#submit').replaceWith(
+                    $('form [type="submit"]').replaceWith(
                         `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-save-3-fill"></i>
                         </span>`
                     );
 
-                    $('#del-submit').replaceWith(
+                    $('.btn-delete').replaceWith(
                         `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
@@ -869,7 +859,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    <input type="text" class="input-number form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab text-end" name="detail[jumlah][]" value="${Number(jumlah)}" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -882,6 +872,7 @@
             });
             toggleStorageDisabled();
             tableDetail.draw(false);
+            $('.input-number').inputNumber();
         }
 
         //Initialize Select2 Elements
@@ -1713,7 +1704,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
 
                     `<span class="view-mode qty-view">${formatNumber(sisa)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(sisa)}" min="0" step="any" data-balance="${Number(sisa)}">`,
+                    <input type="text" class="input-number form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end" name="detail[jumlah][]" value="${Number(sisa)}" data-balance="${Number(sisa)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1760,6 +1751,8 @@
 
                 // Uncheck parent checkbox
                 $('.chkRow:checked').prop('checked', false);
+
+                $('.input-number').inputNumber();
             }
             $("#modalMrq").modal("hide");
         });
@@ -1863,8 +1856,8 @@
             });
         });
 
-        $(document).on('click', '#del-submit', function() {
-            let id = $(this).data('id_del');
+        $(document).on('click', '.btn-delete', function() {
+            let id = $(this).data('id');
 
             Swal.fire({
                 title: 'Yakin mau hapus?',
@@ -2364,11 +2357,12 @@
     }, true);
 
     function formatNumber(value, decimal = 2) {
-        if (value === "" || isNaN(value)) return "0.00";
-        return parseFloat(value).toLocaleString("en-US", {
-            minimumFractionDigits: decimal,
-            maximumFractionDigits: decimal
-        });
+        // if (value === "" || isNaN(value)) return "0.00";
+        // return parseFloat(value).toLocaleString("en-US", {
+        //     minimumFractionDigits: decimal,
+        //     maximumFractionDigits: decimal
+        // });
+        return $.inputNumber.format(value);
     }
 
     function toggleStorageDisabled() {
@@ -2456,5 +2450,9 @@
     $('form').on('submit', function(e) {
         $('#customer').prop('disabled', false);
         $('#storage').prop('disabled', false);
+
+        $.each($(document).find('[data-input-number], .input-number'), function(){
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>

@@ -62,15 +62,7 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
+                                    <?= button_actions(['insert','save','reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -283,6 +275,8 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
+        $('.input-number').inputNumber();
+
         tableDetail = $('#table-detail').DataTable({
             ordering: false,
             autoWidth: false,
@@ -579,7 +573,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end input-number" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -593,6 +587,7 @@
             });
             toggleStorageDisabled();
             tableDetail.draw(false);
+            $('.input-number').inputNumber();
         }
 
         //Initialize Select2 Elements
@@ -757,8 +752,8 @@
                                 item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                parseFloat(item.ENTERED_QTY).toFixed(2),
-                                parseFloat(item.BALANCE).toFixed(2),
+                                $.inputNumber.format(item.ENTERED_QTY),
+                                $.inputNumber.format(item.BALANCE),
                                 item.ENTERED_UOM,
                             ]);
                         });
@@ -881,7 +876,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end input-number" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -901,6 +896,7 @@
             if (rowsAdded) {
                 tableDetail.draw(false);
                 toggleStorageDisabled();
+                $('.input-number').inputNumber();
             }
             $("#modalRSP").modal("hide");
         });
@@ -1027,7 +1023,7 @@
             let val = $(this).val();
             if (val === '') return;
 
-            val = parseFloat(val);
+            val = parseFloat($.inputNumber.unformat(val));
             if (val < 1) {
                 $(this).val(1);
             }
@@ -1145,7 +1141,7 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
@@ -1154,7 +1150,7 @@
             Swal.fire({
                 icon: 'warning',
                 title: 'Jumlah melebihi balance',
-                text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(balance) + ')',
                 confirmButtonText: 'OK'
             }).then(() => {
                 input.value = balance;
@@ -1176,14 +1172,14 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
         const balance = parseFloat(input.dataset.balance);
 
         // Tidak boleh minus atau nol
-        if (input.value <= 0) {
+        if ($.inputNumber.unformat(input.value) <= 0) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Jumlah tidak valid',
@@ -1197,7 +1193,7 @@
             return;
         }
 
-        if (input.value === '') {
+        if ($.inputNumber.unformat(input.value) === '') {
             Swal.fire({
                 icon: 'warning',
                 title: 'Input kosong',
@@ -1214,11 +1210,7 @@
     }, true);
 
     function formatNumber(value, decimal = 2) {
-        if (value === "" || isNaN(value)) return "0.00";
-        return parseFloat(value).toLocaleString("en-US", {
-            minimumFractionDigits: decimal,
-            maximumFractionDigits: decimal
-        });
+        return $.inputNumber.format(value)
     }
 
     function toggleStorageDisabled() {
@@ -1257,5 +1249,9 @@
     $("form").on("submit", function(e) {
         $("#supplier").prop("disabled", false);
         $("#main_storage").prop("disabled", false);
+
+        $.each($(document).find('[data-input-number], .input-number'), function(){
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>

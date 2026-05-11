@@ -182,21 +182,83 @@ class M_union_datatables extends CI_Model {
             // Handle WHERE (string atau array)
             if (!empty($where)) {
                 if (is_string($where)) {
-                    // String WHERE
+                    // ── Kondisi 1: Raw string ──────────────────────────────
+                    // 'where' => 'b.STATUS = 1 AND b.DELETED_AT IS NULL'
                     $where_condition = $where;
+
                 } elseif (is_array($where)) {
-                    // Array WHERE - convert ke string
                     $where_parts = [];
+
                     foreach ($where as $col => $val) {
+
+                        // ── Kondisi 1: Numeric key = raw string ───────────
+                        // 'where' => ['COALESCE(b.ITEM_ID, 0) <> 0', 'b.STATUS IS NOT NULL']
                         if (is_int($col)) {
                             $where_parts[] = $val;
-                        } elseif (is_int($val) || is_float($val)) {
-                            $where_parts[] = "$col = " . $val;
+                            continue;
+                        }
+
+                        $col = trim($col);
+
+                        // ── Kondisi 4: Value NULL ──────────────────────────
+                        // 'b.DELETED_AT' => null  →  b.DELETED_AT IS NULL
+                        if (is_null($val)) {
+                            $where_parts[] = "$col IS NULL";
+                            continue;
+                        }
+
+                        // ── Kondisi 5 & 6: Value array → IN atau BETWEEN ──
+                        if (is_array($val)) {
+                            // ── Kondisi 6: BETWEEN ────────────────────────
+                            // 'b.CREATED_AT BETWEEN' => ['2024-01-01', '2024-12-31']
+                            if (stripos($col, 'BETWEEN') !== false) {
+                                $from = $this->db->escape($val[0]);
+                                $to   = $this->db->escape($val[1]);
+                                $where_parts[] = "$col $from AND $to";
+                            } else {
+                                // ── Kondisi 5: IN clause ──────────────────
+                                // 'b.STATUS' => [1, 2, 3]  →  b.STATUS IN (1, 2, 3)
+                                $escaped = array_map(function($v) {
+                                    return is_int($v) || is_float($v)
+                                        ? $v
+                                        : $this->db->escape($v);
+                                }, $val);
+                                $where_parts[] = "$col IN (" . implode(', ', $escaped) . ")";
+                            }
+                            continue;
+                        }
+
+                        // ── Deteksi operator di akhir key ─────────────────
+                        // Kondisi 3 : 'b.AMOUNT >='   => 1000
+                        // Kondisi 7 : 'b.NAME LIKE'   => '%john%'
+                        // Kondisi 8 : 'b.ID IN (...)' => $val  (raw subquery)
+                        $operators = ['>=', '<=', '<>', '!=', '>', '<', 'LIKE', 'NOT LIKE', '='];
+                        $matched_op = null;
+                        foreach ($operators as $op) {
+                            if (substr($col, -strlen($op)) === $op) {
+                                $matched_op = $op;
+                                break;
+                            }
+                        }
+
+                        if ($matched_op !== null) {
+                            // Key sudah mengandung operator, langsung pakai
+                            if (is_int($val) || is_float($val)) {
+                                $where_parts[] = "$col $val";
+                            } else {
+                                $where_parts[] = "$col " . $this->db->escape($val);
+                            }
                         } else {
-                            $val = $this->db->escape($val);
-                            $where_parts[] = "$col = " . $val;
+                            // ── Kondisi 2: Key-value biasa, tambah operator = ──
+                            // 'b.BUILD_ID' => $id
+                            if (is_int($val) || is_float($val)) {
+                                $where_parts[] = "$col = $val";
+                            } else {
+                                $where_parts[] = "$col = " . $this->db->escape($val);
+                            }
                         }
                     }
+
                     $where_condition = implode(' AND ', $where_parts);
                 }
             }

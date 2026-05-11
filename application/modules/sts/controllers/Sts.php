@@ -76,8 +76,8 @@ class Sts extends Back_Controller
                     "no"        => $no++,
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
-                    "qty"       => number_format((float)$d->Qty, 2, '.', ''),
-                    "sisa"       => number_format((float)$d->Sisa, 2, '.', ''),
+                    "qty"       => numb_format((float)$d->Qty),
+                    "sisa"       => numb_format((float)$d->Sisa),
                     "uom"       => $d->UoM,
                     "no_fpk"    => $d->No_FPK,
                     "note"      => $d->Note,
@@ -582,6 +582,7 @@ class Sts extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -663,9 +664,9 @@ class Sts extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'sts' => number_format((float)$row->STS, 2, '.', ','),
-                'rcv' => number_format((float)$row->RCV, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'sts' => numb_format((float)$row->STS),
+                'rcv' => numb_format((float)$row->RCV),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -698,7 +699,7 @@ class Sts extends Back_Controller
                 'no_transaksi' => '<a href="' . site_url('rcv/detail/' . base64url_encode($this->encrypt->encode($row->TAG_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
-                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                'jumlah' => numb_format((float)$row->Jumlah),
                 's_loc' => $row->S_Loc,
             ];
         }));
@@ -706,6 +707,7 @@ class Sts extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $sts    = $this->sts->get_sts_detail($id)->row();
         if ($sts) {

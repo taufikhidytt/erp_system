@@ -80,7 +80,7 @@ class User_model extends CI_Model
         $this->db->where('a.ACTIVE_FLAG', 'Y');
         $this->db->where('b.VIEW_FLAG', 'Y');
         $this->db->where('b.ERP_GROUP_ID',$group_id);
-        $this->db->order_by('a.SEQ');
+        $this->db->order_by('a.PARENT_ID, a.SEQ');
         return $this->db->get();
     }
 

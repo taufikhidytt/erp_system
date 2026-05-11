@@ -20,22 +20,24 @@
         white-space: nowrap;
     }
 
-    #table table th, #table table td {
+    #table table th,
+    #table table td {
         white-space: nowrap !important;
         width: 1px !important;
         padding-right: 6px !important;
         padding-left: 6px !important;
     }
 
-    #table table th:nth-child(2), 
-    #table table td:nth-child(2){
-        width: 200px !important; 
+    #table table th:nth-child(2),
+    #table table td:nth-child(2) {
+        width: 200px !important;
         white-space: normal !important;
     }
-    #table table th:nth-child(3), 
-    #table table td:nth-child(3){
-        width: 70px !important; 
-        max-width: 70px !important; 
+
+    #table table th:nth-child(3),
+    #table table td:nth-child(3) {
+        width: 70px !important;
+        max-width: 70px !important;
     }
 
     #table td {
@@ -146,13 +148,7 @@
     $(document).ready(function() {
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: [{
-                text: '<i class="ri ri-add-circle-fill"></i> Tambah',
-                className: 'btn btn-sm btn-primary',
-                action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('fpk/add') ?>";
-                }
-            }],
+            buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,
@@ -173,11 +169,11 @@
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "status",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "no_transaksi"
@@ -187,7 +183,7 @@
                 },
                 {
                     "data": "tanggal",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "supplier",
@@ -260,7 +256,7 @@
                     },
                     "columns": [{
                             "data": "no",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -273,7 +269,7 @@
                         },
                         {
                             "data": "item_code",
-                            className : "text-center text-nowrap",
+                            className: "text-center text-nowrap",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

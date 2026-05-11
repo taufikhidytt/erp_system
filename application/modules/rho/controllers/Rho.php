@@ -79,8 +79,8 @@ class Rho extends Back_Controller
                     "no"        => $no++,
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
-                    "jumlah"    => number_format((float)$d->Qty, 2, '.', ''),
-                    "sisa"      => number_format((float)$d->Sisa, 2, '.', ''),
+                    "jumlah"    => numb_format((float)$d->Qty),
+                    "sisa"      => numb_format((float)$d->Sisa),
                     "satuan"    => $d->UoM,
                     "no_rcv"    => $d->No_RCV,
                     "note"      => $d->Note,
@@ -525,6 +525,7 @@ class Rho extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -606,9 +607,9 @@ class Rho extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'rho' => number_format((float)$row->RHO, 2, '.', ','),
-                'rco' => number_format((float)$row->RCO, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'rho' => numb_format((float)$row->RHO),
+                'rco' => numb_format((float)$row->RCO),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -641,7 +642,7 @@ class Rho extends Back_Controller
                 'no_transaksi' => '<a href="' . site_url('rco/detail/' . base64url_encode($this->encrypt->encode($row->TAG_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
-                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                'jumlah' => numb_format((float)$row->Jumlah),
                 's_loc' => $row->S_Loc,
             ];
         }));
@@ -649,6 +650,7 @@ class Rho extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rho    = $this->rho->get_rho_detail($id)->row();
         if ($rho) {

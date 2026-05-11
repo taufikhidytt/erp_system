@@ -76,8 +76,8 @@ class Rcv extends Back_Controller
                     "no"        => $no++,
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
-                    "jumlah"    => number_format((float)$d->Qty, 2, '.', ''),
-                    "sisa"    => number_format((float)$d->Sisa, 2, '.', ''),
+                    "jumlah"    => numb_format((float)$d->Qty),
+                    "sisa"    => numb_format((float)$d->Sisa),
                     "satuan"    => $d->UoM,
                     "no_sjs"    => $d->No_SJS,
                     "note"      => $d->Note,
@@ -542,6 +542,7 @@ class Rcv extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -623,9 +624,9 @@ class Rcv extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'rcv' => number_format((float)$row->RCV, 2, '.', ','),
-                'rho_mr' => number_format((float)$row->RHO_MR, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'rcv' => numb_format((float)$row->RCV),
+                'rho_mr' => numb_format((float)$row->RHO_MR),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -683,7 +684,7 @@ class Rcv extends Back_Controller
         $data = $this->db->query($query)->result();
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
-            $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
+            $d->Jumlah = numb_format((float) $d->Jumlah);
             $d->link = site_url(strtolower($d->Erp_Menu_Name) . '/' . 'detail/' . base64url_encode($this->encrypt->encode($d->HEADER_ID)));
         }
         echo json_encode($data);
@@ -691,6 +692,7 @@ class Rcv extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rcv    = $this->rcv->get_rcv_detail($id)->row();
         if ($rcv) {

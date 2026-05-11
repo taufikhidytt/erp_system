@@ -82,21 +82,11 @@
                                     <h5 style="width: 100px;" id="readonlyMrqId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('mrq/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->BUILD_ID); ?>">
-                                        <i class="ri ri-delete-bin-5-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
-                                    <a href="<?= site_url('mrq/print/' . base64url_encode($this->encrypt->encode($data->BUILD_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
-                                        <i class="ri ri-printer-fill"></i>
-                                    </a>
+                                    <?= button_actions(['insert','save',
+                                        ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->BUILD_ID)],
+                                        'reload',
+                                        ['key' => 'print_out', 'redirect' => site_url('mrq/print/' . base64url_encode($this->encrypt->encode($data->BUILD_ID)))]
+                                    ]) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -185,7 +175,7 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-numbers-fill"></i>
                                                 </span>
-                                                <input type="number" name="jumlah" id="jumlah" class="form-control jumlah <?= form_error('jumlah') ? 'is-invalid' : null; ?>" min="1" placeholder="Enter Jumlah" value="<?= $this->input->post('jumlah') ?? rtrim(rtrim($data->ENTERED_QTY, '0'), '.'); ?>">
+                                                <input type="text" name="jumlah" id="jumlah" class="form-control jumlah input-number <?= form_error('jumlah') ? 'is-invalid' : null; ?>" placeholder="Enter Jumlah" value="<?= $this->input->post('jumlah') ?? rtrim(rtrim($data->ENTERED_QTY, '0'), '.'); ?>">
                                             </div>
                                             <div class="text-danger"><?= form_error('jumlah') ?></div>
                                         </div>
@@ -418,7 +408,7 @@
                                                                         <span class="view-mode qty-view ellipsis align-middle">
                                                                             <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab jumlah" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-build_detail_id="<?= $this->encrypt->encode($dd->BUILD_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                        <input type="text" class="form-control form-control-sm qty auto-width edit-mode qty-edit text-end input-number d-none enter-as-tab jumlah w-100" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-build_detail_id="<?= $this->encrypt->encode($dd->BUILD_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : number_format(rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.'), 2, '.', ',') ?>">
                                                                     </td>
                                                                     <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                         <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -565,6 +555,9 @@
     let tableItem;
     let tableInfo;
     $(document).ready(function() {
+        // Init inputNumber untuk field jumlah header
+        $('.input-number').inputNumber();
+
         let build_id = $('#build_id').val();
         $.ajax({
             url: '<?= base_url() ?>mrq/getStatus',
@@ -589,13 +582,13 @@
 
                     $('#table-detail td').css('pointer-events', 'none');
 
-                    $('#submit').replaceWith(
+                    $('#myForm button[type="submit"]').replaceWith(
                         `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-save-3-fill"></i>
                         </span>`
                     );
 
-                    $('#del-submit').replaceWith(
+                    $('#myForm .btn-delete').replaceWith(
                         `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
@@ -879,7 +872,7 @@
                     `
                     <input type="hidden" name="detail[build_detail_id][]" value="">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
                     <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
                     <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
                     <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
@@ -907,8 +900,8 @@
                     </span>
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
-                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    `<span class="view-mode qty-view">${$.inputNumber.format(jumlah)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode jumlah qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[jumlah][]" value="${$.inputNumber.format(jumlah)}" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -922,6 +915,7 @@
             toggleStorageDisabled();
             toggleShipToDisabled();
             tableDetail.draw(false);
+            $('#table-detail .input-number').inputNumber();
         }
 
 
@@ -1138,8 +1132,8 @@
                                 item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                parseFloat(item.ENTERED_QTY).toFixed(2),
-                                parseFloat(item.BALANCE).toFixed(2),
+                                $.inputNumber.format(item.ENTERED_QTY),
+                                $.inputNumber.format(item.BALANCE),
                                 item.ENTERED_UOM,
                             ]);
                         });
@@ -1225,7 +1219,7 @@
                     `
                     <input type="hidden" name="detail[build_detail_id][]" value="">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[base_qty][]" value="${base_qty}">
                     <input type="hidden" name="detail[unit_price][]" value="${unit_price}">
                     <input type="hidden" name="detail[subtotal][]" value="${subtotal}">
                     <input type="hidden" name="detail[warehouse_id][]" value="${warehouse_id}">
@@ -1253,8 +1247,8 @@
                     </span>
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
 
-                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode jumlah qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    `<span class="view-mode qty-view">${$.inputNumber.format(balance)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode jumlah qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[jumlah][]" value="${$.inputNumber.format(balance)}" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1276,6 +1270,7 @@
             if (rowsAdded) {
                 tableDetail.draw(false);
                 tableDetail.columns.adjust();
+                $('#table-detail .input-number').inputNumber();
                 toggleStorageDisabled();
                 toggleShipToDisabled();
             }
@@ -1306,7 +1301,8 @@
 
             let value = input.val();
             if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
-                span.text(formatNumber(value, 2));
+                let numVal = $.inputNumber.unformat(value);
+                span.text($.inputNumber.format(numVal));
             } else {
                 span.text(value === "" ? "0" : value);
             }
@@ -1317,27 +1313,15 @@
 
         $(document).on("input", ".qty, .harga-input", function() {
             let row = $(this).closest("tr");
-            let qty = parseFloat(row.find(".qty").val()) || 0;
-            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
+            let qty = $.inputNumber.unformat(row.find(".qty").val()) || 0;
+            let harga_input = $.inputNumber.unformat(row.find(".harga-input").val()) || 0;
 
-            let hargaInputDisplay = (harga_input === 0) ?
-                '0' :
-                harga_input.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
+            let hargaInputDisplay = $.inputNumber.format(harga_input);
             let subtotal = qty * harga_input;
+            let subTotalDisplay = $.inputNumber.format(subtotal);
 
-            let subTotalDisplay = (subtotal === 0) ?
-                '0' :
-                subtotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
-            row.find(".subtotal-text").text(subTotalDisplay.toLocaleString("en-US"));
+            row.find(".harga-input-b").text(hargaInputDisplay);
+            row.find(".subtotal-text").text(subTotalDisplay);
 
             row.find('input[name="detail[harga][]"]').val(harga_input);
             row.find('input[name="detail[subtotal][]"]').val(subtotal);
@@ -1423,7 +1407,7 @@
                 .val(toQty);
         });
 
-        $(document).on('keydown', '.qty, .jumlah, .harga-input', function(e) {
+        $(document).on('keydown', '.qty, .jumlah', function(e) {
             if (
                 e.key === 'e' || e.key === 'E' ||
                 e.key === '+' || e.key === '-'
@@ -1748,14 +1732,14 @@
         const build_detail_id = input.dataset.build_detail_id;
         const value_old = parseFloat(input.dataset.value_old);
         const balance = parseFloat(input.dataset.balance);
-        let value = parseFloat(input.value);
+        let value = $.inputNumber.unformat(input.value);
 
         const row = $(input).closest("tr");
 
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
@@ -1768,10 +1752,10 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah melebihi balance',
-                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(maxAllowed) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     updateSpan(value_old);
                 });
@@ -1783,10 +1767,10 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah melebihi balance',
-                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(balance) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     updateSpan(balance);
                 });
@@ -1808,24 +1792,25 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
         const balance = parseFloat(input.dataset.balance);
+        const value = $.inputNumber.unformat(input.value);
 
         if (build_detail_id) {
             // UPDATE
 
             // Tidak boleh minus atau nol
-            if (input.value <= 0) {
+            if (value <= 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah tidak valid',
                     text: 'Jumlah harus lebih dari 0',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     updateSpan(value_old);
                 });
@@ -1840,25 +1825,25 @@
                     text: 'Jumlah tidak boleh kosong',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     updateSpan(value_old);
                 });
                 return;
             }
-            updateSpan(balance);
+            updateSpan(value);
         } else {
             // ADD
 
             // Tidak boleh minus atau nol
-            if (input.value <= 0) {
+            if (value <= 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah tidak valid',
                     text: 'Jumlah harus lebih dari 0',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = input.dataset.balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     updateSpan(balance);
                 });
@@ -1873,18 +1858,18 @@
                     text: 'Jumlah tidak boleh kosong',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = input.dataset.balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     updateSpan(balance);
                 });
                 return;
             }
-            updateSpan(balance);
+            updateSpan(value);
         }
     }, true);
 
-    $(document).on('click', '#del-submit', function() {
-        let id = $(this).data('id_del');
+    $(document).on('click', '#myForm .btn-delete', function() {
+        let id = $(this).data('id');
 
         Swal.fire({
             title: 'Yakin mau hapus?',
@@ -1944,13 +1929,7 @@
         el.style.width = (el.value.length + 1) + 'ch';
     }
 
-    function formatNumber(value, decimal = 2) {
-        if (value === "" || isNaN(value)) return "0.00";
-        return parseFloat(value).toLocaleString("en-US", {
-            minimumFractionDigits: decimal,
-            maximumFractionDigits: decimal
-        });
-    }
+    // Format number ditangani oleh $.inputNumber.format() dan $.inputNumber.unformat()
 
     function toggleStorageDisabled() {
         if (!tableDetail) return;
@@ -2098,6 +2077,9 @@
     $('form').on('submit', function(e) {
         $('#ship_to').prop('disabled', false);
         $('#storage').prop('disabled', false);
+        $.each($(document).find('[data-input-number], .input-number'), function(){
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>
 <?php $this->load->view('mrq/tab_material'); ?>

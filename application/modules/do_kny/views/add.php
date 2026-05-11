@@ -62,15 +62,7 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
+                                    <?= button_actions(['insert','save','reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -635,7 +627,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
 
                     `<span class="view-mode qty-view">${formatNumber(sisa)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(sisa)}" min="0" step="any" data-balance="${Number(sisa)}">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab input-number text-end" name="detail[jumlah][]" value="${Number(sisa)}" data-balance="${Number(sisa)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -649,6 +641,8 @@
             });
             toggleStorageDisabled();
             tableDetail.draw(false);
+
+            $('[data-input-number], .input-number').inputNumber();
         }
 
         //Initialize Select2 Elements
@@ -1516,7 +1510,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
 
                     `<span class="view-mode qty-view">${formatNumber(sisa)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(sisa)}" min="0" step="any" data-balance="${Number(sisa)}">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab input-number text-end" name="detail[jumlah][]" value="${Number(sisa)}" data-balance="${Number(sisa)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1551,6 +1545,9 @@
 
                 // Reset global variable karena modal sudah ditutup
                 // Data sudah ada di table detail, akan di-load kembali saat modal dibuka
+
+                const last_tr = $('#table-detail tbody tr:last');
+                last_tr.find('[data-input-number], .input-number').inputNumber();
             }
             $("#modalMrq").modal("hide");
         });
@@ -1893,11 +1890,12 @@
     }, true);
 
     function formatNumber(value, decimal = 2) {
-        if (value === "" || isNaN(value)) return "0.00";
-        return parseFloat(value).toLocaleString("en-US", {
-            minimumFractionDigits: decimal,
-            maximumFractionDigits: decimal
-        });
+        // if (value === "" || isNaN(value)) return "0.00";
+        // return parseFloat(value).toLocaleString("en-US", {
+        //     minimumFractionDigits: decimal,
+        //     maximumFractionDigits: decimal
+        // });
+        return $.inputNumber.format(value)
     }
 
     function toggleStorageDisabled() {
@@ -1980,5 +1978,9 @@
     $("form").on("submit", function(e) {
         $("#customer").prop("disabled", false);
         $("#storage").prop("disabled", false);
+
+        $.each($(document).find('[data-input-number], .input-number'), function(){
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>

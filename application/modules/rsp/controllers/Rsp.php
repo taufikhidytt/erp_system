@@ -77,7 +77,7 @@ class Rsp extends Back_Controller
                     "no"            => $no++,
                     "nama_item"     => $d->Nama_Item,
                     "kode_item"     => $d->Kode_Item,
-                    "jumlah"        => number_format((float)$d->Qty, 2, '.', ''),
+                    "jumlah"        => numb_format((float)$d->Qty),
                     "satuan"        => $d->UoM,
                     "no_reff_1"     => $d->No_Reff_1,
                     "no_reff_2"     => $d->No_Reff_2,
@@ -596,6 +596,7 @@ class Rsp extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -651,6 +652,7 @@ class Rsp extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rsp    = $this->rsp->get_rsp_detail($id)->row();
         if ($rsp) {

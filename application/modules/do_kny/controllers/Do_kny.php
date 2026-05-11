@@ -78,7 +78,7 @@ class Do_kny extends Back_Controller
                     "no"            => $no++,
                     "nama_item"     => $d->Nama_Item ?? '-',
                     "kode_item"     => $d->Kode_Item ?? '-',
-                    "jumlah"        => number_format((float)$d->Qty, 2, '.', '') ?? '-',
+                    "jumlah"        => numb_format((float)$d->Qty) ?? '-',
                     "satuan"        => $d->UoM ?? '-',
                     "no_mr"         => $d->No_MR ?? '-',
                     "s_loc"         => $d->S_Loc ?? '-',
@@ -228,8 +228,8 @@ class Do_kny extends Back_Controller
                     "no_mr"         => $d->DOCUMENT_NO,
                     "kode_item"     => $d->ITEM_CODE,
                     "nama_item"     => $d->ITEM_DESCRIPTION,
-                    "jumlah"        => number_format((float)$d->ENTERED_QTY, 2, '.', ''),
-                    "sisa"          => number_format((float)$d->BALANCE, 2, '.', ''),
+                    "jumlah"        => numb_format((float)$d->ENTERED_QTY),
+                    "sisa"          => numb_format((float)$d->BALANCE),
                     "satuan"        => $d->ENTERED_UOM,
                     "note"          => $d->NOTE,
                     "memo"          => $d->DESKRIPSI,
@@ -647,6 +647,7 @@ class Do_kny extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -727,9 +728,9 @@ class Do_kny extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'do' => number_format((float)$row->DO, 2, '.', ','),
-                'inv' => number_format((float)$row->INV, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'do' => numb_format((float)$row->DO),
+                'inv' => numb_format((float)$row->INV),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -763,7 +764,7 @@ class Do_kny extends Back_Controller
                 'no_transaksi' => $row->No_Transaksi,
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
-                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                'jumlah' => numb_format((float)$row->Jumlah),
                 's_loc' => $row->S_Loc,
             ];
         }));
@@ -771,6 +772,8 @@ class Do_kny extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
+
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $do    = $this->do_kny->get_do_detail($id)->row();
         if ($do) {

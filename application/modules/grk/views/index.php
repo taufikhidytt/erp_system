@@ -28,7 +28,8 @@
     }
 
     /* mengatasi width table dalam table */
-    #table table th, #table table td {
+    #table table th,
+    #table table td {
         white-space: nowrap !important;
         width: 1px !important;
         padding-right: 6px !important;
@@ -130,13 +131,7 @@
     $(document).ready(function() {
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: [{
-                text: '<i class="ri ri-add-circle-fill"></i> Tambah',
-                className: 'btn btn-sm btn-primary',
-                action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('grk/add') ?>";
-                }
-            }],
+            buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,
@@ -157,11 +152,11 @@
                     "data": "no",
                     "orderable": false,
                     "searchable": false,
-                    className : "text-center"
+                    className: "text-center"
                 },
                 {
                     "data": "status",
-                    className : "text-center"
+                    className: "text-center"
                 },
                 {
                     "data": "no_transaksi"
@@ -171,7 +166,7 @@
                 },
                 {
                     "data": "tanggal",
-                    className : "text-center"
+                    className: "text-center"
                 },
                 {
                     "data": "supplier",
@@ -247,7 +242,7 @@
                         },
                         {
                             "data": "item_code",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

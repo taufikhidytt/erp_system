@@ -77,8 +77,8 @@ class Rco extends Back_Controller
                     "no"        => $no++,
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
-                    "jumlah"    => number_format((float)$d->Qty, 2, '.', ''),
-                    "sisa"      => number_format((float)$d->Sisa, 2, '.', ''),
+                    "jumlah"    => numb_format((float)$d->Qty),
+                    "sisa"      => numb_format((float)$d->Sisa),
                     "satuan"    => $d->UoM,
                     "no_rho"    => $d->No_RHO,
                     "note"      => $d->Note,
@@ -533,6 +533,7 @@ class Rco extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -614,9 +615,9 @@ class Rco extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'rco' => number_format((float)$row->RCO, 2, '.', ','),
-                'mr_sts_rsp' => number_format((float)$row->MR_STS_RSP, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'rco' => numb_format((float)$row->RCO),
+                'mr_sts_rsp' => numb_format((float)$row->MR_STS_RSP),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -698,7 +699,7 @@ class Rco extends Back_Controller
         $data = $this->db->query($query)->result();
         foreach ($data as $d) {
             $d->Tanggal = date('Y-m-d H:i', strtotime($d->Tanggal));
-            $d->Jumlah = number_format((float) $d->Jumlah, 2, '.', ',');
+            $d->Jumlah = numb_format((float) $d->Jumlah);
             $d->link = site_url(strtolower($d->Erp_Menu_Name) . "/detail/" . base64url_encode($this->encrypt->encode($d->HEADER_ID)));
         }
         echo json_encode($data);
@@ -706,6 +707,7 @@ class Rco extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $rco    = $this->rco->get_rco_detail($id)->row();
         if ($rco) {

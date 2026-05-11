@@ -122,13 +122,7 @@
     $(document).ready(function() {
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: [{
-                text: '<i class="ri ri-add-circle-fill"></i> Tambah',
-                className: 'btn btn-sm btn-primary',
-                action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('rcv/add') ?>";
-                }
-            }],
+            buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,
@@ -151,12 +145,12 @@
                     "orderable": false,
                     "searchable": false,
                     "width": "5%",
-                    "className" : "text-center"
+                    "className": "text-center"
                 },
                 {
                     "data": "status",
                     "width": "10%",
-                    "className" : "text-center"
+                    "className": "text-center"
                 },
                 {
                     "data": "no_transaksi",
@@ -169,7 +163,7 @@
                 {
                     "data": "tanggal",
                     "width": "10%",
-                    "className" : "text-center"
+                    "className": "text-center"
                 },
                 {
                     "data": "site",
@@ -236,7 +230,7 @@
                     },
                     "columns": [{
                             "data": "no",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -249,7 +243,7 @@
                         },
                         {
                             "data": "kode_item",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

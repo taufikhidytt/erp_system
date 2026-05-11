@@ -62,15 +62,7 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
+                                    <?= button_actions(['insert', 'save', 'reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -309,6 +301,8 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
+        $('.input-number').inputNumber();
+
         tableDetail = $('#table-detail').DataTable({
             ordering: false,
             autoWidth: false,
@@ -655,22 +649,22 @@
                     </span>
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
-                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${formatNumber(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    `<span class="view-mode qty-view">${$.inputNumber.format(jumlah)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[jumlah][]" value="${$.inputNumber.format(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
                     </span>
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
-                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}" step="any">`,
+                    `<span class="view-mode harga-view">${$.inputNumber.format(harga_input)}</span>
+                    <input type="text" class="form-control form-control-sm harga-input edit-mode harga-edit text-end input-number d-none enter-as-tab w-100" name="detail[harga_input][]" value="${$.inputNumber.format(harga_input)}" step="any">`,
 
-                    `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${unit_price}" step="any">`,
+                    `<span class="harga-input-b ellipsis">${$.inputNumber.format(unit_price)}</span>
+                    <input type="hidden" name="detail[harga][]" class="text-end input-number w-100" value="${$.inputNumber.format(unit_price)}" step="any">`,
 
-                    `<span class="subtotal ellipsis">${formatNumber(balance * harga_input)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}" step="any">`,
+                    `<span class="subtotal ellipsis">${$.inputNumber.format(balance * harga_input)}</span>
+                    <input type="hidden" name="detail[subtotal][]" class="text-end input-number w-100" value="${$.inputNumber.format(balance*harga_input)}" step="any">`,
 
                     `<span class="ellipsis" title="${nama_sales}">
                         ${ellipsis(nama_sales)}
@@ -689,6 +683,7 @@
             if (rowsAdded) {
                 toggleSupplierDisabled();
                 tableDetail.draw(false);
+                $('#table-detail .input-number').inputNumber();
             }
 
             hitungTotal();
@@ -836,11 +831,11 @@
                                 item.SALES,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                parseFloat(item.ENTERED_QTY).toFixed(2),
-                                parseFloat(item.BALANCE).toFixed(2),
+                                $.inputNumber.format(item.ENTERED_QTY),
+                                $.inputNumber.format(item.BALANCE),
                                 item.ENTERED_UOM,
-                                formatNumber(item.UNIT_PRICE),
-                                formatNumber(item.SUBTOTAL),
+                                $.inputNumber.format(item.UNIT_PRICE),
+                                $.inputNumber.format(item.SUBTOTAL),
                             ]);
                         });
                         tableItem.draw();
@@ -927,22 +922,22 @@
                     </span>
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
 
-                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    `<span class="view-mode qty-view">${$.inputNumber.format(balance)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
                     </span>
                     <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
 
-                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" name="detail[harga_input][]" value="${harga_input}" step="any">`,
+                    `<span class="view-mode harga-view">${$.inputNumber.format(harga_input)}</span>
+                    <input type="text" class="form-control form-control-sm harga-input edit-mode harga-edit text-end input-number d-none enter-as-tab w-100" name="detail[harga_input][]" value="${$.inputNumber.format(harga_input)}" step="any">`,
 
-                    `<span class="harga-input-b ellipsis">${formatNumber(unit_price)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${unit_price}">`,
+                    `<span class="harga-input-b ellipsis">${$.inputNumber.format(unit_price)}</span>
+                    <input type="hidden" name="detail[harga][]" class="text-end input-number w-100" value="${$.inputNumber.format(unit_price)}">`,
 
-                    `<span class="subtotal ellipsis">${formatNumber(balance * harga_input)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${balance*harga_input}">`,
+                    `<span class="subtotal ellipsis">${$.inputNumber.format(balance * harga_input)}</span>
+                    <input type="hidden" name="detail[subtotal][]" class="text-end input-number w-100" value="${$.inputNumber.format(balance*harga_input)}">`,
 
                     `<span class="ellipsis" title="${sales}">
                         ${ellipsis(sales)}
@@ -961,6 +956,7 @@
 
             if (rowsAdded) {
                 tableDetail.draw(false);
+                $('#table-detail .input-number').inputNumber();
                 toggleSupplierDisabled();
             }
             $("#modalFPK").modal("hide");
@@ -990,7 +986,13 @@
 
             let value = input.val();
             if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
-                span.text(formatNumber(value, 2));
+                let numVal = $.inputNumber.unformat(value ?? 0);
+
+                if (isNaN(numVal) || value === "" || value === null) {
+                    numVal = 0;
+                }
+
+                span.text($.inputNumber.format(numVal));
             } else {
                 span.text(value === "" ? "0" : value);
             }
@@ -1001,27 +1003,21 @@
 
         $(document).on("input", ".qty, .harga-input", function() {
             let row = $(this).closest("tr");
-            let qty = parseFloat(row.find(".qty").val()) || 0;
-            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
+            let qty = $.inputNumber.unformat(row.find(".qty").val() || 0);
+            let harga_input = $.inputNumber.unformat(row.find(".harga-input").val() || 0);
 
             let hargaInputDisplay = (harga_input === 0) ?
                 '0' :
-                harga_input.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                $.inputNumber.format(harga_input)
 
             let subtotal = qty * harga_input;
 
             let subTotalDisplay = (subtotal === 0) ?
                 '0' :
-                subtotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                $.inputNumber.format(subtotal);
 
-            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
-            row.find(".subtotal").text(subTotalDisplay.toLocaleString("en-US"));
+            row.find(".harga-input-b").text($.inputNumber.format(hargaInputDisplay));
+            row.find(".subtotal").text($.inputNumber.format(subTotalDisplay));
 
             row.find('input[name="detail[harga][]"]').val(harga_input);
             row.find('input[name="detail[subtotal][]"]').val(subtotal);
@@ -1230,14 +1226,14 @@
 
         const input = e.target;
         const balance = parseFloat(input.dataset.balance);
-        let value = parseFloat(input.value);
+        let value = $.inputNumber.unformat(input.value);
 
         const row = $(input).closest("tr");
 
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
@@ -1249,7 +1245,7 @@
                 text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
                 confirmButtonText: 'OK'
             }).then(() => {
-                input.value = balance;
+                input.value = $.inputNumber.format(balance);
                 input.focus();
                 updateSpan(balance);
                 hitungRow(row);
@@ -1270,21 +1266,22 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
-        const balance = parseFloat(input.dataset.balance);
+        const balance = $.inputNumber.format(input.dataset.balance);
+        const value = $.inputNumber.unformat(input.value);
 
         // Tidak boleh minus atau nol
-        if (input.value <= 0) {
+        if (value <= 0) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Jumlah tidak valid',
                 text: 'Jumlah harus lebih dari 0',
                 confirmButtonText: 'OK'
             }).then(() => {
-                input.value = input.dataset.balance;
+                input.value = $.inputNumber.format(balance);
                 input.focus();
                 updateSpan(balance);
                 hitungRow(row);
@@ -1299,7 +1296,7 @@
                 text: 'Jumlah tidak boleh kosong',
                 confirmButtonText: 'OK'
             }).then(() => {
-                input.value = input.dataset.balance;
+                input.value = $.inputNumber.format(balance);
                 input.focus();
                 updateSpan(balance);
                 hitungRow(row);
@@ -1394,5 +1391,8 @@
 
     $("form").on("submit", function(e) {
         $("#supplier").prop("disabled", false);
+        $.each($(document).find('[data-input-number], .input-number'), function() {
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>

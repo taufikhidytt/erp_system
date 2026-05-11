@@ -82,24 +82,14 @@
                                     <h5 style="width: 100px;" id="readonlyPR"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('fpk/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <span class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
-                                        <i class="ri  ri-close-circle-fill"></i>
-                                    </span>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->PR_ID); ?>">
-                                        <i class="ri ri-delete-bin-5-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
-                                    <a href="<?= site_url('fpk/print/' . base64url_encode($this->encrypt->encode($data->PR_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
-                                        <i class="ri ri-printer-fill"></i>
-                                    </a>
+                                    <?= button_actions([
+                                        'insert',
+                                        'save',
+                                        ['key' => 'close', 'data-id_close' => $this->encrypt->encode($data->PR_ID)],
+                                        ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->PR_ID)],
+                                        'reload',
+                                        ['key' => 'print_out', 'redirect' => site_url('fpk/print/' . base64url_encode($this->encrypt->encode($data->PR_ID)))]
+                                    ]) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -276,7 +266,7 @@
                                                                     </td>
                                                                     <td style="width: 8%" class="ellipsis text-end">
                                                                         <span class="view-mode qty-view ellipsis align-middle"><?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?></span>
-                                                                        <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" data-pr_detail_id="<?= $this->encrypt->encode($dd->PR_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" step="any">
+                                                                        <input type="text" class="form-control form-control-sm qty auto-width edit-mode qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[qty][]" data-pr_detail_id="<?= $this->encrypt->encode($dd->PR_DETAIL_ID) ?>" data-value_old="<?= rtrim(rtrim($dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : number_format(rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.'), 2, '.', ',') ?>" step="any">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis">
                                                                         <?php $data_uom_selected = $this->db->query("SELECT
@@ -321,17 +311,18 @@
                                                                         </select>
                                                                         <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]" value="">
                                                                     </td>
+                                                                    <?php
+                                                                    $hargaInputRaw = (float) str_replace(',', '', (string) ($dd->HARGA_INPUT ?? 0));
+                                                                    $hargaInputValue = $hargaInputRaw == 0 ? '0' : rtrim(rtrim(number_format($hargaInputRaw, 10, '.', ''), '0'), '.');
+                                                                    ?>
                                                                     <td style="width: 10%" class="ellipsis text-end">
                                                                         <span class="view-mode harga-view ellipsis">
-                                                                            <?php
-                                                                            $value = $postDetail['harga_input'][$i] ?? $dd->HARGA_INPUT ?? 0;
-                                                                            ?>
-                                                                            <?= number_format((float)$value, 2, '.', ','); ?>
+                                                                            <?= number_format($hargaInputRaw, 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="number"
-                                                                            class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab"
+                                                                        <input type="text"
+                                                                            class="form-control form-control-sm harga-input auto-width edit-mode harga-edit text-end input-number d-none enter-as-tab w-100"
                                                                             name="detail[harga_input][]" min="0" step="any"
-                                                                            value="<?= $postDetail['harga_input'][$i] ?? rtrim(rtrim($dd->HARGA_INPUT, '0'), '.') ?>">
+                                                                            value="<?= $hargaInputValue ?>">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis text-end">
                                                                         <span class="harga-input-b ellipsis">
@@ -340,7 +331,7 @@
                                                                             ?>
                                                                             <?= number_format((float)$value, 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="hidden" name="detail[harga][]" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
+                                                                        <input type="hidden" name="detail[harga][]" class="text-end input-number w-100" value="<?= $postDetail['harga'][$i] ?? rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis text-end">
                                                                         <span class="subtotal-text ellipsis">
@@ -349,7 +340,7 @@
                                                                             ?>
                                                                             <?= number_format((float)$value, 2, '.', ','); ?>
                                                                         </span>
-                                                                        <input type="hidden" name="detail[subtotal][]" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
+                                                                        <input type="hidden" name="detail[subtotal][]" class="text-end input-number w-100" value="<?= $postDetail['subtotal'][$i] ?? rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                                     </td>
                                                                     <td style="width: 10%" class="ellipsis text-end">
                                                                         <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
@@ -505,6 +496,7 @@
     let tableInfo;
 
     $(document).ready(function() {
+        $('.input-number').inputNumber();
         let pr_id = $('#pr_id').val();
         $.ajax({
             url: '<?= base_url() ?>fpk/getStatus',
@@ -527,34 +519,34 @@
                     $('#table-info_wrapper').find('input,select').prop('disabled', false);
                     $('#table-detail td').css('pointer-events', 'none');
 
-                    $('#submit').replaceWith(
+                    $('#myForm button[type="submit"]').replaceWith(
                         `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-save-3-fill"></i>
                         </span>`
                     );
 
-                    $('#del-submit').replaceWith(
+                    $('#myForm .btn-delete').replaceWith(
                         `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
                     );
 
-                    $('#btn-close-header').replaceWith(
-                        `<span class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                    $('#myForm .btn-close-header').replaceWith(
+                        `<span class="btn btn-dark btn-sm btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri  ri-close-circle-fill"></i>
                         </span>`
                     );
                 }
 
                 if (response.data[0].status_code === "NEW" || response.data[0].status_code === "PARTIAL") {
-                    $('#btn-close-header').replaceWith(
-                        `<button type="button" class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" data-id_close="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                    $('#myForm .btn-close-header').replaceWith(
+                        `<button type="button" class="btn btn-dark btn-sm btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" data-id_close="<?= $this->encrypt->encode($data->PR_ID); ?>">
                             <i class="ri  ri-close-circle-fill"></i>
                         </button>`
                     );
                 } else if (response.data[0].status_code === "CLOSE") {
-                    $('#btn-close-header').replaceWith(
-                        `<button type="button" class="btn btn-dark btn-sm" name="btn-close-header" id="btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" data-status="close_true" data-id_close="<?= $this->encrypt->encode($data->PR_ID); ?>">
+                    $('#myForm .btn-close-header').replaceWith(
+                        `<button type="button" class="btn btn-dark btn-sm btn-close-header" data-toggle="tooltip" data-placement="bottom" title="close" data-status="close_true" data-id_close="<?= $this->encrypt->encode($data->PR_ID); ?>">
                             <i class="ri  ri-close-circle-fill"></i>
                         </button>`
                     );
@@ -829,7 +821,6 @@
                 let harga = oldDetail.harga[i] ?? 0;
                 let subtotal = oldDetail.subtotal[i] ?? 0;
                 let keterangan = oldDetail.keterangan[i] ?? '';
-                console.log(hargaInput);
 
                 let rowNode = tableDetail.row.add([
                     nomor,
@@ -845,22 +836,22 @@
                     `<span class="ellipsis">${kode}</span>
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
-                    `<span class="view-mode qty-view ellipsis">${formatNumber(qty)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="${formatNumber(qty)}" step="any">`,
+                    `<span class="view-mode qty-view ellipsis">${$.inputNumber.format(qty)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[qty][]" value="${$.inputNumber.format(qty)}" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="${uom}" selected>${uom}</option>
                     </select>
-                    <input type="hidden" name="detail[to_qty][]" value="${to_qty}">`,
+                    <input type="hidden" name="detail[to_qty][]" value="${$.inputNumber.unformat(to_qty)}">`,
 
-                    `<span class="view-mode harga-view ellipsis">${formatNumber(hargaInput)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input auto-width edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${hargaInput}">`,
+                    `<span class="view-mode harga-view ellipsis">${$.inputNumber.format(hargaInput)}</span>
+                    <input type="text" class="form-control form-control-sm harga-input auto-width edit-mode harga-edit text-end input-number d-none enter-as-tab w-100" min="0" step="any" name="detail[harga_input][]" value="${$.inputNumber.format(hargaInput)}">`,
 
-                    `<span class="harga-input-b ellipsis">${formatNumber(harga)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
+                    `<span class="harga-input-b ellipsis">${$.inputNumber.format(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" class="text-end input-number w-100" value="${harga}">`,
 
-                    `<span class="subtotal-text ellipsis">${formatNumber(subtotal)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
+                    `<span class="subtotal-text ellipsis">${$.inputNumber.format(subtotal)}</span>
+                    <input type="hidden" class="text-end input-number w-100" name="detail[subtotal][]" value="${subtotal}">`,
 
                     `<textarea class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`
                 ]).node();
@@ -873,6 +864,7 @@
 
             tableDetail.draw(false);
             toggleSupplierDisabled();
+            $('#table-detail .input-number').inputNumber();
 
             hitungTotal();
         }
@@ -989,17 +981,13 @@
                                 return;
                             }
 
-                            var stok = parseFloat(item.STOK).toFixed(2);
-                            var price_buy = parseFloat(item.PRICE_BUY).toFixed(2);
-
                             var checkbox = `
                                 <input type="checkbox" class="chkRow"
                                     data-id_item="${item.ITEM_ID}"
                                     data-name="${item.ITEM_DESCRIPTION}"
                                     data-code="${item.ITEM_CODE}"
                                     data-uom="${item.UOM}"
-                                    data-price_buy="${price_buy}"
-                                    
+                                    data-price_buy="${item.PRICE_BUY}"
                                     >
                             `;
 
@@ -1011,9 +999,9 @@
                                 item.ASSY_CODE,
                                 item.CATEGORY,
                                 item.UOM,
-                                stok,
+                                $.inputNumber.format(item.STOK),
                                 item.BRAND,
-                                price_buy
+                                $.inputNumber.format(item.PRICE_BUY)
                             ]);
                         });
                         tableItem.draw();
@@ -1080,21 +1068,21 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
 
                     `<span class="view-mode qty-view ellipsis">1.00</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[qty][]" value="1" step="any">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[qty][]" value="${$.inputNumber.format('1')}" step="any">`,
 
                     `<select class="form-control form-control-sm uom-select border-0" name="detail[uom][]">
                         <option value="">Loading...</option>
                     </select>
                     <input type="hidden" class="form-control form-control-sm to-qty" name="detail[to_qty][]">`,
 
-                    `<span class="view-mode harga-view">${formatNumber(price_buy,2)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${price_buy}">`,
+                    `<span class="view-mode harga-view">${$.inputNumber.format(price_buy)}</span>
+                    <input type="text" class="form-control form-control-sm harga-input edit-mode harga-edit text-end input-number d-none enter-as-tab w-100" min="0" step="any" name="detail[harga_input][]" value="${$.inputNumber.format(price_buy)}">`,
 
-                    `<span class="harga-input-b">${formatNumber(price_buy,2)}</span>
-                    <input type="hidden" name="detail[harga][]"  value="${price_buy}">`,
+                    `<span class="harga-input-b">${$.inputNumber.format(price_buy)}</span>
+                    <input type="hidden" class="text-end input-number w-100" name="detail[harga][]"  value="${$.inputNumber.format(price_buy)}">`,
 
-                    `<span class="subtotal-text ellipsis">0.00</span>
-                    <input type="hidden" name="detail[subtotal][]">`,
+                    `<span class="subtotal-text ellipsis">${$.inputNumber.format('0.00')}</span>
+                    <input type="hidden" class="text-end input-number w-100" name="detail[subtotal][]">`,
 
                     `<textarea class="form-control form-control-sm auto-width border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`
                 ]).draw(false).node();
@@ -1114,6 +1102,7 @@
                 if (rowsAdded) {
                     tableDetail.draw(false);
                     tableDetail.columns.adjust().draw(false); // refresh layout
+                    $('#table-detail .input-number').inputNumber();
                     toggleSupplierDisabled();
                 }
 
@@ -1144,7 +1133,8 @@
 
             let value = input.val();
             if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
-                span.text(formatNumber(value, 2));
+                let numVal = $.inputNumber.unformat(value);
+                span.text($.inputNumber.format(value));
             } else {
                 span.text(value === "" ? "0" : value);
             }
@@ -1157,27 +1147,21 @@
 
         $(document).on("input", ".qty, .harga-input", function() {
             let row = $(this).closest("tr");
-            let qty = parseFloat(row.find(".qty").val()) || 0;
-            let harga_input = parseFloat(row.find(".harga-input").val()) || 0;
+            let qty = $.inputNumber.unformat(row.find(".qty").val()) || 0;
+            let harga_input = $.inputNumber.unformat(row.find(".harga-input").val()) || 0;
 
             let hargaInputDisplay = (harga_input === 0) ?
                 '0' :
-                harga_input.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                $.inputNumber.format(harga_input)
 
             let subtotal = qty * harga_input;
 
             let subTotalDisplay = (subtotal === 0) ?
                 '0' :
-                subtotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                $.inputNumber.format(subtotal);
 
-            row.find(".harga-input-b").text(hargaInputDisplay.toLocaleString("en-US"));
-            row.find(".subtotal-text").text(subTotalDisplay.toLocaleString("en-US"));
+            row.find(".harga-input-b").text(hargaInputDisplay);
+            row.find(".subtotal-text").text(subTotalDisplay);
 
             row.find('input[name="detail[harga][]"]').val(harga_input);
             row.find('input[name="detail[subtotal][]"]').val(subtotal);
@@ -1581,7 +1565,7 @@
         $('#modalKeteranganText').val('');
     });
 
-    // // jika jumlah kosong
+    // jika jumlah kosong
     document.addEventListener('blur', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
 
@@ -1592,26 +1576,28 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
         const balance = 1.00;
+        const value = $.inputNumber.unformat(input.value);
 
         if (pr_detail_id) {
             // UPDATE
 
             // Tidak boleh minus atau nol
-            if (input.value <= 0) {
+            if (value <= 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah tidak valid',
                     text: 'Jumlah harus lebih dari 0',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     updateSpan(value_old);
+                    hitungRow(row);
                 });
                 return;
             }
@@ -1624,26 +1610,30 @@
                     text: 'Jumlah tidak boleh kosong',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     updateSpan(value_old);
+                    hitungRow(row);
                 });
                 return;
             }
+            updateSpan(value);
+            hitungRow(row);
         } else {
             // ADD
 
             // Tidak boleh minus atau nol
-            if (input.value <= 0) {
+            if (value <= 0) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah tidak valid',
                     text: 'Jumlah harus lebih dari 0',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     updateSpan(balance);
+                    hitungRow(row);
                 });
                 return;
             }
@@ -1656,105 +1646,19 @@
                     text: 'Jumlah tidak boleh kosong',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     updateSpan(balance);
+                    hitungRow(row);
                 });
                 return;
             }
+            updateSpan(balance);
+            hitungRow(row);
         }
     }, true);
 
-    // // jika jumlah kosong
-    document.addEventListener('blur', function(e) {
-        if (!e.target.classList.contains('harga-input')) return;
-
-        const input = e.target;
-        const pr_detail_id = input.dataset.pr_detail_id;
-        const value_old = parseFloat(input.dataset.value_old);
-        const row = $(input).closest("tr");
-        const updateSpan = (val) => {
-            const span = input.closest('td').querySelector('.qty-view');
-            const inputField = input.closest('td').querySelector('.harga-input');
-            if (span) {
-                span.textContent = val.toFixed(2).replace(',', '.');
-            }
-
-            if (inputField) {
-                inputField.value = val;
-            }
-        }
-
-        const balance = 0.00;
-
-        if (pr_detail_id) {
-            // UPDATE
-
-            // Tidak boleh minus atau nol
-            if (input.value <= 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Jumlah tidak valid',
-                    text: 'Jumlah harus lebih dari 0',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    input.value = value_old;
-                    input.focus();
-                    updateSpan(value_old);
-                });
-                return;
-            }
-
-            // Tidak boleh kosong
-            if (input.value === '') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Input kosong',
-                    text: 'Jumlah tidak boleh kosong',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    input.value = value_old;
-                    input.focus();
-                    updateSpan(value_old);
-                });
-                return;
-            }
-        } else {
-            // ADD
-
-            // Tidak boleh minus atau nol
-            if (input.value <= 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Jumlah tidak valid',
-                    text: 'Jumlah harus lebih dari 0',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    input.value = balance;
-                    input.focus();
-                    updateSpan(balance);
-                });
-                return;
-            }
-
-            // Tidak boleh kosong
-            if (input.value === '') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Input kosong',
-                    text: 'Jumlah tidak boleh kosong',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    input.value = balance;
-                    input.focus();
-                    updateSpan(balance);
-                });
-                return;
-            }
-        }
-    }, true);
-
-    $(document).on('click', '#del-submit', function() {
+    $(document).on('click', '#myForm .btn-delete', function() {
         let id = $(this).data('id_del');
 
         Swal.fire({
@@ -1811,7 +1715,7 @@
         });
     });
 
-    $(document).on('click', '#btn-close-header', function() {
+    $(document).on('click', '.btn-close-header', function() {
         let id = $(this).data('id_close');
         let status = $(this).data('status');
 
@@ -1869,6 +1773,26 @@
             }
         });
     });
+
+    function hitungRow(row) {
+        let qty = $.inputNumber.unformat(row.find(".qty-edit").val()) || 0;
+        let harga = $.inputNumber.unformat(row.find(".harga-input").val()) || 0;
+
+        let subtotal = qty * harga;
+
+        row.find(".harga-input-b").text(
+            $.inputNumber.format(harga)
+        );
+
+        row.find(".subtotal-text").text(
+            $.inputNumber.format(subtotal)
+        );
+
+        row.find('input[name="detail[harga][]"]').val(harga);
+        row.find('input[name="detail[subtotal][]"]').val(subtotal);
+
+        hitungTotal();
+    }
 
     function hitungTotal() {
         let tableDetail = $('#table-detail').DataTable();
@@ -1980,5 +1904,8 @@
 
     $('form').on('submit', function(e) {
         $('#supplier').prop('disabled', false);
+        $.each($(document).find('[data-input-number], .input-number'), function() {
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>

@@ -185,10 +185,11 @@
         var cfg = $el.data('inputNumber.cfg');
         var val = $el.val();
         if (val !== '') {
-            // Nilai awal dari database selalu pakai format standar JS (titik sebagai desimal),
-            // sehingga parseFloat digunakan langsung, bukan _unformat dengan cfg separator.
-            var num = parseFloat(val);
-            if (!isNaN(num)) {
+            // Gunakan _unformat agar bisa handle nilai mentah (dari DB) maupun
+            // nilai yang sudah terformat (mis. "20,000.00"), sehingga init ulang
+            // tidak akan mem-truncate angka karena parseFloat berhenti di koma.
+            var num = _unformat(val, cfg.thousand, cfg.decimalSep);
+            if (num !== null && !isNaN(num)) {
                 $el.val(_format(num, cfg.decimal, cfg.thousand, cfg.decimalSep));
             }
         }

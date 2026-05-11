@@ -80,7 +80,7 @@ class Mrq extends Back_Controller
                     "no"            => $no++,
                     "nama_item"     => $d->Nama_Item,
                     "kode_item"     => $d->Kode_Item,
-                    "jumlah"        => number_format((float)$d->Qty, 2, '.', ''),
+                    "jumlah"        => numb_format((float)$d->Qty),
                     "satuan"        => $d->UoM,
                     "no_reff_trx"   => $d->Reff_Trx,
                     "note"          => $d->Note,
@@ -728,6 +728,7 @@ class Mrq extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -824,9 +825,9 @@ class Mrq extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'mr' => number_format((float)$row->MR, 2, '.', ','),
-                'po' => number_format((float)$row->{'PO/SO'}, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'mr' => numb_format((float)$row->MR),
+                'po' => numb_format((float)$row->{'PO/SO'}),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         });
         echo json_encode($result);
@@ -915,7 +916,7 @@ class Mrq extends Back_Controller
                 'no' => $no,
                 'no_transaksi' => '<a href="' . $link . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
-                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                'jumlah' => numb_format((float)$row->Jumlah),
                 'satuan' => $row->Satuan,
                 's_loc' => $row->{'S.Loc'},
             ];
@@ -926,6 +927,7 @@ class Mrq extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $mrq    = $this->mrq->get_mrq_detail($id)->row();
         if ($mrq) {
@@ -972,7 +974,7 @@ class Mrq extends Back_Controller
                 'nama_item' => $row->ITEM_DESCRIPTION,
                 'kode_item' => $row->ITEM_CODE,
                 'satuan' => $row->UOM_CODE,
-                'qty' => number_format((float)$row->ENTERED_QTY, 2, '.', ','),
+                'qty' => numb_format((float)$row->ENTERED_QTY),
                 'unit' => $row->UNIT,
                 'code' => $row->LOKASI,
                 'note' => $row->NOTE,
@@ -1007,7 +1009,7 @@ class Mrq extends Back_Controller
                 'nama_item' => $row->ITEM_DESCRIPTION,
                 'kode_item' => $row->ITEM_CODE,
                 'satuan' => $row->ENTERED_UOM,
-                'qty' => number_format((float)$row->ENTERED_QTY, 2, '.', ','),
+                'qty' => numb_format((float)$row->ENTERED_QTY),
                 'note' => $row->NOTE,
             ];
         }));

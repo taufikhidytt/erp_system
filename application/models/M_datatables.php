@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * DataTables Server-Side General Model — CodeIgniter 3
+ * DataTables Server-Side
  *
  * Mendukung:
  *  - SELECT biasa, ekspresi (raw), subquery
@@ -50,12 +50,25 @@ class M_datatables extends CI_Model {
         }
 
         // ── WHERE (array key=>val) ───────────────────────────
+        // Kondisi 2: key-value biasa → operator "="
+        //   'where' => ['b.STATUS' => 1, 'b.TYPE' => 'A']
+        //   → b.STATUS = 1 AND b.TYPE = 'A'
+        //
+        // Kondisi 3: key sudah mengandung operator
+        //   'where' => ['b.AMOUNT >=' => 1000, 'b.STOCK <' => 10, 'b.QTY <>' => 0]
+        //   → b.AMOUNT >= 1000 AND b.STOCK < 10 AND b.QTY <> 0
+        //
+        // Kondisi 4: value NULL → IS NULL
+        //   'where' => ['b.DELETED_AT' => null]
+        //   → b.DELETED_AT IS NULL
         if (!empty($p['where'])) {
             $this->db->where($p['where']);
         }
 
         // ── WHERE IN ─────────────────────────────────────────
-        // Format: ['col' => [val1, val2], ...]
+        // Kondisi 5: value array → IN clause
+        //   'where_in' => ['b.STATUS' => [1, 2, 3], 'b.TYPE' => ['A', 'B']]
+        //   → b.STATUS IN (1, 2, 3) AND b.TYPE IN ('A', 'B')
         if (!empty($p['where_in'])) {
             foreach ($p['where_in'] as $col => $vals) {
                 $this->db->where_in($col, (array) $vals);
@@ -63,9 +76,21 @@ class M_datatables extends CI_Model {
         }
 
         // ── WHERE custom string (raw) ─────────────────────────
-        // Format: string | array of string
-        // Contoh: 'DATE(created_at) = CURDATE()'
-        // Contoh: ['a.status = 1', 'b.deleted = 0']
+        // Kondisi 1: raw string (ekspresi bebas, tidak di-escape)
+        //   'where_raw' => 'COALESCE(b.ITEM_ID, 0) <> 0'
+        //   'where_raw' => ['b.STATUS IS NOT NULL', 'b.DELETED_AT IS NULL']
+        //
+        // Kondisi 6: BETWEEN
+        //   'where_raw' => 'b.CREATED_AT BETWEEN "2024-01-01" AND "2024-12-31"'
+        //
+        // Kondisi 7: LIKE (custom)
+        //   'where_raw' => 'b.NAME LIKE "%john%"'
+        //   * untuk search DataTables gunakan column_search
+        //
+        // Kondisi 8: subquery
+        //   'where_raw' => 'b.ID IN (SELECT ID FROM other_table WHERE x = 1)'
+        //
+        // ⚠️  Nilai tidak di-escape otomatis — pastikan aman dari SQL injection
         if (!empty($p['where_raw'])) {
             $raws = is_array($p['where_raw']) ? $p['where_raw'] : [$p['where_raw']];
             foreach ($raws as $raw) {
@@ -93,15 +118,26 @@ class M_datatables extends CI_Model {
         }
 
         // ── SEARCH (dari DataTables input) ───────────────────
-        $search = trim($this->input->post('search')['value'] ?? '');
-        if ($search !== '' && !empty($p['column_search'])) {
-            $this->db->group_start();
-            foreach ($p['column_search'] as $i => $col) {
-                $i === 0
-                    ? $this->db->like($col, $search)
-                    : $this->db->or_like($col, $search);
+        $i = 0;
+        $global_search_value = $this->input->post('search')['value'] ?? '';
+        if (!empty($p['column_search'])) {
+            foreach ($p['column_search'] as $item) {
+                $global_search_value = $this->input->post('search')['value'] ?? '';
+                $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
+
+                if ($column_search_value != '') {
+                    $this->db->like($item, $column_search_value);
+                } elseif ($global_search_value != '') {
+                    if ($i === 0) {
+                        $this->db->group_start();
+                        $this->db->like($item, $global_search_value);
+                    } else {
+                        $this->db->or_like($item, $global_search_value);
+                    }
+                    if (count($p['column_search']) - 1 == $i) $this->db->group_end();
+                }
+                $i++;
             }
-            $this->db->group_end();
         }
 
         // ── ORDER (dari DataTables input / default) ──────────

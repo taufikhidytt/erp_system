@@ -191,8 +191,8 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             url: '<?= site_url() ?>'
         }
     </script>
-    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.0"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.10"></script>
+    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.1"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.11"></script>
 </head>
 
 <body data-sidebar="dark" data-update="<?= $access['update'] ?? false ?>">
@@ -426,6 +426,9 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
     <script src="<?= base_url() ?>assets/admin/js/app.js"></script>
 
     <script>
+        $.extend(true, $.fn.dataTable.defaults, {
+            "keys": true,
+        });
         $(document).ready(function() {
             $('#loading').hide();
 

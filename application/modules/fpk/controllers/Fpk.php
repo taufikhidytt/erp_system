@@ -42,7 +42,7 @@ class Fpk extends Back_Controller
             $row['supplier'] = $fpk->Supplier ? $fpk->Supplier : '-';
             $row['sales'] = $fpk->Sales ? $fpk->Sales : '-';
             $row['gudang'] = $fpk->Gudang ? $fpk->Gudang : '-';
-            $row['total'] = $fpk->Total ? number_format($fpk->Total, 2, '.', ',') : '-';
+            $row['total'] = $fpk->Total ? numb_format($fpk->Total) : '-';
 
             $row['pr_id'] = $this->encrypt->encode($fpk->PR_ID);
             $data[] = $row;
@@ -80,10 +80,10 @@ class Fpk extends Back_Controller
                     "item"      => $d->Item_Name,
                     "item_code" => $d->ITEM_CODE,
                     "entered_uom" => $d->ENTERED_UOM,
-                    "qty"       => number_format((float)$d->QTY, 2, '.', ''),
-                    "sisa"       => number_format((float)$d->Sisa, 2, '.', ''),
-                    "price"     => number_format($d->PRICE, 2, '.', ','),
-                    "total"     => number_format($d->TOTAL, 2, '.', ','),
+                    "qty"       => numb_format((float)$d->QTY),
+                    "sisa"       => numb_format((float)$d->Sisa),
+                    "price"     => numb_format($d->PRICE),
+                    "total"     => numb_format($d->TOTAL),
                     "note"      => $d->NOTE,
                 ];
             }
@@ -597,6 +597,7 @@ class Fpk extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
         $this->db->query("CALL SET_VAR()");
         $this->db->close();
@@ -691,9 +692,9 @@ class Fpk extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'fpk' => number_format((float)$row->FPK, 2, '.', ','),
-                'grk' => number_format((float)$row->GRK, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'fpk' => numb_format((float)$row->FPK),
+                'grk' => numb_format((float)$row->GRK),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -725,7 +726,7 @@ class Fpk extends Back_Controller
                 'no_transaksi' => '<a href="' . site_url('grk/detail/' . base64url_encode($this->encrypt->encode($row->PO_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
-                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                'jumlah' => numb_format((float)$row->Jumlah),
                 's_loc' => $row->S_Loc,
             ];
         }));
@@ -733,6 +734,7 @@ class Fpk extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $fpk    = $this->fpk->get_fpk_detail($id)->row();
         if ($fpk) {

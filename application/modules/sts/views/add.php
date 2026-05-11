@@ -62,15 +62,7 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <button type="button" class="btn btn-primary btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </button>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
+                                    <?= button_actions(['insert', 'save', 'reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -285,6 +277,8 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
+        $('.input-number').inputNumber();
+
         tableDetail = $('#table-detail').DataTable({
             ordering: false,
             autoWidth: false,
@@ -563,8 +557,8 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode}">
                     `,
 
-                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="1" step="any" data-balance="${Number(balance)}">`,
+                    `<span class="view-mode qty-view">${$.inputNumber.format(jumlah)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit text-end input-number d-none enter-as-tab w-100" name="detail[jumlah][]" value="${$.inputNumber.unformat(jumlah)}" min="1" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -577,14 +571,11 @@
 
                 $(rowNode).addClass('tr-height-30');
 
-                rowsAdded = true;
-
             });
 
-            if (rowsAdded) {
-                tableDetail.draw(false);
-                toggleStorageDisabled();
-            }
+            tableDetail.draw(false);
+            toggleStorageDisabled();
+            $('#table-detail .input-number').inputNumber();
 
         }
 
@@ -747,8 +738,8 @@
                                 item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                parseFloat(item.ENTERED_QTY).toFixed(2),
-                                parseFloat(item.BALANCE).toFixed(2),
+                                $.inputNumber.format(item.ENTERED_QTY),
+                                $.inputNumber.format(item.BALANCE),
                                 item.ENTERED_UOM,
                             ]);
                         });
@@ -839,8 +830,8 @@
                     <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
                     `,
 
-                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab jumlah" name="detail[jumlah][]" value="${Number(balance)}" min="1" step="any" data-balance="${Number(balance)}">`,
+                    `<span class="view-mode qty-view">${$.inputNumber.format(balance)}</span>
+                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit text-end input-number d-none enter-as-tab jumlah w-100" name="detail[jumlah][]" value="${Number(balance)}" min="1" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -859,6 +850,7 @@
 
             if (rowsAdded) {
                 tableDetail.draw(false);
+                $('#table-detail .input-number').inputNumber();
                 toggleStorageDisabled();
             }
             $("#modalGRK").modal("hide");
@@ -887,7 +879,13 @@
 
             let value = input.val();
             if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
-                span.text(formatNumber(value, 2));
+                let numVal = $.inputNumber.unformat(value ?? 0);
+
+                if (isNaN(numVal) || value === "" || value === null) {
+                    numVal = 0;
+                }
+
+                span.text($.inputNumber.format(numVal));
             } else {
                 span.text(value === "" ? "0" : value);
             }
@@ -1097,14 +1095,14 @@
 
         const input = e.target;
         const balance = parseFloat(input.dataset.balance);
-        let value = parseFloat(input.value);
+        let value = $.inputNumber.format(input.value);
 
         const row = $(input).closest("tr");
 
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
@@ -1116,7 +1114,7 @@
                 text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
                 confirmButtonText: 'OK'
             }).then(() => {
-                input.value = balance;
+                input.value = $.inputNumber.format(balance);
                 input.focus();
                 updateSpan(balance);
             });
@@ -1135,21 +1133,22 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
-        const balance = parseFloat(input.dataset.balance);
+        const balance = $.inputNumber.format(input.dataset.balance);
+        const value = $.inputNumber.format(input.value);
 
         // Tidak boleh minus atau nol
-        if (input.value <= 0) {
+        if (value <= 0) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Jumlah tidak valid',
                 text: 'Jumlah harus lebih dari 0',
                 confirmButtonText: 'OK'
             }).then(() => {
-                input.value = input.dataset.balance;
+                input.value = $.inputNumber.format(balance);
                 input.focus();
                 updateSpan(balance);
             });
@@ -1163,7 +1162,7 @@
                 text: 'Jumlah tidak boleh kosong',
                 confirmButtonText: 'OK'
             }).then(() => {
-                input.value = input.dataset.balance;
+                input.value = $.inputNumber.format(balance);
                 input.focus();
                 updateSpan(balance);
             });
@@ -1215,5 +1214,8 @@
     $("form").on("submit", function(e) {
         $("#main_storage").prop("disabled", false);
         $("#site_storage").prop("disabled", false);
+        $.each($(document).find('[data-input-number], .input-number'), function() {
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>

@@ -82,21 +82,11 @@
                                     <h5 style="width: 100px;" id="readonlyRcoId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('rsp/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->TAG_PINJAM_ID); ?>">
-                                        <i class="ri ri-delete-bin-5-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
-                                    <a href="<?= site_url('rsp/print/' . base64url_encode($this->encrypt->encode($data->TAG_PINJAM_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
-                                        <i class="ri ri-printer-fill"></i>
-                                    </a>
+                                    <?= button_actions(['insert','save',
+                                        ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->TAG_PINJAM_ID)],
+                                        'reload',
+                                        ['key' => 'print_out', 'redirect' => site_url('rsp/print/' . base64url_encode($this->encrypt->encode($data->TAG_PINJAM_ID)))]
+                                    ]) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -263,15 +253,15 @@
                                                             <td style="display: none;">
                                                                 <input type="hidden" name="detail[tag_pinjam_detail_id][]" id="tag_pinjam_detail_id" value="<?= $this->encrypt->encode($dd->TAG_PINJAM_DETAIL_ID); ?>">
                                                                 <input type="hidden" name="detail[item_id][]" value="<?= $dd->ITEM_ID ?>">
-                                                                <input type="hidden" name="detail[base_qty][]" value="<?= number_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[unit_price][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>">
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>">
+                                                                <input type="hidden" name="detail[base_qty][]" value="<?= numb_format(rtrim(rtrim($dd->BASE_QTY, '0'), '.'), 0) ?>">
+                                                                <input type="hidden" name="detail[unit_price][]" value="<?= numb_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.')); ?>">
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= numb_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.')); ?>">
                                                                 <input type="hidden" name="detail[warehouse_id][]" value="<?= $dd->WAREHOUSE_ID ?>">
                                                                 <input type="hidden" name="detail[po_detail_id][]" value="<?= $dd->PO_DETAIL_ID ?>">
                                                                 <input type="hidden" name="detail[tag_detail_id][]" value="<?= $dd->TAG_DETAIL_ID ?>">
-                                                                <input type="hidden" name="detail[harga_input][]" value="<?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?>">
-                                                                <input type="hidden" name="detail[berat][]" value="<?= number_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0, '.', ',') ?>">
-                                                                <input type="hidden" name="detail[balance][]" value="<?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0, '.', ',') ?>">
+                                                                <input type="hidden" name="detail[harga_input][]" value="<?= numb_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.')); ?>">
+                                                                <input type="hidden" name="detail[berat][]" value="<?= numb_format(rtrim(rtrim($dd->BERAT, '0'), '.'), 0) ?>">
+                                                                <input type="hidden" name="detail[balance][]" value="<?= numb_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 0) ?>">
                                                             </td>
                                                             <td class="text-center">
                                                                 <input type="checkbox" class="chkDetail">
@@ -302,9 +292,9 @@
                                                             </td>
                                                             <td class="ellipsis text-end">
                                                                 <span class="view-mode qty-view ellipsis align-middle">
-                                                                    <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
+                                                                    <?= numb_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.')); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-tag_pinjam_detail_id="<?= $this->encrypt->encode($dd->TAG_PINJAM_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                <input type="text" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab text-end input-number w-100" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-tag_pinjam_detail_id="<?= $this->encrypt->encode($dd->TAG_PINJAM_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
                                                                 <span class="ellipsis" title="<?= $dd->ENTERED_UOM ?>">
@@ -409,6 +399,8 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
+        $('.input-number').inputNumber();
+
         let tag_pinjam_id = $('#tag_pinjam_id').val();
         $.ajax({
             url: '<?= base_url() ?>rsp/getStatus',
@@ -430,13 +422,13 @@
 
                     $('#table-detail td').css('pointer-events', 'none');
 
-                    $('#submit').replaceWith(
+                    $('#myForm button[type="submit"]').replaceWith(
                         `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-save-3-fill"></i>
                         </span>`
                     );
 
-                    $('#del-submit').replaceWith(
+                    $('#myForm .btn-delete').replaceWith(
                         `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
@@ -763,7 +755,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end input-number w-100" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -776,6 +768,7 @@
             });
             toggleStorageDisabled();
             tableDetail.draw(false);
+            $('.input-number').inputNumber();
         }
 
         //Initialize Select2 Elements
@@ -942,8 +935,8 @@
                                 item.DOCUMENT_REFF_NO,
                                 item.ITEM_DESCRIPTION,
                                 item.ITEM_CODE,
-                                parseFloat(item.ENTERED_QTY).toFixed(2),
-                                parseFloat(item.BALANCE).toFixed(2),
+                                $.inputNumber.format(item.ENTERED_QTY),
+                                $.inputNumber.format(item.BALANCE),
                                 item.ENTERED_UOM,
                             ]);
                         });
@@ -1063,7 +1056,7 @@
                     `,
 
                     `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end input-number w-100" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
 
                     `<span class="ellipsis" title="${satuan}">
                         ${ellipsis(satuan)}
@@ -1086,6 +1079,7 @@
                 tableDetail.draw(false);
                 tableDetail.columns.adjust();
                 toggleStorageDisabled();
+                $('.input-number').inputNumber();
             }
 
             $("#modalRSP").modal("hide");
@@ -1405,7 +1399,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah melebihi balance',
-                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(maxAllowed) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
                     input.value = value_old;
@@ -1420,7 +1414,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Jumlah melebihi balance',
-                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(balance) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
                     input.value = balance;
@@ -1445,7 +1439,7 @@
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
             if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
+                span.textContent = $.inputNumber.format(val);
             }
         }
 
@@ -1520,8 +1514,8 @@
         }
     }, true);
 
-    $(document).on('click', '#del-submit', function() {
-        let id = $(this).data('id_del');
+    $(document).on('click', '#myForm .btn-delete', function() {
+        let id = $(this).data('id');
 
         Swal.fire({
             title: 'Yakin mau hapus?',
@@ -1582,11 +1576,7 @@
     }
 
     function formatNumber(value, decimal = 2) {
-        if (value === "" || isNaN(value)) return "0.00";
-        return parseFloat(value).toLocaleString("en-US", {
-            minimumFractionDigits: decimal,
-            maximumFractionDigits: decimal
-        });
+        return $.inputNumber.format(value);
     }
 
     function toggleStorageDisabled() {
@@ -1631,5 +1621,9 @@
     $('form').on('submit', function(e) {
         $('#supplier').prop('disabled', false);
         $('#main_storage').prop('disabled', false);
+
+        $.each($(document).find('[data-input-number], .input-number'), function(){
+            $(this).val($(this).inputNumber('getValue'));
+        });
     });
 </script>
