@@ -315,7 +315,7 @@ class Mrq extends Back_Controller
                     AND b.TO_WH_ID = '{$storage}'
             ) tmp
             JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = tmp.STATUS_ID
-            ORDER BY PO_DETAIL_ID;
+            ORDER BY PO_DETAIL_ID, TAG_DETAIL_ID;
             ");
 
             if ($data->num_rows() > 0) {
@@ -845,7 +845,7 @@ class Mrq extends Back_Controller
                 // Query 1: inventory_in_detail (PO Kny)
                 [
                     'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, b.ITEM_ID, c.DOCUMENT_NO AS No_Transaksi, c.DOCUMENT_DATE AS Tanggal, 
-                        (a.INVOICE_ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, 
+                        (d.ENTERED_QTY * b.BASE_QTY) AS Jumlah, b.ENTERED_UOM AS Satuan, w.WAREHOUSE_NAME AS `S.Loc`, w.WAREHOUSE_ID, 
                         d.INVOICE_ID AS HEADER_ID, d.INVOICE_DETAIL_ID, "PO_Kny" AS Erp_Menu_Name',
                     'table'  => 'build_detail b',
                     'join'   => [

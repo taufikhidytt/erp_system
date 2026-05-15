@@ -36,8 +36,9 @@ class Val_mr_po_model extends CI_Model
     }
 
     public function get_so($so_id){
-        $this->db->select('a.SO_ID,a.DOCUMENT_NO,a.PO_NO');
+        $this->db->select("a.SO_ID,a.DOCUMENT_NO,a.PO_NO, CONCAT(p.PERSON_NAME,' - [',p.PERSON_CODE,']') AS PERSON");
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
+        $this->db->join("person p",'a.PERSON_ID = p.PERSON_ID');
         $this->db->where('a.DOCUMENT_TYPE_ID',3);
         $this->db->where_not_in('b.DISPLAY_NAME',['DELETE','COMPLETE','CLOSE']);
         $this->db->where('a.SO_ID',$so_id);

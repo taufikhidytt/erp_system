@@ -428,6 +428,10 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
     <script>
         $.extend(true, $.fn.dataTable.defaults, {
             "keys": true,
+            "drawCallback": function(settings) {
+                var api = this.api();
+                $(api.table().body()).hide().fadeIn(500);
+            }
         });
         $(document).ready(function() {
             $('#loading').hide();

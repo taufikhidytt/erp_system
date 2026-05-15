@@ -14,7 +14,7 @@
                 <td class="text-center"><?=  $k+1 ?></td>
                 <td><?= $v['MRD_Nama_Item'] ?></td>
                 <td class="text-center"><?= $v['MRD_Kode_Item'] ?></td>
-                <td class="text-end"><?= number_format($v['MRD_Qty'],2,'.',',') ?></td>
+                <td class="text-end"><?= numb_format($v['MRD_Qty']) ?></td>
                 <td><?= $v['MRD_Satuan'] ?></td>
             </tr>
         <?php } ?>

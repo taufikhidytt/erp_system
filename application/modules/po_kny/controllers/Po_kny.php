@@ -42,7 +42,7 @@ class Po_kny extends Back_Controller
             $row['supplier'] = $po_kny->Supplier ? $po_kny->Supplier : '-';
             $row['s_loc'] = $po_kny->S_Loc ? $po_kny->S_Loc : '-';
             $row['terms'] = $po_kny->Terms ? $po_kny->Terms : '-';
-            $row['total'] = $po_kny->Total ? number_format($po_kny->Total, 2, '.', ',') : '-';
+            $row['total'] = $po_kny->Total ? numb_format($po_kny->Total) : '-';
 
             $row['invoice_id'] = $this->encrypt->encode($po_kny->INVOICE_ID);
             $data[] = $row;
@@ -78,11 +78,11 @@ class Po_kny extends Back_Controller
                     "no"            => $no++,
                     "nama_item"     => $d->Nama_Item,
                     "kode_item"     => $d->Kode_Item,
-                    "jumlah"        => number_format((float)$d->Qty, 2, '.', ''),
+                    "jumlah"        => numb_format((float)$d->Qty),
                     "satuan"        => $d->UoM,
-                    "harga"         => number_format($d->Harga, 2, '.', ','),
-                    "diskon"        => number_format($d->Diskon, 2, '.', ','),
-                    "total"         => number_format($d->Total, 2, '.', ','),
+                    "harga"         => numb_format($d->Harga),
+                    "diskon"        => numb_format($d->Diskon),
+                    "total"         => numb_format($d->Total),
                     "no_mr"         => $d->No_MR,
                     "s_loc_in"      => $d->S_Loc_In,
                     "note"          => $d->Note,
@@ -186,7 +186,7 @@ class Po_kny extends Back_Controller
                     JOIN item i ON b.ITEM_ID = i.ITEM_ID
                     JOIN person psn ON a.PERSON_ID = psn.PERSON_ID
                     JOIN warehouse w ON b.WAREHOUSE_ID = w.WAREHOUSE_ID
-                    JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
+                    JOIN erp_lookup_value s ON s.ERP_LOOKUP_VALUE_ID = bl.STATUS_ID
                 WHERE
                     b.ENTERED_QTY > 0 
                     AND b.BASE_QTY > 0 
@@ -339,12 +339,11 @@ class Po_kny extends Back_Controller
                 // ======================
                 foreach ($detail['nama_item'] as $i => $val) {
 
-                    $jumlah_raw  = $detail['jumlah'][$i] ?? null;
-                    $balance_raw = $detail['balance'][$i] ?? null;
+                    // Ambil nilai dan unformat
+                    $jumlah_raw = isset($detail['jumlah'][$i]) ? numb_unformat($detail['jumlah'][$i]) : null;
+                    $balance_raw = isset($detail['balance'][$i]) ? numb_unformat($detail['balance'][$i]) : null;
 
-                    if (
-                        $jumlah_raw === '' || $jumlah_raw === null || !is_numeric($jumlah_raw)
-                    ) {
+                    if ($jumlah_raw === '' || $jumlah_raw === null || !is_numeric($jumlah_raw)) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', 'Jumlah "' . $detail['nama_item'][$i] . '" tidak boleh kosong');
                         redirect('po_kny/add');
@@ -363,32 +362,40 @@ class Po_kny extends Back_Controller
                     // Tidak boleh melebihi balance
                     if ($jumlah > $balance) {
                         $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', 'Jumlah "' . $detail['nama_item'][$i] . '" tidak boleh lebih besar dari balance (' . $balance . ')');
+                        $this->session->set_flashdata('warning', 'Jumlah "' . $detail['nama_item'][$i] . '" tidak boleh lebih besar dari balance (' . numb_format($balance) . ')');
                         redirect('po_kny/add');
                     }
 
+                    // Unformat Nilai Harga & Diskon
+                    $harga_input = numb_unformat($detail['harga_input'][$i]);
+                    $harga_bersih = numb_unformat($detail['harga'][$i]);
+                    $diskon_harga = numb_unformat($detail['diskon_harga'][$i]);
+                    $subtotal = numb_unformat($detail['subtotal'][$i]);
+
                     if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                        $diskon_price = $detail['diskon_harga'][$i] / (1 + ($detail['diskon_persentase'][$i] / 100));
+                        $diskon_price   = $diskon_harga / (1 + ($post['PPN_PERCEN'] / 100));
+                        $harga_bersih   = $harga_input / (1 + ($post['PPN_PERCEN'] / 100));
+                        $subtotal       = $subtotal / (1 + ($post['PPN_PERCEN'] / 100));
                     } else {
-                        $diskon_price = $detail['diskon_harga'][$i];
+                        $diskon_price = $diskon_harga;
                     }
 
                     $dataDetail = [
                         'INVOICE_ID'             => $post['seq'],
                         'ITEM_ID'                => $detail['item_id'][$i],
                         'ENTERED_QTY'            => $jumlah,
-                        'BASE_QTY'               => $detail['base_qty'][$i],
-                        'UNIT_PRICE'             => str_replace([','], '', $detail['harga'][$i]),
+                        'BASE_QTY'               => numb_unformat($detail['base_qty'][$i]),
+                        'UNIT_PRICE'             => $harga_bersih,
                         'DISCOUNT_PRICE'         => $diskon_price,
-                        'SUBTOTAL'               => $detail['subtotal'][$i],
+                        'SUBTOTAL'               => $subtotal,
                         'ENTERED_UOM'            => $detail['satuan'][$i],
                         'COA_ID'                 => $detail['coa_suspend_id'][$i],
                         'WAREHOUSE_ID'           => $post['storage'],
                         'INVENTORY_IN_ID'        => $detail['inventory_in_id'][$i],
                         'INVENTORY_IN_DETAIL_ID' => $detail['inventory_in_detail_id'][$i],
                         'DISCOUNT_PERCEN'        => $detail['diskon_persentase'][$i],
-                        'HARGA_INPUT'            => str_replace([','], '', $detail['harga_input'][$i]),
-                        'DISKON_INPUT'           => $detail['diskon_harga'][$i],
+                        'HARGA_INPUT'            => $harga_input,
+                        'DISKON_INPUT'           => $diskon_harga,
                         'ITEM_DESCRIPTION'       => $detail['nama_item'][$i],
                         'KET'                    => $detail['memo'][$i],
                         'NOTE'                   => $detail['keterangan'][$i],
@@ -402,10 +409,12 @@ class Po_kny extends Back_Controller
                     $this->db->insert('invoice_detail', $dataDetail);
                 }
 
+                $total_diskon_input_hidden = numb_unformat($post['TOTAL_DISKON_INPUT_HIDDEN']);
+
                 if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT_HIDDEN'] / (1 + ($post['PPN_PERCEN'] / 100));
+                    $total_diskon_header = $total_diskon_input_hidden / (1 + ($post['PPN_PERCEN'] / 100));
                 } else {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT_HIDDEN'];
+                    $total_diskon_header = $total_diskon_input_hidden;
                 }
 
                 $invoice_type_id = $this->db->query("SELECT FN_GET_VAR_VALUE('PO') as po")->row();
@@ -430,13 +439,13 @@ class Po_kny extends Back_Controller
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
                     'INVOICE_TYPE_ID'       => $invoice_type_id->po,
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
-                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT_HIDDEN'],
+                    'TOTAL_DISKON_INPUT'    => $total_diskon_input_hidden,
 
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
 
-                    'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
-                    'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
-                    'TOTAL_NET'             => $post['TOTAL_NET'],
+                    'TOTAL_AMOUNT'          => numb_unformat($post['TOTAL_AMOUNT']),
+                    'PPN_AMOUNT'            => numb_unformat($post['PPN_AMOUNT']),
+                    'TOTAL_NET'             => numb_unformat($post['TOTAL_NET']),
                     'NOTE'                  => $post['keterangan'],
                     'KONSINYASI_FLAG'       => 'Y',
                     'CREATED_BY'            => $this->session->userdata('id'),
@@ -574,10 +583,20 @@ class Po_kny extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
+                    // Unformat values from view
+                    $jumlah = numb_unformat($detail['jumlah'][$i]);
+                    $base_qty = numb_unformat($detail['base_qty'][$i]);
+                    $harga_input = numb_unformat($detail['harga_input'][$i]);
+                    $harga_bersih = numb_unformat($detail['harga'][$i]);
+                    $diskon_harga = numb_unformat($detail['diskon_harga'][$i]);
+                    $subtotal = numb_unformat($detail['subtotal'][$i]);
+
                     if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                        $diskon_price = $detail['diskon_harga'][$i] / (1 + ($detail['diskon_persentase'][$i] / 100));
+                        $diskon_price   = $diskon_harga / (1 + ($post['PPN_PERCEN'] / 100));
+                        $harga_bersih   = $harga_input / (1 + ($post['PPN_PERCEN'] / 100));
+                        $subtotal       = $subtotal / (1 + ($post['PPN_PERCEN'] / 100));
                     } else {
-                        $diskon_price = $detail['diskon_harga'][$i];
+                        $diskon_price = $diskon_harga;
                     }
 
                     $invoice_detail_id = !empty($detail['invoice_detail_id'][$i])
@@ -586,19 +605,19 @@ class Po_kny extends Back_Controller
 
                     $dataDetail = [
                         'ITEM_ID'                => $detail['item_id'][$i],
-                        'ENTERED_QTY'            => $detail['jumlah'][$i],
-                        'BASE_QTY'               => $detail['base_qty'][$i],
-                        'UNIT_PRICE'             => str_replace([','], '', $detail['harga'][$i]),
+                        'ENTERED_QTY'            => $jumlah,
+                        'BASE_QTY'               => $base_qty,
+                        'UNIT_PRICE'             => $harga_bersih,
                         'DISCOUNT_PRICE'         => $diskon_price,
-                        'SUBTOTAL'               => $detail['subtotal'][$i],
+                        'SUBTOTAL'               => $subtotal,
                         'ENTERED_UOM'            => $detail['satuan'][$i],
                         'COA_ID'                 => $detail['coa_suspend_id'][$i],
                         'WAREHOUSE_ID'           => $post['storage'],
                         'INVENTORY_IN_ID'        => $detail['inventory_in_id'][$i],
                         'INVENTORY_IN_DETAIL_ID' => $detail['inventory_in_detail_id'][$i],
                         'DISCOUNT_PERCEN'        => $detail['diskon_persentase'][$i],
-                        'HARGA_INPUT'            => str_replace([','], '', $detail['harga_input'][$i]),
-                        'DISKON_INPUT'           => $detail['diskon_harga'][$i],
+                        'HARGA_INPUT'            => $harga_input,
+                        'DISKON_INPUT'           => $diskon_harga,
                         'ITEM_DESCRIPTION'       => $detail['nama_item'][$i],
                         'KET'                    => $detail['memo'][$i],
                         'NOTE'                   => $detail['keterangan'][$i],
@@ -650,10 +669,12 @@ class Po_kny extends Back_Controller
                     }
                 }
 
+                $total_diskon_input_hidden = numb_unformat($post['TOTAL_DISKON_INPUT']);
+
                 if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'] / (1 + ($post['PPN_PERCEN'] / 100));
+                    $total_diskon_header = $total_diskon_input_hidden / (1 + ($post['PPN_PERCEN'] / 100));
                 } else {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'];
+                    $total_diskon_header = $total_diskon_input_hidden;
                 }
 
                 $invoice_type_id = $this->db->query("SELECT FN_GET_VAR_VALUE('PO') as po;")->row();
@@ -677,13 +698,13 @@ class Po_kny extends Back_Controller
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
                     'INVOICE_TYPE_ID'       => $invoice_type_id->po,
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
-                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT_HIDDEN'],
+                    'TOTAL_DISKON_INPUT'    => numb_unformat($post['TOTAL_DISKON_INPUT_HIDDEN']),
 
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
 
-                    'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
-                    'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
-                    'TOTAL_NET'             => $post['TOTAL_NET'],
+                    'TOTAL_AMOUNT'          => numb_unformat($post['TOTAL_AMOUNT']),
+                    'PPN_AMOUNT'            => numb_unformat($post['PPN_AMOUNT']),
+                    'TOTAL_NET'             => numb_unformat($post['TOTAL_NET']),
                     'NOTE'                  => $post['keterangan'],
                     'KONSINYASI_FLAG'       => 'Y',
                     'LAST_UPDATE_BY'        => $this->session->userdata('id'),
@@ -738,6 +759,7 @@ class Po_kny extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -793,6 +815,7 @@ class Po_kny extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $po    = $this->po_kny->get_po_detail($id)->row();
         if ($po) {

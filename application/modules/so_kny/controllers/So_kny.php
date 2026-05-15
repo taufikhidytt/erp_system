@@ -350,7 +350,6 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('location_id', 'location', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('payment_term', 'payment term', 'trim|required');
-            // $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
             $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
@@ -396,12 +395,11 @@ class So_kny extends Back_Controller
                 // ======================
                 foreach ($detail['nama_item'] as $i => $val) {
 
-                    $jumlah_raw  = $detail['jumlah'][$i] ?? null;
-                    $balance_raw = $detail['balance'][$i] ?? null;
+                    // Ambil nilai dan unformat
+                    $jumlah_raw = isset($detail['jumlah'][$i]) ? numb_unformat($detail['jumlah'][$i]) : null;
+                    $balance_raw = isset($detail['balance'][$i]) ? numb_unformat($detail['balance'][$i]) : null;
 
-                    if (
-                        $jumlah_raw === '' || $jumlah_raw === null || !is_numeric($jumlah_raw)
-                    ) {
+                    if ($jumlah_raw === '' || $jumlah_raw === null || !is_numeric($jumlah_raw)) {
                         $this->db->trans_rollback();
                         $this->session->set_flashdata('warning', 'Jumlah "' . $detail['nama_item'][$i] . '" tidak boleh kosong');
                         redirect('so_kny/add');
@@ -420,32 +418,43 @@ class So_kny extends Back_Controller
                     // Tidak boleh melebihi balance
                     if ($jumlah > $balance) {
                         $this->db->trans_rollback();
-                        $this->session->set_flashdata('warning', 'Jumlah "' . $detail['nama_item'][$i] . '" tidak boleh lebih besar dari balance (' . $balance . ')');
+                        $this->session->set_flashdata('warning', 'Jumlah "' . $detail['nama_item'][$i] . '" tidak boleh lebih besar dari balance (' . numb_format($balance) . ')');
                         redirect('so_kny/add');
                     }
 
-                    if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                        $diskon_price = $detail['diskon_harga'][$i] / (1 + ($detail['diskon_persentase'][$i] / 100));
+                    // Unformat Nilai Harga & Diskon dan pastikan tipe datanya float
+                    $harga_input  = (float)numb_unformat($detail['harga_input'][$i] ?? 0);
+                    $harga_bersih = (float)numb_unformat($detail['harga'][$i] ?? 0);
+                    $diskon_harga = (float)numb_unformat($detail['diskon_harga'][$i] ?? 0);
+                    $subtotal     = (float)numb_unformat($detail['subtotal'][$i] ?? 0);
+
+                    // Ambil nilai PPN Persen, default ke 0 jika kosong
+                    $ppn_percen = (isset($post['PPN_PERCEN']) && is_numeric($post['PPN_PERCEN'])) ? (float)$post['PPN_PERCEN'] : 0;
+
+                    if (stripos($post['PPN_CODE'], 'INCL') !== false && $ppn_percen > 0) {
+                        $diskon_price   = $diskon_harga / (1 + ($ppn_percen / 100));
+                        $harga_bersih   = $harga_bersih / (1 + ($ppn_percen / 100));
+                        $subtotal       = $subtotal / (1 + ($ppn_percen / 100));
                     } else {
-                        $diskon_price = $detail['diskon_harga'][$i];
+                        $diskon_price = $diskon_harga;
                     }
 
                     $dataDetail = [
                         'SO_ID'              => $post['seq'],
                         'ITEM_ID'            => $detail['item_id'][$i],
                         'ENTERED_QTY'        => $jumlah,
-                        'BASE_QTY'           => $detail['base_qty'][$i],
-                        'UNIT_PRICE'         => str_replace([','], '', $detail['harga'][$i]),
+                        'BASE_QTY'           => (float)numb_unformat($detail['base_qty'][$i] ?? 0),
+                        'UNIT_PRICE'         => $harga_bersih,
                         'DISCOUNT_PRICE'     => $diskon_price,
-                        'SUBTOTAL'           => $detail['subtotal'][[$i]],
+                        'SUBTOTAL'           => $subtotal,
                         'ENTERED_UOM'        => $detail['satuan'][$i],
                         'GUDANG_ID'          => $post['storage'],
                         'KARYAWAN_ID'        => $post['sales'],
                         'BUILD_ID'           => $detail['build_id'][$i],
                         'BUILD_DETAIL_ID'    => $detail['build_detail_id'][$i],
                         'DISCOUNT_PERCEN'    => $detail['diskon_persentase'][$i],
-                        'HARGA_INPUT'        => str_replace([','], '', $detail['harga_input'][$i]),
-                        'DISKON_INPUT'       => $detail['diskon_harga'][$i],
+                        'HARGA_INPUT'        => $harga_input,
+                        'DISKON_INPUT'       => $diskon_harga,
                         'ITEM_DESCRIPTION'   => $detail['nama_item'][$i],
                         'DESKRIPSI'          => $detail['memo'][$i],
                         'NOTE'               => $detail['keterangan'][$i],
@@ -459,12 +468,14 @@ class So_kny extends Back_Controller
                     $this->db->insert('so_detail', $dataDetail);
                 }
 
-                if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'] / (1 + ($post['PPN_PERCEN'] / 100));
-                } else {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'];
-                }
+                $total_diskon_input_hidden = (float)numb_unformat($post['TOTAL_DISKON_INPUT_HIDDEN'] ?? 0);
+                $ppn_percen_header = (isset($post['PPN_PERCEN']) && is_numeric($post['PPN_PERCEN'])) ? (float)$post['PPN_PERCEN'] : 0;
 
+                if (stripos($post['PPN_CODE'], 'INCL') !== false && $ppn_percen_header > 0) {
+                    $total_diskon_header = $total_diskon_input_hidden / (1 + ($ppn_percen_header / 100));
+                } else {
+                    $total_diskon_header = $total_diskon_input_hidden;
+                }
 
                 // ======================
                 // INSERT PARENT / HEADER
@@ -482,18 +493,17 @@ class So_kny extends Back_Controller
                     'PERSON_SITE_ID'        => $post['person_site_id'],
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PAYMENT_TERM_ID'       => $post['payment_term'],
-                    // 'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
                     'KARYAWAN_ID'           => $post['sales'],
                     'PPN_CODE'              => $post['PPN_CODE'],
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
                     'PPH_CODE'              => 'NO PPH',
                     'PPH_PERCEN'            => '0',
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
-                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT_HIDDEN'],
+                    'TOTAL_DISKON_INPUT'    => $total_diskon_input_hidden,
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
-                    'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
-                    'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
-                    'TOTAL_NET'             => $post['TOTAL_NET'],
+                    'TOTAL_AMOUNT'          => (float)numb_unformat($post['TOTAL_AMOUNT'] ?? 0),
+                    'PPN_AMOUNT'            => (float)numb_unformat($post['PPN_AMOUNT'] ?? 0),
+                    'TOTAL_NET'             => (float)numb_unformat($post['TOTAL_NET'] ?? 0),
                     'NOTE'                  => $post['keterangan'],
                     'CABANG_FLAG'           => 'Y',
                     'KONSINYASI_FLAG'       => 'Y',
@@ -556,7 +566,6 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('location_id', 'location', 'trim|required');
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
             $this->form_validation->set_rules('payment_term', 'payment term', 'trim|required');
-            // $this->form_validation->set_rules('jatuh_tempo', 'jatuh tempo', 'trim|required');
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
             $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
@@ -636,10 +645,22 @@ class So_kny extends Back_Controller
 
                     if (empty($detail['nama_item'][$i])) continue;
 
-                    if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                        $diskon_price = $detail['diskon_harga'][$i] / (1 + ($detail['diskon_persentase'][$i] / 100));
+                    // Unformat values from view dan pastikan tipe datanya float
+                    $jumlah       = (float)numb_unformat($detail['jumlah'][$i] ?? 0);
+                    $base_qty     = (float)numb_unformat($detail['base_qty'][$i] ?? 0);
+                    $harga_input  = (float)numb_unformat($detail['harga_input'][$i] ?? 0);
+                    $harga_bersih = (float)numb_unformat($detail['harga'][$i] ?? 0);
+                    $diskon_harga = (float)numb_unformat($detail['diskon_harga'][$i] ?? 0);
+                    $subtotal     = (float)numb_unformat($detail['subtotal'][$i] ?? 0);
+
+                    // Ambil nilai PPN Persen, default ke 0 jika kosong
+                    $ppn_percen = (isset($post['PPN_PERCEN']) && is_numeric($post['PPN_PERCEN'])) ? (float)$post['PPN_PERCEN'] : 0;
+
+                    if (stripos($post['PPN_CODE'], 'INCL') !== false && $ppn_percen > 0) {
+                        // Pembagi adalah PPN
+                        $diskon_price = $diskon_harga / (1 + ($ppn_percen / 100));
                     } else {
-                        $diskon_price = $detail['diskon_harga'][$i];
+                        $diskon_price = $diskon_harga;
                     }
 
                     $so_detail_id = !empty($detail['so_detail_id'][$i])
@@ -648,23 +669,23 @@ class So_kny extends Back_Controller
 
                     $dataDetail = [
                         'ITEM_ID'            => $detail['item_id'][$i],
-                        'ENTERED_QTY'        => $detail['jumlah'][$i],
-                        'BASE_QTY'           => $detail['base_qty'][$i],
-                        'UNIT_PRICE'         => str_replace([','], '', $detail['harga'][$i]),
+                        'ENTERED_QTY'        => $jumlah,
+                        'BASE_QTY'           => $base_qty,
+                        'UNIT_PRICE'         => $harga_bersih,
                         'DISCOUNT_PRICE'     => $diskon_price,
-                        'SUBTOTAL'           => $detail['subtotal'][[$i]],
+                        'SUBTOTAL'           => $subtotal,
                         'ENTERED_UOM'        => $detail['satuan'][$i],
                         'GUDANG_ID'          => $post['storage'],
                         'KARYAWAN_ID'        => $post['sales'],
                         'BUILD_ID'           => $detail['build_id'][$i],
                         'BUILD_DETAIL_ID'    => $detail['build_detail_id'][$i],
                         'DISCOUNT_PERCEN'    => $detail['diskon_persentase'][$i],
-                        'HARGA_INPUT'        => str_replace([','], '', $detail['harga_input'][$i]),
-                        'DISKON_INPUT'       => $detail['diskon_harga'][$i],
+                        'HARGA_INPUT'        => $harga_input,
+                        'DISKON_INPUT'       => $diskon_harga,
                         'ITEM_DESCRIPTION'   => $detail['nama_item'][$i],
                         'DESKRIPSI'          => $detail['memo'][$i],
                         'NOTE'               => $detail['keterangan'][$i],
-                        'BERAT'              => $detail['berat'][$i],
+                        'BERAT'              => $detail['berat'][$i], // Typically not formatted, but verify
                         'LAST_UPDATE_BY'     => $this->session->userdata('id'),
                         'LAST_UPDATE_DATE'   => date('Y-m-d H:i:s'),
                     ];
@@ -712,10 +733,13 @@ class So_kny extends Back_Controller
                     }
                 }
 
-                if (stripos($post['PPN_CODE'], 'INCL') !== false) {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'] / (1 + ($post['PPN_PERCEN'] / 100));
+                $total_diskon_input_hidden = (float)numb_unformat($post['TOTAL_DISKON_INPUT_HIDDEN'] ?? 0);
+                $ppn_percen_header = (isset($post['PPN_PERCEN']) && is_numeric($post['PPN_PERCEN'])) ? (float)$post['PPN_PERCEN'] : 0;
+
+                if (stripos($post['PPN_CODE'], 'INCL') !== false && $ppn_percen_header > 0) {
+                    $total_diskon_header = $total_diskon_input_hidden / (1 + ($ppn_percen_header / 100));
                 } else {
-                    $total_diskon_header = $post['TOTAL_DISKON_INPUT'];
+                    $total_diskon_header = $total_diskon_input_hidden;
                 }
 
                 // ===============================
@@ -730,18 +754,17 @@ class So_kny extends Back_Controller
                     'PERSON_SITE_ID'        => $post['person_site_id'],
                     'WAREHOUSE_ID'          => $post['storage'],
                     'PAYMENT_TERM_ID'       => $post['payment_term'],
-                    // 'JTEMPO'                => date('Y-m-d H:i:s', strtotime($post['jatuh_tempo'])),
                     'KARYAWAN_ID'           => $post['sales'],
                     'PPN_CODE'              => $post['PPN_CODE'],
                     'PPN_PERCEN'            => $post['PPN_PERCEN'],
                     'PPH_CODE'              => 'NO PPH',
                     'PPH_PERCEN'            => '0',
                     'TOTAL_DISCOUNT_PERCEN' => $post['TOTAL_DISCOUNT_PERCEN'],
-                    'TOTAL_DISKON_INPUT'    => $post['TOTAL_DISKON_INPUT_HIDDEN'],
+                    'TOTAL_DISKON_INPUT'    => $total_diskon_input_hidden,
                     'TOTAL_DISCOUNT'        => $total_diskon_header,
-                    'TOTAL_AMOUNT'          => $post['TOTAL_AMOUNT'],
-                    'PPN_AMOUNT'            => $post['PPN_AMOUNT'],
-                    'TOTAL_NET'             => $post['TOTAL_NET'],
+                    'TOTAL_AMOUNT'          => (float)numb_unformat($post['TOTAL_AMOUNT'] ?? 0),
+                    'PPN_AMOUNT'            => (float)numb_unformat($post['PPN_AMOUNT'] ?? 0),
+                    'TOTAL_NET'             => (float)numb_unformat($post['TOTAL_NET'] ?? 0),
                     'NOTE'                  => $post['keterangan'],
                     'CABANG_FLAG'           => 'Y',
                     'KONSINYASI_FLAG'       => 'Y',
@@ -797,6 +820,7 @@ class So_kny extends Back_Controller
 
     public function del()
     {
+        checkAccess('delete');
         $id = $this->encrypt->decode($this->input->post('id'));
 
         $this->db->query("CALL SET_VAR()");
@@ -945,6 +969,7 @@ class So_kny extends Back_Controller
 
     public function print($id)
     {
+        checkAccess('print_out');
         $id     = (int) $this->encrypt->decode(base64url_decode($id));
         $so    = $this->so_kny->get_so_detail($id)->row();
         if ($so) {

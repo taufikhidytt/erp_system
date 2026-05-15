@@ -5,6 +5,9 @@
     #result table thead th{
         font-family: Tahoma !important;
     }
+    #result table td,#result table th{
+        white-space: nowrap;
+    }
 </style>
 <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
 <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>

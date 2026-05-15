@@ -50,7 +50,7 @@ class Group_menu_model extends CI_Model
         $this->db->select('a.ERP_MENU_ID,a.PARENT_ID,a.ERP_MENU_NAME,a.PROMPT,a.MENU_ICON');
         $this->db->from('erp_menu a');
         $this->db->where('a.ACTIVE_FLAG', 'Y');
-        $this->db->order_by('a.ERP_MENU_ID');
+        $this->db->order_by('a.PARENT_ID, a.SEQ');
         return $this->db->get();
     }
 

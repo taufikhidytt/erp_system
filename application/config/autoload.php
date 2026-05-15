@@ -58,7 +58,15 @@ $autoload['packages'] = array();
 |
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
-$autoload['libraries'] = array('template', 'session', 'form_validation', 'CheckUsers', 'database', 'pdf', 'encrypt');
+$autoload['libraries'] = array('database', 'encrypt');
+if (!is_cli()) {
+    $autoload['libraries'][] = 'template';
+    $autoload['libraries'][] = 'session';
+    $autoload['libraries'][] = 'form_validation';
+    $autoload['libraries'][] = 'session';
+    $autoload['libraries'][] = 'CheckUsers';
+    $autoload['libraries'][] = 'pdf';
+}
 
 /*
 | -------------------------------------------------------------------

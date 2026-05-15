@@ -49,7 +49,6 @@
 
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
-        <!-- start page title -->
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
@@ -64,7 +63,6 @@
                 </div>
             </div>
         </div>
-        <!-- end page title -->
         <div class="row">
             <div class="col-12">
                 <div class="card border-2">
@@ -76,21 +74,11 @@
                                     <h5 style="width: 100px;" id="readonlyPoId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <a href="<?= base_url('po_kny/add') ?>" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="bottom" title="Tambah">
-                                        <i class="ri ri-add-box-fill"></i>
-                                    </a>
-                                    <button type="submit" class="btn btn-success btn-sm" name="submit" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan">
-                                        <i class="ri ri-save-3-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->INVOICE_ID); ?>">
-                                        <i class="ri ri-delete-bin-5-fill"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
-                                        <i class="ri ri-reply-fill"></i>
-                                    </button>
-                                    <a href="<?= site_url('po_kny/print/' . base64url_encode($this->encrypt->encode($data->INVOICE_ID))) ?>" id="btn-print" target="_blank" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="bottom" title="Print">
-                                        <i class="ri ri-printer-fill"></i>
-                                    </a>
+                                    <?= button_actions(['insert','save',
+                                        ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->INVOICE_ID)],
+                                        'reload',
+                                        ['key' => 'print_out', 'redirect' => site_url('po_kny/print/' . base64url_encode($this->encrypt->encode($data->INVOICE_ID)))]
+                                    ]) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -226,7 +214,6 @@
                             </div>
                             <div class="row">
                                 <div class="card-body">
-                                    <!-- Nav tabs -->
                                     <ul class="nav nav-tabs" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" data-bs-toggle="tab" href="#detail" role="tab" aria-selected="true">
@@ -235,7 +222,6 @@
                                             </a>
                                         </li>
                                     </ul>
-                                    <!-- Tab panes -->
                                     <div class="tab-content py-3 text-muted">
                                         <div class="tab-pane active" id="detail" role="tabpanel">
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 55px;height:29.89px;">
@@ -333,7 +319,7 @@
                                                                 <span class="view-mode qty-view ellipsis align-middle">
                                                                     <?= number_format(rtrim(rtrim($dd->ENTERED_QTY, '0'), '.'), 2, '.', ','); ?>
                                                                 </span>
-                                                                <input type="number" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab" min="0" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-invoice_detail_id="<?= $this->encrypt->encode($dd->INVOICE_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
+                                                                <input type="text" class="form-control form-control-sm qty auto-width edit-mode qty-edit d-none enter-as-tab text-end input-number" step="any" name="detail[jumlah][]" data-balance="<?= ($dd->BALANCE == 0) ? '0' : rtrim(rtrim((string)$dd->BALANCE, '0'), '.') ?>" data-invoice_detail_id="<?= $this->encrypt->encode($dd->INVOICE_DETAIL_ID) ?>" data-value_old="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>" value="<?= ($dd->ENTERED_QTY == 0) ? '0' : rtrim(rtrim((string)$dd->ENTERED_QTY, '0'), '.') ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="ellipsis" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->ENTERED_UOM ?>">
@@ -343,23 +329,23 @@
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="view-mode harga-view"><?= number_format(rtrim(rtrim($dd->HARGA_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="<?= $dd->HARGA_INPUT ?>">
+                                                                <input type="text" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab text-end input-number" step="any" name="detail[harga_input][]" value="<?= $dd->HARGA_INPUT ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="harga-input-b"><?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="hidden" name="detail[harga][]" value="<?= number_format(rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'), 2, '.', ','); ?>" step="any">
+                                                                <input type="hidden" name="detail[harga][]" value="<?= rtrim(rtrim($dd->UNIT_PRICE, '0'), '.'); ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="view-mode harga-view diskon-harga-view"><?= number_format(rtrim(rtrim($dd->DISKON_INPUT, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="<?= $dd->DISKON_INPUT ?>">
+                                                                <input type="text" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab text-end input-number" step="any" name="detail[diskon_harga][]" value="<?= $dd->DISKON_INPUT ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="view-mode"><?= $dd->DISCOUNT_PERCEN ?></span>
-                                                                <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="<?= $dd->DISCOUNT_PERCEN ?>">
+                                                                <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" name="detail[diskon_persentase][]" value="<?= $dd->DISCOUNT_PERCEN ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <span class="subtotal"><?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?></span>
-                                                                <input type="hidden" name="detail[subtotal][]" value="<?= number_format(rtrim(rtrim($dd->SUBTOTAL, '0'), '.'), 2, '.', ','); ?>" step="any">
+                                                                <input type="hidden" name="detail[subtotal][]" value="<?= rtrim(rtrim($dd->SUBTOTAL, '0'), '.'); ?>">
                                                             </td>
                                                             <td class="ellipsis">
                                                                 <textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly data-toggle="tooltip" data-placement="bottom" title="<?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?>"><?= $postDetail['keterangan'][$i] ?? $dd->NOTE; ?></textarea>
@@ -382,10 +368,9 @@
                                                         </td>
                                                         <td class="text-center">%</td>
                                                         <td class="text-center">=</td>
-                                                        <?php $total_diskon = number_format($data->TOTAL_DISKON_INPUT, 2, '.', ',');
-                                                        ?>
+                                                        <?php $total_diskon = rtrim(rtrim((string)$data->TOTAL_DISKON_INPUT, '0'), '.'); ?>
                                                         <td class="text-right">
-                                                            <input type="text" id="cal_diskon_price" name="TOTAL_DISKON_INPUT" class="form-control form-control-sm input-container" placeholder="Rupiah" value="<?= $total_diskon ?>">
+                                                            <input type="text" id="cal_diskon_price" name="TOTAL_DISKON_INPUT" class="form-control form-control-sm input-container text-end input-number" placeholder="Rupiah" value="<?= $total_diskon ?>">
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -408,11 +393,12 @@
                                                                 <?php
                                                                 $selected_ppn_persen = $this->input->post('cal_ppn_code') ?? ($data->PPN_PERCEN ?? '');
                                                                 $selected_ppn_code = $this->input->post('ppn_code_selected') ?? ($data->PPN_CODE ?? '');
+
                                                                 ?>
                                                                 <?php foreach ($ppn_code->result() as $pc): ?>
                                                                     <option
                                                                         value="<?= $pc->PERCENTAGE ?>" data-code="<?= $pc->PPN_CODE ?>"
-                                                                        <?= set_value('ppn_code_selected') == $pc->PPN_CODE ? 'selected' : ($defaultValue == $pc->PPN_CODE ? 'selected' : '') ?>>
+                                                                        <?= set_value('ppn_code_selected', $data->PPN_CODE ?? '') == $pc->PPN_CODE ? 'selected' : ($defaultValue == $pc->PPN_CODE ? 'selected' : '') ?>>
                                                                         <?= strtoupper($pc->PPN_CODE) ?>
                                                                     </option>
                                                                 <?php endforeach; ?>
@@ -493,11 +479,8 @@
         </div>
     </div>
 </div>
-<!-- container-fluid -->
 </div>
-<!-- End Page-content -->
 
-<!-- modal -->
 <div id="modalMrq" class="modal fade" style="font-size: 12px;">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -533,13 +516,9 @@
                 <button type="button" class="btn btn-primary waves-effect waves-light" id="btnSubmit">Selected</button>
             </div>
         </div>
-        <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
 </div>
-<!-- / modal -->
 
-<!-- modal memo -->
 <div class="modal fade" id="modalMemo" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -547,27 +526,20 @@
                 <h5 class="modal-title">Memo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
             <div class="modal-body">
                 <textarea id="modalMemoText"
                     class="form-control"
                     rows="5"
                     placeholder="Masukkan Memo..."></textarea>
             </div>
-
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Batal
-                </button>
-                <button type="button" class="btn btn-primary" id="btnSaveMemo">
-                    Simpan
-                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="btnSaveMemo">Simpan</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- modal keterangan -->
 <div class="modal fade" id="modalKeterangan" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -575,21 +547,15 @@
                 <h5 class="modal-title">Keterangan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
             <div class="modal-body">
                 <textarea id="modalKeteranganText"
                     class="form-control"
                     rows="5"
                     placeholder="Masukkan keterangan..."></textarea>
             </div>
-
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    Batal
-                </button>
-                <button type="button" class="btn btn-primary" id="btnSaveKeterangan">
-                    Simpan
-                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="btnSaveKeterangan">Simpan</button>
             </div>
         </div>
     </div>
@@ -599,16 +565,11 @@
     let tableDetail;
     let tableItem;
     $(document).ready(function() {
+        // Initialize input-number for static elements
+        $('.input-number').inputNumber();
+
         setTimeout(function() {
             calculateGrandTotal();
-            // Format diskon nominal awal
-            let diskonVal = $('#cal_diskon_price').val();
-            if (diskonVal && diskonVal !== '') {
-                let num = parseFloat(diskonVal.replace(/,/g, ''));
-                if (!isNaN(num)) {
-                    $('#cal_diskon_price').val(formatNumber(num));
-                }
-            }
         }, 100);
 
         let invoice_id = $('#invoice_id').val();
@@ -617,9 +578,7 @@
             url: '<?= base_url() ?>po_kny/getStatus',
             type: 'POST',
             dataType: 'json',
-            data: {
-                invoice_id: invoice_id,
-            },
+            data: { invoice_id: invoice_id },
             success: function(response) {
                 $('#statusPoId').html(badgeStatus(response.data[0].DISPLAY_NAME, response.data[0].MENU_ICON));
                 $('#readonlyPoId').hide();
@@ -633,14 +592,14 @@
 
                     $('#table-detail td').css('pointer-events', 'none');
 
-                    $('#submit').replaceWith(
-                        `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                    $('#myForm button[type="submit"]').replaceWith(
+                        `<span class="btn btn-success btn-sm" id="submit" data-toggle="tooltip" data-placement="bottom" title="Simpan" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-save-3-fill"></i>
                         </span>`
                     );
 
-                    $('#del-submit').replaceWith(
-                        `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                    $('#myForm .btn-delete').replaceWith(
+                        `<span class="btn btn-danger btn-sm" id="del-submit" name="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" disabled style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
                             <i class="ri ri-delete-bin-5-fill"></i>
                         </span>`
                     );
@@ -665,275 +624,93 @@
             autoWidth: false,
             paging: false,
             columnDefs: [{
-                    targets: 0,
-                    width: "2%",
-                    className: "text-center",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // no
-                {
-                    targets: 2,
-                    width: "2%",
-                    className: "text-center",
-                }, // checkbox
-                {
-                    targets: 3,
-                    width: "15%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // no transaksi
-                {
-                    targets: 4,
-                    width: "20%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // nama item
-                {
-                    targets: 5,
-                    width: "15%",
-                    className: "ellipsis text-center",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // kode item
-                {
-                    targets: 6,
-                    width: "15%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // memo
-                {
-                    targets: 7,
-                    width: "10%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer';
-                    }
-                }, // jumlah
-                {
-                    targets: 8,
-                    width: "10%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // satuan
-                {
-                    targets: 9,
-                    width: "15%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer';
-                    }
-                }, // harga input
-                {
-                    targets: 10,
-                    width: "15%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // harga
-                {
-                    targets: 11,
-                    width: "15%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer';
-                    }
-                }, // diskon rp
-                {
-                    targets: 12,
-                    width: "15%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer';
-                    }
-                }, // diskon %
-                {
-                    targets: 13,
-                    width: "15%",
-                    className: "ellipsis text-end",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // subtotal
-                {
-                    targets: 14,
-                    width: "15%",
-                    className: "ellipsis",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                        td.style.cursor = 'pointer';
-                    }
-                }, // keterangan
+                    targets: 0, width: "2%", className: "text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; }
+                }, 
+                { targets: 2, width: "2%", className: "text-center", }, 
+                { targets: 3, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 4, width: "20%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 5, width: "15%", className: "ellipsis text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 6, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 7, width: "10%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
+                { targets: 8, width: "10%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 9, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
+                { targets: 10, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 11, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
+                { targets: 12, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
+                { targets: 13, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 14, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
             ],
         });
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
-            columnDefs: [{
-                    targets: 0,
-                    className: "text-center"
-                }, // checkbox
-                {
-                    targets: 1,
-                    className: "text-center",
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // no
-                {
-                    targets: 2,
-                    className: "ellipsis text-center",
-                    // render: function(data) {
-                    //     if (!data) return '-';
-                    //     let limit = 20;
-                    //     let text = data.length > limit ?
-                    //         data.substring(0, limit) + '...' :
-                    //         data;
-                    //     return `<span title="${data}">${text}</span>`;
-                    // },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // status
-                {
-                    targets: 3,
-                    className: "ellipsis text-center",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // tanggal
-                {
-                    targets: 4,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // no transaksi
-                {
-                    targets: 5,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // no refrensi
-                {
-                    targets: 6,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // nama item
-                {
-                    targets: 7,
-                    className: "ellipsis text-center",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 15;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // kode item
-                {
-                    targets: 8,
-                    className: "ellipsis text-end",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // jumlah
-                {
-                    targets: 9,
-                    className: "ellipsis text-end",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    }
-                }, // sisa
-                {
-                    targets: 10,
-                    className: "ellipsis",
-                    render: function(data) {
-                        if (!data) return '-';
-                        let limit = 20;
-                        let text = data.length > limit ?
-                            data.substring(0, limit) + '...' :
-                            data;
-                        return `<span title="${data}">${text}</span>`;
-                    },
-                    createdCell: function(td) {
-                        td.style.fontFamily = 'monospace';
-                    },
-                }, // satuan
+            columnDefs: [{ targets: 0, className: "text-center" },
+                { targets: 1, className: "text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 2, className: "ellipsis text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 3, className: "ellipsis text-center", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 4, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 5, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 6, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 7, className: "ellipsis text-center", render: function(data) { if (!data) return '-'; let limit = 15; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 8, className: "ellipsis text-end", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 9, className: "ellipsis text-end", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
+                { targets: 10, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; }, }, 
             ],
             autoWidth: false,
             paging: true,
             searching: true,
             ordering: false,
+        });
+        var dateFilterHTML = `
+            <div class="d-flex align-items-top gap-2 me-3">
+                <label class="mt-1 text-nowrap">Periode:</label>
+                <input type="date" id="min-date" class="form-control form-control-sm" style="max-width: 130px;height:29px">
+                <span class="mt-1">-</span>
+                <input type="date" id="max-date" class="form-control form-control-sm" style="max-width: 130px;height:29px">
+            </div>
+        `;
+
+        $('#table-item_wrapper .dataTables_filter')
+            .addClass('d-flex align-items-top justify-content-end')
+            .prepend(dateFilterHTML);
+
+        $(document).on('change', '#min-date, #max-date', function() {
+            if ($(this).attr('id') == 'min-date') {
+                var minDateVal = $(this).val();
+                var $maxDateInput = $(document).find('#max-date');
+                var currentMaxVal = $maxDateInput.val();
+                
+                $maxDateInput.attr('min', minDateVal); 
+                
+                if (currentMaxVal && minDateVal > currentMaxVal) {
+                    $maxDateInput.val(minDateVal);
+                }
+            }
+            tableItem.draw();
+        });
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            var min = $(document).find('#min-date').val();
+            var max = $(document).find('#max-date').val();
+            
+            var fullDateStr = data[3] || ""; 
+            
+            var dateStr = fullDateStr.substring(0, 10); 
+
+            if (!min && !max) {
+                return true;
+            }
+            if (!min && dateStr <= max) {
+                return true;
+            }
+            if (min <= dateStr && !max) {
+                return true;
+            }
+            if (min <= dateStr && dateStr <= max) {
+                return true;
+            }
+            
+            return false;
         });
 
         let oldDetail = <?= json_encode($detail ?? []) ?>;
@@ -970,125 +747,72 @@
 
                 let rowNode = tableDetail.row.add([
                     nomor,
-
                     `<input type="hidden" name="detail[invoice_detail_id][]" value="">
                     <input type="hidden" name="detail[inventory_in_detail_id][]" value="${inventory_in_detail_id}">
                     <input type="hidden" name="detail[inventory_in_id][]" value="${inventory_in_id}">
                     <input type="hidden" name="detail[coa_suspend_id][]" value="${coa_suspend_id}">
                     <input type="hidden" name="detail[no_mrq][]" value="${no_transaksi}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[base_qty][]" value="${$.inputNumber.format(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
                     <input type="hidden" name="detail[balance][]" value="${balance}">`,
-
                     `<input type="checkbox" class="chkDetail">`,
-
-                    `<span class="ellipsis" title="${no_transaksi}">
-                        ${ellipsis(no_transaksi)}
-                    </span>`,
-
-                    `<span class="ellipsis" title="${nama_item}">
-                        ${ellipsis(nama_item)}
-                    </span>
+                    `<span class="ellipsis" title="${no_transaksi}">${ellipsis(no_transaksi)}</span>`,
+                    `<span class="ellipsis" title="${nama_item}">${ellipsis(nama_item)}</span>
                     <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
-
-                    `<span class="ellipsis" title="${kode}">
-                        ${ellipsis(kode)}
-                    </span>
-                    <input type="hidden" name="detail[kode_item][]" value="${kode}">
-                    `,
-
+                    `<span class="ellipsis" title="${kode}">${ellipsis(kode)}</span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode}">`,
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly>${memo}</textarea>`,
-                    // memo
-
-                    `<span class="view-mode qty-view">${formatNumber(jumlah)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(jumlah)}" min="0" step="any" data-balance="${Number(balance)}">`,
-
-                    `<span class="ellipsis" title="${satuan}">
-                        ${ellipsis(satuan)}
-                    </span>
-                    <input type="hidden" name="detail[satuan][]" value="${satuan}">
-                    `,
-
-                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${harga_input}">`,
+                    // qty
+                    `<span class="view-mode qty-view">${$.inputNumber.format(jumlah)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end input-number" name="detail[jumlah][]" value="${$.inputNumber.format(jumlah)}" data-balance="${Number(balance)}">`,
+                    // satuan
+                    `<span class="ellipsis" title="${satuan}">${ellipsis(satuan)}</span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
                     // harga input
-
-                    `<span class="harga-input-b">${formatNumber(harga)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${harga}" step="any">`,
+                    `<span class="view-mode harga-view">${$.inputNumber.format(harga_input)}</span>
+                    <input type="text" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab text-end input-number" name="detail[harga_input][]" value="${$.inputNumber.format(harga_input)}">`,
                     // harga
-
-                    `<span class="view-mode harga-view diskon-harga-view">${formatNumber(diskon_harga)}</span>
-                    <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="${diskon_harga}">`,
+                    `<span class="harga-input-b">${$.inputNumber.format(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
                     // diskon rp
-
-                    `<span class="view-mode">${diskon_persentase}</span>
-                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="${diskon_persentase}">`,
+                    `<span class="view-mode harga-view diskon-harga-view">${$.inputNumber.format(diskon_harga)}</span>
+                    <input type="text" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab text-end input-number" name="detail[diskon_harga][]" value="${$.inputNumber.format(diskon_harga)}">`,
                     // diskon %
-
-                    `<span class="subtotal">${formatNumber(subtotal)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${formatNumber(subtotal)}" step="any">`,
+                    `<span class="view-mode">${diskon_persentase}</span>
+                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" name="detail[diskon_persentase][]" value="${diskon_persentase}">`,
                     // subtotal
-
+                    `<span class="subtotal">${$.inputNumber.format(subtotal)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
+                    // keterangan
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
                 ]).node();
                 $(rowNode).addClass('tr-height-30');
+                $(rowNode).find('.input-number').inputNumber(); 
             });
             toggleStorageDisabled();
             tableDetail.draw(false);
+            
+            // Re-trigger perhitungan row untuk sinkronisasi nilai UI setelah reload dari fail validasi
+            setTimeout(refreshPPN, 200);
         }
-
-        //Initialize Select2 Elements
-        // $('.select2').each(function() {
-        //     $(this).select2({
-        //         theme: 'bootstrap-5',
-        //         dropdownParent: $(this).parent(),
-        //     });
-        // });
 
         var flashsuccess = $('#flashSuccess').data('success');
         var flashwarning = $('#flashWarning').data('warning');
         var flasherror = $('#flashError').data('error');
 
-        if (flashsuccess) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: flashsuccess,
-            })
-        }
-
-        if (flashwarning) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: flashwarning,
-            })
-        }
-
-        if (flasherror) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: flasherror,
-            })
-        }
+        if (flashsuccess) { Swal.fire({ icon: 'success', title: 'Success', text: flashsuccess }) }
+        if (flashwarning) { Swal.fire({ icon: 'warning', title: 'Warning', text: flashwarning }) }
+        if (flasherror)   { Swal.fire({ icon: 'error', title: 'Error', text: flasherror }) }
 
         toggleStorageDisabled();
 
         $('#location').prop('disabled', true);
-
-        $('#location').on('select2:opening', function(e) {
-            e.preventDefault();
-        });
+        $('#location').on('select2:opening', function(e) { e.preventDefault(); });
 
         let initialSupplier = $('#supplier option:selected').data('person_site_id');
-
         let oldLocation = "<?= set_value('location') ?>";
-
-        if (initialSupplier) {
-            loadLocation(initialSupplier, oldLocation);
-        }
+        if (initialSupplier) { loadLocation(initialSupplier, oldLocation); }
 
         $('#supplier').on('change', function() {
             setTimeout(function() {
@@ -1100,7 +824,6 @@
                 var paymentTermId = $('#supplier').find(':selected').data('payment_term_id');
                 if (paymentTermId) {
                     var paymentTermName = $('#supplier').find(':selected').data('payment_term_name');
-
                     var newOption = new Option(paymentTermName, paymentTermId, true, true);
                     $('#payment_term').append(newOption).trigger('change');
                 } else {
@@ -1109,17 +832,8 @@
             }, 100);
         });
 
-        // Event untuk input normal
-        $('#tanggal').on('change', function() {
-            setTimeout(function() {
-                updateJatuhTempo;
-            }, 100);
-        });
-
-        // Event untuk Select2
-        $('#payment_term').on('change.select2', updateJatuhTempo);
-
-        // Inisialisasi
+        $('#tanggal').on('change', function() { setTimeout(function() { updateJatuhTempo(); }, 100); });
+        $('#payment_term').on('change.select2',function() { setTimeout(function() { updateJatuhTempo(); }, 100); });
         updateJatuhTempo();
 
         $("#storage").data("prev", $("#storage").val());
@@ -1140,9 +854,7 @@
                         $(this).data("prev", current);
                         toggleStorageDisabled();
                     } else {
-                        $(this).val(prev).trigger('change.select2', {
-                            skipEvent: true
-                        });
+                        $(this).val(prev).trigger('change.select2', { skipEvent: true });
                     }
                 });
             } else {
@@ -1150,7 +862,6 @@
             }
         });
 
-        // modal
         $("#btn-modalMrq").on("click", function() {
             resetModalItem();
             $("#checkAll").prop('checked', false);
@@ -1161,31 +872,20 @@
 
             if (!storage) {
                 $('#loading').hide();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Warning',
-                    text: 'Storage tidak terisi, Mohon isi terlebih dahulu',
-                });
+                Swal.fire({ icon: 'warning', title: 'Warning', text: 'Storage tidak terisi, Mohon isi terlebih dahulu', });
                 return;
             }
 
             if (!supplier) {
                 $('#loading').hide();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Warning',
-                    text: 'supplier tidak terisi, Mohon isi terlebih dahulu',
-                });
+                Swal.fire({ icon: 'warning', title: 'Warning', text: 'supplier tidak terisi, Mohon isi terlebih dahulu', });
                 return;
             }
 
             $.ajax({
                 type: "POST",
                 url: "<?= base_url() ?>po_kny/getMrq",
-                data: {
-                    storage: storage,
-                    supplier: supplier,
-                },
+                data: { storage: storage, supplier: supplier },
                 dataType: "json",
                 success: function(response) {
                     $('#loading').hide();
@@ -1200,10 +900,7 @@
 
                     if (response.status === 'success' && Array.isArray(response.data)) {
                         response.data.forEach(function(item, i) {
-
-                            if (existingInventoryInId.has(item.INVENTORY_IN_DETAIL_ID)) {
-                                return;
-                            }
+                            if (existingInventoryInId.has(item.INVENTORY_IN_DETAIL_ID)) return;
 
                             var checkbox = `
                             <input type="checkbox" class="chkRow"
@@ -1219,7 +916,6 @@
                                 data-diskon_input="${item.DISKON_INPUT}"
                                 data-diskon_percen="${item.DISCOUNT_PERCEN}"
                                 data-subtotal="${item.SUBTOTAL}"
-
                                 data-status="${item.STATUS_NAME}"
                                 data-tanggal="${item.DOCUMENT_DATE}"
                                 data-no_transaksi="${item.DOCUMENT_NO}"
@@ -1229,20 +925,11 @@
                                 data-jumlah="${item.ENTERED_QTY}"
                                 data-sisa="${item.BALANCE}"
                                 data-satuan="${item.ENTERED_UOM}"
-                            >
-                            `;
+                            >`;
                             tableItem.row.add([
-                                checkbox,
-                                i + 1,
-                                badgeStatus(item.STATUS_NAME, item.MENU_ICON),
-                                item.DOCUMENT_DATE,
-                                item.DOCUMENT_NO,
-                                item.DOCUMENT_REFF_NO,
-                                item.ITEM_DESCRIPTION,
-                                item.ITEM_CODE,
-                                parseFloat(item.ENTERED_QTY).toFixed(2),
-                                parseFloat(item.BALANCE).toFixed(2),
-                                item.ENTERED_UOM,
+                                checkbox, i + 1, badgeStatus(item.STATUS_NAME, item.MENU_ICON), item.DOCUMENT_DATE,
+                                item.DOCUMENT_NO, item.DOCUMENT_REFF_NO, item.ITEM_DESCRIPTION, item.ITEM_CODE,
+                                $.inputNumber.format(parseFloat(item.ENTERED_QTY)), $.inputNumber.format(parseFloat(item.BALANCE)), item.ENTERED_UOM,
                             ]);
                         });
                         tableItem.draw();
@@ -1252,18 +939,10 @@
                 }
             });
         });
-        $('#modalMrq').on('shown.bs.modal', function() {
-            $(this).find('.dataTables_filter input').focus();
-        });
 
-        // Centang semua
-        $("#checkAllParent").change(function() {
-            $(".chkDetail").prop('checked', $(this).prop('checked'));
-        });
-
-        $("#checkAll").change(function() {
-            $(".chkRow").prop('checked', $(this).prop('checked'));
-        });
+        $('#modalMrq').on('shown.bs.modal', function() { $(this).find('.dataTables_filter input').focus(); });
+        $("#checkAllParent").change(function() { $(".chkDetail").prop('checked', $(this).prop('checked')); });
+        $("#checkAll").change(function() { $(".chkRow").prop('checked', $(this).prop('checked')); });
 
         // submit
         $("#btnSubmit").on("click", function(e) {
@@ -1274,7 +953,6 @@
             tableDetail.rows().every(function() {
                 let node = this.node();
                 let inventoryDetailId = $(node).find('input[name="detail[inventory_detail_id][]"]').val();
-
                 if (inventoryDetailId) existingInventoryDetailId.add(inventoryDetailId);
             });
 
@@ -1295,23 +973,12 @@
                 let diskon_input = $(this).data('diskon_input') ?? '0';
                 let diskon_percen = $(this).data('diskon_percen') ?? '';
                 let subtotal = $(this).data('subtotal') ?? '0';
-
-                let status = $(this).data("status");
-                let tanggal = $(this).data("tanggal");
                 let no_transaksi = $(this).data("no_transaksi");
-                let no_referensi = $(this).data("no_referensi");
                 let nama_item = $(this).data("nama_item");
                 let kode_item = $(this).data("kode_item");
-                let jumlah = $(this).data("jumlah");
                 let satuan = $(this).data("satuan");
 
-                // Cegah double di tableDetail
-                let exists = tableDetail
-                    .column(2)
-                    .data()
-                    .toArray()
-                    .includes(inventory_in_detail_id);
-
+                let exists = tableDetail.column(2).data().toArray().includes(inventory_in_detail_id);
                 if (exists) {
                     $(this).prop('checked', false).prop('disabled', true);
                     return;
@@ -1319,66 +986,43 @@
 
                 let rowNode = tableDetail.row.add([
                     "",
-
                     `<input type="hidden" name="detail[invoice_detail_id][]" value="">
                     <input type="hidden" name="detail[inventory_in_detail_id][]" value="${inventory_in_detail_id}">
                     <input type="hidden" name="detail[inventory_in_id][]" value="${inventory_in_id}">
                     <input type="hidden" name="detail[coa_suspend_id][]" value="${coa_suspend_id}">
                     <input type="hidden" name="detail[no_mrq][]" value="${no_transaksi}">
                     <input type="hidden" name="detail[item_id][]" value="${item_id}">
-                    <input type="hidden" name="detail[base_qty][]" value="${formatNumber(base_qty)}">
+                    <input type="hidden" name="detail[base_qty][]" value="${$.inputNumber.format(base_qty)}">
                     <input type="hidden" name="detail[berat][]" value="${berat}">
                     <input type="hidden" name="detail[balance][]" value="${balance}">`,
-
                     `<input type="checkbox" class="chkDetail">`,
-
-                    `<span class="ellipsis" title="${no_transaksi}">
-                        ${ellipsis(no_transaksi)}
-                    </span>`,
-
-                    `<span class="ellipsis" title="${nama_item}">
-                        ${ellipsis(nama_item)}
-                    </span>
+                    `<span class="ellipsis" title="${no_transaksi}">${ellipsis(no_transaksi)}</span>`,
+                    `<span class="ellipsis" title="${nama_item}">${ellipsis(nama_item)}</span>
                     <input type="hidden" name="detail[nama_item][]" value="${nama_item}">`,
-
-                    `<span class="ellipsis" title="${kode_item}">
-                        ${ellipsis(kode_item)}
-                    </span>
-                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">
-                    `,
-
+                    `<span class="ellipsis" title="${kode_item}">${ellipsis(kode_item)}</span>
+                    <input type="hidden" name="detail[kode_item][]" value="${kode_item}">`,
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[memo][]" rows="1" readonly></textarea>`,
-                    // memo
-
-                    `<span class="view-mode qty-view">${formatNumber(balance)}</span>
-                    <input type="number" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab" name="detail[jumlah][]" value="${Number(balance)}" min="0" step="any" data-balance="${Number(balance)}">`,
-
-                    `<span class="ellipsis" title="${satuan}">
-                        ${ellipsis(satuan)}
-                    </span>
-                    <input type="hidden" name="detail[satuan][]" value="${satuan}">
-                    `,
-
-                    `<span class="view-mode harga-view">${formatNumber(harga_input)}</span>
-                    <input type="number" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[harga_input][]" value="${harga_input}">`,
-                    // harga input
-
-                    `<span class="harga-input-b">${formatNumber(harga)}</span>
-                    <input type="hidden" name="detail[harga][]" value="${harga}" step="any">`,
+                    // qty
+                    `<span class="view-mode qty-view">${$.inputNumber.format(balance)}</span>
+                    <input type="text" class="form-control form-control-sm qty edit-mode qty-edit d-none enter-as-tab text-end input-number" name="detail[jumlah][]" value="${$.inputNumber.format(balance)}" data-balance="${Number(balance)}">`,
+                    // satuan
+                    `<span class="ellipsis" title="${satuan}">${ellipsis(satuan)}</span>
+                    <input type="hidden" name="detail[satuan][]" value="${satuan}">`,
+                    // harga_input
+                    `<span class="view-mode harga-view">${$.inputNumber.format(harga_input)}</span>
+                    <input type="text" class="form-control form-control-sm harga-input edit-mode harga-edit d-none enter-as-tab text-end input-number" name="detail[harga_input][]" value="${$.inputNumber.format(harga_input)}">`,
                     // harga
-
-                    `<span class="view-mode harga-view diskon-harga-view">${formatNumber(diskon_input)}</span>
-                    <input type="number" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab" min="0" step="any" name="detail[diskon_harga][]" value="${diskon_input}">`,
-                    // diskon rp
-
+                    `<span class="harga-input-b">${$.inputNumber.format(harga)}</span>
+                    <input type="hidden" name="detail[harga][]" value="${harga}">`,
+                    // diskonrp
+                    `<span class="view-mode harga-view diskon-harga-view">${$.inputNumber.format(diskon_input)}</span>
+                    <input type="text" class="form-control form-control-sm diskon-harga edit-mode harga-edit d-none enter-as-tab text-end input-number" name="detail[diskon_harga][]" value="${$.inputNumber.format(diskon_input)}">`,
+                    // diskon percen
                     `<span class="view-mode">${diskon_percen}</span>
-                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" step="any" name="detail[diskon_persentase][]" value="${diskon_percen}">`,
-                    // diskon %
-
-                    `<span class="subtotal">${formatNumber(subtotal)}</span>
-                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}" step="any">`,
+                    <input type="text" class="form-control form-control-sm edit-mode d-none enter-as-tab persen-detail" name="detail[diskon_persentase][]" value="${diskon_percen}">`,
                     // subtotal
-
+                    `<span class="subtotal">${$.inputNumber.format(subtotal)}</span>
+                    <input type="hidden" name="detail[subtotal][]" value="${subtotal}">`,
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly></textarea>`,
                 ]).node();
 
@@ -1387,15 +1031,13 @@
                 let ppn_code = $('#cal_ppn_code option:selected').text().trim();
 
                 $(rowNode).addClass('tr-height-30');
+                $(rowNode).find('.input-number').inputNumber();
 
                 hitungSubTotal(row, ppn_code, ppn);
-
                 rowsAdded = true;
             });
 
-            setTimeout(() => {
-                calculateGrandTotal();
-            }, 300);
+            setTimeout(() => { calculateGrandTotal(); }, 300);
 
             if (rowsAdded) {
                 tableDetail.draw(false);
@@ -1406,69 +1048,79 @@
         });
 
         $(document).on("click", "#table-detail tbody td", function(e) {
-
-            // kalau yang diklik memang input, biarkan normal
             if ($(e.target).is("input, select, textarea")) return;
-
             let td = $(this);
             let span = td.find(".view-mode");
             let input = td.find(".edit-mode");
 
-            // hanya jalan kalau memang ada view/edit mode
             if (span.length && input.length) {
                 span.addClass("d-none");
                 input.removeClass("d-none").focus().select();
             }
         });
 
-        // keluar input
         $(document).on("blur change", ".edit-mode", function() {
             let input = $(this);
             let span = input.prev(".view-mode");
-
             let value = input.val();
+
             if (input.hasClass("harga-edit") || input.hasClass("qty-edit")) {
-                span.text(formatNumber(value, 2));
+                let unformatted = $.inputNumber.unformat(value) || 0;
+                span.text($.inputNumber.format(unformatted));
             } else {
                 span.text(value === "" ? "0" : value);
             }
 
             input.addClass("d-none");
             span.removeClass("d-none");
+            updatePpnHidden();
         });
 
-        // Update saat ada perubahan di tabel detail (jumlah/harga/diskon)
         let timerDetail;
+        $(document).on('input change', '.qty-edit, input[name="detail[harga_input][]"], input[name="detail[diskon_harga][]"], input[name="detail[diskon_persentase][]"]', function() {
+            clearTimeout(timerDetail);
+            let row = $(this).closest('tr');
+            let trigger = $(this).attr('name');
+            let ppn = $('#cal_ppn_code').val();
+            let ppn_code = $('#cal_ppn_code option:selected').text().trim();
 
-        $(document).on(
-            'input change',
-            '.qty-edit, input[name="detail[harga_input][]"], input[name="detail[diskon_harga][]"], input[name="detail[diskon_persentase][]"]',
-            function() {
+            timerDetail = setTimeout(function() {
+                hitungSubTotal(row, ppn_code, ppn, trigger);
+            }, 300);
+        });
 
-                clearTimeout(timerDetail);
+        // Validasi Diskon Row agar tidak melebihi harga input (Alert on Input & Change)
+        $(document).on('input change', 'input[name="detail[diskon_harga][]"]', function() {
+            let row = $(this).closest('tr');
+            let diskonVal = parseFloat($.inputNumber.unformat($(this).val())) || 0;
+            let hargaInput = parseFloat($.inputNumber.unformat(row.find('input[name="detail[harga_input][]"]').val())) || 0;
+            let diskonPersen = row.find('input[name="detail[diskon_persentase][]"]').val();
 
-                let row = $(this).closest('tr');
-                let trigger = $(this).attr('name'); // field yang berubah
+            if (diskonVal > hargaInput) {
+                let recalculatedDisc = 0;
+                if (diskonPersen && diskonPersen.trim() !== '' && diskonPersen !== '0') {
+                    recalculatedDisc = calcDiscount(hargaInput, diskonPersen);
+                }
+                
+                $(this).val($.inputNumber.format(recalculatedDisc));
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Diskon Melebihi Total! Diskon rupiah tidak boleh melebihi total (' + $.inputNumber.format(hargaInput) + ')',
+                    confirmButtonText: 'OK'
+                });
+                
                 let ppn = $('#cal_ppn_code').val();
                 let ppn_code = $('#cal_ppn_code option:selected').text().trim();
-
-                timerDetail = setTimeout(function() {
-                    hitungSubTotal(row, ppn_code, ppn, trigger);
-                }, 300);
-
-            });
+                hitungSubTotal(row, ppn_code, ppn);
+            }
+        });
 
         tableDetail.on("draw.dt", function() {
-            tableDetail
-                .column(0)
-                .nodes()
-                .each(function(cell, i) {
-                    cell.innerHTML = i + 1;
-                });
+            tableDetail.column(0).nodes().each(function(cell, i) { cell.innerHTML = i + 1; });
         });
 
         $("#checkAllParent").prop("checked", false);
-
         $("#checkAllParent").on("change", function() {
             let isChecked = $(this).is(":checked");
             $("#table-detail .chkDetail").prop("checked", isChecked);
@@ -1477,7 +1129,6 @@
         $(document).on("change", ".chkDetail", function() {
             let total = $("#table-detail .chkDetail").length;
             let checked = $("#table-detail .chkDetail:checked").length;
-
             $("#checkAllParent").prop("checked", total > 0 && total === checked);
         });
 
@@ -1486,141 +1137,62 @@
                 return $(this).find(".chkDetail").is(":checked");
             });
             if (rowsToRemove.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Peringatan',
-                    text: 'Tidak ada item yang dipilih!'
-                });
+                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Tidak ada item yang dipilih!' });
                 return;
             }
             Swal.fire({
-                title: 'Yakin mau hapus?',
-                text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Batal',
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#6ebbff'
+                title: 'Yakin mau hapus?', text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
+                icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33', cancelButtonColor: '#6ebbff'
             }).then((result) => {
                 if (result.isConfirmed) {
-
-                    rowsToRemove.each(function() {
-                        tableDetail.row(this).remove();
-                    });
+                    rowsToRemove.each(function() { tableDetail.row(this).remove(); });
                     tableDetail.draw(false);
-
                     $("#checkAllParent").prop("checked", false);
-
                     toggleStorageDisabled();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-
+                    Swal.fire({ icon: 'success', title: 'Success', text: 'Item berhasil dihapus', timer: 1500, showConfirmButton: false });
                     let row = $(rowsToRemove);
                     let ppn = $('#cal_ppn_code').val();
                     let ppn_code = $('#cal_ppn_code option:selected').text().trim();
-
                     hitungSubTotal(row, ppn_code, ppn);
                 }
             });
         });
 
-        $(document).on('click', '#del-submit', function() {
-            let id = $(this).data('id_del');
-
+        $(document).on('click', '#myForm .btn-delete', function() {
+            let id = $(this).data('id');
             Swal.fire({
-                title: 'Yakin mau hapus?',
-                text: 'Data yang dihapus tidak bisa dikembalikan!',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#70bcff',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
+                title: 'Yakin mau hapus?', text: 'Data yang dihapus tidak bisa dikembalikan!',
+                icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#70bcff', confirmButtonText: 'Ya, hapus!', cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
                         url: '<?= base_url() ?>po_kny/del',
-                        type: 'POST',
-                        dataType: 'json',
-                        data: {
-                            id: id
-                        },
-                        beforeSend: function() {
-                            Swal.fire({
-                                title: 'Menghapus...',
-                                allowOutsideClick: false,
-                                didOpen: () => {
-                                    Swal.showLoading();
-                                }
-                            });
-                        },
+                        type: 'POST', dataType: 'json', data: { id: id },
+                        beforeSend: function() { Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } }); },
                         success: function(res) {
-                            if (res.status) {
-                                Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: res.message,
-                                    icon: 'success'
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Warning!',
-                                    text: res.error,
-                                    icon: 'warning'
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            }
+                            if (res.status) { Swal.fire({ title: 'Berhasil!', text: res.message, icon: 'success' }).then(() => { location.reload(); }); } 
+                            else { Swal.fire({ title: 'Warning!', text: res.error, icon: 'warning' }).then(() => { location.reload(); }); }
                         },
-                        error: function() {
-                            Swal.fire('Error', 'Gagal menghapus data!', 'error');
-                        }
+                        error: function() { Swal.fire('Error', 'Gagal menghapus data!', 'error'); }
                     });
                 }
             });
         });
 
-        $(document).on('keydown', '.jumlah, .harga-input, .diskon-harga', function(e) {
-            if (
-                e.key === 'e' || e.key === 'E' ||
-                e.key === '+' || e.key === '-'
-            ) {
-                e.preventDefault();
-            }
-        });
-
-        $(document).on('input change', '.jumlah, .harga-input', function() {
-            let val = $(this).val();
-            if (val === '') return;
-
-            val = parseFloat(val);
-            if (val < 1) {
-                $(this).val(1);
-            }
-
+        $(document).on('input change', '.qty-edit, .harga-input', function() {
+            let val = $.inputNumber.unformat($(this).val());
+            if (val === '' || isNaN(val)) return;
+            if (val < 1) { $(this).val($.inputNumber.format(1)); }
             updatePpnHidden();
         });
 
         refreshPPN();
 
-        $('#cal_ppn_code').on('select2:select', function(e) {
-            updatePpnHidden();
-        });
-
+        $('#cal_ppn_code').on('select2:select', function(e) { updatePpnHidden(); });
         $('#cal_ppn_code').on('change', function() {
             let ppn = $(this).val();
             let ppn_code = $('#cal_ppn_code option:selected').text();
-            // Ambil jumlah row pada table detail
-            let totalRows = $('#table-detail tbody tr').length;
-            // Loop setiap row
             $('#table-detail tbody tr').each(function(index) {
                 let row = $(this);
                 hitungSubTotal(row, ppn_code, parseFloat(ppn));
@@ -1628,138 +1200,77 @@
         });
 
         $('#cal_ppn_code').on('change', function() {
-            if (!$(this).data('skipEvent')) {
-                updatePpnHidden();
-            }
+            if (!$(this).data('skipEvent')) { updatePpnHidden(); }
             refreshPPN();
         });
 
         $('#cal_ppn_code').on('change', function() {
-
             let code = $(this).find(':selected').data('code');
-
             $('#ppn_code_selected').val(code);
-
         });
 
     });
 
-    // persen detail
     $(document).on('input', '.persen-detail', function() {
         let value = $(this).val();
-
-        // Hanya izinkan angka dan +
         value = value.replace(/[^\d+]/g, '');
-
-        // Pisahkan berdasarkan +
         let parts = value.split('+');
-
-        // Validasi tiap angka
         parts = parts.map(function(part) {
             if (part === '') return '';
-
             let num = parseInt(part, 10);
-
             if (isNaN(num)) return '';
-
-            // Maksimal 100
             if (num > 100) num = 100;
-
             return num;
         });
-
-        // Gabungkan kembali
         $(this).val(parts.join('+'));
-
-        // Hitung total jika perlu
-        let total = parts.reduce((sum, val) => {
-            return sum + (parseFloat(val) || 0);
-        }, 0);
     });
 
     $(document).on('keydown', '.enter-as-tab', function(e) {
         if (e.which !== 13) return;
-
         e.preventDefault();
         const $row = $(this).closest('tr');
-
         if ($(this).hasClass('qty-edit')) {
             const $harga = $row.find('.harga-edit');
-
             $row.find('.harga-view').addClass('d-none');
             $harga.removeClass('d-none');
             $harga.focus();
             return;
         }
-
         if ($(this).hasClass('harga-edit')) {
             $row.find('textarea[name="detail[keterangan][]"]').focus();
             return;
         }
     });
 
-    let openedSelect = null;
-    let isOpening = false;
-
+    let activeMemoInput = null;
     let activeKeteranganInput = null;
 
-    $('#table-detail tbody').on(
-        'click',
-        'textarea[name="detail[memo][]"]',
-        function() {
+    $('#table-detail tbody').on('click', 'textarea[name="detail[memo][]"]', function() {
+        activeMemoInput = $(this);
+        $('#modalMemoText').val($(this).val());
+        $('#modalMemo').modal('show');
+    });
 
-            activeMemoInput = $(this);
-
-            // isi modal dengan nilai input saat ini
-            $('#modalMemoText').val($(this).val());
-
-            $('#modalMemo').modal('show');
-        }
-    );
-
-    $('#table-detail tbody').on(
-        'click',
-        'textarea[name="detail[keterangan][]"]',
-        function() {
-
-            activeKeteranganInput = $(this);
-
-            // isi modal dengan nilai input saat ini
-            $('#modalKeteranganText').val($(this).val());
-
-            $('#modalKeterangan').modal('show');
-        }
-    );
+    $('#table-detail tbody').on('click', 'textarea[name="detail[keterangan][]"]', function() {
+        activeKeteranganInput = $(this);
+        $('#modalKeteranganText').val($(this).val());
+        $('#modalKeterangan').modal('show');
+    });
 
     $('#btnSaveMemo').on('click', function() {
         if (!activeMemoInput) return;
-
-        activeMemoInput.val(
-            $('#modalMemoText').val()
-        );
-
+        activeMemoInput.val($('#modalMemoText').val());
         $('#modalMemo').modal('hide');
     });
 
     $('#btnSaveKeterangan').on('click', function() {
         if (!activeKeteranganInput) return;
-
-        activeKeteranganInput.val(
-            $('#modalKeteranganText').val()
-        );
-
+        activeKeteranganInput.val($('#modalKeteranganText').val());
         $('#modalKeterangan').modal('hide');
     });
 
-    $('#modalMemo').on('hidden.bs.modal', function() {
-        activeMemoInput = null;
-        $('#modalMemoText').val('');
-    });
-
-    $('#modalKeterangan').on('hidden.bs.modal', function() {
-        activeKeteranganInput = null;
-        $('#modalKeteranganText').val('');
-    });
+    $('#modalMemo').on('hidden.bs.modal', function() { activeMemoInput = null; $('#modalMemoText').val(''); });
+    $('#modalKeterangan').on('hidden.bs.modal', function() { activeKeteranganInput = null; $('#modalKeteranganText').val(''); });
 
     document.addEventListener('input', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
@@ -1769,32 +1280,25 @@
 
         const input = e.target;
         const invoice_detail_id = input.dataset.invoice_detail_id;
-        const value_old = parseFloat(input.dataset.value_old);
+        const value_old = parseFloat(input.dataset.value_old) || 0;
         const balance = parseFloat(input.dataset.balance);
-        let value = parseFloat(input.value);
-
+        let value = parseFloat($.inputNumber.unformat(input.value)) || 0;
         const row = $(input).closest("tr");
 
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
-            if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
-            }
+            if (span) { span.textContent = $.inputNumber.format(val); }
         }
 
-        // Tidak boleh lebih dari balance
         if (invoice_detail_id) {
-            // UPDATE
             const maxAllowed = balance + value_old;
-
             if (value > maxAllowed) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Jumlah melebihi balance',
-                    text: 'Jumlah tidak boleh melebihi balance (' + maxAllowed + ')',
+                    icon: 'warning', title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(maxAllowed) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(value_old);
@@ -1802,15 +1306,13 @@
                 return;
             }
         } else {
-            // ADD
             if (value > balance) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Jumlah melebihi balance',
-                    text: 'Jumlah tidak boleh melebihi balance (' + balance + ')',
+                    icon: 'warning', title: 'Jumlah melebihi balance',
+                    text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(balance) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(balance);
@@ -1818,11 +1320,8 @@
                 return;
             }
         }
-
-        updateSpan(value);
     });
 
-    // // jika jumlah kosong
     document.addEventListener('blur', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
 
@@ -1831,45 +1330,22 @@
 
         const input = e.target;
         const invoice_detail_id = input.dataset.invoice_detail_id;
-        const value_old = parseFloat(input.dataset.value_old);
+        const value_old = parseFloat(input.dataset.value_old) || 0;
         const row = $(input).closest("tr");
+        const balance = parseFloat(input.dataset.balance);
+        let value = parseFloat($.inputNumber.unformat(input.value)) || 0;
+
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
-            if (span) {
-                span.textContent = val.toFixed(2).replace('.', ',');
-            }
+            if (span) { span.textContent = $.inputNumber.format(val); }
         }
-
-        const balance = parseFloat(input.dataset.balance);
 
         if (invoice_detail_id) {
-            // UPDATE
-
-            // Tidak boleh minus atau nol
-            if (input.value <= 0) {
+            if (value <= 0 || isNaN(value)) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Jumlah tidak valid',
-                    text: 'Jumlah harus lebih dari 0',
-                    confirmButtonText: 'OK'
+                    icon: 'warning', title: 'Jumlah tidak valid', text: 'Jumlah harus lebih dari 0', confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = value_old;
-                    input.focus();
-                    hitungSubTotal(row, ppn_code, ppn);
-                    updateSpan(value_old);
-                });
-                return;
-            }
-
-            // Tidak boleh kosong
-            if (input.value === '') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Input kosong',
-                    text: 'Jumlah tidak boleh kosong',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    input.value = value_old;
+                    input.value = $.inputNumber.format(value_old);
                     input.focus();
                     hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(value_old);
@@ -1877,35 +1353,13 @@
                 return;
             }
             hitungSubTotal(row, ppn_code, ppn);
-            updateSpan(balance);
+            updateSpan(value);
         } else {
-            // ADD
-
-            // Tidak boleh minus atau nol
-            if (input.value <= 0) {
+            if (value <= 0 || isNaN(value)) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'Jumlah tidak valid',
-                    text: 'Jumlah harus lebih dari 0',
-                    confirmButtonText: 'OK'
+                    icon: 'warning', title: 'Jumlah tidak valid', text: 'Jumlah harus lebih dari 0', confirmButtonText: 'OK'
                 }).then(() => {
-                    input.value = input.dataset.balance;
-                    input.focus();
-                    hitungSubTotal(row, ppn_code, ppn);
-                    updateSpan(balance);
-                });
-                return;
-            }
-
-            // Tidak boleh kosong
-            if (input.value === '') {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Input kosong',
-                    text: 'Jumlah tidak boleh kosong',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    input.value = input.dataset.balance;
+                    input.value = $.inputNumber.format(balance);
                     input.focus();
                     hitungSubTotal(row, ppn_code, ppn);
                     updateSpan(balance);
@@ -1913,21 +1367,17 @@
                 return;
             }
             hitungSubTotal(row, ppn_code, ppn);
-            updateSpan(balance);
+            updateSpan(value);
         }
-
     }, true);
 
-    // Timer untuk debounce AJAX diskon
     let diskonHeaderTimer = null;
 
-    // Update diskon persentase
     $('#cal_diskon_percen').on('input blur', function() {
         let persenVal = $(this).val().trim();
-        let priceVal = $('#cal_diskon_price').val().trim();
+        let priceVal = parseFloat($.inputNumber.unformat($('#cal_diskon_price').val())) || 0;
 
         if (persenVal === '') {
-            // reset jika kosong
             $('#hid_diskon_percen').val('');
             $('#cal_diskon_price').val('');
             $('#hid_diskon_input').val('');
@@ -1935,12 +1385,10 @@
             return;
         }
 
-        // validasi angka saja
         persenVal = persenVal.replace(/[^\d+]/g, '');
         $(this).val(persenVal);
         $('#hid_diskon_percen').val(persenVal);
 
-        // Debounce 500ms untuk input persen
         if (diskonHeaderTimer) clearTimeout(diskonHeaderTimer);
         diskonHeaderTimer = setTimeout(function() {
             let totalAmount = 0;
@@ -1948,140 +1396,57 @@
                 totalAmount += parseFloat($(this).val()) || 0;
             });
 
-            // Kondisi 1: hanya persen terisi
-            if (persenVal !== '' && priceVal === '') {
-                $.ajax({
-                    type: "POST",
-                    url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat_header') ?>",
-                    data: {
-                        total_amount: totalAmount,
-                        persen: persenVal
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        let diskonHasil = parseFloat(response.data[0].harga) || 0;
-                        $('#cal_diskon_price').val(formatNumber(diskonHasil));
-                        $('#hid_diskon_input').val(diskonHasil.toFixed(2));
-                        calculateGrandTotal();
-                    },
-                    error: function(err) {
-                        console.error("Error hitung diskon bertingkat:", err);
-                    }
-                });
+            if (persenVal !== '') {
+                let diskonHasil = calcDiscount(totalAmount, persenVal);
+                $('#cal_diskon_price').val($.inputNumber.format(diskonHasil));
+                $('#hid_diskon_input').val(diskonHasil);
+                calculateGrandTotal();
             }
-
-            // Kondisi 2: persen dan price terisi
-            if (persenVal !== '' && priceVal !== '') {
-                $.ajax({
-                    type: "POST",
-                    url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat_header') ?>",
-                    data: {
-                        total_amount: totalAmount,
-                        persen: persenVal,
-                        price: priceVal
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        let diskonHasil = parseFloat(response.data[0].harga) || 0;
-                        $('#cal_diskon_price').val(formatNumber(diskonHasil));
-                        $('#hid_diskon_input').val(diskonHasil.toFixed(2));
-                        calculateGrandTotal();
-                    },
-                    error: function(err) {
-                        console.error("Error hitung diskon bertingkat:", err);
-                    }
-                });
-            }
-        }, 500);
-
-        let ppn = $('#cal_ppn_code').val();
-        let ppn_code = $('#cal_ppn_code option:selected').text().trim();
-        if (ppn !== '' && ppn_code) {
-            $('#table-detail tbody tr').each(function() {
-                let row = $(this);
-                hitungSubTotal(row, ppn_code, ppn);
-            });
-            calculateGrandTotal();
-        }
+        }, 300);
     });
 
-    // Jika diskon price diubah
     let diskonPriceTimer = null;
 
-    // Validasi input - hanya angka dan koma
-    $('#cal_diskon_price').on('input', function() {
-        let val = $(this).val().replace(/[^0-9,.]/g, '');
-        $(this).val(val);
-        $('#hid_diskon_input').val(val.replace(/,/g, ''));
-    });
+    // Validasi Global Diskon dan Event Input
+    $('#cal_diskon_price').on('input change', function() {
+        let val = parseFloat($.inputNumber.unformat($(this).val())) || 0;
+        let totalAmount = parseFloat($('#hid_total_amount').val()) || 0;
+        let persenInput = $('#cal_diskon_percen').val().trim();
 
-    // Format dan AJAX saat blur
-    $('#cal_diskon_price').on('blur', function() {
-        let persenVal = $('#cal_diskon_percen').val().trim();
-        let priceVal = $(this).val().trim();
-
-        // Format nilai
-        if (priceVal !== '') {
-            let num = parseFloat(priceVal.replace(/,/g, ''));
-            if (!isNaN(num)) {
-                $(this).val(formatNumber(num));
-                $('#hid_diskon_input').val(num.toFixed(2));
+        if (val > totalAmount) {
+            let recalculatedDisc = 0;
+            if (persenInput !== '') {
+                recalculatedDisc = calcDiscount(totalAmount, persenInput);
             }
+            $(this).val($.inputNumber.format(recalculatedDisc));
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan',
+                text: 'Diskon Melebihi Total! Diskon rupiah tidak boleh melebihi total (' + $.inputNumber.format(totalAmount) + ')',
+                confirmButtonText: 'OK'
+            });
+            calculateGrandTotal();
+            return;
         }
 
-        // hapus timer sebelumnya
+        $('#hid_diskon_input').val(val);
         if (diskonPriceTimer) clearTimeout(diskonPriceTimer);
-
-        // jalankan debounce 500ms
         diskonPriceTimer = setTimeout(function() {
-            // Kondisi: kedua field terisi
-            if (persenVal !== '' && priceVal !== '') {
-                let totalAmount = 0;
-                $('input[name="detail[subtotal][]"]').each(function() {
-                    totalAmount += parseFloat($(this).val()) || 0;
-                });
-
-                $.ajax({
-                    type: "POST",
-                    url: "<?= site_url('so_kny/get_hitung_diskon_bertingkat_header') ?>",
-                    data: {
-                        total_amount: totalAmount,
-                        persen: persenVal,
-                        price: priceVal
-                    },
-                    dataType: "json",
-                    success: function(response) {
-                        let diskonHasil = parseFloat(response.data[0].harga) || 0;
-                        $('#cal_diskon_price').val(formatNumber(diskonHasil));
-                        $('#hid_diskon_input').val(diskonHasil.toFixed(2));
-                        calculateGrandTotal();
-                    },
-                    error: function(err) {
-                        console.error("Error hitung diskon bertingkat:", err);
-                    }
-                });
-            }
-        }, 500); // debounce 500ms
-
-        calculateGrandTotal();
+            calculateGrandTotal();
+        }, 300);
     });
 
-
-    // Update PPN saat select berubah
     $('#cal_ppn_code').on('change', function() {
         calculateGrandTotal();
         updatePpnHidden();
     });
-
-    let hitungTimerDetail = null;
 
     function refreshPPN() {
         let ppn = $('#cal_ppn_code').val();
         let ppn_code = $('#cal_ppn_code option:selected').text().trim();
         if (ppn !== '' && ppn_code) {
             $('#table-detail tbody tr').each(function() {
-                let row = $(this);
-                hitungSubTotal(row, ppn_code, ppn);
+                hitungSubTotal($(this), ppn_code, ppn);
             });
             calculateGrandTotal();
         }
@@ -2094,245 +1459,85 @@
         $('#hid_ppn').val(ppn);
         $('#hid_ppn_code').val(ppn_code);
 
-        // ✅ TRIGGER UPDATE SEMUA BARIS DI TABEL DETAIL
         $('#table-detail tbody tr').each(function() {
-            let row = $(this);
-            hitungSubTotal(row, ppn_code, parseFloat(ppn));
+            hitungSubTotal($(this), ppn_code, parseFloat(ppn));
         });
 
         calculateGrandTotal();
     }
 
     function hitungSubTotal(row, ppn_code = '', ppn = 0, trigger = '') {
-
-        let qty = parseFloat(row.find(".qty-edit").val()) || 0;
-        let harga_input = parseFloat(row.find('input[name="detail[harga_input][]"]').val()) || 0;
+        let qty = parseFloat($.inputNumber.unformat(row.find(".qty-edit").val())) || 0;
+        let harga_input = parseFloat($.inputNumber.unformat(row.find('input[name="detail[harga_input][]"]').val())) || 0;
         let diskon_persentase = row.find('input[name="detail[diskon_persentase][]"]').val();
 
-        // reset diskon hanya jika persen yang diubah
         if (trigger === "detail[diskon_persentase][]") {
             if (!diskon_persentase || diskon_persentase.trim() === '') {
-                row.find('input[name="detail[diskon_harga][]"]').val(0);
+                row.find('input[name="detail[diskon_harga][]"]').val($.inputNumber.format(0));
             }
         }
 
-        let diskon_harga = parseFloat(row.find('input[name="detail[diskon_harga][]"]').val()) || 0;
-
+        let diskon_harga = parseFloat($.inputNumber.unformat(row.find('input[name="detail[diskon_harga][]"]').val())) || 0;
         let isPpnIncl = ppn_code && typeof ppn_code === 'string' && ppn_code.toUpperCase().includes('INCL');
         let ppnRate = parseFloat(ppn) || 0;
 
-        let nettoHargaInput = harga_input;
-        let nettoDiskonHarga = diskon_harga;
+        let rawDiskon = diskon_harga;
+
+        if (diskon_persentase && diskon_persentase !== '' && diskon_persentase !== '0') {
+            rawDiskon = calcDiscount(harga_input, diskon_persentase);
+            row.find('input[name="detail[diskon_harga][]"]').val($.inputNumber.format(rawDiskon));
+        }
+
+        let rawSubtotal = (harga_input - rawDiskon) * qty;
+        if (rawSubtotal < 0) rawSubtotal = 0;
+
+        let displayHarga = harga_input;
+        let displayDiskon = rawDiskon;
+        let displaySubtotal = rawSubtotal;
 
         if (isPpnIncl && ppnRate > 0) {
-            nettoHargaInput = harga_input / (1 + ppnRate / 100);
-            nettoDiskonHarga = diskon_harga / (1 + ppnRate / 100);
+            displayHarga = harga_input / (1 + ppnRate / 100);
+            displayDiskon = rawDiskon / (1 + ppnRate / 100);
+            displaySubtotal = rawSubtotal / (1 + ppnRate / 100);
         }
 
-        let hargaBersih = Math.max(0, nettoHargaInput - nettoDiskonHarga);
+        row.find(".harga-input-b").text($.inputNumber.format(displayHarga));
+        row.find('.diskon-harga-view').text($.inputNumber.format(displayDiskon));
+        row.find(".subtotal").text($.inputNumber.format(displaySubtotal));
 
-        // =====================================
-        // JIKA ADA DISKON PERSENTASE
-        // =====================================
+        row.find('input[name="detail[harga][]"]').val(harga_input);
+        row.find('input[name="detail[subtotal][]"]').val(rawSubtotal);
 
-        if (diskon_persentase && diskon_persentase !== '') {
-
-            $.ajax({
-                type: "POST",
-                url: "<?= site_url('po_kny/get_hitung_diskon_bertingkat') ?>",
-                data: {
-                    harga_input: nettoHargaInput,
-                    persen: diskon_persentase
-                },
-                dataType: "json",
-
-                success: function(response) {
-
-                    let diskonHasil = parseFloat(response.data[0].harga) || 0;
-
-                    let subtotal = (nettoHargaInput - diskonHasil) * qty;
-                    if (subtotal < 0) subtotal = 0;
-
-                    row.find(".harga-input-b").text(
-                        nettoHargaInput.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })
-                    );
-
-                    row.find('input[name="detail[harga][]"]').val(nettoHargaInput.toFixed(2));
-
-                    // auto isi diskon jika pakai persen
-                    row.find('input[name="detail[diskon_harga][]"]').val(diskonHasil.toFixed(2));
-
-                    row.find('.diskon-harga-view').text(
-                        diskonHasil.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })
-                    );
-
-                    row.find(".subtotal").text(
-                        subtotal.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })
-                    );
-
-                    row.find('input[name="detail[subtotal][]"]').val(subtotal.toFixed(2));
-
-                    calculateGrandTotal();
-                },
-
-                error: function(err) {
-
-                    console.error("Error hitung diskon bertingkat:", err);
-
-                    let subtotal = hargaBersih * qty;
-                    if (subtotal < 0) subtotal = 0;
-
-                    row.find(".harga-input-b").text(
-                        nettoHargaInput.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })
-                    );
-
-                    row.find('input[name="detail[harga][]"]').val(nettoHargaInput.toFixed(2));
-
-                    row.find('.diskon-harga-view').text(
-                        nettoDiskonHarga.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })
-                    );
-
-                    row.find(".subtotal").text(
-                        subtotal.toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })
-                    );
-
-                    row.find('input[name="detail[subtotal][]"]').val(subtotal.toFixed(2));
-
-                    calculateGrandTotal();
-                }
-
-            });
-
-        }
-
-        // =====================================
-        // TANPA DISKON PERSENTASE
-        // =====================================
-        else {
-
-            let subtotal = hargaBersih * qty;
-            if (subtotal < 0) subtotal = 0;
-
-            row.find(".harga-input-b").text(
-                nettoHargaInput.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })
-            );
-
-            row.find('input[name="detail[harga][]"]').val(nettoHargaInput.toFixed(2));
-
-            // hanya tampilkan diskon manual
-            row.find('.diskon-harga-view').text(
-                nettoDiskonHarga.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })
-            );
-
-            row.find(".subtotal").text(
-                subtotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                })
-            );
-
-            row.find('input[name="detail[subtotal][]"]').val(subtotal.toFixed(2));
-
-            calculateGrandTotal();
-        }
-
+        calculateGrandTotal();
     }
 
-    // --- FUNGSI BANTUAN ---
     function parseDiscountFormula(formula) {
-        if (!formula || formula.trim() === '') return {
-            type: 'none',
-            value: 0
-        };
+        if (!formula || formula.trim() === '') return { type: 'none', value: 0 };
         let parts = formula.split('+').map(p => p.trim()).filter(p => p !== '');
-        if (parts.length === 0) return {
-            type: 'none',
-            value: 0
-        };
+        if (parts.length === 0) return { type: 'none', value: 0 };
 
-        // Jika ada angka dengan awalan '0' (misal: "05000") → anggap sebagai rupiah
         let hasRupiah = parts.some(p => /^0\d+$/.test(p));
         if (hasRupiah) {
-            let totalRp = parts.reduce((sum, p(parseInt(p, 10) || 0), 0));
-            return {
-                type: 'rupiah',
-                value: totalRp
-            };
+            let totalRp = parts.reduce((sum, p) => sum + (parseInt(p, 10) || 0), 0);
+            return { type: 'rupiah', value: totalRp };
         } else {
             let totalPct = parts.reduce((sum, p) => sum + (parseFloat(p) || 0), 0);
-            return {
-                type: 'persen',
-                value: totalPct
-            };
+            return { type: 'persen', value: totalPct };
         }
     }
 
-    // --- HITUNG DISKON BERTINGKAT (HEADER) ---
-    function DiscountHeader(totalAmount, discountFormula) {
-        let parsed = parseDiscountFormula(discountFormula);
-        if (parsed.type === 'rupiah') {
-            return Math.min(parsed.value, totalAmount); // tidak boleh melebihi total
-        }
-
-        let remaining = totalAmount;
-        let totalDiscount = 0;
-        let parts = discountFormula.split('+').map(p => parseFloat(p.trim()) || 0).filter(p => p > 0);
-
-        for (let pct of parts) {
-            let disc = (remaining * pct) / 100;
-            totalDiscount += disc;
-            remaining -= disc;
-        }
-        return parseFloat(totalDiscount.toFixed(2));
-    }
-
-    // --- HITUNG PPN (EXCLUSIVE & INCLUSIVE) ---
     function calculatePPN(totalAmount, discountAmount, ppnRate, ppnCode, setup = {}) {
-
-        let pembulatan = setup.PEMBULATAN_PPN || 0; // 0=off, 1=ceil, 2=floor, 3=round
+        let pembulatan = setup.PEMBULATAN_PPN || 0;
         let isInclude = ppnCode && ppnCode.toUpperCase().includes('INCL');
-
         let taxableBase = totalAmount - discountAmount;
 
         let ppnAmount = 0;
         if (ppnRate > 0) {
             if (isInclude) {
-
-                // Rumus: Netto = Bruto / (1 + PPN%)
-                // Maka PPN = Bruto - Netto
-                // let netto = taxableBase / (1 + ppnRate / 100);
                 ppnAmount = taxableBase * (ppnRate / 100);
-
-                // ppnAmount = taxableBase - netto;
             } else {
                 ppnAmount = (taxableBase * ppnRate) / 100;
             }
-
-            // Pembulatan
             if (pembulatan === 1) ppnAmount = Math.ceil(ppnAmount);
             else if (pembulatan === 2) ppnAmount = Math.floor(ppnAmount);
             else if (pembulatan === 3) ppnAmount = Math.round(ppnAmount);
@@ -2341,123 +1546,88 @@
     }
 
     function calculateGrandTotal() {
-        // 1. Hitung total subtotal
         let totalAmount = 0;
         $('input[name="detail[subtotal][]"]').each(function() {
             totalAmount += parseFloat($(this).val()) || 0;
         });
 
         $('#hid_total_amount').val(totalAmount);
-        $('#v_total_amount').text(formatNumber(totalAmount));
 
-        // 2. Ambil PPN
         let ppnRate = parseFloat($('#cal_ppn_code').val()) || 0;
         let ppnCode = $('#cal_ppn_code option:selected').text().trim();
-        $('#hid_ppn').val(ppnRate);
-        $('#hid_ppn_code').val(ppnCode);
         let isIncl = ppnCode.toUpperCase().includes('INCL') && ppnRate > 0;
 
-        // 3. Ambil input diskon
+        $('#hid_ppn').val(ppnRate);
+        $('#hid_ppn_code').val(ppnCode);
+
         let diskonPersenInput = ($('#cal_diskon_percen').val() || '').trim();
-        let diskonRpInput = ($('#cal_diskon_price').val() || '').replace(/,/g, '');
-        let diskonPersenParsed = {
-            value: 0
-        };
+        let diskonRpInput = parseFloat($.inputNumber.unformat($('#cal_diskon_price').val())) || 0;
+        let diskonPersenParsed = { value: 0 };
         let diskonRpParsed = 0;
 
         if (diskonPersenInput !== '') {
-            // Diskon persen
-            let baseAmount = isIncl ? totalAmount / (1 + ppnRate / 100) : totalAmount;
+            let baseAmount = totalAmount;
             diskonPersenParsed = parseDiscountFormula(diskonPersenInput);
-            diskonRpParsed = calculateDiscountHeader(baseAmount, diskonPersenInput);
+            diskonRpParsed = calcDiscount(baseAmount, diskonPersenInput);
         } else {
-            // Diskon rupiah dari input user, jangan ubah input
-            let diskonRp = parseFloat(diskonRpInput) || 0;
-            diskonRpParsed = isIncl ? diskonRp / (1 + (ppnRate / 100)) : diskonRp;
-
+            diskonRpParsed = diskonRpInput;
             if (totalAmount > 0) {
                 diskonPersenParsed.value = (diskonRpParsed / totalAmount) * 100;
             }
         }
 
-        // 4. Update hidden & tampilan
         $('#hid_diskon_percen').val(diskonPersenParsed.value);
         $('#hid_diskon_input').val(diskonRpParsed);
         $('#hid_diskon_price').val(diskonRpParsed);
-        $('#v_diskon').text(formatNumber(diskonRpParsed));
 
-        // JANGAN UBAH INPUT USER - tapi format jika perlu
-        if (diskonPersenInput === '' && diskonRpInput !== '') {
-            let num = parseFloat(diskonRpInput) || 0;
-            $('#cal_diskon_price').val(formatNumber(num));
+        // Kunci Perbaikan Bug 2: Update UI Form Input dengan Nilai Persentase Kalkulasi
+        if (!$('#cal_diskon_price').is(':focus')) {
+            $('#cal_diskon_price').val($.inputNumber.format(diskonRpParsed));
         }
 
-        // 5. Hitung PPN
-        let ppnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, {
-            PEMBULATAN_PPN: 0
-        });
-        $('#hid_ppn_amount').val(ppnAmount);
-        $('#v_ppn_amount').text(formatNumber(ppnAmount));
+        let displayTotalAmount = totalAmount;
+        let displayDiskon = diskonRpParsed;
+        let displayPpnAmount = 0;
+        let displayTotalNet = 0;
 
-        // 6. Grand Total
-        let grandTotal = totalAmount - diskonRpParsed + ppnAmount;
-        $('#hid_total_net').val(grandTotal);
-        $('#v_total_net').text(formatNumber(grandTotal));
+        let hiddenPpnAmount = 0;
+        let hiddenTotalNet = 0;
 
-        // 7. Hidden field untuk submit
+        if (isIncl) {
+            displayTotalAmount = totalAmount / (1 + ppnRate / 100);
+            displayDiskon = diskonRpParsed / (1 + ppnRate / 100);
+
+            let totalNetRaw = totalAmount - diskonRpParsed;
+            let dpp = totalNetRaw / (1 + ppnRate / 100);
+            displayPpnAmount = totalNetRaw - dpp;
+            displayTotalNet = totalNetRaw;
+
+            hiddenPpnAmount = displayPpnAmount;
+            hiddenTotalNet = displayTotalNet;
+        } else {
+            displayPpnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, { PEMBULATAN_PPN: 0 });
+            displayTotalNet = totalAmount - diskonRpParsed + displayPpnAmount;
+
+            hiddenPpnAmount = displayPpnAmount;
+            hiddenTotalNet = displayTotalNet;
+        }
+
+        $('#v_total_amount').text($.inputNumber.format(displayTotalAmount));
+        $('#v_diskon').text($.inputNumber.format(displayDiskon));
+        $('#v_ppn_amount').text($.inputNumber.format(displayPpnAmount));
+        $('#v_total_net').text($.inputNumber.format(displayTotalNet));
+
+        $('#hid_ppn_amount').val(hiddenPpnAmount);
+        $('#hid_total_net').val(hiddenTotalNet);
+
         $('input[name="TOTAL_AMOUNT"]').val(totalAmount);
         $('input[name="TOTAL_DISKON_INPUT_HIDDEN"]').val(diskonRpParsed);
-        $('input[name="PPN_AMOUNT"]').val(ppnAmount);
-        $('input[name="TOTAL_NET"]').val(grandTotal);
-    }
-
-    function calculateDiscountHeader(totalAmount, discountFormula) {
-        if (!discountFormula || typeof discountFormula !== 'string') return 0;
-
-        // Bersihkan input: hanya angka, titik, dan +
-        let clean = discountFormula.replace(/[^\d.+]/g, '');
-        if (!clean) return 0;
-
-        // Pisahkan berdasarkan '+'
-        let parts = clean.split('+').map(p => p.trim()).filter(p => p !== '');
-
-        // Jika ada bagian yang dimulai dengan '0' dan panjang > 1 → anggap sebagai nominal rupiah (e.g., "05000")
-        let hasRupiah = parts.some(p => /^0\d+$/.test(p));
-
-        if (hasRupiah) {
-            // Hitung total nominal rupiah (contoh: "05000+03000" → 500 + 3000 = 8000)
-            let totalRp = parts.reduce((sum, p) => {
-                let num = parseInt(p, 10) || 0;
-                return sum + num;
-            }, 0);
-            return Math.min(totalRp, totalAmount); // Tidak boleh melebihi total
-        } else {
-            // Diskon persentase bertingkat (e.g., "10+5" → 10% lalu 5% dari sisa)
-            let remaining = totalAmount;
-            let totalDiscount = 0;
-
-            for (let part of parts) {
-                let pct = parseFloat(part) || 0;
-                if (pct <= 0) continue;
-                let disc = (remaining * pct) / 100;
-                totalDiscount += disc;
-                remaining -= disc;
-            }
-            return parseFloat(totalDiscount.toFixed(2));
-        }
-    }
-
-    function formatNumber(value, decimal = 2) {
-        if (value === "" || isNaN(value)) return "0.00";
-        return parseFloat(value).toLocaleString("en-US", {
-            minimumFractionDigits: decimal,
-            maximumFractionDigits: decimal
-        });
+        $('input[name="PPN_AMOUNT"]').val(hiddenPpnAmount);
+        $('input[name="TOTAL_NET"]').val(hiddenTotalNet);
     }
 
     function toggleStorageDisabled() {
         if (!tableDetail) return;
-
         let hasDetail = tableDetail.rows().count() > 0;
         let $supplier = $('#supplier');
         let $storage = $('#storage');
@@ -2473,52 +1643,34 @@
 
     function resetModalItem() {
         tableItem.search('').columns().search('').draw();
-
         $('#checkAll').prop('checked', false);
-
-        $('#tableItem').find('.chkRow')
-            .prop('checked', false)
-            .prop('disabled', false);
+        $('#tableItem').find('.chkRow').prop('checked', false).prop('disabled', false);
     }
 
     function ellipsis(text, limit = 25) {
         if (!text) return '-';
-        return text.length > limit ?
-            text.substring(0, limit) + '...' :
-            text;
+        return text.length > limit ? text.substring(0, limit) + '...' : text;
     }
 
     function loadLocation(supplier, selectedLocation = null) {
         $('#location').removeClass('readonly-select');
-
-        $('#location')
-            .empty()
-            .prop('disabled', true)
-            .trigger('change');
+        $('#location').empty().prop('disabled', true).trigger('change');
         if (!supplier) return;
 
         $.ajax({
             url: "<?= base_url('po_kny/get_location_by_supplier') ?>",
             type: "POST",
-            data: {
-                supplier: supplier
-            },
+            data: { supplier: supplier },
             dataType: "json",
             success: function(response) {
                 if (response.status === 'success') {
                     let locations = response.data;
                     $.each(locations, function(i, item) {
                         let selected = "";
-
-                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) {
-                            selected = "selected";
-                        } else if (!selectedLocation && item.PRIMARY_SHIP === "Y") {
-                            selected = "selected";
-                        }
-
+                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) { selected = "selected"; } 
+                        else if (!selectedLocation && item.PRIMARY_SHIP === "Y") { selected = "selected"; }
                         $('#location').val(item.SITE_NAME);
                         $('#location_id').val(item.PERSON_SITE_ID);
-
                         $('#address').val((item.ADDRESS1 ?? '') + '\n' + (item.CITY ?? ''));
                     });
                 }
@@ -2527,35 +1679,22 @@
     }
 
     function updateJatuhTempo() {
-        // Ambil tanggal awal
         let tanggal = $('#tanggal').val();
         if (!tanggal) return;
-
-        // Ambil jumlah hari dari payment term yang dipilih
-        let days = parseInt($('#payment_term option:selected').data('number')) || 0;
-
-        // Buat object Date dari tanggal
+        let days = parseInt($('#payment_term option:selected').data('number_days')) || 0;
         let dateObj = new Date(tanggal);
-
-        // Tambahkan jumlah hari
         dateObj.setDate(dateObj.getDate() + days);
-
-        // Format ke yyyy-MM-ddTHH:mm (format datetime-local)
         let year = dateObj.getFullYear();
         let month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
         let day = ("0" + dateObj.getDate()).slice(-2);
         let hours = ("0" + dateObj.getHours()).slice(-2);
         let minutes = ("0" + dateObj.getMinutes()).slice(-2);
-
         let formatted = `${year}-${month}-${day}T${hours}:${minutes}`;
-
-        // Set nilai jatuh tempo
         $('#jatuh_tempo').val(formatted);
     }
+
     $(document).on('click', '#btn-print', function() {
-        setTimeout(function() {
-            $('#loading').hide();
-        }, 300);
+        setTimeout(function() { $('#loading').hide(); }, 300);
     });
 
     $('form').on('submit', function(e) {

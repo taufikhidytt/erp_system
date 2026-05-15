@@ -1,6 +1,9 @@
 <div class="card border-2">
     <div class="card-header">
-        <div class="card-title"><h5>Daftar Perbandingan Item</h5></div>
+        <div class="card-title">
+            <h5>Daftar Perbandingan Item</h5>
+            <?= $so->PERSON ?>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -38,9 +41,9 @@
                             <td><?= $item['PO_NO'] ?></td>
                             <td><?= $item['SO_Nama_Item'] ?></td>
                             <td><?= $item['MR_Nama_Item'] ?></td>
-                            <td class="text-end"><?= number_format($item['MR_Qty'],2,'.',',') ?></td>
-                            <td class="text-end"><?= number_format($item['PO_Qty'],2,'.',',') ?></td>
-                            <td class="text-end"><?= number_format($item['Qty_Difference'],2,'.',',') ?></td>
+                            <td class="text-end"><?= numb_format($item['MR_Qty']) ?></td>
+                            <td class="text-end"><?= numb_format($item['PO_Qty']) ?></td>
+                            <td class="text-end"><?= numb_format($item['Qty_Difference']) ?></td>
                             <td class="text-center">
                                 <span class="badge bg-<?= $item['Match_Status']=='MATCH'?'success':($item['Match_Status']=='OVER_QTY'?'warning':'danger') ?>">
                                     <?= str_replace('_',' ',$item['Match_Status']) ?>
