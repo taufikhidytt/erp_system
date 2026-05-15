@@ -303,3 +303,16 @@ if (! function_exists('button_actions')) {
         return ($type === 'dt') ? $results : implode(' ', $results);
     }
 }
+
+if(! function_exists('folder_key')){
+    function folder_key()
+    {
+        $ci     = &get_instance();
+        $db_info = [
+            'hostname' => $ci->db->hostname,
+            'database' => $ci->db->database,
+            'port'     => $ci->db->port,
+        ];
+        return sha1(sha1(json_encode($db_info)));
+    }
+}

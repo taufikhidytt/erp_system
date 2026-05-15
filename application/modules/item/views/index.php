@@ -1,5 +1,5 @@
 <style>
-    .dt-buttons .btn {
+    .dt-buttons .btn-primary {
         background-color: #0d6efd;
         /* warna biru Bootstrap primary */
         border-color: #0d6efd;
@@ -170,7 +170,16 @@
     $(document).ready(function() {
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
+            buttons: getButtons(<?= json_encode(button_actions(['insert',
+                [
+                    'key'      => 'import',
+                    'redirect' => site_url('item/import'),
+                    'class'    => 'btn-success',
+                    'title'    => 'Import',
+                    'icon'     => 'ri-file-upload-line',
+                    'needs_auth' => true,
+                ],
+            ], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,

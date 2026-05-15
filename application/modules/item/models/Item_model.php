@@ -7,6 +7,7 @@ class Item_model extends CI_Model
     public function __construct()
     {
         setVariableMysql();
+        $this->init_database();
     }
 
     var $column_order = array(
@@ -194,7 +195,6 @@ class Item_model extends CI_Model
     {
         return $this->db->query("SELECT b.DISPLAY_NAME Grade, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'RAK' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
     }
-
     public function getMadeIn()
     {
         return $this->db->query("SELECT b.DISPLAY_NAME Made_In, b.DESCRIPTION Note, b.PRIMARY_FLAG Default_Flag, b.ERP_LOOKUP_VALUE_ID FROM erp_lookup_set a INNER JOIN erp_lookup_value b ON ( a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID ) WHERE a.PROGRAM_CODE = 'MADE_IN' AND b.ACTIVE_FLAG = 'Y' ORDER BY b.PRIMARY_FLAG DESC, b.DISPLAY_NAME");
@@ -219,7 +219,6 @@ class Item_model extends CI_Model
     {
         return $this->db->query("SELECT a.PERSON_ID, a.PERSON_NAME Supplier, a.PERSON_CODE Kode FROM person a JOIN person_site b ON (a.PERSON_ID = b.PERSON_ID) WHERE a.FLAG_SUPP = 1 AND a.ACTIVE_FLAG = 'Y' GROUP BY a.PERSON_ID ORDER BY a.PERSON_NAME");
     }
-
     public function add($post)
     {
         date_default_timezone_set('Asia/Jakarta');
@@ -827,5 +826,163 @@ class Item_model extends CI_Model
         }
         $this->db->limit(50);
         return $this->db->get()->result();
+    }
+
+
+    // import data
+    private function init_database()
+    {
+        if (!$this->db->table_exists('import_history')) {
+            $this->load->dbforge();
+            $fields = [
+                'IMPORT_HISTORY_ID' => ['type' => 'INT', 'constraint' => 11, 'unsigned' => TRUE, 'auto_increment' => TRUE],
+                'IMPORT_KEY'        => ['type' => 'VARCHAR', 'constraint' => '30'],
+                'SESSION_ID'        => ['type' => 'VARCHAR', 'constraint' => '128'],
+                'STATUS'            => ['type' => 'ENUM("pending","queued","running","done","failed","archived")', 'default' => 'pending'],
+                'PROGRESS'          => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+                'MAX_PROGRESS'      => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+                'CHUNK'             => ['type' => 'INT', 'constraint' => 11, 'default' => 0],
+                'MESSAGE'           => ['type' => 'VARCHAR', 'constraint' => '255', 'null' => TRUE],
+                'PROCESS_ID'        => ['type' => 'INT', 'constraint' => 11, 'null' => TRUE],
+                'THREAD_ID'         => ['type' => 'INT', 'constraint' => 11, 'null' => TRUE],
+                'JSON_TEXT'         => ['type' => 'TEXT', 'null' => TRUE],
+                'CREATED_BY'        => ['type' => 'INT', 'constraint' => 11, 'null' => TRUE],
+                'CREATED_DATE'      => ['type' => 'DATETIME', 'null' => TRUE],
+                'LAST_UPDATE_BY'    => ['type' => 'INT', 'constraint' => 11, 'null' => TRUE],
+                'LAST_UPDATE_DATE'  => ['type' => 'DATETIME', 'null' => TRUE],
+                'STARTED_AT'        => ['type' => 'DATETIME', 'null' => TRUE],
+                'FINISHED_AT'       => ['type' => 'DATETIME', 'null' => TRUE],
+            ];
+
+            $this->dbforge->add_field($fields);
+            $this->dbforge->add_key('IMPORT_HISTORY_ID', TRUE);
+            $this->dbforge->add_key('STATUS');
+            $this->dbforge->add_key('CREATED_BY');
+            $this->dbforge->add_key(['IMPORT_KEY', 'STATUS']);
+
+            $attributes = ['ENGINE' => 'InnoDB', 'COMMENT' => '"Tracking import logs"'];
+            $this->dbforge->create_table('import_history', FALSE, $attributes);
+        }
+    }
+    public function create_job($data)
+    {
+        $data['SESSION_ID'] = session_id();
+        $data['STATUS']     = 'queued';
+        $data['PROGRESS']   = 0;
+        $data['MESSAGE']    = 'Menunggu proses dimulai...';
+        $data['CREATED_DATE'] = date('Y-m-d H:i:s');
+        $data['CREATED_BY'] = $this->session->userdata('id');
+        $this->db->insert('import_history', $data);
+        return (int)$this->db->insert_id();
+    }
+
+    public function get_job($job_id)
+    {
+        $this->db->where('IMPORT_HISTORY_ID', (int) $job_id);
+        $query = $this->db->get('import_history');
+        return $query->row_array() ?: null;
+    }
+
+    public function get_active_job(){
+        $this->db->where('IMPORT_KEY','item');
+        $this->db->where('CREATED_BY', (int) $this->session->id);
+        $this->db->where_in('STATUS', ['pending', 'queued', 'running']);
+        $query = $this->db->get('import_history');
+        return $query->row_array();
+    }
+
+    public function update_job($job_id, array $data)
+    {
+        $data['LAST_UPDATE_DATE']   = date('Y-m-d H:i:s');
+        $data['LAST_UPDATE_BY']     = $this->session->id;
+
+        $this->db->where('IMPORT_HISTORY_ID', (int)$job_id);
+        return $this->db->update('import_history', $data);
+    }
+
+    public function checkLastData()
+    {
+        $lookup_codes = [
+            'MEREK', 'GROUP', 'TYPEINVENTORY', 'RAK', 
+            'MADE_IN', 'TIPE', 'JENIS', 'GRADE'
+        ];
+
+        $placeholders = implode(',', array_fill(0, count($lookup_codes), '?'));
+
+        $sql = "
+            SELECT 
+                a.PROGRAM_CODE AS ref_key, 
+                MAX(b.LAST_UPDATE_DATE) AS last_update, 
+                COUNT(b.ERP_LOOKUP_VALUE_ID) AS total_count 
+            FROM erp_lookup_set a 
+            INNER JOIN erp_lookup_value b ON a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID 
+            WHERE a.PROGRAM_CODE IN ($placeholders)
+            GROUP BY a.PROGRAM_CODE
+
+            UNION ALL
+
+            SELECT 
+                'UOM' AS ref_key, 
+                MAX(last_update_date), 
+                COUNT(*) 
+            FROM uom
+
+            UNION ALL
+
+            SELECT 
+                'SUPPLIER' AS ref_key, 
+                MAX(a.LAST_UPDATE_DATE), 
+                COUNT(a.PERSON_ID) 
+            FROM person a 
+            INNER JOIN person_site b ON a.PERSON_ID = b.PERSON_ID 
+            WHERE a.FLAG_SUPP = 1
+        ";
+
+        $result = $this->db->query($sql, $lookup_codes)->result_array();
+
+        $metadata = [];
+        foreach ($result as $row) {
+            $metadata[strtolower($row['ref_key'])] = [
+                'last_update' => $row['last_update'],
+                'total'       => (int)$row['total_count']
+            ];
+        }
+
+        return $metadata;
+    }
+
+    public function cacheData($name, $key_db, $ckLastData)
+    {
+        $name       = ucwords($name);
+        $dir        = APPPATH . 'cache/master/';
+        $folder_key = folder_key();
+        $path       = $dir.$folder_key.'/'.$name.'.json';
+        
+        $db_date    = $ckLastData[$key_db]['last_update'];
+        $total      = $ckLastData[$key_db]['total'];
+        $cache      = file_exists($path) ? json_decode(file_get_contents($path), true) : null;
+
+        if ($cache && isset($cache['last_update_date']) && $cache['last_update_date'] === $db_date &&
+            isset($cache['total']) && $cache['total'] === $total) {
+            return $cache['data'];
+        }
+
+        $data = $this->{'get'.$name}()->result_array();
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+            file_put_contents($dir . 'index.html', ''); 
+        }
+        if (!is_dir($dir.$folder_key)) {
+            mkdir($dir.$folder_key, 0755, true);
+            file_put_contents($dir.$folder_key.'/' . 'index.html', ''); 
+        }
+
+        file_put_contents($path, json_encode([
+            'last_update_date' => $db_date,
+            'total'            => $total,
+            'data'             => $data
+        ]));
+
+        return $data;
     }
 }
