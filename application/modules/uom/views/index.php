@@ -1,11 +1,12 @@
 <style>
-    .dt-buttons .btn {
+    .dt-buttons .btn-primary {
         background-color: #0d6efd;
         /* warna biru Bootstrap primary */
         border-color: #0d6efd;
         color: white;
     }
 </style>
+
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
@@ -54,21 +55,13 @@
                                                     <option value="N">✖</option>
                                                 </select>
                                             </th>
-                                            <th style="min-width: 50px;">
-                                                <select class="column_search" data-column="5" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                                    <option value="">All</option>
-                                                    <option value="Y">✔</option>
-                                                    <option value="N">✖</option>
-                                                </select>
-                                            </th>
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th>No</th>
                                             <th>Satuan</th>
                                             <th>Deskripsi</th>
-                                            <th>Base Flag</th>
-                                            <th>Primary Flag</th>
-                                            <th>Active Flag</th>
+                                            <th>Default</th>
+                                            <th>Aktif</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -85,7 +78,9 @@
 </div>
 <!-- End Page-content -->
 
- <script>
+<link href="<?= base_url() ?>assets/admin/libs/inline-editor/inline-editor.css" rel="stylesheet" type="text/css" />
+<script src="<?= base_url() ?>assets/admin/libs/inline-editor/inline-editor.js"></script>
+<script>
     $(document).ready(function() {
         let columns = [
             {
@@ -103,11 +98,6 @@
                 "data": "description",
             },
             {
-                "data": "base_flag",
-                "className" : "text-center",
-                "width" : "70px"
-            },
-            {
                 "data": "primary_flag",
                 "className" : "text-center",
                 "width" : "80px"
@@ -119,8 +109,14 @@
             },
         ];
         var table = $('#table').DataTable({
-            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: getButtons(<?= json_encode(button_actions(['insert',
+            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>rtip',
+            buttons: getButtons(<?= json_encode(button_actions([
+                [
+                    'key'      => 'insert',
+                    'class'    => 'btn-insert btn-primary',
+                    'url'      => '',
+                    'raw_url'  => true
+                ],
                 [
                     'key'      => 'import',
                     'redirect' => site_url('uom/import'),
@@ -143,11 +139,35 @@
             "columns": columns
         });
         
-        $('.column_search').on('keyup change', function() {
+        $('.column_search').on('input', function() {
             table
                 .column($(this).data('column'))
                 .search(this.value)
                 .draw();
         });
+
+        const editor = InlineEditor.init({
+            table : table,
+            add   : <?= $access['insert']?'true':'false' ?>,
+            edit  : <?= $access['update']?'true':'false' ?>,
+            urls  : {
+                save : '<?= site_url('uom/save') ?>',
+            },
+            fields: [
+                { field: 'name',         type: 'text', maxlength: 18, required: true, label: 'Satuan', editable: false,
+                    attrs: { 
+                        oninput: "let p = this.selectionStart; this.value = this.value.toUpperCase(); this.setSelectionRange(p, p);"
+                    }
+                },
+                { field: 'description',  type: 'text', maxlength:80, required: true, label : 'Deskripsi',
+                    attrs: { 
+                        oninput: "let p = this.selectionStart; this.value = this.value.toUpperCase(); this.setSelectionRange(p, p);"
+                    }
+                },
+                { field: 'primary_flag', type: 'checkbox', exclusive: true },
+                { field: 'active_flag',  type: 'checkbox', value: 'Y'},
+            ],
+        });
+        console.log(editor);
     });
 </script>

@@ -208,6 +208,12 @@ if (! function_exists('button_actions')) {
                 if (isset($item['icon']))         $btn['icon']         = $item['icon'];
                 if (isset($item['target']))       $btn['target']       = $item['target'];
 
+                if (isset($item['url'])) {
+                    $btn['url'] = $item['url'];
+                }
+                if (isset($item['raw_url'])) {
+                    $btn['raw_url'] = $item['raw_url'];
+                }
                 // redirect → render sebagai <a href>
                 if (isset($item['redirect'])) {
                     $btn['url']     = $item['redirect'];
@@ -277,9 +283,14 @@ if (! function_exists('button_actions')) {
                 }
 
                 $results[] = [
-                    'text'      => '<i class="' . $btn['icon'] . '"></i> ' . $btn['title'],
+                    'text'      => '<i class="' . $btn['icon'] . '"></i>',
                     'className' => 'btn btn-sm ' . $btn['class'] . ' ' . $extra_class,
                     'url'       => $url,
+                    'titleAttr' => $btn['title'],
+                    'attr'      => [
+                        'data-toggle' => 'tooltip',
+                        'data-bs-placement' => 'left'
+                    ]
                 ];
             } else {
                 if (isset($btn['url'])) {
@@ -296,7 +307,7 @@ if (! function_exists('button_actions')) {
                 $target    = isset($btn['target'])  ? 'target="' . $btn['target'] . '"' : '';
                 $onclick   = isset($btn['onclick']) ? 'onclick="' . $btn['onclick'] . '"' : '';
 
-                $results[] = "<$tag $href $type_attr $target $onclick $data_attrs class='btn btn-sm {$btn['class']} $extra_class' data-toggle='tooltip' title='{$btn['title']}'><i class='{$btn['icon']}'></i></$tag>";
+                $results[] = "<$tag $href $type_attr $target $onclick $data_attrs class='btn btn-sm {$btn['class']} $extra_class' data-toggle='tooltip' data-bs-placement='left' title='{$btn['title']}'><i class='{$btn['icon']}'></i></$tag>";
             }
         }
 
@@ -314,5 +325,215 @@ if(! function_exists('folder_key')){
             'port'     => $ci->db->port,
         ];
         return sha1(sha1(json_encode($db_info)));
+    }
+}
+
+if(! function_exists('get_bi_data')){
+    function get_bi_data()
+    {
+        $cache_file = APPPATH . 'cache/bi_exchange_rates.json';
+        $cache_ttl  = 6 * 3600; // 6 jam dalam detik
+
+        // Cek cache valid
+        if (file_exists($cache_file)) {
+            $cache = json_decode(file_get_contents($cache_file), true);
+            if (
+                isset($cache['last_sync']) &&
+                (time() - $cache['last_sync']) < $cache_ttl
+            ) {
+                return $cache;
+            }
+        }
+
+        try {
+            $data = fetch_bi_data();
+            $data['last_sync'] = time();
+
+            file_put_contents($cache_file, json_encode($data), LOCK_EX);
+
+            return $data;
+        } catch (Exception $e) {
+            if (isset($cache['last_sync'])) {
+                return $cache;
+            }
+            throw $e;
+        }
+    }
+}
+
+if(! function_exists('fetch_bi_data')){
+    function fetch_bi_data()
+    {
+        $url = 'https://www.bi.go.id/id/statistik/informasi-kurs/transaksi-bi/Default.aspx';
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_USERAGENT      => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTPHEADER     => [
+                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language: id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Accept-Encoding: gzip, deflate, br',
+                'Connection: keep-alive',
+                'Upgrade-Insecure-Requests: 1',
+            ],
+        ]);
+
+        $output = curl_exec($ch);
+        $errno  = curl_errno($ch);
+        $error  = curl_error($ch);
+        curl_close($ch);
+
+        if ($errno) {
+            $cache_file = APPPATH . 'cache/bi_exchange_rates.json';
+            if (file_exists($cache_file)) {
+                $cache = json_decode(file_get_contents($cache_file), true);
+                if (isset($cache['data'])) {
+                    return $cache['data'];
+                }
+            }
+            throw new Exception('Gagal mengambil data BI: ' . $error);
+        }
+
+        $dom = new DOMDocument();
+        @$dom->loadHTML($output);
+        $xpath = new DOMXPath($dom);
+
+        // Parse last_update
+        $last_update      = '';
+        $last_update_node = $xpath->query(
+            "//div[contains(@class,'search-box-wrapper') and contains(text(),'Update Terakhir')]/span"
+        )->item(0);
+
+        if ($last_update_node) {
+            $raw    = trim($last_update_node->nodeValue);
+            $months = [
+                'Januari'=>'01','Februari'=>'02','Maret'=>'03','April'=>'04',
+                'Mei'=>'05','Juni'=>'06','Juli'=>'07','Agustus'=>'08',
+                'September'=>'09','Oktober'=>'10','November'=>'11','Desember'=>'12',
+                'Jan'=>'01','Feb'=>'02','Mar'=>'03','Apr'=>'04','May'=>'05',
+                'Jun'=>'06','Jul'=>'07','Aug'=>'08','Sep'=>'09',
+                'Oct'=>'10','Nov'=>'11','Dec'=>'12',
+            ];
+            if (preg_match('/(\d+)\s+(\w+)\s+(\d{4})/', $raw, $m)) {
+                $last_update = sprintf(
+                    '%s-%s-%s',
+                    $m[3],
+                    $months[$m[2]] ?? '01',
+                    str_pad($m[1], 2, '0', STR_PAD_LEFT)
+                );
+            }
+        }
+
+        $result = [
+            'last_update'    => $last_update,
+            'source'         => 'Bank Indonesia',
+            'base_currency'  => 'IDR',
+            'exchange_rates' => [],
+        ];
+
+        $rows = $xpath->query("//table[contains(@class,'table')]//tbody/tr");
+        foreach ($rows as $row) {
+            $cols = $xpath->query('td', $row);
+            if ($cols->length < 4) continue;
+
+            $currency = trim($cols->item(0)->nodeValue);
+            $unit     = (float) str_replace('.', '', trim($cols->item(1)->nodeValue));
+            $selling  = (float) str_replace(['.', ','], ['', '.'], trim($cols->item(2)->nodeValue));
+            $buying   = (float) str_replace(['.', ','], ['', '.'], trim($cols->item(3)->nodeValue));
+
+            $result['exchange_rates'][$currency] = [
+                'unit'         => $unit,
+                'selling_rate' => $selling,
+                'buying_rate'  => $buying,
+                'middle_rate'  => (($selling + $buying) / 2),
+            ];
+        }
+
+        return $result;
+    }
+}
+
+if(! function_exists('get_currencies')){
+    function get_currencies()
+    {
+        $cache_file = APPPATH . 'cache/currencies.json';
+        $cache_ttl  = 24 * 3600; // 6 jam dalam detik
+
+        if (file_exists($cache_file)) {
+            $cache = json_decode(file_get_contents($cache_file), true);
+            if (
+                isset($cache['last_sync']) &&
+                (time() - $cache['last_sync']) < $cache_ttl
+            ) {
+                return $cache;
+            }
+        }
+
+        try {
+            $data = fetch_currencies();
+            $data['last_sync'] = time();
+
+            file_put_contents($cache_file, json_encode($data), LOCK_EX);
+
+            return $data;
+        } catch (Exception $e) {
+            if (isset($cache['last_sync'])) {
+                return $cache;
+            }
+            throw $e;
+        }
+    }
+}
+
+if(! function_exists('fetch_currencies')){
+    function fetch_currencies()
+    {
+        // https://api.frankfurter.dev/v2/rates?base=USD&quotes=IDR
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => 'https://api.frankfurter.dev/v2/currencies',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING       => '',
+            CURLOPT_USERAGENT      => 'Mozilla/5.0',
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_CONNECTTIMEOUT => 10,
+        ]);
+
+        $output = curl_exec($ch);
+        $errno  = curl_errno($ch);
+        $error  = curl_error($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($errno) {
+            throw new Exception('Curl error: ' . $error);
+        }
+
+        if ($http_code !== 200) {
+            throw new Exception('API error: HTTP ' . $http_code);
+        }
+
+        $data = json_decode($output, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception('Invalid JSON response');
+        }
+
+        $result = [];
+
+        foreach ($data as $v) {
+            $result[$v['iso_code']] = $v;
+        }
+
+        return $result;
     }
 }

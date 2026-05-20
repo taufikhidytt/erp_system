@@ -530,6 +530,7 @@
         });
 
         $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+            if(settings.sTableId != 'table-item') return true;
             var min = $(document).find('#min-date').val();
             var max = $(document).find('#max-date').val();
             

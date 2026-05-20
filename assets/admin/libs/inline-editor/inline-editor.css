@@ -1,0 +1,47 @@
+/* ================================================================
+   inline-editor.css
+   ================================================================ */
+
+.ie-cell { cursor: pointer; }
+.ie-cell:hover { background: #eef4ff !important; }
+.ie-cell.ie-changed { background: #fff8e1 !important; }
+.ie-cell.ie-editing { background: #f0f7ff !important; cursor: default; }
+
+/* Row baru */
+tr.ie-new-row td { background: #f0fff4 !important; }
+tr.ie-new-row td.ie-changed { background: #e6ffed !important; }
+
+/* Input & select */
+.ie-cell input[type="text"],
+.ie-cell input[type="number"],
+.ie-cell input[type="date"],
+.ie-cell input[type="time"],
+.ie-cell input[type="datetime-local"],
+.ie-cell select {
+    width: 100%;
+    min-width: 60px;
+    border: 1px solid #86b7fe;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: inherit;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, .15);
+    outline: none;
+    background: #fff;
+}
+
+/* Checkbox */
+.ie-cell input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+/* Select2 wrapper — paksa lebar mengikuti cell */
+.ie-cell .select2-container {
+    width: 100% !important;
+    min-width: 100px;
+}
+
+/* Tombol Save — disembunyikan by default */
+#ie-btn-save { display: none; }

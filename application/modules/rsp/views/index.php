@@ -300,7 +300,7 @@
             }
         });
 
-        $('.column_search').on('keyup change', function() {
+        $('.column_search').on('input', function() {
             table
                 .column($(this).data('column'))
                 .search(this.value)

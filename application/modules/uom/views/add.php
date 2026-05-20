@@ -35,50 +35,45 @@
                                 <div class="row form-xs">
                                     <div class="col-lg-6 col-md-12 col-sm-12">
                                         <div class="mb-3">
-                                            <label for="uom_code">UOM Code:</label>
+                                            <label for="uom_code">Satuan:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-price-tag-3-fill"></i>
                                                 </span>
                                                 <input type="text" name="uom_code" id="uom_code" class="form-control <?= form_error('uom_code') ? 'is-invalid' : null; ?>" 
-                                                    placeholder="UOM Code" value="<?= set_value('uom_code',''); ?>" required>
+                                                    placeholder="Masukan satuan" value="<?= set_value('uom_code',''); ?>" maxlength="18" style="text-transform: uppercase;">
                                             </div>
                                             <div class="text-danger"><?= form_error('uom_code') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="description">Description:</label>
+                                            <label for="description">Deskripsi:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
                                                     <i class="ri ri-file-text-fill"></i>
                                                 </span>
                                                 <input type="text" name="description" id="description" class="form-control <?= form_error('description') ? 'is-invalid' : null; ?>" 
-                                                    placeholder="Description" value="<?= set_value('description',''); ?>" required>
+                                                    placeholder="Masukan deskripsi" value="<?= set_value('description',''); ?>" maxlength="80">
                                             </div>
                                             <div class="text-danger"><?= form_error('description') ?></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-12 col-sm-12 d-flex gap-3">
-                                        <div class="mb-3">
-                                            <label for="base_uom_flag" class="form-label d-block">Base UOM Flag</label>
-                                            <div class="form-check form-switch form-switch-md mb-3" dir="ltr">
-                                                <input type="checkbox" class="form-check-input" id="base_uom_flag" name="base_uom_flag" value="Y" <?= set_value('base_uom_flag', 'N') == 'Y' ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="base_uom_flag">Yes</label>
+                                        <div class="d-flex gap-3">
+                                            <div class="mb-3">
+                                                <label for="primary_flag" class="form-label d-block">Default</label>
+                                                <div class="form-check form-switch form-switch-md mb-3" dir="ltr">
+                                                    <input type="checkbox" class="form-check-input" id="primary_flag" name="primary_flag" value="Y" <?= set_value('primary_flag', 'N') == 'Y' ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="primary_flag">Yes</label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="primary_flag" class="form-label d-block">Primary Flag</label>
-                                            <div class="form-check form-switch form-switch-md mb-3" dir="ltr">
-                                                <input type="checkbox" class="form-check-input" id="primary_flag" name="primary_flag" value="Y" <?= set_value('primary_flag', 'N') == 'Y' ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="primary_flag">Yes</label>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="active_flag" class="form-label d-block">Active Flag</label>
-                                            <div class="form-check form-switch form-switch-md mb-3" dir="ltr">
-                                                <input type="checkbox" class="form-check-input" id="active_flag" name="active_flag" value="Y" <?= set_value('active_flag', 'Y') == 'Y' ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="active_flag">Yes</label>
+                                            <div class="mb-3">
+                                                <label for="active_flag" class="form-label d-block">Aktif</label>
+                                                <div class="form-check form-switch form-switch-md mb-3" dir="ltr">
+                                                    <input type="checkbox" class="form-check-input" id="active_flag" name="active_flag" value="Y" <?= set_value('active_flag', 'Y') == 'Y' ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="active_flag">Yes</label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -91,3 +86,17 @@
         </form>
     </div>
 </div>
+<script>
+    $(document).ready(function(){
+        $('#uom_code').on('input', function() {
+            $(this).val($(this).val().toUpperCase());
+        });
+        $('#active_flag, #primary_flag').trigger('change');
+    });
+    $(document).on('change','#active_flag, #primary_flag', function(){
+        swith_label($(this), $(this).is(":checked"));
+    });
+    function swith_label(e,checked){
+        e.closest('.form-check').find('label').text(checked?'Yes':'No');
+    }
+</script>

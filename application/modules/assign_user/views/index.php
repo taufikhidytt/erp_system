@@ -69,7 +69,7 @@
 <script>
     $(document).ready(function() {
         var table = $('#table').DataTable({
-            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
+           dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>rtip',
             buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
@@ -95,17 +95,17 @@
                 {
                     "data": "created_at",
                     "className" : "text-center",
-                    "width": "10%",
+                    "width": "150px",
                 },
                 {
                     "data": "updated_at",
                     "className" : "text-center",
-                    "width": "10%",
+                    "width": "150px",
                 },
             ]
         });
 
-        $('.column_search').on('keyup change', function() {
+        $('.column_search').on('input', function() {
             // let i = $(this).data('column');
             table
                 .column($(this).data('column'))

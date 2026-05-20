@@ -338,7 +338,7 @@
             }
         });
 
-        $('.column_search').on('keyup change', function() {
+        $('.column_search').on('input', function() {
             // let i = $(this).data('column');
             table
                 .column($(this).data('column'))

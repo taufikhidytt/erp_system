@@ -101,7 +101,7 @@
             });
         }
         var table = $('#table').DataTable({
-            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
+            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>rtip',
             buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": true,
             "searching": true,
@@ -116,7 +116,7 @@
             "columns": columns
         });
         
-        $('.column_search').on('keyup change', function() {
+        $('.column_search').on('input', function() {
             table
                 .column($(this).data('column'))
                 .search(this.value)

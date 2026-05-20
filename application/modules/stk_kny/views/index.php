@@ -354,7 +354,7 @@
             ]
         });
 
-        $('#table thead').on('keyup change', '.column_search', debounce(function() {
+        $('#table thead').on('input', '.column_search', debounce(function() {
             let index = $(this).parent().index();
             table.column(index).search(this.value).draw();
         }, 1500));
@@ -474,7 +474,7 @@
                 });
 
                 // SEARCH PER COLUMN
-                $('#table-summary thead').on('keyup change', '.column_search', debounce(function() {
+                $('#table-summary thead').on('input', '.column_search', debounce(function() {
                     let index = $(this).parent().index();
                     tableSummary.column(index).search(this.value).draw();
                 }, 1500));
@@ -513,7 +513,7 @@
             }
         });
 
-        $('#table-kartu-stok thead').on('keyup change', '.column_search', debounce(function() {
+        $('#table-kartu-stok thead').on('input', '.column_search', debounce(function() {
 
             let colIndex = $(this).data('col');
             let value = this.value;

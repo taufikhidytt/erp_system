@@ -12,7 +12,6 @@ class Assign_user_model extends CI_Model
         "LAST_UPDATE_DATE"
     );
     private $column_search = array(
-        null,
         "USER_NAME",
         "CREATED_DATE",
         "LAST_UPDATE_DATE"
@@ -32,23 +31,21 @@ class Assign_user_model extends CI_Model
         ");
         $this->db_srv->from('users a');
 
-        $i = 0;
-        foreach ($this->column_search as $item) {
-            $global_search_value = $this->input->post('search')['value'] ?? '';
-            $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
-
-            if ($column_search_value != '') {
-                $this->db_srv->like($item, $column_search_value);
-            } elseif ($global_search_value != '') {
-                if ($i === 0) {
-                    $this->db_srv->group_start();
-                    $this->db_srv->like($item, $global_search_value);
-                } else {
-                    $this->db_srv->or_like($item, $global_search_value);
-                }
-                if (count($this->column_search) - 1 == $i) $this->db_srv->group_end();
+        $global_search_value = $this->input->post('search')['value'] ?? '';
+        if ($global_search_value !== '') {
+            $this->db_srv->group_start();
+            foreach ($this->column_search as $index => $item) {
+                $index === 0 ? $this->db_srv->like($item, $global_search_value) : $this->db_srv->or_like($item, $global_search_value);
             }
-            $i++;
+            $this->db_srv->group_end();
+        }
+
+        foreach ($this->column_search as $index => $item) {
+            $col_index = $index + 1; 
+            $column_search_value = $this->input->post('columns')[$col_index]['search']['value'] ?? '';
+            if ($column_search_value !== '') {
+                $this->db_srv->like($item, $column_search_value);
+            }
         }
 
         if (isset($_POST['order'])) {

@@ -29,30 +29,31 @@ function belum_login()
 
 function rules()
 {
-    $ci = &get_instance();
-    $session = $ci->session->userdata('group');
-    $data = $ci->db->query("SELECT erp_menu_name, erp_menu.parent_id
-        FROM erp_menu 
-        JOIN erp_group_menu
-        ON erp_group_menu.erp_menu_id = erp_menu.erp_menu_id
-        WHERE active_flag = 'Y' 
-        AND erp_group_id = $session
-        AND erp_group_menu.view_flag = 'Y'
-    ");
+    // dibuat komentar karena sudah di handle oleh code/back_controller
+    // $ci = &get_instance();
+    // $session = $ci->session->userdata('group');
+    // $data = $ci->db->query("SELECT erp_menu_name, erp_menu.parent_id
+    //     FROM erp_menu 
+    //     JOIN erp_group_menu
+    //     ON erp_group_menu.erp_menu_id = erp_menu.erp_menu_id
+    //     WHERE active_flag = 'Y' 
+    //     AND erp_group_id = $session
+    //     AND erp_group_menu.view_flag = 'Y'
+    // ");
 
-    $hasil = [];
-    foreach ($data->result() as $dt) {
-        if ($ci->uri->segment(1) != strtolower($dt->erp_menu_name)) {
-            $hasil[] = false;
-        } else {
-            $hasil[] = true;
-        }
-    }
+    // $hasil = [];
+    // foreach ($data->result() as $dt) {
+    //     if ($ci->uri->segment(1) != strtolower($dt->erp_menu_name)) {
+    //         $hasil[] = false;
+    //     } else {
+    //         $hasil[] = true;
+    //     }
+    // }
 
-    if (count(array_filter($hasil)) == 0) {
-        $ci->session->set_flashdata('warning', 'Anda tidak ada akses untuk menu ini, silahkan hubungi administrator untuk mendapatkan akses tersebut!');
-        redirect('dashboard');
-    }
+    // if (count(array_filter($hasil)) == 0) {
+    //     $ci->session->set_flashdata('warning', 'Anda tidak ada akses untuk menu ini, silahkan hubungi administrator untuk mendapatkan akses tersebut!');
+    //     redirect('dashboard');
+    // }
 }
 
 function sendSuccess($result = null, $message)

@@ -49,7 +49,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                             <th style="min-width: 50px;">
-                                                <select class="column_search" data-column="5" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                <select class="column_search" data-column="5" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;min-height:35.66px;">
                                                     <option value="">All</option>
                                                     <option value="Y">✔</option>
                                                     <option value="N">✖</option>
@@ -81,7 +81,7 @@
 <script>
     $(document).ready(function() {
         var table = $('#table').DataTable({
-            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
+            dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>rtip',
             buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
@@ -121,7 +121,7 @@
             ]
         });
 
-        $('.column_search').on('keyup change', function() {
+        $('.column_search').on('input', function() {
             // let i = $(this).data('column');
             table
                 .column($(this).data('column'))

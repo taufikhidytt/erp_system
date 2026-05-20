@@ -410,18 +410,21 @@
 
             abortXhr();
 
+            $('#btn-submit').prop('disabled', true)
+                        .html('<span class="spinner-border spinner-border-sm text-white"></span>');
             xhr = $.ajax({
                 url: '<?= site_url('auth/submit_signin') ?>',
                 method: 'POST',
                 data: $(this).serialize(),
                 dataType: 'json',
-                beforeSend: function () {
-                    $('#btn-submit').prop('disabled', true)
-                        .html('<span class="spinner-border spinner-border-sm text-white"></span>');
-                },
                 success: function (res) {
+                    xhr = null;
+                    $('#btn-submit').prop('disabled', false)
+                        .html('<i class="ri-login-box-line me-2"></i>Sign In');
                     if (res.success) {
                         showAlert('success', res.message);
+                        $('#btn-submit').prop('disabled', true)
+                            .html('<span class="spinner-border spinner-border-sm text-white me-1"></span> Please wait...');
                         setTimeout(function () { window.location.href = res.result.redirect; }, 1500);
                     } else {
                         showAlert('danger', res.message);
@@ -429,15 +432,13 @@
                     }
                 },
                 error: function (_, status) {
+                    xhr = null;
+                    $('#btn-submit').prop('disabled', false)
+                        .html('<i class="ri-login-box-line me-2"></i>Sign In');
                     if (status !== 'abort') {
                         showAlert('danger', 'An error occurred during login. Please try again.');
                         $('#password').focus();
                     }
-                },
-                complete: function () {
-                    $('#btn-submit').prop('disabled', false)
-                        .html('<i class="ri-login-box-line me-2"></i>Sign In');
-                    xhr = null;
                 }
             });
         });
