@@ -1,7 +1,6 @@
 <style>
     .dt-buttons .btn-primary {
         background-color: #0d6efd;
-        /* warna biru Bootstrap primary */
         border-color: #0d6efd;
         color: white;
     }
@@ -36,18 +35,12 @@
                                     <thead>
                                         <tr>
                                             <th></th>
-                                            <?php for ($i=1; $i <=2 ; $i++) { ?> 
+                                            <?php for ($i=1; $i <=3 ; $i++) { ?> 
                                                 <th>
                                                     <input type="text" placeholder="Cari.." class="column_search" data-column="<?= $i ?>" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                                 </th>
                                             <?php } ?>
-                                            <th style="min-width: 50px;">
-                                                <select class="column_search" data-column="3" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                                    <option value="">All</option>
-                                                    <option value="Y">✔</option>
-                                                    <option value="N">✖</option>
-                                                </select>
-                                            </th>
+                                            <th></th>
                                             <th style="min-width: 50px;">
                                                 <select class="column_search" data-column="4" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                                     <option value="">All</option>
@@ -58,9 +51,10 @@
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th>No</th>
-                                            <th>Satuan</th>
-                                            <th>Deskripsi</th>
-                                            <th>Default</th>
+                                            <th>Satuan Lain</th>
+                                            <th>Satuan Utama</th>
+                                            <th>Nilai Konversi</th>
+                                            <th>Keterangan</th>
                                             <th>Aktif</th>
                                         </tr>
                                     </thead>
@@ -91,16 +85,17 @@
                 "width" : "30px"
             },
             {
-                "data": "name",
-                "width" : "150px"
+                "data": "from_uom",
             },
             {
-                "data": "description",
+                "data": "to_uom",
             },
             {
-                "data": "primary_flag",
-                "className" : "text-center",
-                "width" : "80px"
+                "data": "to_qty",
+                "className" : "text-end",
+            },
+            {
+                "data": "keterangan",
             },
             {
                 "data": "active_flag",
@@ -117,14 +112,6 @@
                     'url'      => '',
                     'raw_url'  => true
                 ],
-                [
-                    'key'      => 'import',
-                    'redirect' => site_url('uom/import'),
-                    'class'    => 'btn-success',
-                    'title'    => 'Import',
-                    'icon'     => 'ri-file-upload-line',
-                    'needs_auth' => true,
-                ],
             ], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
@@ -133,7 +120,7 @@
             "ordering": true,
             "order": [],
             "ajax": {
-                "url": "<?= site_url('uom/get_data'); ?>",
+                "url": "<?= site_url('konversi/get_data'); ?>",
                 "type": "POST"
             },
             "columns": columns
@@ -151,23 +138,43 @@
             add   : <?= $access['insert']?'true':'false' ?>,
             edit  : <?= $access['update']?'true':'false' ?>,
             urls  : {
-                save : '<?= site_url('uom/save') ?>',
+                save : '<?= site_url('konversi/save') ?>',
             },
             fields: [
-                { field: 'name',         type: 'text', maxlength: 18, required: true, label: 'Satuan', editable: false,
-                    attrs: { 
-                        oninput: "let p = this.selectionStart; this.value = this.value.toUpperCase(); this.setSelectionRange(p, p);"
+                { field: 'from_uom',     type: 'select2', required: true, label: 'Satuan Lain-lain', 
+                    select2: {
+                        url         : '/api/get_uom',
+                        placeholder : 'Pilih Satuan',
+                    },
+                    attrs: {
+                        'data-dropdown-parent' : 'body' 
                     }
                 },
-                { field: 'description',  type: 'text', maxlength:80, required: true, label : 'Deskripsi',
-                    attrs: { 
-                        oninput: "let p = this.selectionStart; this.value = this.value.toUpperCase(); this.setSelectionRange(p, p);"
+                { field: 'to_uom',       type: 'select2',required: true, label: 'Satuan Utama', 
+                    select2: {
+                        url         : '/api/get_uom',
+                        placeholder : 'Pilih Satuan',
+                    },
+                    attrs: {
+                        'data-dropdown-parent' : 'body' 
                     }
                 },
-                { field: 'primary_flag', type: 'checkbox', exclusive: true },
+                { field: 'to_qty',       type: 'text', required: true, label: 'Nilai Konversi', 
+                    attrs: { 
+                        min: 1,
+                        class : 'input-number text-end'
+                    }
+                },
+                { field: 'keterangan', inputable : false,
+                    compute: function(vals) {
+                        const from = vals.from_uom?.label ?? '';
+                        const to   = vals.to_uom?.label   ?? '';
+                        const qty  = vals.to_qty          ?? 1;
+                        return $.inputNumber.format(1) + ' ' + from + ' = ' + $.inputNumber.format(qty) + ' ' + to;
+                    }
+                },
                 { field: 'active_flag',  type: 'checkbox', value: 'Y'},
             ],
         });
-        console.log(editor);
     });
 </script>

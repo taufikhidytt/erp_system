@@ -3,9 +3,13 @@
 class Back_Controller extends MX_Controller
 {
     public $access = [];
+    public $version=[
+        'inline-editor' => '1.1'
+    ];
     public function __construct()
     {
         parent::__construct();
+         $this->load->vars(['version' => $this->version]);
 
         //check cache validation
         $this->refreshCache();
@@ -88,7 +92,7 @@ class Back_Controller extends MX_Controller
         $this->load->vars(['access' => $this->access]);
         $current_url = $this->uri->segment(1);
         $p1          = $this->uri->segment(2);
-        if(!in_array($current_url,['dashboard','api','management_menu'])){
+        if(!in_array($current_url,['dashboard','api'])){
 
             // pengecekan akses view
             if (empty($this->access) || (isset($this->access['view']) && $this->access['view'] === false)) {

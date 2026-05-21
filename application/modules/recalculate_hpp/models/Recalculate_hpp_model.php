@@ -2,7 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Recalculate_stok_model extends CI_Model
+class Recalculate_hpp_model extends CI_Model
 {
     public function __construct()
     {
@@ -49,7 +49,7 @@ class Recalculate_stok_model extends CI_Model
 
     public function get_active_job()
     {
-        $this->db->where('PROCEDURE_KEY', 'SYNC_ITEM_STOCK');
+        $this->db->where('PROCEDURE_KEY', 'RECALCULATE_HPP_ITEM');
         $this->db->where_in('STATUS', ['pending', 'queued', 'running']);
         $query = $this->db->get('job');
         return $query->row_array();
@@ -59,7 +59,7 @@ class Recalculate_stok_model extends CI_Model
     {
         $this->db->select('STATUS as status, CREATED_DATE as created_at, MESSAGE as message, DURATION_SEC as duration_sec');
         $this->db->where_in('STATUS', ['done', 'failed']);
-        $this->db->where('PROCEDURE_KEY', 'SYNC_ITEM_STOCK');
+        $this->db->where('PROCEDURE_KEY', 'RECALCULATE_HPP_ITEM');
         $this->db->order_by('JOB_ID', 'DESC');
         $this->db->limit($limit);
         $query = $this->db->get('job');

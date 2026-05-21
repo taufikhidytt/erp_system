@@ -44,9 +44,9 @@ class Sync extends MX_Controller
         $ci->db = $db_job;
 
         //  2. Load model
-        $this->load->model('Recalculate_stok_model', 'recalculate_stok');
+        $this->load->model('Recalculate_hpp_model', 'recalculate_hpp');
 
-        $job = $this->recalculate_stok->get_job($job_id);
+        $job = $this->recalculate_hpp->get_job($job_id);
         if (!$job || $job['STATUS'] === 'failed') return;
 
         //  3. Set running + spawn monitor
@@ -57,7 +57,7 @@ class Sync extends MX_Controller
         $thread_row = $db_sp->query("SELECT CONNECTION_ID() AS tid")->row();
         $thread_id  = $thread_row ? (int) $thread_row->tid : null;
 
-        $this->recalculate_stok->update_job($job_id, [
+        $this->recalculate_hpp->update_job($job_id, [
             'STATUS'     => 'running',
             'STARTED_AT' => $started_at,
             'PROGRESS'   => 3,
@@ -69,7 +69,7 @@ class Sync extends MX_Controller
         // Spawn monitor_progress
         $os       = strtoupper(substr(PHP_OS, 0, 3));
         $app_path = FCPATH . 'app';
-        $cmd      = "php " . escapeshellarg($app_path) . " recalculate_stok/sync monitor_progress " . escapeshellarg($job_id) . " " . escapeshellarg($encoded_db);
+        $cmd      = "php " . escapeshellarg($app_path) . " recalculate_hpp/sync monitor_progress " . escapeshellarg($job_id) . " " . escapeshellarg($encoded_db);
         if ($os === 'WIN') {
             $run_cmd = 'start /B "" ' . $cmd . ' > NUL 2>&1';
             pclose(popen($run_cmd, "r"));
@@ -94,19 +94,19 @@ class Sync extends MX_Controller
             //     Update job via $ci->db ($db_job) — koneksi berbeda, selalu aktif
 
             // === SP 1 ===
-            $this->recalculate_stok->update_job($job_id, ['MESSAGE' => 'Menyinkronkan Item Stock...']);
-            $db_sp->query("CALL SP_SYNC_ITEM_STOCK()");
+            $this->recalculate_hpp->update_job($job_id, ['MESSAGE' => 'Sinkronisasi HPP...']);
+            $db_sp->query("CALL SP_RECALCULATE_HPP_ITEM(NULL)");
             $this->_clear_result_buffer($db_sp);
 
-            if ($this->recalculate_stok->is_cancelled($job_id)) return;
+            if ($this->recalculate_hpp->is_cancelled($job_id)) return;
 
             // === SP 2 ===
-            $this->recalculate_stok->update_job($job_id, ['MESSAGE' => 'Menyinkronkan Consignment Stock...']);
-            $db_sp->query("CALL SP_SYNC_CONSIGNMENT_STOCK()");
-            $this->_clear_result_buffer($db_sp);
+            // $this->recalculate_hpp->update_job($job_id, ['MESSAGE' => 'Menyinkronkan Consignment Stock...']);
+            // $db_sp->query("CALL SP_RECALCULATE_HPP_ITEM(NULL)");
+            // $this->_clear_result_buffer($db_sp);
 
             // Tambah SP berikutnya dengan pola yang sama:
-            // $this->recalculate_stok->update_job($job_id, ['MESSAGE' => '...']);
+            // $this->recalculate_hpp->update_job($job_id, ['MESSAGE' => '...']);
             // $db_sp->query("CALL SP_LAINNYA()");
             // $this->_clear_result_buffer($db_sp);
 
@@ -127,17 +127,17 @@ class Sync extends MX_Controller
             }
 
             $duration_text .= $seconds . ' detik';
-            $this->recalculate_stok->update_job($job_id, [
+            $this->recalculate_hpp->update_job($job_id, [
                 'STATUS'       => 'done',
                 'PROGRESS'     => 100,
-                'MESSAGE'      => 'Semua stok berhasil disinkronkan dalam ' . trim($duration_text) . '.',
+                'MESSAGE'      => 'Semua hpp berhasil disinkronkan dalam ' . trim($duration_text) . '.',
                 'FINISHED_AT'  => date('Y-m-d H:i:s'),
                 'DURATION_SEC' => $duration,
                 'PROCESS_ID'   => null,
                 'THREAD_ID'    => null,
             ]);
         } catch (Exception $e) {
-            $this->recalculate_stok->update_job($job_id, [
+            $this->recalculate_hpp->update_job($job_id, [
                 'STATUS'      => 'failed',
                 'MESSAGE'     => 'Error: ' . $e->getMessage(),
                 'FINISHED_AT' => date('Y-m-d H:i:s'),
@@ -176,7 +176,7 @@ class Sync extends MX_Controller
         }
         $ci->db = $db_obj;
 
-        $this->load->model('Recalculate_stok_model', 'recalculate_stok');
+        $this->load->model('Recalculate_hpp_model', 'recalculate_hpp');
 
         // Register signal handler agar monitor keluar bersih saat di-kill
         // Dipanggil oleh cancel_sync() via posix_kill / kill command
@@ -190,7 +190,7 @@ class Sync extends MX_Controller
         }
 
         // Ambil rata-rata durasi dari histori
-        $avg_total = $this->recalculate_stok->get_avg_duration('SYNC_ITEM_STOCK') ?: 144.0;
+        $avg_total = $this->recalculate_hpp->get_avg_duration('RECALCULATE_HPP_ITEM') ?: 860;
 
         // Aktifkan async signal handling (PHP 7.1+)
         if (function_exists('pcntl_async_signals')) {
@@ -205,7 +205,7 @@ class Sync extends MX_Controller
                 pcntl_signal_dispatch();
             }
 
-            $job = $this->recalculate_stok->get_job($job_id);
+            $job = $this->recalculate_hpp->get_job($job_id);
 
             // Berhenti jika sudah terminal
             if (!$job || $job['STATUS'] !== 'running') {
@@ -251,7 +251,7 @@ class Sync extends MX_Controller
                 $base_msg    = preg_replace('/\s*\(~[^)]*\)$/', '', $current_msg);
                 $new_msg     = str_replace('(hampir selesai...)', '', $base_msg) . " ({$eta})";
 
-                $this->recalculate_stok->update_job($job_id, [
+                $this->recalculate_hpp->update_job($job_id, [
                     'PROGRESS' => $progress,
                     'MESSAGE'  => $new_msg,
                 ]);

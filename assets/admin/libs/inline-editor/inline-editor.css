@@ -37,10 +37,44 @@ tr.ie-new-row td.ie-changed { background: #e6ffed !important; }
     vertical-align: middle;
 }
 
-/* Select2 wrapper — paksa lebar mengikuti cell */
+/* ── Select2 — seragamkan ukuran & tampilan dengan input ──────── */
+
+/* Wrapper: paksa lebar penuh mengikuti cell */
 .ie-cell .select2-container {
     width: 100% !important;
     min-width: 100px;
+}
+
+/* Selection box: tinggi, padding, border, shadow sama dengan input */
+.ie-cell .select2-container--bootstrap-5 .select2-selection {
+    min-height: unset;
+    height: auto;
+    padding: 3px 6px;
+    font-size: inherit;
+    border: 1px solid #86b7fe !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, .15) !important;
+    background-color: #fff;
+    line-height: 1.5;
+}
+
+/* Teks yang dipilih: rata tengah vertikal, tidak terpotong */
+.ie-cell .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+    padding: 0;
+    line-height: 1.5;
+    color: inherit;
+}
+
+/* Placeholder */
+.ie-cell .select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+    color: #6c757d;
+}
+
+/* Arrow dropdown: sejajarkan vertikal */
+.ie-cell .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+    height: 100%;
 }
 
 /* Tombol Save — disembunyikan by default */
