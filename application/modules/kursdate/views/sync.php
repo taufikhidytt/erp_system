@@ -39,7 +39,7 @@ table.dataTable.table-sm>thead>tr>th :not(.sorting_disabled){
                         <div id="preview-container" style="display: none;">
                             <div class="table-responsive">
                                 <table class="table align-middle table-sm w-100" id="preview-table">
-                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff" class="align-middle">
                                         <tr>
                                             <th rowspan="2" class="text-center">
                                                 <div class="form-check d-flex justify-content-center">

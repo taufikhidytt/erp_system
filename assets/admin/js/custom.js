@@ -52,7 +52,21 @@ $(document).on('mouseenter', '[data-bs-toggle="tooltip"]', function() {
     tooltip.show();
 
     $(this).one('mouseleave click', function() {
-        tooltip.dispose();
+        $('.tooltip').remove();
+    });
+});
+$(document).on('mouseenter', '[data-toggle="tooltip"]', function() {
+    $('.tooltip').remove();
+
+    var tooltip = new bootstrap.Tooltip(this, {
+        container: 'body',
+        trigger: 'manual',
+        boundary: 'viewport'
+    });
+
+    tooltip.show();
+
+    $(this).one('mouseleave click', function() {
         $('.tooltip').remove();
     });
 });
@@ -234,9 +248,6 @@ function getButtons(config) {
 function checkForm(){
     const url   = window.location.href.replace(config_app.url,'').split('/');
     const p1    = url[1] ?? '';
-    console.log($('body').attr('data-update'), 'data-update');
-    console.log(p1, 'p1');
-    console.log($('body').attr('data-update') !== "1" && p1=='detail', 'condition');
     if($('body').attr('data-update') !== "1" && p1=='detail'){
         $('.page-content form').find('input, select, textarea').prop('disabled',true);
         $.each($('.page-content form .tab-content button'), function() {
@@ -261,3 +272,27 @@ $(document).on('click', '.show-password', function() {
     $input.attr('type', type);
     $icon.toggleClass('ri-eye-close-fill ri-eye-fill');
 });
+
+function calcDiscount(price, disc) {
+    let harga = Math.max(0, parseFloat(price) || 0);
+
+    if (!disc && disc !== 0) return 0;
+    disc = String(disc).trim();
+    if (disc === '') return 0;
+
+    disc = disc.replace(/[,;]/g, '+');
+
+    if (/[^0-9+]/.test(disc)) return 0;
+
+    if (/\+{2,}/.test(disc) || /^\+|\+$/.test(disc)) return 0;
+
+    let remaining = harga;
+
+    for (const seg of disc.split('+').filter(Boolean)) {
+        const pct = parseInt(seg, 10);
+        if (pct < 0 || pct > 100) return 0;
+        remaining -= (pct / 100) * remaining;
+    }
+
+    return Math.max(0, Math.min(harga - remaining, harga));
+}

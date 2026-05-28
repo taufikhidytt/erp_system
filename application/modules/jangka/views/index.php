@@ -59,7 +59,7 @@
                                             <th>No</th>
                                             <th>Nama / Kode</th>
                                             <th>Keterangan</th>
-                                            <th>Janga Waktu</th>
+                                            <th>Jangka Waktu</th>
                                             <th>Default</th>
                                             <th>Aktif</th>
                                         </tr>

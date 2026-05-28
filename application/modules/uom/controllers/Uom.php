@@ -60,6 +60,7 @@ class Uom extends Back_Controller
             $user_id = (int) $this->session->id;
             $arr_insert = [];
             $arr_update = [];
+            $has_default= false;
 
             //pengecekan untuk insert
             $new_codes = array_column(array_filter($rows, fn($r) => !empty($r['isNew'])), 'fields');
@@ -85,6 +86,10 @@ class Uom extends Back_Controller
                 $fields = $row['fields'] ?? [];
                 $isNew  = !empty($row['isNew']);
                 $id     = $isNew ? null : $this->encrypt->decode(base64url_decode($row['id'] ?? ''));
+
+                if($fields['primary_flag'] === 'Y'){
+                    $has_default = true;
+                }
 
                 if ($isNew) {
                     $code = strtoupper(trim($fields['name'] ?? ''));
@@ -115,6 +120,13 @@ class Uom extends Back_Controller
             if (!empty($arr_insert) && !$this->access['insert']) throw new Exception('Tidak ada akses tambah!');
 
             $this->db->trans_start();
+            
+            //update default menjadi N jika terdeteksi di databaru ada default Y
+            if($has_default){
+                $this->db->where('PRIMARY_FLAG','Y');
+                $this->db->update('uom',['PRIMARY_FLAG' => 'N']);
+            }
+
             if (!empty($arr_insert)) $this->uom->insert_batch($arr_insert);
             if (!empty($arr_update)) $this->uom->update_batch($arr_update);
             $this->db->trans_complete();

@@ -45,8 +45,8 @@ class Item extends Back_Controller
             $row['komoditi'] = $item->KOMODITI ? $item->KOMODITI : '-';
             $row['brand'] = $item->BRAND ? $item->BRAND : '-';
             $row['trade'] = $item->TRADE ? $item->TRADE : '-';
-            $row['price_last_buy'] = $item->PRICE_LAST_BUY ? numb_format($item->PRICE_LAST_BUY) : '-';
-            $row['price_last_sell'] = $item->PRICE_LAST_SELL ? numb_format($item->PRICE_LAST_SELL) : '-';
+            // $row['price_last_buy'] = $item->PRICE_LAST_BUY ? numb_format($item->PRICE_LAST_BUY) : '-';
+            // $row['price_last_sell'] = $item->PRICE_LAST_SELL ? numb_format($item->PRICE_LAST_SELL) : '-';
             $row['lead_time'] = $item->LEAD_TIME ? $item->LEAD_TIME . " Week" : '-';
             if ($item->KONSY == 'Y') {
                 $returnKonsy = '<i class="text-success fa fa-check" title="Yes" data-bs-toggle="tooltip" data-bs-placement="left"></i>';

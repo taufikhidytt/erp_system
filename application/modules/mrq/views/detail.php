@@ -82,7 +82,9 @@
                                     <h5 style="width: 100px;" id="readonlyMrqId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['insert','save',
+                                    <?= button_actions([
+                                        'insert',
+                                        'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->BUILD_ID)],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('mrq/print/' . base64url_encode($this->encrypt->encode($data->BUILD_ID)))]
@@ -112,7 +114,7 @@
                                                 </span>
                                                 <select name="ship_to" id="ship_to"
                                                     data-url="api/get_ship_to"
-                                                    data-selected-id="<?= set_value('ship_to', $data->PERSON_ID) ?>"
+                                                    data-selected-id="<?= set_value('ship_to', $data->PERSON_ID . "_" . $data->PERSON_SITE_ID) ?>"
                                                     class="form-control select2 <?= form_error('ship_to') ? 'is-invalid' : null; ?>">
                                                 </select>
                                             </div>
@@ -2077,7 +2079,7 @@
     $('form').on('submit', function(e) {
         $('#ship_to').prop('disabled', false);
         $('#storage').prop('disabled', false);
-        $.each($(document).find('[data-input-number], .input-number'), function(){
+        $.each($(document).find('[data-input-number], .input-number'), function() {
             $(this).val($(this).inputNumber('getValue'));
         });
     });

@@ -57,7 +57,7 @@
                                         </tr>
                                         <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
                                             <th>No</th>
-                                            <th>KODE</th>
+                                            <th>Kode</th>
                                             <th>Nama</th>
                                             <th>Negara</th>
                                             <th>Kurs Awal</th>

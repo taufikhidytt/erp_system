@@ -1,7 +1,4 @@
 <style>
-h5, button{
-font-family: Tahoma !important;
-}
 .rv-wrap { padding: 1.5rem 0; }
 .rv-header { text-align: center; margin-bottom: 1.5rem; }
 .rv-header h5 { font-weight: 600; margin: 0 0 4px; color: #212529; }
@@ -507,7 +504,7 @@ font-family: Tahoma !important;
             if (!currentJobId) return;
     
             Swal.fire({
-                title: 'Yakin ingin mmenyimpan '+$('#review-success-count').text()+' data?',
+                title: 'Yakin ingin menyimpan '+$('#review-success-count').text()+' data?',
                 icon: 'warning', showCancelButton: true, confirmButtonColor: '#70bcff', cancelButtonColor: '#d33', confirmButtonText: 'Ya, simpan!', cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {

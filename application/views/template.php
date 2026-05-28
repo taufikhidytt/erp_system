@@ -37,9 +37,60 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
     <link rel="stylesheet" href="<?= base_url() ?>assets/admin/css/aos.css">
 
     <style>
+        @font-face {
+            font-family: 'Poppins';
+            src: url('<?= base_url('assets/admin/fonts/poppins/Poppins-Regular.ttf') ?>') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            src: url('<?= base_url('assets/admin/fonts/poppins/Poppins-Bold.ttf') ?>') format('truetype');
+            font-weight: 700;
+            font-style: normal;
+        }
+
         body {
             /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
-            font-family: Tahoma !important;
+            /* font-family: Tahoma !important; */
+            font-family: 'Poppins', sans-serif !important;
+        }
+        #sidebar-menu ul li ul.sub-menu li a, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
+            font-family: 'Poppins', sans-serif !important;
+        }
+        #sidebar-menu ul li a, .select2-container--bootstrap-5 .select2-selection{
+            font-family: 'Poppins', sans-serif !important;
+        }
+        input, optgroup, select, textarea{
+            /* font-family: 'Courier New', Courier, monospace; */
+            font-family: monospace !important;
+            font-size: 0.8rem !important;
+        }
+        .label-status .badge{
+            font-size: 1.25rem !important;
+        }
+        table thead th input, table thead th select{
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 0.7rem !important;
+        }
+        .dataTables_length label, .dataTables_length select, .dataTables_length select option{
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 0.75rem !important;
+        }
+        .modal .table thead th, .modal .table tbody td, .modal .dataTables_wrapper{
+            font-size: 0.75rem !important;
+        }
+        button{
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 0.75rem !important;
+        }
+        .swal2-popup{
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .swal2-popup pre{
+            font-family: 'Poppins', sans-serif !important;
+            font-size: 1rem !important;
         }
 
         #loading {
@@ -92,14 +143,16 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             height: 30px !important;
             min-height: 30px !important;
             padding: 2px 6px !important;
-            font-size: 0.75rem !important;
+            /* font-size: 0.75rem !important; */
+            font-size: 0.8rem !important;
         }
 
         /* Input-group icon */
         .form-xs .input-group-text {
             height: 30px !important;
             padding: 2px 6px !important;
-            font-size: 0.75rem !important;
+            /* font-size: 0.75rem !important; */
+            font-size: 0.8rem !important;
         }
 
         /* ===================== */
@@ -137,29 +190,48 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             color: #1DAA61;
         }
 
-        table.dataTable.table-sm thead .sorting:before,
-        table.dataTable.table-sm thead .sorting:after,
-        table.dataTable.table-sm thead .sorting_asc:before,
-        table.dataTable.table-sm thead .sorting_asc:after,
-        table.dataTable.table-sm thead .sorting_desc:before,
-        table.dataTable.table-sm thead .sorting_desc:after {
-            right: 9px !important;
+        /* 1. Reset posisi sel header */
+        table.dataTable.table-sm thead th {
+            position: relative !important;
+            vertical-align: middle !important;
         }
 
-        table.dataTable.table-sm thead .sorting:before,
-        table.dataTable.table-sm thead .sorting_asc:before,
-        table.dataTable.table-sm thead .sorting_desc:before {
-            margin-top: -6px;
+        /* 2. Reset total pseudo-elements dan MATIKAN properti 'bottom' bawaan */
+        table.dataTable.table-sm thead .sorting::before,
+        table.dataTable.table-sm thead .sorting_asc::before,
+        table.dataTable.table-sm thead .sorting_desc::before,
+        table.dataTable.table-sm thead .sorting::after,
+        table.dataTable.table-sm thead .sorting_asc::after,
+        table.dataTable.table-sm thead .sorting_desc::after {
+            position: absolute !important;
+            bottom: auto !important; /* KUNCI UTAMA: Matikan posisi bottom bawaan DataTables */
+            top: 50% !important;     /* Tarik ke tepat garis tengah vertikal */
+            right: 0.5em !important; /* Jarak dari kanan sel */
+            margin-top: 0 !important;
+            line-height: 0.1 !important;
         }
 
-        table.dataTable.table-sm thead .sorting:after,
-        table.dataTable.table-sm thead .sorting_asc:after,
-        table.dataTable.table-sm thead .sorting_desc:after {
-            margin-top: 0px;
+        /* 3. Atur panah atas (Before) agar duduk tepat di ATAS garis tengah 50% */
+        table.dataTable.table-sm thead .sorting::before,
+        table.dataTable.table-sm thead .sorting_asc::before,
+        table.dataTable.table-sm thead .sorting_desc::before {
+            transform: translateY(-100%) !important;
+            padding-bottom: 2px !important; /* Memberi sedikit jarak di tengah */
+        }
+
+        /* 4. Atur panah bawah (After) agar menggantung tepat di BAWAH garis tengah 50% */
+        table.dataTable.table-sm thead .sorting::after,
+        table.dataTable.table-sm thead .sorting_asc::after,
+        table.dataTable.table-sm thead .sorting_desc::after {
+            transform: translateY(0%) !important;
+            padding-top: 2px !important; /* Memberi sedikit jarak di tengah */
         }
 
         .dataTable tbody td {
-            font-family: monospace;
+            font-family: monospace;   
+        }
+        .dataTable tbody td, .dataTable thead th{
+            white-space: nowrap;
         }
 
         .dataTable thead th,
@@ -167,7 +239,11 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         .dataTables_filter,
         .dataTables_paginate,
         .dataTables_info {
-            font-family: Tahoma !important;
+            /* font-family: Tahoma !important; */
+            font-family: 'Poppins', sans-serif !important;
+        }
+        .dataTables_info{
+            font-weight: 400 !important;
         }
 
         .swal2-popup pre {
@@ -182,6 +258,28 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         .show-password{
             cursor: pointer;
         }
+
+        .dt-buttons{
+            display: inline-grid !important;
+            grid-auto-flow: column;
+            grid-auto-columns: 1fr;
+        }
+
+        .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option, .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field{
+            font-size: 1rem !important;
+            white-space: nowrap;
+            font-family: monospace !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered{
+            font-size: 1rem !important;
+            font-family: monospace !important;
+        }
+        .table th{
+            font-weight: 400 !important;
+        }
+        .btn-group-sm>.btn, .btn-sm, .modal .btn{
+            font-size: 0.75rem !important;
+        }
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
@@ -191,8 +289,8 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             url: '<?= site_url() ?>'
         }
     </script>
-    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.1"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.11"></script>
+    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.2"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.12"></script>
 </head>
 
 <body data-sidebar="dark" data-update="<?= $access['update'] ?? false ?>">
@@ -570,6 +668,20 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                 });
             });
         }
+        $(document).on('keydown', function(e) {
+            if (e.which === 32) {
+                const focusedCell = $(document).find('.dataTables_wrapper table tbody td.focus');
+                if (focusedCell.length > 0) {
+                    const chk = focusedCell.find('input[type="checkbox"]');
+                    if (chk.length > 0) {
+                        e.preventDefault();
+                        const currentState = chk.prop('checked');
+                        chk.prop('checked', !currentState);
+                        chk.trigger('change');
+                    }
+                }
+            }
+        });
         
         $(document).ready(function() {
             $('#loading').hide();

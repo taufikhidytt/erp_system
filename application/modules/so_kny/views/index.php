@@ -134,13 +134,7 @@
     $(document).ready(function() {
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>frtip',
-            buttons: [{
-                text: '<i class="ri ri-add-circle-fill"></i> Tambah',
-                className: 'btn btn-sm btn-primary',
-                action: function(e, dt, node, config) {
-                    window.location.href = "<?= base_url('so_kny/add') ?>";
-                }
-            }],
+            buttons: getButtons(<?= json_encode(button_actions(['insert'], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,

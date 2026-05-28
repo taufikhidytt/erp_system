@@ -422,7 +422,7 @@ class Api_model extends CI_Model
     public function getShipTo()
     {
         $searchTerm = trim($this->input->get('q') ?? '');
-        $id         = (int) $this->input->get('id');
+        $id         = $this->input->get('id');
 
         setVariableMysql();
         $this->db
@@ -470,7 +470,9 @@ class Api_model extends CI_Model
             ->order_by('a.PERSON_NAME', 'ASC');
 
         if ($id) {
-            $this->db->where('a.PERSON_ID', $id)->limit(1);
+            [$person_id, $person_site_id] = explode('_', $id);
+            $this->db->where('ps.PERSON_SITE_ID', $person_site_id);
+            $this->db->where('a.PERSON_ID', $person_id)->limit(1);
         } else {
             $this->db->where('a.ACTIVE_FLAG', 'Y');
             if ($searchTerm) {
@@ -506,6 +508,67 @@ class Api_model extends CI_Model
             if ($searchTerm) {
                 $this->db->group_start()
                     ->like('p.PAYMENT_TERM_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function getCoa()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("a.COA_ID as id, CONCAT('[',a.COA_CODE,'] - ',a.COA_NAME) text, a.COA_CODE as code, a.COA_NAME as name")
+            ->from('coa a')
+            ->order_by('a.COA_CODE');
+
+        if ($id) {
+            $this->db->where('a.COA_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->group_start()
+                ->where('a.END_DATE', 0)
+                ->or_where('a.END_DATE IS NULL', null, false)
+                ->or_where('a.END_DATE >= CURDATE()', null, false)
+                ->group_end();
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.COA_CODE', $searchTerm)
+                    ->or_like('a.COA_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function getTipePajak()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("b.DISPLAY_NAME as text,b.ERP_LOOKUP_VALUE_ID as id")
+            ->from('erp_lookup_set a')
+            ->join('erp_lookup_value b', 'a.ERP_LOOKUP_SET_ID = b.ERP_LOOKUP_SET_ID')
+            ->where('a.PROGRAM_CODE', 'TIPE_PAJAK')
+            ->order_by('b.PRIMARY_FLAG DESC, b.DISPLAY_NAME ASC');
+
+        if ($id) {
+            $this->db->where('b.ERP_LOOKUP_VALUE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('b.ACTIVE_FLAG', 'Y')->limit(1);
+        } else {
+            $this->db->where('b.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('b.DISPLAY_NAME', $searchTerm)
                     ->group_end();
             }
             $this->db->limit(50);

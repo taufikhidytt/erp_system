@@ -70,61 +70,27 @@
                                         <tr>
                                             <th></th>
                                             <th></th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            <?php for ($i=1; $i <=11 ; $i++) { ?>
+                                                <th>
+                                                    <input type="text" placeholder="Cari.." class="column_search" data-column="<?= $i ?>" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                </th>
+                                            <?php } ?>
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="12" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
                                             </th>
-                                            <th style="width: 80%;">
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="2" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="3" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="10" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="11" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="12" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="13" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            <th style="min-width: 50px;">
+                                                <select class="column_search" data-column="13" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                    <option value="">All</option>
+                                                    <option value="Y">✔</option>
+                                                    <option value="N">✖</option>
+                                                </select>
                                             </th>
                                             <th style="min-width: 50px;">
                                                 <select class="column_search" data-column="14" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                                    <option value="">All</option>
-                                                    <option value="Y">✔</option>
-                                                    <option value="N">✖</option>
-                                                </select>
-                                            </th>
-                                            <th style="min-width: 50px;">
-                                                <select class="column_search" data-column="15" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                                    <option value="">All</option>
-                                                    <option value="Y">✔</option>
-                                                    <option value="N">✖</option>
-                                                </select>
-                                            </th>
-                                            <th style="min-width: 50px;">
-                                                <select class="column_search" data-column="16" style="border-radius: 5%; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                                     <option value="">All</option>
                                                     <option value="Y">✔</option>
                                                     <option value="N">✖</option>
@@ -143,8 +109,6 @@
                                             <th>Komoditi</th>
                                             <th>Brand</th>
                                             <th>Trade</th>
-                                            <th>Last Buy</th>
-                                            <th>Last Sell</th>
                                             <th>Lead Time</th>
                                             <th>Made In</th>
                                             <th>Konsy</th>
@@ -185,6 +149,11 @@
             "processing": true,
             "serverSide": true,
             "ordering": true,
+            scrollX: true,
+            scrollY: '47dvh',
+            drawCallback: function() {
+                this.api().columns.adjust();
+            },
             "order": [],
             "ajax": {
                 "url": "<?= site_url('item/get_data'); ?>",
@@ -238,12 +207,6 @@
                 },
                 {
                     "data": "trade"
-                },
-                {
-                    "data": "price_last_buy"
-                },
-                {
-                    "data": "price_last_sell"
                 },
                 {
                     "data": "lead_time"

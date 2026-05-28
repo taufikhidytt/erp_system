@@ -82,7 +82,14 @@
         if (isNaN(num)) num = 0;
 
         var parts = num.toFixed(decimal).split('.');
-        parts[0] = parts[0].replace(new RegExp('\\B(?=(\\d{3})+(?!\\d))', 'g'), thousand);
+
+        // Pisahkan tanda minus dahulu agar regex \B tidak salah posisi
+        // pada angka negatif, misal "-1234567" → regex bisa menghasilkan ",-1234,567"
+        var isNeg = parts[0].charAt(0) === '-';
+        var intPart = isNeg ? parts[0].slice(1) : parts[0];
+        intPart = intPart.replace(new RegExp('\\B(?=(\\d{3})+(?!\\d))', 'g'), thousand);
+        parts[0] = isNeg ? '-' + intPart : intPart;
+
         return decimal > 0 ? parts.join(decimalSep) : parts[0];
     }
 
@@ -140,12 +147,45 @@
         if (!cfg) return;
 
         var val = $el.val();
+        var lastValid = $el.data('inputNumber.lastValid') || '';
         var pattern = _allowedPattern(cfg);
 
+        // -------------------------------------------------------
+        // LOGIKA TOGGLE TANDA MINUS (hanya jika allowNegative: true)
+        // -------------------------------------------------------
+        // Deteksi: user mengetik "-" di posisi mana saja.
+        // Caranya: bandingkan jumlah "-" di val vs lastValid.
+        // Jika val punya 1 lebih banyak "-" dari lastValid → user baru ketik "-".
+        if (cfg.allowNegative) {
+            var minusInVal      = (val.match(/-/g) || []).length;
+            var minusInLast     = (lastValid.match(/-/g) || []).length;
+            var userTypedMinus  = minusInVal > minusInLast;
+
+            if (userTypedMinus) {
+                // Ambil nilai numerik dari lastValid (kondisi sebelum user ketik "-")
+                var num = _unformat(lastValid, cfg.thousand, cfg.decimalSep);
+
+                if (num === null || num === 0 || lastValid === '') {
+                    // Belum ada angka → izinkan "-" saja sebagai awalan
+                    $el.val('-');
+                    $el.data('inputNumber.lastValid', '-');
+                } else {
+                    // Toggle sign: positif → negatif, negatif → positif
+                    var toggled = (-num).toString().replace('.', cfg.decimalSep);
+                    $el.val(toggled);
+                    $el.data('inputNumber.lastValid', toggled);
+                }
+                return;
+            }
+        }
+
+        // Karakter "-" saat allowNegative false → tolak
+        // atau karakter lain yang tidak sesuai pattern → kembalikan ke lastValid
         if (val !== '' && !pattern.test(val)) {
-            $el.val($el.data('inputNumber.lastValid') || '');
+            $el.val(lastValid);
             return;
         }
+
         $el.data('inputNumber.lastValid', val);
     }
 

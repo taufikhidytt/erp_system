@@ -94,14 +94,14 @@ class Sync extends MX_Controller
             //     Update job via $ci->db ($db_job) — koneksi berbeda, selalu aktif
 
             // === SP 1 ===
-            $this->recalculate_stok->update_job($job_id, ['MESSAGE' => 'Menyinkronkan Item Stock...']);
+            $this->recalculate_stok->update_job($job_id, ['MESSAGE' => 'Sinkronisasi Item Stock...']);
             $db_sp->query("CALL SP_SYNC_ITEM_STOCK()");
             $this->_clear_result_buffer($db_sp);
 
             if ($this->recalculate_stok->is_cancelled($job_id)) return;
 
             // === SP 2 ===
-            $this->recalculate_stok->update_job($job_id, ['MESSAGE' => 'Menyinkronkan Consignment Stock...']);
+            $this->recalculate_stok->update_job($job_id, ['MESSAGE' => 'Sinkronisasi Konsinyasi Stock...']);
             $db_sp->query("CALL SP_SYNC_CONSIGNMENT_STOCK()");
             $this->_clear_result_buffer($db_sp);
 

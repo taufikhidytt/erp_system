@@ -113,4 +113,16 @@ class Api extends Back_Controller
         $result = $this->api->getPayment()->result();
         echo json_encode($result);
     }
+
+    public function get_coa()
+    {
+        $result = $this->api->getCoa()->result();
+        echo json_encode($result);
+    }
+    
+    public function get_tipe_pajak()
+    {
+        $result = $this->api->getTipePajak()->result();
+        echo json_encode($result);
+    }
 }

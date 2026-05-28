@@ -11,6 +11,9 @@ if (! function_exists('numb_format')) {
             $ci = &get_instance();
             $decimal = (int) $ci->session->setup->CUSTOM2;
         }
+        if(!is_numeric($value)){
+            return $value;
+        }
 
         $formatted = number_format($value, $decimal, $decimal_sep, $thousand);
 

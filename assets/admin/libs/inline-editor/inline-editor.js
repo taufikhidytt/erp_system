@@ -12,7 +12,6 @@
        edit   : true,              // izinkan edit cell
        urls   : {
            save   : '/uom/save',   // wajib
-           // tambah url custom lain jika perlu
        },
        fields : [
            { field: 'name',         type: 'text', maxlength: 100 },
@@ -20,37 +19,39 @@
            { field: 'qty',          type: 'number', min: 0, max: 9999, step: 1,
              attrs: { 'data-min': 1, 'data-decimal': 0, class: 'input-number' } },
            { field: 'start_date',   type: 'date' },
-           { field: 'created_at',   type: 'datetime-local' },
-           { field: 'open_time',    type: 'time' },
-           { field: 'primary_flag', type: 'checkbox', exclusive: true },
            { field: 'active_flag',  type: 'checkbox' },
-           { field: 'keterangan',  editable: false,
-             compute: function(vals) {
-                 // vals = snapshot semua nilai row saat ini { field: value, ... }
-                 // Contoh: auto-generate teks dari field lain
-                 const from = vals.from_uom?.label ?? '';
-                 const to   = vals.to_uom?.label   ?? '';
-                 const qty  = vals.to_qty           ?? '';
-                 if (!from || !to || !qty) return '';
-                 return $.inputNumber.format(1) + ' ' + from + ' = ' + $.inputNumber.format(qty) + ' ' + to;
-             }
-           },
            { field: 'uom_id',       type: 'select2',
              select2: {
-                 url         : '/api/get_uom',   // di-fetch tiap buka
-                 dataDefault : 'Y',              // param data-default
+                 url         : '/api/get_uom',
+                 dataDefault : 'Y',
                  placeholder : 'Select Satuan',
              }
            },
-           { field: 'keterangan', inputable : false,
-                compute: function(vals) {
-                    console.log(vals);
-                    const from = vals.from_uom?.label ?? '';
-                    const to   = vals.to_uom?.label   ?? '';
-                    const qty  = vals.to_qty          ?? 1;
-                    return $.inputNumber.format(1) + ' ' + from + ' = ' + $.inputNumber.format(qty) + ' ' + to;
-                }
-            },
+           // syncTo: saat field ini dipilih, otomatis update field lain
+           { field: 'kode_account', type: 'select2', required: true,
+             select2: {
+                 url         : '/api/get_coa',
+                 placeholder : 'Pilih Kode',
+                 labelFn     : row => row.code,
+                 syncTo      : 'nama_account',
+             }
+           },
+           { field: 'nama_account', type: 'select2', required: true,
+             select2: {
+                 url         : '/api/get_coa',
+                 placeholder : 'Pilih Nama',
+                 labelFn     : row => row.name,
+                 syncTo      : 'kode_account',
+             }
+           },
+           { field: 'keterangan', inputable: false,
+             compute: function(vals) {
+                 const from = vals.from_uom?.label ?? '';
+                 const to   = vals.to_uom?.label   ?? '';
+                 const qty  = vals.to_qty           ?? 1;
+                 return $.inputNumber.format(1) + ' ' + from + ' = ' + $.inputNumber.format(qty) + ' ' + to;
+             }
+           },
        ],
    });
    ================================================================ */
@@ -102,14 +103,15 @@ const InlineEditor = (() => {
                 if (cfg.max !== undefined) $el.attr('max', cfg.max);
                 if (cfg.step !== undefined) $el.attr('step', cfg.step);
                 if (cfg.class !== undefined) $el.addClass(cfg.class);
-
-                if ($.fn.inputNumber && cfg.attrs?.class?.includes('input-number')) {
-                    $el.inputNumber();
-                }
         }
 
         // Terapkan custom attrs (class, data-*, dll)
         if (Object.keys(attrs).length) $el.attr(attrs);
+
+        if (cfg.attrs?.class?.includes('input-number')) {
+            console.log(attrs);
+            $el.inputNumber();
+        }
 
         return $el;
     }
@@ -119,37 +121,114 @@ const InlineEditor = (() => {
     // ================================================================
     function init(config) {
 
-        const { fields, urls, add = true, edit = true } = config;
+        const { fields, urls, extraData, add = true, edit = true } = config;
 
         // Terima string selector atau instance DataTable
         const dt = typeof config.table === 'string'
             ? $(config.table).DataTable()
             : config.table;
         const $table = $(dt.table().node());
-        // ── Mencegah DataTables KeyTable membajak tombol navigasi saat mengetik ──
-        $table.on('keydown', 'input', function (e) {
-            // 37: Left, 38: Up, 39: Right, 40: Down
+
+        // ── Helper: pindah fokus ke cell inputable berikutnya di baris yang sama ──
+        // Dipakai saat Tab ditekan di dalam input/select pada ie-new-row maupun edit mode.
+        // Urutan kolom mengikuti array fields, bukan urutan DOM/tabindex browser,
+        // sehingga select2 (hidden element) pun bisa dimasuki dengan benar.
+        function focusNextCell($currentTd, $row) {
+            // Kumpulkan semua td inputable di baris ini, sesuai urutan fields
+            const inputableTds = fields
+                .filter(f => f.inputable !== false && f.type !== 'checkbox')
+                .map(f => $row.find(`td.ie-cell[data-field="${f.field}"]`).get(0))
+                .filter(Boolean);
+
+            const currentIndex = inputableTds.indexOf($currentTd.get(0));
+            const $next = $(inputableTds[currentIndex + 1]);
+
+            if (!$next.length) return; // sudah kolom terakhir, biarkan Tab keluar normal
+
+            const nextField = $next.attr('data-field');
+            const nextCfg   = fields.find(f => f.field === nextField);
+            if (!nextCfg) return;
+
+            if (nextCfg.type === 'select2') {
+                // Trigger klik agar select2 terbuka via handler klik cell yang sudah ada
+                $next.trigger('click');
+            } else {
+                // Input biasa: fokus langsung
+                const $input = $next.find('input');
+                if ($input.length) {
+                    $input.focus();
+                } else {
+                    // Belum ada input (baris baru), init dulu via trigger klik
+                    $next.trigger('click');
+                }
+            }
+        }
+
+        // ── Keydown: tangkap Tab & Enter di input, Arrow di select2 ──────────────
+        // Ini menggantikan handler lama. Logika:
+        // - Jika sedang dalam mode inputan (ie-new-row atau ie-editing):
+        //   Tab → navigasi manual ke kolom berikutnya (bypass DataTables Keys)
+        //   Enter → selesaikan edit (blur)
+        //   Arrow → stop propagation agar DataTables Keys tidak ikut campur
+        // - Jika tidak dalam mode inputan → biarkan DataTables Keys bekerja normal
+        $table.on('keydown', 'td.ie-cell input:not([type="checkbox"])', function (e) {
+            const $td  = $(this).closest('td');
+            const $row = $td.closest('tr');
+            const isNewRow = $row.hasClass('ie-new-row');
+            const isEditing = $td.hasClass('ie-editing');
+
+            // Arrow keys: selalu stop propagation saat mengetik agar kursor bisa bergerak
             if ([37, 38, 39, 40].includes(e.keyCode)) {
                 e.stopPropagation();
             }
 
-            // 9: Tab
+            // Tab: navigasi manual ke kolom berikutnya
             if (e.keyCode === 9) {
-                if ($(this).closest('tr').hasClass('ie-new-row')) {
-                    // Mode Add: Stop propagasi agar KeyTable tidak menculik Tab.
-                    // Jangan preventDefault, agar browser memindahkan fokus ke kolom input selanjutnya.
-                    e.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation(); // cegah DataTables Keys
+                if (isNewRow) {
+                    // Mode add: blur dulu agar nilai tersimpan, lalu pindah fokus
+                    $(this).blur();
+                    setTimeout(() => focusNextCell($td, $row), 0);
                 } else {
-                    // Mode Edit: Selesaikan edit (blur)
-                    e.preventDefault();
+                    // Mode edit: selesaikan edit saja
                     $(this).blur();
                 }
             }
 
-            // 13: Enter
+            // Enter: selesaikan edit
             if (e.keyCode === 13) {
                 e.preventDefault();
                 $(this).blur();
+            }
+        });
+
+        // ── Keydown untuk select2: cegah Arrow & Tab dibajak DataTables Keys ─────
+        // select2 membuat elemen .select2-search__field saat dropdown terbuka —
+        // tangkap di level document agar tidak terblokir oleh stopPropagation select2
+        $(document).on('keydown.ie-select2', '.select2-search__field', function (e) {
+            const $openTd = $table.find('td.ie-cell.ie-editing');
+            if (!$openTd.length) return;
+
+            const $row = $openTd.closest('tr');
+
+            // Arrow: stop agar DataTables tidak navigasi baris
+            if ([37, 38, 39, 40].includes(e.keyCode)) {
+                e.stopPropagation();
+            }
+
+            // Tab: tutup dropdown lalu pindah ke kolom berikutnya
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Tutup select2 — select2:close akan handle destroy & render
+                const $select = $openTd.find('select');
+                if ($select.length && $select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('close');
+                }
+                if ($row.hasClass('ie-new-row')) {
+                    setTimeout(() => focusNextCell($openTd, $row), 50);
+                }
             }
         });
 
@@ -168,7 +247,7 @@ const InlineEditor = (() => {
             if (!pending[key]) {
                 const isNew = $row.hasClass('ie-new-row');
                 pending[key] = { id: $row.data('id') || '', isNew, fields: {} };
-                
+
                 // Jika edit baris lama, salin semua data aslinya dulu ke dalam pending
                 if (!isNew) {
                     const rowData = dt.row($row).data();
@@ -190,7 +269,6 @@ const InlineEditor = (() => {
                 const $td = $row.find(`td.ie-cell[data-field="${cfg.field}"]`);
                 if (!$td.length) return;
 
-                // Ambil dari pending dulu (sudah ada perubahan), fallback ke data di td
                 const key = $row.data('key');
                 if (pending[key]?.fields?.[cfg.field] !== undefined) {
                     snapshot[cfg.field] = pending[key].fields[cfg.field];
@@ -221,11 +299,10 @@ const InlineEditor = (() => {
             });
         }
 
-        // ── Tandai cell editable setiap draw ───────────────
+        // ── Tandai cell editable setiap draw ──────────────────────
         dt.on('draw', function () {
             $table.find('tbody tr').each(function () {
                 const $row = $(this);
-                // Lewati baris baru yang sedang ditambah (insert mode)
                 if ($row.hasClass('ie-new-row')) return;
 
                 const data = dt.row(this).data();
@@ -243,9 +320,10 @@ const InlineEditor = (() => {
                     }
                     if (cfg.type === 'select2') {
                         // Normalisasi: terima object {id,label} atau string/number plain
+                        // ...raw membawa semua field dari API untuk kebutuhan compute/syncTo di client
                         const raw = data[cfg.field];
                         const val = (raw && typeof raw === 'object')
-                            ? { id: raw.id, label: raw.label ?? raw.text ?? raw.id }
+                            ? { ...raw, id: raw.id, label: raw.label ?? raw.text ?? raw.id }
                             : (raw != null ? { id: raw, label: String(raw) } : null);
                         $td.data('val', val);
                         $td.html(renderView(cfg, val));
@@ -254,7 +332,7 @@ const InlineEditor = (() => {
             });
         });
 
-        // ── Inject tombol Save & Cancel ke toolbar DT ─────────────────────
+        // ── Inject tombol Save & Cancel ke toolbar DT ────────────
         const $btnSave = $('<button id="ie-btn-save" class="btn btn-success btn-sm" style="display: none;" title="Simpan" data-toggle="tooltip" data-bs-placement="left">' +
             '<i class="ri-save-line"></i></button>')
             .appendTo($table.closest('.card').find('.dt-buttons'));
@@ -293,28 +371,26 @@ const InlineEditor = (() => {
                     const def = cfg.value !== undefined ? cfg.value : (cfg.type === 'checkbox' ? 'N' : '');
                     const $td = $('<td class="ie-cell ie-changed">').attr('data-field', cfg.field);
 
-                    if(cfg.inputable !== false){
+                    if (cfg.inputable !== false) {
                         if (cfg.type === 'checkbox') {
                             $td.data('val', def).html(renderView(cfg, def)).addClass('text-center');
+                        } else if (cfg.type === 'select2') {
+                            // Di mode add, select2 tidak langsung di-init semua sekaligus.
+                            // Render sebagai placeholder text dulu, baru init saat diklik/Tab masuk.
+                            $td.data('val', null).data('orig', null)
+                               .html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
                         } else {
                             const $input = makeInput(cfg, def);
                             $td.data('orig', def).append($input);
-
-                            // Untuk select2: init setelah di-append ke DOM (dilakukan setelah prepend)
-                            if (cfg.type === 'select2') {
-                                $td.addClass('ie-editing');
-                                $td.data('_ie_select2_init', true);
-                            }
                         }
                     }
-                    
 
                     $tr.append($td);
-                    
-                    $last_td = $tr.find('td:last');
-                    $last_th = $table.find('thead tr:last th').eq($last_td.index());
-                    $th_attr = $last_th.attr('class');
-                    if($th_attr){
+
+                    const $last_td = $tr.find('td:last');
+                    const $last_th = $table.find('thead tr:last th').eq($last_td.index());
+                    const $th_attr = $last_th.attr('class');
+                    if ($th_attr) {
                         const th_class = $th_attr.replace(/sorting/g, "");
                         $last_td.addClass(th_class);
                     }
@@ -324,18 +400,7 @@ const InlineEditor = (() => {
 
                 $table.find('tbody').prepend($tr);
 
-                // Inisialisasi select2 untuk baris baru setelah masuk DOM
-                $tr.find('td[data-field]').each(function () {
-                    const $td = $(this);
-                    if ($td.data('_ie_select2_init')) {
-                        $td.removeData('_ie_select2_init');
-                        const $select = $td.find('select');
-                        if ($select.length && typeof initSelect2 === 'function') {
-                            initSelect2($select[0]);
-                        }
-                    }
-                });
-
+                // Fokus ke input text/number pertama saja
                 $tr.find('input[type="text"], input[type="number"]').first().focus();
             });
         }
@@ -345,20 +410,17 @@ const InlineEditor = (() => {
             const $td = $(this);
             const $row = $td.closest('tr');
 
-            // Jika hak akses edit false, HANYA izinkan interaksi pada baris baru (insert)
             if (!edit && !$row.hasClass('ie-new-row')) return;
 
             const field = $td.attr('data-field');
             const cfg = cfgOf(field);
 
-            // Jika field diset tidak bisa diedit secara spesifik (editable: false),
             if ((cfg.editable === false && !$row.hasClass('ie-new-row')) || cfg.inputable === false) return;
 
             // ── CHECKBOX: toggle langsung ─────────────────────
             if (cfg.type === 'checkbox') {
                 const cur = $td.data('val') === 'Y' ? 'N' : 'Y';
 
-                // exclusive: reset semua row lain ke N dulu
                 if (cfg.exclusive && cur === 'Y') {
                     $table.find(`tbody td.ie-cell[data-field="${field}"]`).each(function () {
                         if ($(this).data('val') === 'Y') {
@@ -383,12 +445,10 @@ const InlineEditor = (() => {
                 const $select = makeInput(cfg, cur);
                 $td.data('orig', cur).empty().append($select);
 
-                // Inisialisasi select2 via initSelect2 dari custom.js
                 if (typeof initSelect2 === 'function') {
                     initSelect2($select[0]);
                 }
 
-                // Buka dropdown langsung setelah inisialisasi
                 setTimeout(() => $select.select2('open'), 0);
                 return;
             }
@@ -398,24 +458,23 @@ const InlineEditor = (() => {
             $td.data('orig', raw).empty().append(makeInput(cfg, raw));
             const $input = $td.find('input').focus();
 
-            // Pindahkan kursor ke karakter paling akhir
             let tmp = $input.val();
             $input.val('').val(tmp);
         });
 
-        // ── Blur input text/number/date/time ─────────────────
+        // ── Blur input text/number/date/time ─────────────────────
         $table.on('blur', 'td.ie-cell input:not([type="checkbox"])', function () {
-            const $td = $(this).closest('td');
-            const $row = $td.closest('tr');
+            const $td   = $(this).closest('td');
+            const $row  = $td.closest('tr');
             const field = $td.attr('data-field');
-            let   val = $(this).val();
-            const orig = $td.data('orig');
+            let   val   = $(this).val();
+            const orig  = $td.data('orig');
 
-            if($(this).hasClass('input-number')){
+            if ($(this).hasClass('input-number')) {
                 val = $.inputNumber.format(val);
             }
 
-            setTimeout(function() {
+            setTimeout(function () {
                 $td.removeClass('ie-editing').text(val);
 
                 if (val !== orig || $row.hasClass('ie-new-row')) {
@@ -423,76 +482,104 @@ const InlineEditor = (() => {
                     trackChange($row, field, val);
                 }
 
-                // Hitung ulang field compute setelah nilai berubah
                 runCompute($row);
             }, 0);
         });
 
-        // ── Select2: pilih nilai → catat & tutup ─────────────────
+        // ── Select2: pilih nilai → simpan val, tandai flag ────────
+        // Destroy dan render view dilakukan di select2:close
         $table.on('select2:select', 'td.ie-cell select', function (e) {
-            const $td  = $(this).closest('td');
-            const $row = $td.closest('tr');
+            const $td   = $(this).closest('td');
+            const $row  = $td.closest('tr');
             const field = $td.attr('data-field');
+            const cfg   = cfgOf(field);
+
             let val = {};
             if (e.params.data.id === '__empty__') {
-                val  = { id: '', label: '' };
-            }else{
-                val  = { id: e.params.data.id, label: e.params.data.text };
+                val = { id: '', label: '' };
+            } else {
+                const raw2 = e.params.data;
+                // ...raw2 membawa semua field dari API untuk kebutuhan compute/syncTo di client
+                val = { ...raw2, id: raw2.id, label: cfg.select2?.labelFn ? cfg.select2.labelFn(raw2) : raw2.text };
             }
 
-            // Tandai sudah memilih agar select2:close tidak revert
+            // Simpan val & tandai sudah memilih — destroy dilakukan di select2:close
+            $td.data('ie-val-selected', val);
             $(this).data('ie-selected', true);
 
-            // Destroy select2, kembalikan ke view
-            try { $select.select2('destroy'); } catch (_) {}
-            $td.removeClass('ie-editing').data('val', val).html(renderView(cfgOf(field), val));
             $td.addClass('ie-changed');
             trackChange($row, field, val);
 
-            // Hitung ulang field compute setelah pilih select2
+            // ── Sync ke field lain jika ada syncTo ────────────────
+            const syncField = cfg.select2?.syncTo;
+            if (syncField && val.id !== undefined) {
+                const syncCfg = cfgOf(syncField);
+                const $syncTd = $row.find(`td.ie-cell[data-field="${syncField}"]`);
+                if ($syncTd.length && syncCfg) {
+                    const syncVal = {
+                        ...val,
+                        label: syncCfg.select2?.labelFn ? syncCfg.select2.labelFn(val) : val.label
+                    };
+
+                    // Jika field tujuan sedang ie-editing (select2 aktif), jangan replace html —
+                    // cukup update val-nya saja agar tidak merusak select2 yang sedang terbuka
+                    if ($syncTd.hasClass('ie-editing')) {
+                        $syncTd.data('val', syncVal);
+                    } else {
+                        $syncTd.data('val', syncVal).html(renderView(syncCfg, syncVal));
+                    }
+
+                    $syncTd.addClass('ie-changed');
+                    trackChange($row, syncField, syncVal);
+                }
+            }
+
             runCompute($row);
         });
 
-        // ── Select2: blur / tutup tanpa memilih → revert ke view ─
+        // ── Select2: close → destroy & render view ────────────────
+        // Selalu fired setelah select2:select, sehingga destroy cukup di sini
         $table.on('select2:close', 'td.ie-cell select', function () {
             const $select = $(this);
 
-            // Jika sudah memilih, select2:select yang handle — skip
-            if ($select.data('ie-selected')) {
-                $select.removeData('ie-selected');
-                return;
-            }
-
-            // Beri jeda agar select2:select sempat jalan lebih dulu
             setTimeout(() => {
-                if ($select.data('ie-selected')) {
-                    $select.removeData('ie-selected');
-                    return;
-                }
+                const didSelect = $select.data('ie-selected');
+                $select.removeData('ie-selected');
 
                 const $td   = $select.closest('td');
                 const $row  = $td.closest('tr');
                 const field = $td.attr('data-field');
-                const orig  = $td.data('orig');
 
-                // Destroy select2 lalu kembalikan ke tampilan semula
-                try { $select.select2('destroy'); } catch (_) {}
+                // Destroy select2 jika masih aktif
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    try { $select.select2('destroy'); } catch (_) {}
+                }
                 $td.removeClass('ie-editing');
 
-                // Baris baru: tampilkan teks placeholder, baris edit: nilai semula
-                if ($row.hasClass('ie-new-row')) {
-                    $td.html(renderView(cfgOf(field), orig));
+                if (didSelect) {
+                    // Ambil val yang disimpan oleh select2:select lalu render
+                    const val = $td.data('ie-val-selected');
+                    $td.removeData('ie-val-selected');
+                    $td.data('val', val).html(renderView(cfgOf(field), val));
                 } else {
-                    $td.data('val', orig).html(renderView(cfgOf(field), orig));
+                    // Batal pilih → revert ke nilai semula
+                    const orig = $td.data('orig');
+                    if ($row.hasClass('ie-new-row')) {
+                        // Mode add: kembalikan ke placeholder span
+                        const cfg = cfgOf(field);
+                        $td.html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
+                    } else {
+                        $td.data('val', orig).html(renderView(cfgOf(field), orig));
+                    }
                 }
-            }, 150);
+            }, 0);
         });
 
         // ── Save semua pending ────────────────────────────────────
         let isSaving = false;
 
         $btnSave.on('click', function () {
-            if (isSaving) return; // Cegah double submit
+            if (isSaving) return;
 
             const rows = Object.values(pending);
 
@@ -501,7 +588,6 @@ const InlineEditor = (() => {
             for (const row of rows) {
                 for (const f of requiredFields) {
                     const raw = row.fields[f.field];
-                    // select2: cek id-nya; yang lain: cek string-nya
                     const isEmpty = (f.type === 'select2')
                         ? !raw?.id?.toString().trim()
                         : !raw?.toString().trim();
@@ -532,10 +618,19 @@ const InlineEditor = (() => {
             $btnSave.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
             $btnCancel.prop('disabled', true);
 
+            const additionalData = typeof config.extraData === 'function' 
+                                   ? config.extraData() 
+                                   : (config.extraData || {});
+            
+            const payload = {
+                rows: JSON.stringify(serializedRows),
+                ...additionalData
+            };
+
             $.ajax({
                 url: urls.save,
                 type: 'POST',
-                data: { rows: JSON.stringify(serializedRows) },
+                data: payload,
                 dataType: 'json',
             })
                 .done(res => {
@@ -544,7 +639,7 @@ const InlineEditor = (() => {
                     }
                     pending = {};
                     toggleButtons(false);
-                    
+
                     Swal.fire({
                         title: 'Berhasil',
                         text: res.message,
@@ -554,7 +649,7 @@ const InlineEditor = (() => {
                         showConfirmButton: true,
                         confirmButtonText: 'OK',
                         willClose: () => {
-                           dt.ajax.reload(null, false);
+                            dt.ajax.reload(null, false);
                         }
                     });
                 })
@@ -566,7 +661,7 @@ const InlineEditor = (() => {
                 });
         });
 
-        // ── Guard: Paging, Filter, Sorting DT ─────────────────────
+        // ── Guard: Paging, Filter, Sorting DT ────────────────────
         let isPrompting = false;
         let ignorePendingWarning = false;
 
@@ -593,7 +688,7 @@ const InlineEditor = (() => {
                         });
                     }, 10);
                 }
-                return false; // Batalkan proses draw (menjaga UI tidak ter-refresh)
+                return false;
             }
             ignorePendingWarning = false;
         });
@@ -606,9 +701,8 @@ const InlineEditor = (() => {
             if (!hasPending() || !href || /^(#|javascript)/.test(href)) return;
 
             e.preventDefault();
-            setTimeout(() => {
-                $('#loading').hide();
-            }, 100);
+            setTimeout(() => { $('#loading').hide(); }, 100);
+
             Swal.fire({
                 title: 'Peringatan',
                 text: 'Ada perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?',
@@ -628,9 +722,12 @@ const InlineEditor = (() => {
         return {
             getPending: () => ({ ...pending }),
             clearPending() { pending = {}; toggleButtons(false); },
+            setSaveUrl(newUrl) { urls.save = newUrl; },
+            setExtraData(newData) { config.extraData = newData; },
             destroy() {
                 $(window).off('beforeunload.ie');
                 $(document).off('click.ie');
+                $(document).off('keydown.ie-select2');
                 $btnSave.remove();
                 $btnCancel.remove();
             },

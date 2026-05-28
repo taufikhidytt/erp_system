@@ -361,7 +361,7 @@
                                             <table class="table ">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="vertical-align:middle; font-weight:bold;">Diskon</td>
+                                                        <td style="vertical-align:middle; font-weight:400;">Diskon</td>
                                                         <td>:</td>
                                                         <td class="text-left">
                                                             <input id="cal_diskon_percen" name="TOTAL_DISCOUNT_PERCEN" class="form-control form-control-sm input-container persen-detail" placeholder="Persen" value="<?= $this->input->post('TOTAL_DISCOUNT_PERCEN') ?? $data->TOTAL_DISCOUNT_PERCEN ?>" data-mode="false" style="width: 130px;">
@@ -374,7 +374,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="vertical-align:middle; font-weight:bold;">PPN</td>
+                                                        <td style="vertical-align:middle; font-weight:400;">PPN</td>
                                                         <td>:</td>
                                                         <td colspan="3" class="text-left">
                                                             <?php
@@ -424,45 +424,45 @@
                                             <table class="table">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="font-weight:bold;">Total</td>
+                                                        <td style="font-weight:400;">Total</td>
                                                         <td>:</td>
                                                         <td></td>
                                                         <td></td>
                                                         <td class="text-right" style="text-align: right">
-                                                            <div id="v_total_amount"></div>
+                                                            <div id="v_total_amount" style="font-family: monospace;"></div>
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="font-weight:bold;">Diskon</td>
-                                                        <td>:</td>
-                                                        <td class="text-left">
-                                                        </td>
-                                                        <td></td>
-                                                        <td class="text-right" style="text-align: right">
-                                                            <div id="v_diskon"></div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="font-weight:bold;">PPN</td>
+                                                        <td style="font-weight:400;">Diskon</td>
                                                         <td>:</td>
                                                         <td class="text-left">
                                                         </td>
                                                         <td></td>
                                                         <td class="text-right" style="text-align: right">
-                                                            <div id="v_ppn_amount"></div>
+                                                            <div id="v_diskon" style="font-family: monospace;"></div>
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="font-weight:bold;">
-                                                            <h5>GRAND TOTAL</h5>
+                                                        <td style="font-weight:400;">PPN</td>
+                                                        <td>:</td>
+                                                        <td class="text-left">
+                                                        </td>
+                                                        <td></td>
+                                                        <td class="text-right" style="text-align: right">
+                                                            <div id="v_ppn_amount" style="font-family: monospace;"></div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="font-weight:400;">
+                                                            <h6>GRAND TOTAL</h6>
                                                         </td>
                                                         <td>:</td>
                                                         <td></td>
                                                         <td></td>
                                                         <td class="text-right text-danger" style="text-align: right">
-                                                            <h5>
-                                                                <div id="v_total_net"></div>
-                                                            </h5>
+                                                            <h6>
+                                                                <div id="v_total_net" style="font-family: monospace;"></div>
+                                                            </h6>
                                                         </td>
                                                     </tr>
                                                 </tbody>

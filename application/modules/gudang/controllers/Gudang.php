@@ -27,16 +27,17 @@ class Gudang extends Back_Controller
         $this->load->model('M_datatables', 'datatables');
         $params = [
             'table' => 'warehouse a',
-            'select' => ['a.WAREHOUSE_ID,a.WAREHOUSE_NAME,a.DESCRIPTION,a.SALES_FLAG,a.PRIMARY_FLAG,a.ACTIVE_FLAG,
+            'select' => [
+                'a.WAREHOUSE_ID,a.WAREHOUSE_NAME,a.DESCRIPTION,a.SALES_FLAG,a.PRIMARY_FLAG,a.ACTIVE_FLAG,
                 b.DISPLAY_NAME JENIS,
                 c.ADDRESS_CODE, c.ADDRESS1, c.ADDRESS2, c.CITY, c.PROVINCE, c.COUNTRY,
                 ',
             ],
             'joins' => [
-                ['erp_lookup_value b',"b.ERP_LOOKUP_VALUE_ID = a.JENIS_ID AND b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET('JENIS_GUDANG')",'left'],
-                ['address c',"c.ADDRESS_ID = a.ADDRESS_ID",'left'],
+                ['erp_lookup_value b', "b.ERP_LOOKUP_VALUE_ID = a.JENIS_ID AND b.ERP_LOOKUP_SET_ID = FN_GET_VAR_SET('JENIS_GUDANG')", 'left'],
+                ['address c', "c.ADDRESS_ID = a.ADDRESS_ID", 'left'],
             ],
-            'column_search' => [null, 'a.WAREHOUSE_NAME', 'a.DESCRIPTION','b.DISPLAY_NAME', 'c.ADDRESS_CODE', "CONCAT(c.ADDRESS1,c.ADDRESS2,c.CITY, c.PROVINCE, c.COUNTRY)", 'a.SALES_FLAG', 'a.PRIMARY_FLAG', 'a.ACTIVE_FLAG'],
+            'column_search' => [null, 'a.WAREHOUSE_NAME', 'a.DESCRIPTION', 'b.DISPLAY_NAME', 'c.ADDRESS_CODE', "CONCAT(c.ADDRESS1,c.ADDRESS2,c.CITY, c.PROVINCE, c.COUNTRY)", 'a.SALES_FLAG', 'a.PRIMARY_FLAG', 'a.ACTIVE_FLAG'],
             'column_order'  => [null, 'a.WAREHOUSE_NAME', 'a.DESCRIPTION', 'b.DISPLAY_NAME', 'c.ADDRESS_CODE', 'c.ADDRESS1', 'a.SALES_FLAG', 'a.PRIMARY_FLAG', 'a.ACTIVE_FLAG'],
         ];
 
@@ -44,10 +45,10 @@ class Gudang extends Back_Controller
             $id = base64url_encode($this->encrypt->encode($row->WAREHOUSE_ID));
 
             $address = '';
-            $n=0;
-            foreach (['ADDRESS1','ADDRESS2','CITY', 'PROVINCE','COUNTRY'] as $k => $v) {
-                if($row->{$v}){
-                    $address .= ($n!=0?'</br>':'').$row->{$v};
+            $n = 0;
+            foreach (['ADDRESS1', 'ADDRESS2', 'CITY', 'PROVINCE', 'COUNTRY'] as $k => $v) {
+                if ($row->{$v}) {
+                    $address .= ($n != 0 ? '</br>' : '') . $row->{$v};
                     $n++;
                 }
             }
@@ -185,7 +186,7 @@ class Gudang extends Back_Controller
         $result = $this->gudang->getAddress()->result();
         echo json_encode($result);
     }
-    
+
     public function get_jenis()
     {
         $result = $this->gudang->getJenis()->result();
