@@ -224,8 +224,9 @@
     $(document).ready(function() {
         $('.input-number').inputNumber();
         $('#active_flag').trigger('change');
+        $('#instangible_asset').trigger('change');
     });
-    $(document).on('change', '#active_flag', function() {
+    $(document).on('change', '#active_flag, #instangible_asset', function() {
         swith_label($(this), $(this).is(":checked"));
     });
 
