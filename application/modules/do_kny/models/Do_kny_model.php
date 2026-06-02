@@ -557,4 +557,15 @@ class Do_kny_model extends CI_Model
 
         return $this->db->query($sql);
     }
+
+    public function get_log_user($id)
+    {
+        $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
+        $this->db->from('inventory_out a');
+        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
+        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->where('a.INVENTORY_OUT_ID', $id);
+        $this->db->limit(1);
+        return $this->db->get()->row();
+    }
 }

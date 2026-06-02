@@ -84,6 +84,16 @@
                                         'insert',
                                         'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->INVENTORY_OUT_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'do_kny/get_log_info',
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->INVENTORY_OUT_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('do_kny/print/' . base64url_encode($this->encrypt->encode($data->INVENTORY_OUT_ID)))]
                                     ]) ?>

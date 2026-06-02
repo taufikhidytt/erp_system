@@ -90,6 +90,16 @@
                                         'insert',
                                         'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->TAG_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'rcv/get_log_info',
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->TAG_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('rcv/print/' . base64url_encode($this->encrypt->encode($data->TAG_ID)))]
                                     ]) ?>
@@ -1763,3 +1773,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

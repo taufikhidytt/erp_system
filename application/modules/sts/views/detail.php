@@ -91,6 +91,16 @@
                                         'insert',
                                         'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->TAG_KONSI_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'sts/get_log_info',
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->TAG_KONSI_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('grk/print/' . base64url_encode($this->encrypt->encode($data->TAG_KONSI_ID)))]
                                     ]) ?>
@@ -1775,3 +1785,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

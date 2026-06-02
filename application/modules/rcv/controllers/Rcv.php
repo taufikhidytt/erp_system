@@ -709,4 +709,46 @@ class Rcv extends Back_Controller
             $this->pdf->generate($html, str_replace('/', ' ', $rcv->DOCUMENT_NO), 'A4', 'portrait');
         }
     }
+
+    public function get_log_info(){
+        $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
+        $id     = (int) ($params['id'] ?? 0);
+        $this->load->model('M_union_datatables', 'union_datatables');
+        $config = [
+            'queries' => [
+                [
+                    'select' => 'a.LAST_UPDATE_DATE, u.ERP_USER_NAME, a.TRANSAKSI, a.NOTE',
+                    'table'  => 'erp_log_edit a',
+                    'join'   => ['erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID'],
+                    'where'  => "a.TABLE_NAME = 'TAG' AND a.ID = " . $id,
+                ],
+                [
+                    'select' => 'a.LAST_UPDATE_DATE, u.ERP_USER_NAME, a.TRANSAKSI, a.NOTE',
+                    'table'  => 'erp_log_edit a',
+                    'join'   => ['erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID'],
+                    'where'  => "a.TABLE_NAME = 'TAG_DETAIL' AND a.ORDER_ID = " . $id,
+                ],
+            ],
+            'search_columns' => ['a.LAST_UPDATE_DATE', 'u.ERP_USER_NAME', 'a.TRANSAKSI', 'a.NOTE'],
+            'order_map' => [null, 'LAST_UPDATE_DATE', 'ERP_USER_NAME', 'TRANSAKSI', 'NOTE'],
+            'order_by' => 'LAST_UPDATE_DATE DESC',
+        ];
+        $result = $this->union_datatables->generate($config, function ($row, $no) {
+            return [
+                'no' => $no,
+                'tanggal' => $row->LAST_UPDATE_DATE,
+                'user' => $row->ERP_USER_NAME,
+                'transaksi' => $row->TRANSAKSI,
+                'log' => $row->NOTE,
+            ];
+        });
+        $info_header    = $this->rcv->get_log_user($id);
+        $result['header'] = [
+            'created_date' => $info_header->CREATED_DATE ?? '-',
+            'user_created'   => $info_header->USER_CREATED ?? '-',
+            'last_update_date' => $info_header->LAST_UPDATE_DATE ?? '-',
+            'user_updated'   => $info_header->USER_UPDATED ?? '-',
+        ];
+        echo json_encode($result);
+    }
 }

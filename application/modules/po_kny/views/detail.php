@@ -78,6 +78,16 @@
                                         'insert',
                                         'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->INVOICE_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'po_kny/get_log_info',
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->INVOICE_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('po_kny/print/' . base64url_encode($this->encrypt->encode($data->INVOICE_ID)))]
                                     ]) ?>

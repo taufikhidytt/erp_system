@@ -84,6 +84,16 @@
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <?= button_actions(['insert','save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->TAG_PINJAM_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'rsp/get_log_info',
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->TAG_PINJAM_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('rsp/print/' . base64url_encode($this->encrypt->encode($data->TAG_PINJAM_ID)))]
                                     ]) ?>
@@ -1627,3 +1637,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

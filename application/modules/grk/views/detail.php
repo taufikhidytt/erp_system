@@ -96,7 +96,7 @@
                                             'title'        => 'Log & History',
                                             'icon'         => 'ri-question-line',
                                             'data-url'     => 'grk/get_log_info',
-                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
                                                 'id' => $data->PO_ID,
                                             ]))),
                                         ],
