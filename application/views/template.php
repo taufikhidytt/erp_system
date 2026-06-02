@@ -1,5 +1,8 @@
 <?php
 $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? 'assets/logo/' . $this->session->setup->LOGO_FILENAME : 'assets/logo/logo.png';
+$active_theme = isset($_COOKIE['app-theme']) ? $_COOKIE['app-theme'] : 'light';
+$bs_css = $active_theme !== 'dark' ? 'bootstrap.min.css' : 'bootstrap-dark.min.css';
+$app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
 ?>
 <!DOCTYPE html>
 
@@ -18,13 +21,13 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
     <link href="<?= base_url() ?>assets/admin/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     <!-- Bootstrap Css -->
-    <link href="<?= base_url() ?>assets/admin/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/css/<?= $bs_css ?>" id="bootstrap-style" rel="stylesheet" type="text/css" />
 
     <!-- Icons Css -->
     <link href="<?= base_url() ?>assets/admin/css/icons.min.css" rel="stylesheet" type="text/css" />
 
     <!-- App Css-->
-    <link href="<?= base_url() ?>assets/admin/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/css/<?= $app_css ?>" id="app-style" rel="stylesheet" type="text/css" />
 
     <!-- Sweet Alert-->
     <link href="<?= base_url() ?>assets/admin/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
@@ -57,70 +60,39 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             font-family: 'Poppins', sans-serif !important;
             line-height: 1.25 !important;
         }
-
-        #sidebar-menu ul li ul.sub-menu li a,
-        .h1,
-        .h2,
-        .h3,
-        .h4,
-        .h5,
-        .h6,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
+        #sidebar-menu ul li ul.sub-menu li a, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
             font-family: 'Poppins', sans-serif !important;
         }
-
-        #sidebar-menu ul li a,
-        .select2-container--bootstrap-5 .select2-selection {
+        #sidebar-menu ul li a, .select2-container--bootstrap-5 .select2-selection{
             font-family: 'Poppins', sans-serif !important;
         }
-
-        input,
-        optgroup,
-        select,
-        textarea {
+        input, optgroup, select, textarea{
             /* font-family: 'Courier New', Courier, monospace; */
             font-family: monospace !important;
             font-size: 0.8rem !important;
         }
-
-        .label-status .badge {
+        .label-status .badge{
             font-size: 1.25rem !important;
         }
-
-        table thead th input,
-        table thead th select {
+        table thead th input, table thead th select{
             font-family: 'Poppins', sans-serif !important;
             font-size: 0.7rem !important;
         }
-
-        .dataTables_length label,
-        .dataTables_length select,
-        .dataTables_length select option {
+        .dataTables_length label, .dataTables_length select, .dataTables_length select option{
             font-family: 'Poppins', sans-serif !important;
             font-size: 0.75rem !important;
         }
-
-        .modal .table thead th,
-        .modal .table tbody td,
-        .modal .dataTables_wrapper {
+        .modal .table thead th, .modal .table tbody td, .modal .dataTables_wrapper{
             font-size: 0.75rem !important;
         }
-
-        button {
+        button{
             font-family: 'Poppins', sans-serif !important;
             font-size: 0.75rem !important;
         }
-
-        .swal2-popup {
+        .swal2-popup{
             font-family: 'Poppins', sans-serif !important;
         }
-
-        .swal2-popup pre {
+        .swal2-popup pre{
             font-family: 'Poppins', sans-serif !important;
             font-size: 1rem !important;
         }
@@ -236,12 +208,9 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         table.dataTable.table-sm thead .sorting_asc::after,
         table.dataTable.table-sm thead .sorting_desc::after {
             position: absolute !important;
-            bottom: auto !important;
-            /* KUNCI UTAMA: Matikan posisi bottom bawaan DataTables */
-            top: 50% !important;
-            /* Tarik ke tepat garis tengah vertikal */
-            right: 0.5em !important;
-            /* Jarak dari kanan sel */
+            bottom: auto !important; /* KUNCI UTAMA: Matikan posisi bottom bawaan DataTables */
+            top: 50% !important;     /* Tarik ke tepat garis tengah vertikal */
+            right: 0.5em !important; /* Jarak dari kanan sel */
             margin-top: 0 !important;
             line-height: 0.1 !important;
         }
@@ -251,8 +220,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         table.dataTable.table-sm thead .sorting_asc::before,
         table.dataTable.table-sm thead .sorting_desc::before {
             transform: translateY(-100%) !important;
-            padding-bottom: 2px !important;
-            /* Memberi sedikit jarak di tengah */
+            padding-bottom: 2px !important; /* Memberi sedikit jarak di tengah */
         }
 
         /* 4. Atur panah bawah (After) agar menggantung tepat di BAWAH garis tengah 50% */
@@ -260,20 +228,16 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         table.dataTable.table-sm thead .sorting_asc::after,
         table.dataTable.table-sm thead .sorting_desc::after {
             transform: translateY(0%) !important;
-            padding-top: 2px !important;
-            /* Memberi sedikit jarak di tengah */
+            padding-top: 2px !important; /* Memberi sedikit jarak di tengah */
         }
 
         .dataTable tbody td {
-            font-family: monospace;
+            font-family: monospace;   
         }
-
-        .dataTable tbody td,
-        .dataTable thead th {
+        .dataTable tbody td, .dataTable thead th{
             white-space: nowrap;
         }
-
-        .dataTable tfoot th {
+        .dataTable tfoot th{
             font-family: monospace !important;
             font-weight: 600 !important;
             font-size: 0.875rem !important;
@@ -287,9 +251,13 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             /* font-family: Tahoma !important; */
             font-family: 'Poppins', sans-serif !important;
         }
-
-        .dataTables_info {
+        .dataTables_info{
             font-weight: 400 !important;
+        }
+        @media (max-width: 767.98px) {
+            li.paginate_button.next, li.paginate_button.previous{
+                font-size: 0.7rem !important;
+            }
         }
 
         .swal2-popup pre {
@@ -301,44 +269,37 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             margin: 0;
             font-weight: 400;
         }
-
-        .show-password {
+        .show-password{
             cursor: pointer;
         }
 
-        .dt-buttons {
+        .dt-buttons{
             display: inline-grid !important;
             grid-auto-flow: column;
             grid-auto-columns: 1fr;
+            width: auto !important;
         }
 
-        .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option,
-        .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field {
+        .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option, .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field{
             font-size: 1rem !important;
             white-space: nowrap;
             font-family: monospace !important;
         }
-
-        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered{
             font-size: 1rem !important;
             font-family: monospace !important;
         }
-
-        .table th {
+        .table th{
             font-weight: 400 !important;
         }
-
-        .btn-group-sm>.btn,
-        .btn-sm,
-        .modal .btn {
+        .btn-group-sm>.btn, .btn-sm, .modal .btn{
             font-size: 0.75rem !important;
         }
-
-        .swal2-styled.swal2-confirm,
-        .swal2-styled.swal2-cancel {
+        .swal2-styled.swal2-confirm, .swal2-styled.swal2-cancel{
             font-size: 1rem !important;
         }
     </style>
+    <link href="<?= base_url() ?>assets/admin/css/custom-dark.css?v=1.0" id="custom-dark-style" rel="stylesheet" type="text/css" />
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
     <script>
@@ -351,7 +312,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
     <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.14"></script>
 </head>
 
-<body data-sidebar="dark" data-update="<?= $access['update'] ?? false ?>">
+<body data-sidebar="dark" data-theme="<?= $active_theme ?>" data-update="<?= $access['update'] ?? false ?>">
     <div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
     <div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
     <div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
@@ -386,10 +347,17 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                     <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect" id="vertical-menu-btn">
                         <i class="ri-menu-2-line align-middle"></i>
                     </button>
+
+                    <form class="app-search d-none d-lg-block">
+                        <div class="position-relative">
+                            <input type="text" class="form-control" placeholder="ketik / untuk mencari..." style="font-family: 'Poppins' !important;">
+                            <span class="ri-search-line"></span>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="d-flex">
-
+                    
                     <?php
                     date_default_timezone_set("Asia/jakarta");
                     $date = date('d M Y');
@@ -398,10 +366,19 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                         <div><?= $date ?></div>
                         <div id="jam"></div>
                     </div>
-
                     <div class="dropdown d-inline-block d-lg-inline-block ms-1">
                         <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
                             <i class="ri-fullscreen-line"></i>
+                        </button>
+                    </div>
+                    <div class="dropdown d-inline-block d-lg-inline-block ms-1">
+                        <button type="button" class="btn header-item noti-icon waves-effect" id="theme-toggle-btn" title="Switch Theme">
+                            <i class="<?= $active_theme === 'light' ? 'ri-moon-line' : 'ri-sun-line' ?>" id="theme-icon"></i>
+                        </button>
+                    </div>
+                    <div class="dropdown d-inline-block d-lg-inline-block ms-1 d-none">
+                        <button type="button" class="btn header-item noti-icon waves-effect" onclick="openSheet()">
+                            <i class="ri-information-line"></i>
                         </button>
                     </div>
 
@@ -592,14 +569,12 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                 settings._oldPage = info ? info.page : 0;
             },
             "initComplete": function(settings) {
-                setTimeout(function() {
-                    syncTableHeader(settings);
-                }, 150);
+                setTimeout(function() { syncTableHeader(settings); }, 150);
             },
             "drawCallback": function(settings) {
-                var api = this.api();
+                var api   = this.api();
                 var $body = $(api.table().body());
-                var info = api.page.info();
+                var info  = api.page.info();
                 var oldPage = settings._oldPage !== undefined ? settings._oldPage : info.page;
                 var newPage = info.page;
 
@@ -628,9 +603,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                     $body.addClass('dt-fade');
                 }
 
-                setTimeout(function() {
-                    syncTableHeader(settings);
-                }, 100);
+                setTimeout(function() { syncTableHeader(settings); }, 100);
             }
         });
         $(document).ready(function() {
@@ -639,8 +612,8 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
 
                 const api = new $.fn.dataTable.Api(settings);
                 const $wrapper = $(api.table().container());
-                let isEnabled = settings.oInit.autoScrollPage === true;
-                settings.oInit.autoScrollPage = isEnabled;
+                let isEnabled = settings.oInit.autoScrollPage === true; 
+                settings.oInit.autoScrollPage = isEnabled; 
 
                 if (!$('#dt-switch-style').length) {
                     $('head').append(`
@@ -668,7 +641,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                 `);
 
                 $toggleContainer.find('.dt-scroll-checkbox').on('change', function() {
-                    $(this).closest('.dt-autoscroll-toggle').find('.dt-autoscroll-label').text('Scroll ' + (this.checked ? 'On' : 'Off'));
+                    $(this).closest('.dt-autoscroll-toggle').find('.dt-autoscroll-label').text('Scroll '+(this.checked?'On':'Off'));
                     settings.oInit.autoScrollPage = this.checked;
                 });
 
@@ -689,7 +662,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                 const isBottom = Math.ceil(scrollTop + $scrollBody.innerHeight()) >= $scrollBody[0].scrollHeight;
                 const isTop = scrollTop === 0;
                 const info = dt.page.info();
-
+                
                 let action = null;
 
                 if (oe.deltaY > 0 && isBottom && info.page < info.pages - 1) action = 'next';
@@ -701,13 +674,12 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                         setTimeout(function() {
                             $scrollBody.scrollTop(action === 'previous' ? $scrollBody[0].scrollHeight : 0);
                             setTimeout(() => $table.data('isPageChanging', false), 800);
-                        }, action === 'previous' ? 50 : 0);
+                        }, action === 'previous' ? 50 : 0); 
                     });
                     dt.page(action).draw('page');
                 }
             });
         });
-
         function syncTableHeader(settings) {
             if (!settings || settings.oInit.showScrollToggle === false || !settings.nScrollBody) return;
 
@@ -717,23 +689,23 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             var $scrollHead = $wrapper.find('.dataTables_scrollHead table');
             var $scrollBody = $wrapper.find('.dataTables_scrollBody table');
 
-            var $headThs = $scrollHead.find('thead tr');
-            var $firstRow = $scrollBody.find('tbody tr:first');
-            var $bodyTds = $firstRow.find('td');
+            var $headThs   = $scrollHead.find('thead tr');
+            var $firstRow  = $scrollBody.find('tbody tr:first');
+            var $bodyTds   = $firstRow.find('td');
 
-            var totalCols = $headThs.first().find('th').length;
-            var isEmpty = $bodyTds.length === 0 ||
-                ($bodyTds.length === 1 && $firstRow.hasClass('odd') && $bodyTds.first().attr('colspan'));
+            var totalCols  = $headThs.first().find('th').length;
+            var isEmpty    = $bodyTds.length === 0 
+                            || ($bodyTds.length === 1 && $firstRow.hasClass('odd') && $bodyTds.first().attr('colspan'));
 
             if (isEmpty) {
                 var $tbody = $scrollBody.find('tbody');
-                $headThs.each(function() {
-                    $(this).find('th').each(function() {
+                $headThs.each(function () {
+                    $(this).find('th').each(function () {
                         var $th = $(this);
-                        var w = $th.outerWidth();
+                        var w   = $th.outerWidth();
                         $th.css({
                             'box-sizing': 'border-box',
-                            'width': w + 'px',
+                            'width'    : w + 'px',
                             'min-width': w + 'px',
                         });
                     });
@@ -742,12 +714,12 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                 return;
             }
 
-            $bodyTds.each(function(k) {
+            $bodyTds.each(function (k) {
                 var $td_w = $(this).outerWidth();
-                $headThs.each(function() {
+                $headThs.each(function () {
                     $(this).find('th').eq(k).css({
                         'box-sizing': 'border-box',
-                        'width': $td_w + 'px',
+                        'width'    : $td_w + 'px',
                         'min-width': $td_w + 'px',
                     });
                 });
@@ -767,7 +739,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
                 }
             }
         });
-
+        
         $(document).ready(function() {
             $('#loading').hide();
 
@@ -862,7 +834,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
 
         setTimeout(enableDataTableSearch, 300);
         setTimeout(enableDataTableSearch, 800);
-        $(document).on('click', 'a', function() {
+        $(document).on('click','a', function(){
             setTimeout(() => {
                 $('#loading').hide();
             }, 3000);
@@ -874,7 +846,40 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
     <script>
         AOS.init();
     </script>
+    <script>
+        $(document).ready(function() {
+            const baseUrl = '<?= base_url() ?>';
 
+            function setCookie(name, value, days) {
+                let expires = "";
+                if (days) {
+                    let date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+            }
+
+            let currentTheme = $('body').attr('data-theme') || 'dark';
+
+            $('#theme-toggle-btn').on('click', function() {
+                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setCookie('app-theme', currentTheme, 30);
+                if (currentTheme === 'light') {
+                    $('#bootstrap-style').attr('href', baseUrl + 'assets/admin/css/bootstrap.min.css');
+                    $('#app-style').attr('href', baseUrl + 'assets/admin/css/app.min.css');
+                    $('#theme-icon').removeClass('ri-sun-line').addClass('ri-moon-line');
+                    $('body').attr('data-theme', 'light');
+                } else {
+                    $('#bootstrap-style').attr('href', baseUrl + 'assets/admin/css/bootstrap-dark.min.css');
+                    $('#app-style').attr('href', baseUrl + 'assets/admin/css/app-dark.min.css');
+                    $('#theme-icon').removeClass('ri-moon-line').addClass('ri-sun-line');
+                    $('body').attr('data-theme', 'dark');
+                }
+            });
+        });
+    </script>
+    <script src="<?= base_url() ?>assets/admin/js/shortcut.js?v=1.0"></script>
 </body>
 
 </html>

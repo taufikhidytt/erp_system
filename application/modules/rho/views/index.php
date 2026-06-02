@@ -38,10 +38,6 @@
     }
 </style>
 
-<div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
-<div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
-<div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
-
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
@@ -145,12 +141,12 @@
                     "orderable": false,
                     "searchable": false,
                     "width": "5%",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "status",
                     "width": "13%",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "no_transaksi",
@@ -163,7 +159,7 @@
                 {
                     "data": "tanggal",
                     "width": "10%",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "main_storage",
@@ -230,7 +226,7 @@
                     },
                     "columns": [{
                             "data": "no",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -243,7 +239,7 @@
                         },
                         {
                             "data": "kode_item",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -307,33 +303,5 @@
                 .search(this.value)
                 .draw();
         });
-
-        var flashsuccess = $('#flashSuccess').data('success');
-        var flashwarning = $('#flashWarning').data('warning');
-        var flasherror = $('#flashError').data('error');
-
-        if (flashsuccess) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: flashsuccess,
-            })
-        }
-
-        if (flashwarning) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: flashwarning,
-            })
-        }
-
-        if (flasherror) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: flasherror,
-            })
-        }
     });
 </script>

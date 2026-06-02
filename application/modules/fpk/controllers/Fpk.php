@@ -752,8 +752,9 @@ class Fpk extends Back_Controller
         }
     }
 
-    public function get_log_info(){
-        $params = json_decode($this->encrypt->decode(base64_decode($this->input->post('params'))), true);
+    public function get_log_info()
+    {
+        $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
         $id     = (int) ($params['id'] ?? 0);
         $this->load->model('M_union_datatables', 'union_datatables');
         $config = [

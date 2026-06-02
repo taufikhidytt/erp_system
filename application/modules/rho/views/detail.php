@@ -53,10 +53,6 @@
     }
 </style>
 
-<div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
-<div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
-<div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
-
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
@@ -86,7 +82,9 @@
                                     <h5 style="width: 100px;" id="readonlyRequestQtyId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['insert','save',
+                                    <?= button_actions([
+                                        'insert',
+                                        'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->REQUEST_QTY_ID)],
                                         [
                                             'key'          => 'log_info',
@@ -791,34 +789,6 @@
         //         dropdownParent: $(this).parent(),
         //     });
         // });
-
-        var flashsuccess = $('#flashSuccess').data('success');
-        var flashwarning = $('#flashWarning').data('warning');
-        var flasherror = $('#flashError').data('error');
-
-        if (flashsuccess) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: flashsuccess,
-            })
-        }
-
-        if (flashwarning) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: flashwarning,
-            })
-        }
-
-        if (flasherror) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: flasherror,
-            })
-        }
 
         $("#main_storage").data("prev", $("#main_storage").val());
 
@@ -1742,7 +1712,7 @@
     $('form').on('submit', function(e) {
         $('#site_storage').prop('disabled', false);
         $('#main_storage').prop('disabled', false);
-        $.each($(document).find('[data-input-number], .input-number'), function(){
+        $.each($(document).find('[data-input-number], .input-number'), function() {
             $(this).val($(this).inputNumber('getValue'));
         });
     });

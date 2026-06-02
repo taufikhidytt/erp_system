@@ -1,0 +1,442 @@
+body[data-theme="dark"] {
+    .select2-container .select2-selection--single {
+        background-color: #292f3f;
+        border: 1px solid #2d3448;
+        color: #8590a5;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered{
+        color: #8590a5;
+    }
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered .select2-selection__placeholder{
+        color: #8590a5;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown{
+        background-color: #292f3f;
+        border: 1px solid #2d3448;
+        color: #8590a5;
+    }
+
+    .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field{
+        background: transparent;
+        color: #8590a5;
+    }
+
+    .select2-container--bootstrap-5.select2-container--disabled .select2-selection, .select2-container--bootstrap-5.select2-container--disabled.select2-container--focus .select2-selection{
+        background-color: #292f3f;
+    }
+    .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option.select2-results__option--selected, .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option[aria-selected=true]:not(.select2-results__option--highlighted){
+        color: #fff;
+        background-color: #0d6efd;
+    }
+
+    .nav-tabs .nav-link.active{
+        background: transparent;
+    }
+
+    .dt-buttons button{
+        color: #FFFFFF !important;
+    }
+    
+    /* modal log & history*/
+    #log-info-modal .modal-footer{
+        background-color: #292f3f;
+        border: 1px solid #2d3448;
+    }
+    .log-meta-bar {
+        background: #2a3042; /* Sesuaikan dengan warna background dark Skote/Minia */
+        border-bottom: 1px solid #32394e;
+    }
+    .log-meta-card {
+        background: #222736;
+        border: 1px solid #32394e;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .log-meta-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .log-meta-icon.created { 
+        background: rgba(52, 195, 143, 0.15); /* Hijau transparan */
+        color: #34c38f; 
+    }
+    .log-meta-icon.updated { 
+        background: rgba(241, 180, 76, 0.15); /* Kuning/Orange transparan */
+        color: #f1b44c; 
+    }
+    .log-meta-label {
+        color: #a6b0cf; /* Teks label muted dark */
+    }
+    .log-meta-value {
+        color: #e9ecef; /* Teks utama terang */
+    }
+    .log-meta-value .meta-user {
+        color: #556ee6; /* Biru brand */
+    }
+    .log-meta-value .meta-date {
+        color: #a6b0cf;
+    }
+    body[data-theme="dark"] #log-info-modal .modal-footer {
+        background: #2a3042;
+        border-top: 1px solid #32394e;
+    }
+    .log-footer-info {
+        color: #a6b0cf;
+    }
+
+    .meta-dot.created {
+        background: #34c38f;
+        animation: dotPulseGreenDark 2s ease-in-out infinite;
+    }
+    .meta-dot.updated {
+        background: #f1b44c;
+        animation: dotPulseOrangeDark 2s ease-in-out infinite;
+    }
+    @keyframes dotPulseGreenDark {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(52, 195, 143, 0.4); }
+        50%       { box-shadow: 0 0 0 5px rgba(52, 195, 143, 0);  }
+    }
+    @keyframes dotPulseOrangeDark {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(241, 180, 76, 0.4); }
+        50%       { box-shadow: 0 0 0 5px rgba(241, 180, 76, 0);  }
+    }
+
+    /* card */
+    .card-header.bg-white{
+        background-color: #292f3f !important;
+        border-bottom: 1px solid #2d3448 !important;
+    }
+
+    /* inline editor */
+    .ie-cell:hover { 
+        background: #32394e !important; 
+    }
+    .ie-cell.ie-changed { 
+        background: rgba(241, 180, 76, 0.15) !important; /* Warning/Kuning transparan */
+    }
+    .ie-cell.ie-editing { 
+        background: rgba(85, 110, 230, 0.15) !important; /* Primary/Biru transparan */
+        cursor: default; 
+    }
+
+    /* Row baru */
+    tr.ie-new-row td { 
+        background: rgba(52, 195, 143, 0.1) !important; /* Success/Hijau transparan pudar */
+    }
+    tr.ie-new-row td.ie-changed { 
+        background: rgba(52, 195, 143, 0.2) !important; /* Success/Hijau transparan lebih tebal */
+    }
+
+    /* Input & select */
+    .ie-cell input[type="text"],
+    .ie-cell input[type="number"],
+    .ie-cell input[type="date"],
+    .ie-cell input[type="time"],
+    .ie-cell input[type="datetime-local"],
+    .ie-cell select {
+        border: 1px solid #32394e;
+        box-shadow: 0 0 0 3px rgba(85, 110, 230, 0.15);
+        background: #222736;
+        color: #e9ecef;
+    }
+
+    .ie-cell input:focus,
+    .ie-cell select:focus {
+        border-color: #556ee6; /* Sorotan border biru saat aktif mengetik */
+    }
+
+    /* ── Select2 ──────── */
+    .ie-cell .select2-container--bootstrap-5 .select2-selection {
+        border: 1px solid #32394e !important;
+        box-shadow: 0 0 0 3px rgba(85, 110, 230, 0.15) !important;
+        background-color: #222736;
+    }
+
+    .ie-cell .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+        color: #e9ecef;
+    }
+
+    .ie-cell .select2-container--bootstrap-5 .select2-selection--single .select2-selection__placeholder {
+        color: #a6b0cf;
+    }
+
+
+    /* user page */
+    /* ================================================================
+       DARK MODE STYLES - Permission Panel
+       ================================================================ */
+
+    /* Scrollbar */
+    .perm-panel-left::-webkit-scrollbar-thumb,
+    .perm-panel-right::-webkit-scrollbar-thumb { 
+        background: #32394e; 
+    }
+
+    /* Menu leaf row */
+    .menu-leaf { color: #a6b0cf; }
+    .menu-leaf:hover { background: #2a3042; }
+    .menu-leaf.active { 
+        background: rgba(85, 110, 230, 0.15); 
+        color: #556ee6; 
+    }
+
+    /* Override indicator dot */
+    .ov-dot { background: #f1b44c; } /* Warning orange dark */
+
+    /* CRUD toggle face */
+    .crud-face { 
+        border-color: #32394e; 
+        background: #222736; 
+        color: #a6b0cf; 
+    }
+    .crud-face.on-i { 
+        background: rgba(85, 110, 230, 0.15); border-color: #556ee6; color: #556ee6; 
+    }
+    .crud-face.on-v { 
+        background: rgba(52, 195, 143, 0.15); border-color: #34c38f; color: #34c38f; 
+    }
+    .crud-face.on-u { 
+        background: rgba(241, 180, 76, 0.15); border-color: #f1b44c; color: #f1b44c; 
+    }
+    .crud-face.on-d { 
+        background: rgba(244, 106, 106, 0.15); border-color: #f46a6a; color: #f46a6a; 
+    }
+
+    /* Permission pill */
+    .perm-pill { border-color: #32394e !important; }
+    .perm-pill.on-action { 
+        background: rgba(85, 110, 230, 0.15); border-color: #556ee6 !important; color: #556ee6; 
+    }
+    .perm-pill.on-field { 
+        background: rgba(52, 195, 143, 0.15); border-color: #34c38f !important; color: #34c38f; 
+    }
+    .perm-pill:not(.on-action):not(.on-field) { 
+        background: #222736; color: #a6b0cf; 
+    }
+
+    /* Tab visibility switch */
+    .tab-sw { background: #32394e; }
+    .tab-sw::after { background: #e9ecef; }
+    .tab-sw.on { background: #f1b44c; }
+
+    /* Field chip inside tabs */
+    .f-chip { border-color: #32394e !important; }
+    .f-chip.on { 
+        background: rgba(241, 180, 76, 0.15); border-color: #f1b44c !important; color: #f1b44c; 
+    }
+    .f-chip:not(.on) { 
+        background: #222736; color: #a6b0cf; 
+    }
+
+    /* JSON dark block - Menyesuaikan dengan tone dark base */
+    .json-block { 
+        background: #262b3c; /* Sedikit lebih terang dari border agar menonjol */
+        border: 1px solid #32394e;
+    }
+
+    /* Accordion custom */
+    .perm-accordion .accordion-button { color: #e9ecef; }
+    .perm-accordion .accordion-button:not(.collapsed) { 
+        color: #556ee6; 
+        background: rgba(85, 110, 230, 0.1); 
+    }
+    .perm-accordion .accordion-item { border-bottom-color: #32394e; }
+    
+    /* Memastikan icon accordion panah berubah menjadi terang di dark mode */
+    .perm-accordion .accordion-button::after { 
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    .perm-accordion .accordion-button:not(.collapsed)::after {
+        filter: none; /* Biarkan biru jika sedang active */
+    }
+    #d-menu .bg-white{
+        background-color: #292f3f !important;
+        border: 1px solid #2d3448 !important;
+        color: #8590a5;
+    }
+
+    /* sort order */
+        .parent-item {
+        background: #222736;
+        border-color: #32394e;
+        border-left-color: #556ee6; /* Biru dark mode */
+    }
+    .parent-item:hover { 
+        box-shadow: 0 3px 10px rgba(0,0,0,.2); 
+    }
+    .parent-item.sortable-chosen { 
+        box-shadow: 0 6px 20px rgba(0,0,0,.3); 
+        border-color: #556ee6; 
+    }
+
+    .parent-drag-handle { color: #a6b0cf; }
+    .parent-item:hover .parent-drag-handle { color: #556ee6; }
+
+    .seq-badge {
+        background: rgba(85, 110, 230, 0.15);
+        color: #556ee6;
+    }
+    .parent-name { color: #e9ecef; }
+    .parent-icon-badge {
+        background: #2a3042;
+        color: #a6b0cf;
+    }
+
+    /* ── Child row ────────────────────────────────────────── */
+    .child-item {
+        background: #2a3042;
+        border-color: #32394e;
+        border-left-color: #34c38f; /* Hijau dark mode */
+    }
+    .child-item:hover { 
+        background: rgba(52, 195, 143, 0.08); 
+        box-shadow: 0 2px 6px rgba(0,0,0,.2); 
+    }
+    .child-item.sortable-chosen { 
+        box-shadow: 0 4px 12px rgba(0,0,0,.3); 
+    }
+
+    .child-drag-handle { color: #a6b0cf; }
+    .child-item:hover .child-drag-handle { color: #34c38f; }
+
+    .child-seq-badge {
+        background: rgba(52, 195, 143, 0.15);
+        color: #34c38f;
+    }
+    .child-name { color: #e9ecef; }
+    .child-prompt { color: #a6b0cf; }
+
+    /* ── Empty drop zone & Drag-over ──────────────────────── */
+    .empty-drop {
+        border-color: #32394e;
+        color: #64748b;
+    }
+    .children-list.drag-over { 
+        background: rgba(52, 195, 143, 0.05); 
+        border-radius: 5px; 
+    }
+
+    /* ── Save bar ─────────────────────────────────────────── */
+    .save-bar {
+        background: #2a3042;
+        border-top-color: #32394e;
+        box-shadow: 0 -2px 8px rgba(0,0,0,.25);
+    }
+    .save-hint { color: #a6b0cf; }
+
+    /* ── Seq number live update ───────────────────────────── */
+    .seq-live.updated {
+        background: rgba(241, 180, 76, 0.15) !important; /* Kuning/Warning transparan */
+        color: #f1b44c !important;
+    }
+
+    /* shortcut */
+    #topbar-search-dropdown {
+        background: #2a3042;
+        border-color: #32394e;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    #topbar-search-dropdown::-webkit-scrollbar-thumb {
+        background: #32394e;
+    }
+    #topbar-search-results li a {
+        color: #a6b0cf;
+    }
+    #topbar-search-results li a:hover,
+    #topbar-search-results li a.is-active {
+        background: #32394e;
+        color: #556ee6;
+    }
+    #topbar-search-results li a .search-name {
+        color: #e9ecef;
+    }
+    #topbar-search-results li a.is-active .search-name,
+    #topbar-search-results li a:hover .search-name {
+        color: #556ee6; /* Warna biru primer saat disorot */
+    }
+    #topbar-search-results li a .search-parent {
+        color: #a6b0cf;
+    }
+    .search-highlight {
+        color: #556ee6;
+    }
+    #topbar-search-empty {
+        color: #a6b0cf;
+    }
+
+    /* ---- Bottom Sheet Shortcut ---- */
+    #sc-sheet {
+        background: #2a3042;
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.3);
+    }
+    #sc-drag-handle {
+        background: #32394e;
+    }
+    #sc-drag-handle-wrap:hover #sc-drag-handle {
+        background: #556ee6;
+    }
+    #sc-sheet-title {
+        color: #e9ecef;
+    }
+    #sc-sheet-close {
+        background: #32394e;
+        color: #a6b0cf;
+    }
+    #sc-sheet-close:hover {
+        background: rgba(85, 110, 230, 0.15);
+        color: #556ee6;
+    }
+    #sc-sheet-body::-webkit-scrollbar-thumb {
+        background: #32394e;
+    }
+
+    /* ---- Grid Menu & Key Bindings ---- */
+    .sc-group {
+        background: #2a3042;
+    }
+    .sc-group-title {
+        color: #a6b0cf;
+    }
+    .sc-grid-card {
+        background: #222736;
+        border-color: #32394e;
+    }
+    .sc-grid-card:hover {
+        background: #2a3042;
+        border-color: #556ee6;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+    .sc-desc-wrap {
+        color: #a6b0cf;
+    }
+    .sc-kbd {
+        background: #2a3042;
+        border-color: #32394e;
+        color: #e9ecef;
+    }
+    .sc-plus {
+        color: #a6b0cf;
+    }
+
+    /* ---- Footer & Toast ---- */
+    #sc-sheet-footer {
+        border-top-color: #32394e;
+        color: #a6b0cf;
+    }
+    #sc-toast {
+        background: #32394e;
+        color: #e9ecef;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    /* datatables */
+    .table-striped>tbody>tr:nth-of-type(odd){
+        --bs-table-accent-bg: #292f3f;
+    }
+
+    .table thead input, table thead select {
+        background-color: #292f3f;
+        border: 1px solid #2d3448 !important;
+        color: #8590a5;
+    }
+}

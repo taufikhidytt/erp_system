@@ -49,10 +49,6 @@
     }
 </style>
 
-<div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
-<div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
-<div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
-
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <!-- start page title -->
@@ -93,7 +89,7 @@
                                             'title'        => 'Log & History',
                                             'icon'         => 'ri-question-line',
                                             'data-url'     => 'fpk/get_log_info',
-                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                            'data-param'   => base64url_encode($this->encrypt->encode(json_encode([
                                                 'id' => $data->PR_ID,
                                             ]))),
                                         ],
@@ -886,34 +882,6 @@
         //         dropdownParent: $(this).parent(),
         //     });
         // });
-
-        var flashsuccess = $('#flashSuccess').data('success');
-        var flashwarning = $('#flashWarning').data('warning');
-        var flasherror = $('#flashError').data('error');
-
-        if (flashsuccess) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: flashsuccess,
-            })
-        }
-
-        if (flashwarning) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: flashwarning,
-            })
-        }
-
-        if (flasherror) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: flasherror,
-            })
-        }
 
         $("#supplier").data("prev", $("#supplier").val());
 

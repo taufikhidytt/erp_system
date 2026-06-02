@@ -33,10 +33,6 @@
     }
 </style>
 
-<div id="flashSuccess" data-success="<?= $this->session->flashdata('success'); ?>"></div>
-<div id="flashWarning" data-warning="<?= $this->session->flashdata('warning'); ?>"></div>
-<div id="flashError" data-error="<?= $this->session->flashdata('error'); ?>"></div>
-
 <div class="page-content" data-aos="zoom-in">
     <div class="container-fluid">
         <div class="row">
@@ -60,7 +56,7 @@
                         <form action="" method="post">
                             <div class="row mb-2">
                                 <div class="offset-lg-6 offset-md-6 col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['insert','save','reload']) ?>
+                                    <?= button_actions(['insert', 'save', 'reload']) ?>
                                 </div>
                             </div>
                             <div class="row">
@@ -469,41 +465,247 @@
                     targets: 0,
                     width: "2%",
                     className: "text-center",
-                    createdCell: function(td) { td.style.fontFamily = 'monospace'; }
-                }, 
-                { targets: 1, width: "2%", className: "text-center", }, 
-                { targets: 2, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 3, width: "20%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 4, width: "15%", className: "ellipsis text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 5, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 6, width: "10%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 7, width: "10%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 8, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 9, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 10, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 11, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 12, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 13, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 1,
+                    width: "2%",
+                    className: "text-center",
+                },
+                {
+                    targets: 2,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 3,
+                    width: "20%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 4,
+                    width: "15%",
+                    className: "ellipsis text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 5,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 6,
+                    width: "10%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 7,
+                    width: "10%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 8,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 9,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 10,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 11,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 12,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 13,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
             ],
         });
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
             columnDefs: [{
-                    targets: 0, className: "text-center",
-                }, 
-                { targets: 1, className: "text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 2, className: "ellipsis text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 3, className: "ellipsis text-center", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 4, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 5, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 6, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 7, className: "ellipsis text-center", render: function(data) { if (!data) return '-'; let limit = 15; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 8, className: "ellipsis text-end", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 9, className: "ellipsis text-end", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 10, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; }, }, 
+                    targets: 0,
+                    className: "text-center",
+                },
+                {
+                    targets: 1,
+                    className: "text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 2,
+                    className: "ellipsis text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 3,
+                    className: "ellipsis text-center",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 4,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 5,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 6,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 7,
+                    className: "ellipsis text-center",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 15;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 8,
+                    className: "ellipsis text-end",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 9,
+                    className: "ellipsis text-end",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 10,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    },
+                },
             ],
-            autoWidth: false, paging: true, searching: true, ordering: false,
+            autoWidth: false,
+            paging: true,
+            searching: true,
+            ordering: false,
         });
 
         let oldDetail = <?= json_encode($detail ?? []) ?>;
@@ -578,7 +780,7 @@
                     // keterangan
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
                 ]).node();
-                
+
                 $(rowNode).addClass('tr-height-30');
                 $(rowNode).find('.input-number').inputNumber();
             });
@@ -587,20 +789,16 @@
             setTimeout(refreshPPN, 200);
         }
 
-        var flashsuccess = $('#flashSuccess').data('success');
-        var flashwarning = $('#flashWarning').data('warning');
-        var flasherror = $('#flashError').data('error');
-
-        if (flashsuccess) { Swal.fire({ icon: 'success', title: 'Success', text: flashsuccess }) }
-        if (flashwarning) { Swal.fire({ icon: 'warning', title: 'Warning', text: flashwarning }) }
-        if (flasherror)   { Swal.fire({ icon: 'error', title: 'Error', text: flasherror }) }
-
         $('#location').prop('disabled', true);
-        $('#location').on('select2:opening', function(e) { e.preventDefault(); });
+        $('#location').on('select2:opening', function(e) {
+            e.preventDefault();
+        });
 
         let initialCustomer = $('#customer option:selected').data('person_site_id');
         let oldLocation = "<?= set_value('location') ?>";
-        if (initialCustomer) { loadLocation(initialCustomer, oldLocation); }
+        if (initialCustomer) {
+            loadLocation(initialCustomer, oldLocation);
+        }
 
         $('#customer').on('change', function() {
             setTimeout(function() {
@@ -631,7 +829,9 @@
         });
 
         $('#tanggal').on('change', function() {
-            setTimeout(function() { updateJatuhTempo(); }, 100);
+            setTimeout(function() {
+                updateJatuhTempo();
+            }, 100);
         });
 
         $('#payment_term').on('change.select2', updateJatuhTempo);
@@ -655,7 +855,9 @@
                         $(this).data("prev", current);
                         toggleStorageDisabled();
                     } else {
-                        $(this).val(prev).trigger('change.select2', { skipEvent: true });
+                        $(this).val(prev).trigger('change.select2', {
+                            skipEvent: true
+                        });
                     }
                 });
             } else {
@@ -673,20 +875,31 @@
 
             if (!storage) {
                 $('#loading').hide();
-                Swal.fire({ icon: 'warning', title: 'Warning', text: 'Storage tidak terisi, Mohon isi terlebih dahulu' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Storage tidak terisi, Mohon isi terlebih dahulu'
+                });
                 return;
             }
 
             if (!customer) {
                 $('#loading').hide();
-                Swal.fire({ icon: 'warning', title: 'Warning', text: 'Customer tidak terisi, Mohon isi terlebih dahulu' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Customer tidak terisi, Mohon isi terlebih dahulu'
+                });
                 return;
             }
 
             $.ajax({
                 type: "POST",
                 url: "<?= base_url() ?>so_kny/getMrq",
-                data: { storage: storage, customer: customer },
+                data: {
+                    storage: storage,
+                    customer: customer
+                },
                 dataType: "json",
                 success: function(response) {
                     $('#loading').hide();
@@ -695,9 +908,9 @@
                     let existingBuildDetailId = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let buildId         = $(node).find('input[name="detail[build_id][]"]').val();
-                        let buildDetailId   = $(node).find('input[name="detail[build_detail_id][]"]').val();
-                        if (buildDetailId && buildId){
+                        let buildId = $(node).find('input[name="detail[build_id][]"]').val();
+                        let buildDetailId = $(node).find('input[name="detail[build_detail_id][]"]').val();
+                        if (buildDetailId && buildId) {
                             existingBuildDetailId.add(`${buildDetailId}-${buildId}`);
                         }
                     });
@@ -738,9 +951,15 @@
             });
         });
 
-        $('#modalMrq').on('shown.bs.modal', function() { $(this).find('.dataTables_filter input').focus(); });
-        $("#checkAllParent").change(function() { $(".chkDetail").prop('checked', $(this).prop('checked')); });
-        $("#checkAll").change(function() { $(".chkRow").prop('checked', $(this).prop('checked')); });
+        $('#modalMrq').on('shown.bs.modal', function() {
+            $(this).find('.dataTables_filter input').focus();
+        });
+        $("#checkAllParent").change(function() {
+            $(".chkDetail").prop('checked', $(this).prop('checked'));
+        });
+        $("#checkAll").change(function() {
+            $(".chkRow").prop('checked', $(this).prop('checked'));
+        });
 
         $("#btnSubmit").on("click", function(e) {
             e.preventDefault();
@@ -815,7 +1034,9 @@
                 rowsAdded = true;
             });
 
-            setTimeout(() => { calculateGrandTotal(); }, 300);
+            setTimeout(() => {
+                calculateGrandTotal();
+            }, 300);
 
             if (rowsAdded) {
                 tableDetail.draw(false);
@@ -893,7 +1114,9 @@
         });
 
         tableDetail.on("draw.dt", function() {
-            tableDetail.column(0).nodes().each(function(cell, i) { cell.innerHTML = i + 1; });
+            tableDetail.column(0).nodes().each(function(cell, i) {
+                cell.innerHTML = i + 1;
+            });
         });
 
         $("#checkAllParent").prop("checked", false);
@@ -913,20 +1136,37 @@
                 return $(this).find(".chkDetail").is(":checked");
             });
             if (rowsToRemove.length === 0) {
-                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Tidak ada item yang dipilih!' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Tidak ada item yang dipilih!'
+                });
                 return;
             }
             Swal.fire({
-                title: 'Yakin mau hapus?', text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
-                icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
-                confirmButtonColor: '#d33', cancelButtonColor: '#6ebbff'
+                title: 'Yakin mau hapus?',
+                text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6ebbff'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    rowsToRemove.each(function() { tableDetail.row(this).remove(); });
+                    rowsToRemove.each(function() {
+                        tableDetail.row(this).remove();
+                    });
                     tableDetail.draw(false);
                     $("#checkAllParent").prop("checked", false);
                     toggleStorageDisabled();
-                    Swal.fire({ icon: 'success', title: 'Success', text: 'Item berhasil dihapus', timer: 1500, showConfirmButton: false });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Item berhasil dihapus',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                     let row = $(rowsToRemove);
                     let ppn = $('#cal_ppn_code').val();
                     let ppn_code = $('#cal_ppn_code option:selected').text().trim();
@@ -938,13 +1178,17 @@
         $(document).on('input change', '.qty-edit, .harga-input', function() {
             let val = $.inputNumber.unformat($(this).val());
             if (val === '' || isNaN(val)) return;
-            if (val < 1) { $(this).val($.inputNumber.format(1)); }
+            if (val < 1) {
+                $(this).val($.inputNumber.format(1));
+            }
             updatePpnHidden();
         });
 
         refreshPPN();
 
-        $('#cal_ppn_code').on('select2:select', function(e) { updatePpnHidden(); });
+        $('#cal_ppn_code').on('select2:select', function(e) {
+            updatePpnHidden();
+        });
         $('#cal_ppn_code').on('change', function() {
             let ppn = $(this).val();
             let ppn_code = $('#cal_ppn_code option:selected').text();
@@ -955,7 +1199,9 @@
         });
 
         $('#cal_ppn_code').on('change', function() {
-            if (!$(this).data('skipEvent')) { updatePpnHidden(); }
+            if (!$(this).data('skipEvent')) {
+                updatePpnHidden();
+            }
             refreshPPN();
         });
 
@@ -1023,8 +1269,14 @@
         $('#modalKeterangan').modal('hide');
     });
 
-    $('#modalMemo').on('hidden.bs.modal', function() { activeMemoInput = null; $('#modalMemoText').val(''); });
-    $('#modalKeterangan').on('hidden.bs.modal', function() { activeKeteranganInput = null; $('#modalKeteranganText').val(''); });
+    $('#modalMemo').on('hidden.bs.modal', function() {
+        activeMemoInput = null;
+        $('#modalMemoText').val('');
+    });
+    $('#modalKeterangan').on('hidden.bs.modal', function() {
+        activeKeteranganInput = null;
+        $('#modalKeteranganText').val('');
+    });
 
     document.addEventListener('input', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
@@ -1042,7 +1294,8 @@
 
         if (value > balance) {
             Swal.fire({
-                icon: 'warning', title: 'Jumlah melebihi balance',
+                icon: 'warning',
+                title: 'Jumlah melebihi balance',
                 text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(balance) + ')',
                 confirmButtonText: 'OK'
             }).then(() => {
@@ -1071,7 +1324,8 @@
 
         if (value <= 0 || isNaN(value)) {
             Swal.fire({
-                icon: 'warning', title: 'Jumlah tidak valid',
+                icon: 'warning',
+                title: 'Jumlah tidak valid',
                 text: 'Jumlah harus lebih dari 0',
                 confirmButtonText: 'OK'
             }).then(() => {
@@ -1157,7 +1411,9 @@
         let ppn = $('#cal_ppn_code').val();
         let ppn_code = $('#cal_ppn_code option:selected').text().trim();
         if (ppn !== '' && ppn_code) {
-            $('#table-detail tbody tr').each(function() { hitungSubTotal($(this), ppn_code, ppn); });
+            $('#table-detail tbody tr').each(function() {
+                hitungSubTotal($(this), ppn_code, ppn);
+            });
             calculateGrandTotal();
         }
     }
@@ -1169,7 +1425,9 @@
         $('#hid_ppn').val(ppn);
         $('#hid_ppn_code').val(ppn_code);
 
-        $('#table-detail tbody tr').each(function() { hitungSubTotal($(this), ppn_code, parseFloat(ppn)); });
+        $('#table-detail tbody tr').each(function() {
+            hitungSubTotal($(this), ppn_code, parseFloat(ppn));
+        });
         calculateGrandTotal();
     }
 
@@ -1219,17 +1477,29 @@
     }
 
     function parseDiscountFormula(formula) {
-        if (!formula || formula.trim() === '') return { type: 'none', value: 0 };
+        if (!formula || formula.trim() === '') return {
+            type: 'none',
+            value: 0
+        };
         let parts = formula.split('+').map(p => p.trim()).filter(p => p !== '');
-        if (parts.length === 0) return { type: 'none', value: 0 };
+        if (parts.length === 0) return {
+            type: 'none',
+            value: 0
+        };
 
         let hasRupiah = parts.some(p => /^0\d+$/.test(p));
         if (hasRupiah) {
             let totalRp = parts.reduce((sum, p) => sum + (parseInt(p, 10) || 0), 0);
-            return { type: 'rupiah', value: totalRp };
+            return {
+                type: 'rupiah',
+                value: totalRp
+            };
         } else {
             let totalPct = parts.reduce((sum, p) => sum + (parseFloat(p) || 0), 0);
-            return { type: 'persen', value: totalPct };
+            return {
+                type: 'persen',
+                value: totalPct
+            };
         }
     }
 
@@ -1269,11 +1539,13 @@
 
         let diskonPersenInput = ($('#cal_diskon_percen').val() || '').trim();
         let diskonRpInput = parseFloat($.inputNumber.unformat($('#cal_diskon_price').val())) || 0;
-        let diskonPersenParsed = { value: 0 };
+        let diskonPersenParsed = {
+            value: 0
+        };
         let diskonRpParsed = 0;
 
         if (diskonPersenInput !== '') {
-            let baseAmount = totalAmount; 
+            let baseAmount = totalAmount;
             diskonPersenParsed = parseDiscountFormula(diskonPersenInput);
             diskonRpParsed = calcDiscount(baseAmount, diskonPersenInput);
         } else {
@@ -1311,7 +1583,9 @@
             hiddenPpnAmount = displayPpnAmount;
             hiddenTotalNet = displayTotalNet;
         } else {
-            displayPpnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, { PEMBULATAN_PPN: 0 });
+            displayPpnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, {
+                PEMBULATAN_PPN: 0
+            });
             displayTotalNet = totalAmount - diskonRpParsed + displayPpnAmount;
 
             hiddenPpnAmount = displayPpnAmount;
@@ -1366,15 +1640,20 @@
         $.ajax({
             url: "<?= base_url('so_kny/get_location_by_customer') ?>",
             type: "POST",
-            data: { customer: customer },
+            data: {
+                customer: customer
+            },
             dataType: "json",
             success: function(response) {
                 if (response.status === 'success') {
                     let locations = response.data;
                     $.each(locations, function(i, item) {
                         let selected = "";
-                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) { selected = "selected"; } 
-                        else if (!selectedLocation && item.PRIMARY_SHIP === "Y") { selected = "selected"; }
+                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) {
+                            selected = "selected";
+                        } else if (!selectedLocation && item.PRIMARY_SHIP === "Y") {
+                            selected = "selected";
+                        }
                         $('#location').val(item.SITE_NAME);
                         $('#location_id').val(item.PERSON_SITE_ID);
                         $('#address').val((item.ADDRESS1 ?? '') + '\n' + (item.CITY ?? ''));
