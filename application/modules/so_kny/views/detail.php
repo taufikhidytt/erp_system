@@ -78,7 +78,9 @@
                                     <h5 style="width: 100px;" id="readonlySoId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['insert','save',
+                                    <?= button_actions([
+                                        'insert',
+                                        'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->SO_ID)],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('so_kny/print/' . base64url_encode($this->encrypt->encode($data->SO_ID)))]
@@ -108,7 +110,7 @@
                                                 </span>
                                                 <select name="customer" id="customer"
                                                     data-url="so_kny/get_customer"
-                                                    data-selected-id="<?= set_value('customer', $data->PERSON_ID) ?>"
+                                                    data-selected-id="<?= set_value('customer', $data->PERSON_ID . "_" . $data->PERSON_SITE_ID) ?>"
                                                     class="form-control select2 <?= form_error('customer') ? 'is-invalid' : null; ?>">
                                                 </select>
                                                 <input type="hidden" name="person_site_id" id="person_site_id" value="<?= $this->input->post('person_site_id') ?? ($data->PERSON_SITE_ID ?? '') ?>">
@@ -635,7 +637,9 @@
             url: '<?= base_url() ?>so_kny/getStatus',
             type: 'POST',
             dataType: 'json',
-            data: { so_id: so_id },
+            data: {
+                so_id: so_id
+            },
             success: function(response) {
                 $('#statusSoId').html(badgeStatus(response.data[0].DISPLAY_NAME, response.data[0].MENU_ICON));
                 $('#readonlySoId').hide();
@@ -683,37 +687,246 @@
             autoWidth: false,
             paging: false,
             columnDefs: [{
-                    targets: 0, width: "2%", className: "text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; }
-                }, 
-                { targets: 2, width: "2%", className: "text-center", }, 
-                { targets: 3, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 4, width: "20%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 5, width: "15%", className: "ellipsis text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 6, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 7, width: "10%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 8, width: "10%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 9, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 10, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 11, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 12, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
-                { targets: 13, width: "15%", className: "ellipsis text-end", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 14, width: "15%", className: "ellipsis", createdCell: function(td) { td.style.fontFamily = 'monospace'; td.style.cursor = 'pointer'; } }, 
+                    targets: 0,
+                    width: "2%",
+                    className: "text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 2,
+                    width: "2%",
+                    className: "text-center",
+                },
+                {
+                    targets: 3,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 4,
+                    width: "20%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 5,
+                    width: "15%",
+                    className: "ellipsis text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 6,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 7,
+                    width: "10%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 8,
+                    width: "10%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 9,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 10,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 11,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 12,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
+                {
+                    targets: 13,
+                    width: "15%",
+                    className: "ellipsis text-end",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 14,
+                    width: "15%",
+                    className: "ellipsis",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                        td.style.cursor = 'pointer';
+                    }
+                },
             ],
         });
 
         tableItem = $('#table-item').DataTable({
             autoWidth: false,
-            columnDefs: [{ targets: 0, className: "text-center" }, 
-                { targets: 1, className: "text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 2, className: "ellipsis text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 3, className: "ellipsis text-center", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 4, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 5, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 6, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 7, className: "ellipsis text-center", render: function(data) { if (!data) return '-'; let limit = 15; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 8, className: "ellipsis text-end", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 9, className: "ellipsis text-end", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } }, 
-                { targets: 10, className: "ellipsis", render: function(data) { if (!data) return '-'; let limit = 20; let text = data.length > limit ? data.substring(0, limit) + '...' : data; return `<span title="${data}">${text}</span>`; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; }, }, 
+            columnDefs: [{
+                    targets: 0,
+                    className: "text-center"
+                },
+                {
+                    targets: 1,
+                    className: "text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 2,
+                    className: "ellipsis text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 3,
+                    className: "ellipsis text-center",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 4,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 5,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 6,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 7,
+                    className: "ellipsis text-center",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 15;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 8,
+                    className: "ellipsis text-end",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 9,
+                    className: "ellipsis text-end",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    targets: 10,
+                    className: "ellipsis",
+                    render: function(data) {
+                        if (!data) return '-';
+                        let limit = 20;
+                        let text = data.length > limit ? data.substring(0, limit) + '...' : data;
+                        return `<span title="${data}">${text}</span>`;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    },
+                },
             ],
             autoWidth: false,
             paging: true,
@@ -793,7 +1006,7 @@
                     `<textarea class="form-control form-control-sm border-0 enter-as-tab" name="detail[keterangan][]" rows="1" readonly>${keterangan}</textarea>`,
                 ]).node();
                 $(rowNode).addClass('tr-height-30');
-                $(rowNode).find('.input-number').inputNumber(); 
+                $(rowNode).find('.input-number').inputNumber();
             });
             toggleStorageDisabled();
             tableDetail.draw(false);
@@ -804,18 +1017,40 @@
         var flashwarning = $('#flashWarning').data('warning');
         var flasherror = $('#flashError').data('error');
 
-        if (flashsuccess) { Swal.fire({ icon: 'success', title: 'Success', text: flashsuccess }) }
-        if (flashwarning) { Swal.fire({ icon: 'warning', title: 'Warning', text: flashwarning }) }
-        if (flasherror)   { Swal.fire({ icon: 'error', title: 'Error', text: flasherror }) }
+        if (flashsuccess) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: flashsuccess
+            })
+        }
+        if (flashwarning) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: flashwarning
+            })
+        }
+        if (flasherror) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: flasherror
+            })
+        }
 
         toggleStorageDisabled();
 
         $('#location').prop('disabled', true);
-        $('#location').on('select2:opening', function(e) { e.preventDefault(); });
+        $('#location').on('select2:opening', function(e) {
+            e.preventDefault();
+        });
 
         let initialCustomer = $('#customer option:selected').data('person_site_id');
         let oldLocation = "<?= set_value('location') ?>";
-        if (initialCustomer) { loadLocation(initialCustomer, oldLocation); }
+        if (initialCustomer) {
+            loadLocation(initialCustomer, oldLocation);
+        }
 
         $('#customer').on('change', function() {
             setTimeout(function() {
@@ -845,7 +1080,11 @@
             }, 100)
         });
 
-        $('#tanggal').on('change', function() { setTimeout(function() { updateJatuhTempo(); }, 100); });
+        $('#tanggal').on('change', function() {
+            setTimeout(function() {
+                updateJatuhTempo();
+            }, 100);
+        });
         $('#payment_term').on('change.select2', updateJatuhTempo);
         updateJatuhTempo();
 
@@ -867,7 +1106,9 @@
                         $(this).data("prev", current);
                         toggleStorageDisabled();
                     } else {
-                        $(this).val(prev).trigger('change.select2', { skipEvent: true });
+                        $(this).val(prev).trigger('change.select2', {
+                            skipEvent: true
+                        });
                     }
                 });
             } else {
@@ -885,20 +1126,31 @@
 
             if (!storage) {
                 $('#loading').hide();
-                Swal.fire({ icon: 'warning', title: 'Warning', text: 'Storage tidak terisi, Mohon isi terlebih dahulu' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Storage tidak terisi, Mohon isi terlebih dahulu'
+                });
                 return;
             }
 
             if (!customer) {
                 $('#loading').hide();
-                Swal.fire({ icon: 'warning', title: 'Warning', text: 'Customer tidak terisi, Mohon isi terlebih dahulu' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Customer tidak terisi, Mohon isi terlebih dahulu'
+                });
                 return;
             }
 
             $.ajax({
                 type: "POST",
                 url: "<?= base_url() ?>so_kny/getMrq",
-                data: { storage: storage, customer: customer },
+                data: {
+                    storage: storage,
+                    customer: customer
+                },
                 dataType: "json",
                 success: function(response) {
                     $('#loading').hide();
@@ -907,9 +1159,9 @@
                     let existingBuildDetailId = new Set();
                     tableDetail.rows().every(function() {
                         let node = this.node();
-                        let buildId         = $(node).find('input[name="detail[build_id][]"]').val();
-                        let buildDetailId   = $(node).find('input[name="detail[build_detail_id][]"]').val();
-                        if (buildDetailId && buildId){
+                        let buildId = $(node).find('input[name="detail[build_id][]"]').val();
+                        let buildDetailId = $(node).find('input[name="detail[build_detail_id][]"]').val();
+                        if (buildDetailId && buildId) {
                             existingBuildDetailId.add(`${buildDetailId}-${buildId}`);
                         }
                     });
@@ -950,9 +1202,15 @@
             });
         });
 
-        $('#modalMrq').on('shown.bs.modal', function() { $(this).find('.dataTables_filter input').focus(); });
-        $("#checkAllParent").change(function() { $(".chkDetail").prop('checked', $(this).prop('checked')); });
-        $("#checkAll").change(function() { $(".chkRow").prop('checked', $(this).prop('checked')); });
+        $('#modalMrq').on('shown.bs.modal', function() {
+            $(this).find('.dataTables_filter input').focus();
+        });
+        $("#checkAllParent").change(function() {
+            $(".chkDetail").prop('checked', $(this).prop('checked'));
+        });
+        $("#checkAll").change(function() {
+            $(".chkRow").prop('checked', $(this).prop('checked'));
+        });
 
         $("#btnSubmit").on("click", function(e) {
             e.preventDefault();
@@ -1036,7 +1294,9 @@
                 rowsAdded = true;
             });
 
-            setTimeout(() => { calculateGrandTotal(); }, 300);
+            setTimeout(() => {
+                calculateGrandTotal();
+            }, 300);
 
             if (rowsAdded) {
                 tableDetail.draw(false);
@@ -1112,7 +1372,9 @@
         });
 
         tableDetail.on("draw.dt", function() {
-            tableDetail.column(0).nodes().each(function(cell, i) { cell.innerHTML = i + 1; });
+            tableDetail.column(0).nodes().each(function(cell, i) {
+                cell.innerHTML = i + 1;
+            });
         });
 
         $("#checkAllParent").prop("checked", false);
@@ -1132,20 +1394,37 @@
                 return $(this).find(".chkDetail").is(":checked");
             });
             if (rowsToRemove.length === 0) {
-                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Tidak ada item yang dipilih!' });
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan',
+                    text: 'Tidak ada item yang dipilih!'
+                });
                 return;
             }
             Swal.fire({
-                title: 'Yakin mau hapus?', text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
-                icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus', cancelButtonText: 'Batal',
-                confirmButtonColor: '#d33', cancelButtonColor: '#6ebbff'
+                title: 'Yakin mau hapus?',
+                text: `Ada ${rowsToRemove.length} item yang akan dihapus`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6ebbff'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    rowsToRemove.each(function() { tableDetail.row(this).remove(); });
+                    rowsToRemove.each(function() {
+                        tableDetail.row(this).remove();
+                    });
                     tableDetail.draw(false);
                     $("#checkAllParent").prop("checked", false);
                     toggleStorageDisabled();
-                    Swal.fire({ icon: 'success', title: 'Success', text: 'Item berhasil dihapus', timer: 1500, showConfirmButton: false });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Item berhasil dihapus',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                     let row = $(rowsToRemove);
                     let ppn = $('#cal_ppn_code').val();
                     let ppn_code = $('#cal_ppn_code option:selected').text().trim();
@@ -1157,19 +1436,54 @@
         $(document).on('click', '#myForm .btn-delete', function() {
             let id = $(this).data('id');
             Swal.fire({
-                title: 'Yakin mau hapus?', text: 'Data yang dihapus tidak bisa dikembalikan!',
-                icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#70bcff', confirmButtonText: 'Ya, hapus!', cancelButtonText: 'Batal'
+                title: 'Yakin mau hapus?',
+                text: 'Data yang dihapus tidak bisa dikembalikan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#70bcff',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
                         url: '<?= base_url() ?>so_kny/del',
-                        type: 'POST', dataType: 'json', data: { id: id },
-                        beforeSend: function() { Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } }); },
-                        success: function(res) {
-                            if (res.status) { Swal.fire({ title: 'Berhasil!', text: res.message, icon: 'success' }).then(() => { location.reload(); }); } 
-                            else { Swal.fire({ title: 'Warning!', text: res.error, icon: 'warning' }).then(() => { location.reload(); }); }
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id: id
                         },
-                        error: function() { Swal.fire('Error', 'Gagal menghapus data!', 'error'); }
+                        beforeSend: function() {
+                            Swal.fire({
+                                title: 'Menghapus...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading();
+                                }
+                            });
+                        },
+                        success: function(res) {
+                            if (res.status) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: res.message,
+                                    icon: 'success'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Warning!',
+                                    text: res.error,
+                                    icon: 'warning'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Gagal menghapus data!', 'error');
+                        }
                     });
                 }
             });
@@ -1178,13 +1492,17 @@
         $(document).on('input change', '.qty-edit, .harga-input', function() {
             let val = $.inputNumber.unformat($(this).val());
             if (val === '' || isNaN(val)) return;
-            if (val < 1) { $(this).val($.inputNumber.format(1)); }
+            if (val < 1) {
+                $(this).val($.inputNumber.format(1));
+            }
             updatePpnHidden();
         });
 
         refreshPPN();
 
-        $('#cal_ppn_code').on('select2:select', function(e) { updatePpnHidden(); });
+        $('#cal_ppn_code').on('select2:select', function(e) {
+            updatePpnHidden();
+        });
         $('#cal_ppn_code').on('change', function() {
             let ppn = $(this).val();
             let ppn_code = $('#cal_ppn_code option:selected').text();
@@ -1195,7 +1513,9 @@
         });
 
         $('#cal_ppn_code').on('change', function() {
-            if (!$(this).data('skipEvent')) { updatePpnHidden(); }
+            if (!$(this).data('skipEvent')) {
+                updatePpnHidden();
+            }
             refreshPPN();
         });
 
@@ -1220,17 +1540,67 @@
                 $(row).attr('data-so_detail_id', data.so_detail_id);
             },
             "columns": [{
-                    "className": 'details-control text-center', "orderable": false, "searchable": false,
-                    "data": null, "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>',
-                    createdCell: function(td) { td.style.fontFamily = 'monospace'; }
+                    "className": 'details-control text-center',
+                    "orderable": false,
+                    "searchable": false,
+                    "data": null,
+                    "defaultContent": '<i class="ri ri-add-line" style="cursor:pointer"></i>',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
                 },
-                { "data": "no", "orderable": false, "searchable": false, "className": 'text-center', createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
-                { "data": "nama_item", render: function(data, type, row) { return data; }, createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
-                { "data": "kode_item", className: "text-center", createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
-                { "data": "satuan", createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
-                { "data": "so", "className": 'text-end', createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
-                { "data": "do", "className": 'text-end', createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
-                { "data": "sisa", "className": 'text-end', createdCell: function(td) { td.style.fontFamily = 'monospace'; } },
+                {
+                    "data": "no",
+                    "orderable": false,
+                    "searchable": false,
+                    "className": 'text-center',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    "data": "nama_item",
+                    render: function(data, type, row) {
+                        return data;
+                    },
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    "data": "kode_item",
+                    className: "text-center",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    "data": "satuan",
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    "data": "so",
+                    "className": 'text-end',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    "data": "do",
+                    "className": 'text-end',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
+                {
+                    "data": "sisa",
+                    "className": 'text-end',
+                    createdCell: function(td) {
+                        td.style.fontFamily = 'monospace';
+                    }
+                },
             ]
         });
 
@@ -1252,17 +1622,41 @@
                 icon.removeClass('ri-add-line').addClass('ri-subtract-line');
 
                 $('#' + $.escapeSelector(childTableId)).DataTable({
-                    "processing": true, "serverSide": true,
-                    "ajax": { "url": $('#table-info-detail').data('url') + infoDetailID, "type": "POST", },
-                    "columns": [
-                        { "data": "no", "orderable": false, "className": 'text-center', },
-                        { "data": "no_transaksi", },
-                        { "data": "tanggal", "className": 'text-center', },
-                        { "data": "jumlah", 'className': 'text-end', },
-                        { "data": "satuan", },
-                        { "data": "s_loc", },
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        "url": $('#table-info-detail').data('url') + infoDetailID,
+                        "type": "POST",
+                    },
+                    "columns": [{
+                            "data": "no",
+                            "orderable": false,
+                            "className": 'text-center',
+                        },
+                        {
+                            "data": "no_transaksi",
+                        },
+                        {
+                            "data": "tanggal",
+                            "className": 'text-center',
+                        },
+                        {
+                            "data": "jumlah",
+                            'className': 'text-end',
+                        },
+                        {
+                            "data": "satuan",
+                        },
+                        {
+                            "data": "s_loc",
+                        },
                     ],
-                    "paging": true, "searching": true, "ordering": true, "info": true, "autoWidth": true, "order": []
+                    "paging": true,
+                    "searching": true,
+                    "ordering": true,
+                    "info": true,
+                    "autoWidth": true,
+                    "order": []
                 });
             }
         });
@@ -1326,8 +1720,14 @@
         $('#modalKeterangan').modal('hide');
     });
 
-    $('#modalMemo').on('hidden.bs.modal', function() { activeMemoInput = null; $('#modalMemoText').val(''); });
-    $('#modalKeterangan').on('hidden.bs.modal', function() { activeKeteranganInput = null; $('#modalKeteranganText').val(''); });
+    $('#modalMemo').on('hidden.bs.modal', function() {
+        activeMemoInput = null;
+        $('#modalMemoText').val('');
+    });
+    $('#modalKeterangan').on('hidden.bs.modal', function() {
+        activeKeteranganInput = null;
+        $('#modalKeteranganText').val('');
+    });
 
     document.addEventListener('input', function(e) {
         if (!e.target.classList.contains('qty-edit')) return;
@@ -1344,14 +1744,17 @@
 
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
-            if (span) { span.textContent = $.inputNumber.format(val); }
+            if (span) {
+                span.textContent = $.inputNumber.format(val);
+            }
         }
 
         if (so_detail_id) {
             const maxAllowed = balance + value_old;
             if (value > maxAllowed) {
                 Swal.fire({
-                    icon: 'warning', title: 'Jumlah melebihi balance',
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
                     text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(maxAllowed) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
@@ -1365,7 +1768,8 @@
         } else {
             if (value > balance) {
                 Swal.fire({
-                    icon: 'warning', title: 'Jumlah melebihi balance',
+                    icon: 'warning',
+                    title: 'Jumlah melebihi balance',
                     text: 'Jumlah tidak boleh melebihi balance (' + $.inputNumber.format(balance) + ')',
                     confirmButtonText: 'OK'
                 }).then(() => {
@@ -1394,13 +1798,18 @@
 
         const updateSpan = (val) => {
             const span = input.closest('td').querySelector('.qty-view');
-            if (span) { span.textContent = $.inputNumber.format(val); }
+            if (span) {
+                span.textContent = $.inputNumber.format(val);
+            }
         }
 
         if (so_detail_id) {
             if (value <= 0 || isNaN(value)) {
                 Swal.fire({
-                    icon: 'warning', title: 'Jumlah tidak valid', text: 'Jumlah harus lebih dari 0', confirmButtonText: 'OK'
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
                 }).then(() => {
                     input.value = $.inputNumber.format(value_old);
                     input.focus();
@@ -1414,7 +1823,10 @@
         } else {
             if (value <= 0 || isNaN(value)) {
                 Swal.fire({
-                    icon: 'warning', title: 'Jumlah tidak valid', text: 'Jumlah harus lebih dari 0', confirmButtonText: 'OK'
+                    icon: 'warning',
+                    title: 'Jumlah tidak valid',
+                    text: 'Jumlah harus lebih dari 0',
+                    confirmButtonText: 'OK'
                 }).then(() => {
                     input.value = $.inputNumber.format(balance);
                     input.focus();
@@ -1501,7 +1913,9 @@
         let ppn = $('#cal_ppn_code').val();
         let ppn_code = $('#cal_ppn_code option:selected').text().trim();
         if (ppn !== '' && ppn_code) {
-            $('#table-detail tbody tr').each(function() { hitungSubTotal($(this), ppn_code, ppn); });
+            $('#table-detail tbody tr').each(function() {
+                hitungSubTotal($(this), ppn_code, ppn);
+            });
             calculateGrandTotal();
         }
     }
@@ -1513,7 +1927,9 @@
         $('#hid_ppn').val(ppn);
         $('#hid_ppn_code').val(ppn_code);
 
-        $('#table-detail tbody tr').each(function() { hitungSubTotal($(this), ppn_code, parseFloat(ppn)); });
+        $('#table-detail tbody tr').each(function() {
+            hitungSubTotal($(this), ppn_code, parseFloat(ppn));
+        });
         calculateGrandTotal();
     }
 
@@ -1563,17 +1979,29 @@
     }
 
     function parseDiscountFormula(formula) {
-        if (!formula || formula.trim() === '') return { type: 'none', value: 0 };
+        if (!formula || formula.trim() === '') return {
+            type: 'none',
+            value: 0
+        };
         let parts = formula.split('+').map(p => p.trim()).filter(p => p !== '');
-        if (parts.length === 0) return { type: 'none', value: 0 };
+        if (parts.length === 0) return {
+            type: 'none',
+            value: 0
+        };
 
         let hasRupiah = parts.some(p => /^0\d+$/.test(p));
         if (hasRupiah) {
             let totalRp = parts.reduce((sum, p) => sum + (parseInt(p, 10) || 0), 0);
-            return { type: 'rupiah', value: totalRp };
+            return {
+                type: 'rupiah',
+                value: totalRp
+            };
         } else {
             let totalPct = parts.reduce((sum, p) => sum + (parseFloat(p) || 0), 0);
-            return { type: 'persen', value: totalPct };
+            return {
+                type: 'persen',
+                value: totalPct
+            };
         }
     }
 
@@ -1613,11 +2041,13 @@
 
         let diskonPersenInput = ($('#cal_diskon_percen').val() || '').trim();
         let diskonRpInput = parseFloat($.inputNumber.unformat($('#cal_diskon_price').val())) || 0;
-        let diskonPersenParsed = { value: 0 };
+        let diskonPersenParsed = {
+            value: 0
+        };
         let diskonRpParsed = 0;
 
         if (diskonPersenInput !== '') {
-            let baseAmount = totalAmount; 
+            let baseAmount = totalAmount;
             diskonPersenParsed = parseDiscountFormula(diskonPersenInput);
             diskonRpParsed = calcDiscount(baseAmount, diskonPersenInput);
         } else {
@@ -1655,7 +2085,9 @@
             hiddenPpnAmount = displayPpnAmount;
             hiddenTotalNet = displayTotalNet;
         } else {
-            displayPpnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, { PEMBULATAN_PPN: 0 });
+            displayPpnAmount = calculatePPN(totalAmount, diskonRpParsed, ppnRate, ppnCode, {
+                PEMBULATAN_PPN: 0
+            });
             displayTotalNet = totalAmount - diskonRpParsed + displayPpnAmount;
 
             hiddenPpnAmount = displayPpnAmount;
@@ -1710,15 +2142,20 @@
         $.ajax({
             url: "<?= base_url('so_kny/get_location_by_customer') ?>",
             type: "POST",
-            data: { customer: customer },
+            data: {
+                customer: customer
+            },
             dataType: "json",
             success: function(response) {
                 if (response.status === 'success') {
                     let locations = response.data;
                     $.each(locations, function(i, item) {
                         let selected = "";
-                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) { selected = "selected"; } 
-                        else if (!selectedLocation && item.PRIMARY_SHIP === "Y") { selected = "selected"; }
+                        if (selectedLocation && selectedLocation == item.PERSON_SITE_ID) {
+                            selected = "selected";
+                        } else if (!selectedLocation && item.PRIMARY_SHIP === "Y") {
+                            selected = "selected";
+                        }
                         $('#location').val(item.SITE_NAME);
                         $('#location_id').val(item.PERSON_SITE_ID);
                         $('#address').val((item.ADDRESS1 ?? '') + '\n' + (item.CITY ?? ''));
@@ -1744,7 +2181,9 @@
     }
 
     $(document).on('click', '#btn-print', function() {
-        setTimeout(function() { $('#loading').hide(); }, 300);
+        setTimeout(function() {
+            $('#loading').hide();
+        }, 300);
     });
 
     $('form').on('submit', function(e) {
@@ -1752,3 +2191,4 @@
         $('#storage').prop('disabled', false);
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

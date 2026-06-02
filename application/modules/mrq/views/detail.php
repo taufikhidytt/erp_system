@@ -2084,4 +2084,5 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>
 <?php $this->load->view('mrq/tab_material'); ?>

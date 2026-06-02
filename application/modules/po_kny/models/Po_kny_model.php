@@ -264,7 +264,7 @@ class Po_kny_model extends CI_Model
     public function getSupplier()
     {
         $searchTerm = trim($this->input->get('q') ?? '');
-        $id         = (int) $this->input->get('id');
+        $id         = $this->input->get('id');
 
         $this->db
             ->select(
@@ -312,7 +312,9 @@ class Po_kny_model extends CI_Model
             ->order_by('a.PERSON_NAME', 'ASC');
 
         if ($id) {
-            $this->db->where('a.PERSON_ID', $id)->limit(1);
+            [$person_id, $person_site_id] = explode('_', $id);
+            $this->db->where('ps.PERSON_SITE_ID', $person_site_id);
+            $this->db->where('a.PERSON_ID', $person_id)->limit(1);
         } else {
             $this->db->where('a.ACTIVE_FLAG', 'Y');
             if ($searchTerm) {
