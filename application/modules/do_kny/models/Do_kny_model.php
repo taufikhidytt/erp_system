@@ -367,7 +367,7 @@ class Do_kny_model extends CI_Model
                 "a.POINT,
                 CONCAT(a.PERSON_ID, '_', ps.PERSON_SITE_ID) as id,
                 a.PERSON_CODE,
-                CONCAT(a.PERSON_NAME, ' - [', a.PERSON_CODE, '] - ', ps.SITE_NAME) as text,
+                CONCAT('[', a.PERSON_CODE, '] - ',a.PERSON_NAME, ' - ', ps.SITE_NAME) as text,
                 a.PERSON_NAME,
                 a.LIMIT_PIUTANG,
                 a.TUNAI_FLAG,

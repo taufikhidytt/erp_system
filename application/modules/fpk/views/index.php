@@ -126,7 +126,7 @@
                                             <th>Tanggal</th>
                                             <th>Supplier</th>
                                             <th>Sales</th>
-                                            <th>Gudang</th>
+                                            <th>Storage</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>

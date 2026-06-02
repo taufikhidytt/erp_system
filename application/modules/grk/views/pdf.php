@@ -15,7 +15,7 @@
         <td class="info-card">
             <table width="100%" class="info-row">
                 <tr><td>Tanggal</td><td class="info-dots">:</td><td><?= date('d-m-Y H:i', strtotime($grk->DOCUMENT_DATE)) ?></td></tr>
-                <tr><td>Gudang</td><td class="info-dots">:</td><td><?= $grk->WAREHOUSE_NAME ?? '-' ?></td></tr>
+                <tr><td>Storage</td><td class="info-dots">:</td><td><?= $grk->WAREHOUSE_NAME ?? '-' ?></td></tr>
 
             </table>
         </td>

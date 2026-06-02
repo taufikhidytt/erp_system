@@ -159,6 +159,23 @@
                     'url'      => '',
                     'raw_url'  => true
                 ],
+                [
+                    'key'          => 'log_info',
+                    'class'        => 'btn-info btn-log-info',
+                    'title'        => 'Log & History',
+                    'icon'         => 'ri-question-line',
+                    'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                        'h' => [
+                            't'     => 'ppn',
+                            'type'  => 'by_one',
+                            'id'    => 'PPN_CODE',
+
+                        ],
+                        'where' => [
+                            'TABLE_NAME'    => 'PPN',
+                        ],
+                    ]))),
+                ],
             ], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,

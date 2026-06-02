@@ -16,7 +16,47 @@ class Item_inquiry_model extends CI_Model
 
     public function getItem()
     {
-        return $this->db->query("SELECT i.ITEM_ID, i.ITEM_CODE, LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION, LEFT(i.ASSY_CODE, 30) AS ASSY_CODE, LEFT(e.DISPLAY_NAME, 30) AS CATEGORY, i.UOM_CODE UOM, COALESCE( (SELECT SUM(QTY_AWAL + QTY_MASUK - QTY_KELUAR) FROM item_stok WHERE ITEM_ID = i.ITEM_ID), 0 ) AS STOK, mr.DISPLAY_NAME AS BRAND, tipe.DISPLAY_NAME AS TIPE, i.JENIS_ID FROM item i JOIN ERP_LOOKUP_VALUE e ON e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID JOIN ERP_LOOKUP_VALUE tipe ON i.TYPE_ID = tipe.ERP_LOOKUP_VALUE_ID JOIN ERP_LOOKUP_VALUE mr ON i.MEREK_ID = mr.ERP_LOOKUP_VALUE_ID JOIN PRICE_LIST_DETAIL b ON i.ITEM_ID = b.ITEM_ID AND b.ACTIVE_FLAG = 'Y' AND b.ENTERED_UOM = i.UOM_CODE WHERE i.TYPE_ID = FN_GET_VAR_VALUE ('INV') AND i.JENIS_ID = FN_GET_VAR_VALUE ('GOODS') ORDER BY i.ITEM_CODE");
+        $searchTerm = trim($this->input->get('q') ?? '');
+
+        $subquery = "(SELECT SUM(QTY_AWAL + QTY_MASUK - QTY_KELUAR) 
+                    FROM item_stok_konsinyasi 
+                    WHERE ITEM_ID = i.ITEM_ID)";
+
+        $this->db->select([
+            'i.ITEM_ID AS id',
+            'i.ITEM_CODE',
+            'LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION',
+            "CONCAT('[',i.ITEM_CODE,'] - ',LEFT(i.ITEM_DESCRIPTION, 40)) AS text",
+            'LEFT(i.ASSY_CODE, 30) AS ASSY_CODE',
+            'LEFT(e.DISPLAY_NAME, 30) AS CATEGORY',
+            'i.UOM_CODE AS UOM',
+            "COALESCE($subquery, 0) AS STOK",
+            'mr.DISPLAY_NAME AS BRAND',
+            'tipe.DISPLAY_NAME AS TIPE',
+            'i.JENIS_ID'
+        ], FALSE); 
+
+        $this->db->from('item i');
+
+        $this->db->join('ERP_LOOKUP_VALUE e', 'e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID', 'inner');
+        $this->db->join('ERP_LOOKUP_VALUE tipe', 'tipe.ERP_LOOKUP_VALUE_ID = i.TYPE_ID', 'inner');
+        $this->db->join('ERP_LOOKUP_VALUE mr', 'mr.ERP_LOOKUP_VALUE_ID = i.MEREK_ID', 'inner');
+        $this->db->join('PRICE_LIST_DETAIL b', 'b.ITEM_ID = i.ITEM_ID AND b.ACTIVE_FLAG = "Y" AND b.ENTERED_UOM = i.UOM_CODE', 'inner');
+
+        $this->db->where('i.TYPE_ID = FN_GET_VAR_VALUE("INV")', NULL, FALSE);
+        $this->db->where('i.JENIS_ID = FN_GET_VAR_VALUE("GOODS")', NULL, FALSE);
+
+        if ($searchTerm) {
+            $this->db->group_start()
+                ->like('i.ITEM_CODE', $searchTerm)
+                ->or_like('i.ITEM_DESCRIPTION', $searchTerm)
+                ->group_end();
+        }
+
+        $this->db->order_by('i.ITEM_CODE', 'ASC');
+        $this->db->limit(50);
+
+        return $this->db->get();
     }
 
     public function getPeriod()

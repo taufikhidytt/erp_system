@@ -17,7 +17,6 @@ class Item_inquiry extends Back_Controller
             $data['title'] = 'Info Barang Stok';
             $data['breadcrumb'] = 'Info Barang Stok';
             $data['gudang'] = $this->item_inquiry->getGudang();
-            $data['item'] = $this->item_inquiry->getItem();
             $data['period'] = $this->item_inquiry->getPeriod();
             $this->template->load('template', 'item_inquiry/index', $data);
         } catch (Exception $err) {
@@ -592,5 +591,10 @@ class Item_inquiry extends Back_Controller
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
         exit;
+    }
+
+    public function get_item(){
+        $result = $this->item_inquiry->getItem()->result();
+        echo json_encode($result);
     }
 }

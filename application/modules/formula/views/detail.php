@@ -91,6 +91,18 @@
                                     <button type="button" class="btn btn-danger btn-sm" name="del-submit" id="del-submit" data-toggle="tooltip" data-placement="bottom" title="hapus" data-id_del="<?= $this->encrypt->encode($data->BOM_ID); ?>">
                                         <i class="ri ri-delete-bin-5-fill"></i>
                                     </button>
+                                    <?= button_actions([
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'formula/get_log_info',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->BOM_ID,
+                                            ]))),
+                                        ]
+                                    ]) ?>
                                     <button type="button" class="btn btn-warning btn-sm" onclick="window.location.replace(window.location.pathname);" data-toggle="tooltip" data-placement="bottom" title="Reload">
                                         <i class="ri ri-reply-fill"></i>
                                     </button>

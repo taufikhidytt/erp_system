@@ -221,7 +221,7 @@
                                     <th>Jumlah</th>
                                     <th>Satuan</th>
                                     <th>No MR</th>
-                                    <th>S.Loc-In</th>
+                                    <th>Storage</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

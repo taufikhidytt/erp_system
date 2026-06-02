@@ -90,6 +90,16 @@
                                         'insert',
                                         'save',
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->PO_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'grk/get_log_info',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->PO_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('grk/print/' . base64url_encode($this->encrypt->encode($data->PO_ID)))]
                                     ]) ?>
@@ -148,7 +158,7 @@
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="gudang">Gudang:</label>
+                                            <label for="gudang">Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -452,7 +462,7 @@
                 <th class="text-center">Tanggal</th>
                 <th class="text-end">Jumlah</th>
                 <th>Satuan</th>
-                <th>S.Loc</th>
+                <th>Storage</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -1928,3 +1938,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

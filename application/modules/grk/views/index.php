@@ -110,7 +110,7 @@
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
                                             <th>Supplier</th>
-                                            <th>Gudang</th>
+                                            <th>Storage</th>
                                         </tr>
                                     </thead>
                                     <tbody>

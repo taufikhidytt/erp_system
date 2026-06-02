@@ -3,7 +3,7 @@
         font-family: monospace !important;
     }
     #result table thead th{
-        font-family: Tahoma !important;
+        font-family: 'Poppins', sans-serif !important;
     }
     #result table td,#result table th{
         white-space: nowrap;

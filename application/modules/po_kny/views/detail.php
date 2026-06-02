@@ -361,7 +361,7 @@
                                             <table class="table ">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="vertical-align:middle; font-weight:400;">Diskon</td>
+                                                        <td style="vertical-align:middle; font-weight:600;">Diskon</td>
                                                         <td>:</td>
                                                         <td class="text-left">
                                                             <input id="cal_diskon_percen" name="TOTAL_DISCOUNT_PERCEN" class="form-control form-control-sm input-container persen-detail" placeholder="Persen" value="<?= $this->input->post('TOTAL_DISCOUNT_PERCEN') ?? $data->TOTAL_DISCOUNT_PERCEN ?>" data-mode="false" style="width: 130px;">
@@ -374,7 +374,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="vertical-align:middle; font-weight:400;">PPN</td>
+                                                        <td style="vertical-align:middle; font-weight:600;">PPN</td>
                                                         <td>:</td>
                                                         <td colspan="3" class="text-left">
                                                             <?php
@@ -424,7 +424,7 @@
                                             <table class="table">
                                                 <tbody>
                                                     <tr>
-                                                        <td style="font-weight:400;">Total</td>
+                                                        <td style="font-weight:600;">Total</td>
                                                         <td>:</td>
                                                         <td></td>
                                                         <td></td>
@@ -433,7 +433,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="font-weight:400;">Diskon</td>
+                                                        <td style="font-weight:600;">Diskon</td>
                                                         <td>:</td>
                                                         <td class="text-left">
                                                         </td>
@@ -443,7 +443,7 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="font-weight:400;">PPN</td>
+                                                        <td style="font-weight:600;">PPN</td>
                                                         <td>:</td>
                                                         <td class="text-left">
                                                         </td>
@@ -453,8 +453,8 @@
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td style="font-weight:400;">
-                                                            <h6>GRAND TOTAL</h6>
+                                                        <td>
+                                                            <h6 style="font-weight:600;">GRAND TOTAL</h6>
                                                         </td>
                                                         <td>:</td>
                                                         <td></td>

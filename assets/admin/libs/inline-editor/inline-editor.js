@@ -201,6 +201,44 @@ const InlineEditor = (() => {
                 e.preventDefault();
                 $(this).blur();
             }
+
+            // Escape: batalkan edit, kembalikan nilai ke semula (tidak simpan perubahan)
+            if (e.keyCode === 27) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const orig  = $td.data('orig');
+                const field = $td.attr('data-field');
+                const cfg   = cfgOf(field);
+
+                // Tandai agar blur handler tidak menyimpan perubahan
+                $td.data('ie-escaping', true);
+                $(this).blur();
+
+                // Revert tampilan ke nilai semula
+                $td.removeClass('ie-editing').html(renderView(cfg, orig) || orig || '');
+
+                // Kembalikan nilai di pending ke data asli dari DataTable
+                const key = $row.data('key');
+                if (key && pending[key]) {
+                    const rowData = dt.row($row).data();
+                    if (rowData && field in rowData) {
+                        pending[key].fields[field] = rowData[field];
+                    } else {
+                        delete pending[key].fields[field];
+                    }
+                    // Jika semua field di baris ini sudah kembali ke semula, hapus entri pending
+                    if (rowData) {
+                        const hasActualChange = Object.entries(pending[key].fields).some(([k, v]) => {
+                            return JSON.stringify(v) !== JSON.stringify(rowData[k]);
+                        });
+                        if (!hasActualChange) {
+                            delete pending[key];
+                        }
+                    }
+                    toggleButtons(hasPending());
+                }
+            }
         });
 
         // ── Keydown untuk select2: cegah Arrow & Tab dibajak DataTables Keys ─────
@@ -230,6 +268,45 @@ const InlineEditor = (() => {
                     setTimeout(() => focusNextCell($openTd, $row), 50);
                 }
             }
+
+            // Escape: batalkan pilihan select2, revert ke nilai semula
+            if (e.keyCode === 27) {
+                e.stopPropagation();
+
+                const $select = $openTd.find('select');
+                const field   = $openTd.attr('data-field');
+
+                // Tandai sebagai ESC (bukan pilih) agar select2:close tidak commit
+                $openTd.data('ie-escaping', true);
+
+                if ($select.length && $select.hasClass('select2-hidden-accessible')) {
+                    $select.select2('close');
+                }
+                // select2:close akan membaca ie-escaping dan revert ke orig
+            }
+        });
+
+        // ── F2: masuk edit mode dari DataTables Keys focus ────────
+        // DataTables Keys mengelola fokus via class "focus" pada td, bukan
+        // via browser focus, sehingga handler harus dipasang di document
+        // (sama polanya dengan handler select2 di atas).
+        // Tekan F2 saat td.focus aktif → identik dengan klik di td tersebut.
+        $(document).on('keydown.ie-f2', function (e) {
+            if (e.keyCode !== 113) return; // 113 = F2
+
+            // Cari td yang sedang difokus DataTables Keys di tabel ini
+            const $td = $table.find('td.ie-cell.focus').first();
+            if (!$td.length) return;
+
+            // Jangan buka lagi jika sudah dalam mode editing
+            if ($td.hasClass('ie-editing')) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Trigger click — handler click sudah menangani semua skenario:
+            // guard edit/add, checkbox toggle, select2 open, text/number/date input
+            $td.trigger('click');
         });
 
         // ── Pending changes ───────────────────────────────────────
@@ -470,6 +547,12 @@ const InlineEditor = (() => {
             let   val   = $(this).val();
             const orig  = $td.data('orig');
 
+            // Jika blur dipicu oleh ESC, lewati — ESC handler sudah revert sendiri
+            if ($td.data('ie-escaping')) {
+                $td.removeData('ie-escaping');
+                return;
+            }
+
             if ($(this).hasClass('input-number')) {
                 val = $.inputNumber.format(val);
             }
@@ -543,12 +626,16 @@ const InlineEditor = (() => {
             const $select = $(this);
 
             setTimeout(() => {
-                const didSelect = $select.data('ie-selected');
+                const didSelect  = $select.data('ie-selected');
+                const isEscaping = $select.closest('td').data('ie-escaping');
                 $select.removeData('ie-selected');
 
                 const $td   = $select.closest('td');
                 const $row  = $td.closest('tr');
                 const field = $td.attr('data-field');
+                const cfg   = cfgOf(field);
+
+                $td.removeData('ie-escaping');
 
                 // Destroy select2 jika masih aktif
                 if ($select.hasClass('select2-hidden-accessible')) {
@@ -556,20 +643,43 @@ const InlineEditor = (() => {
                 }
                 $td.removeClass('ie-editing');
 
-                if (didSelect) {
+                if (didSelect && !isEscaping) {
                     // Ambil val yang disimpan oleh select2:select lalu render
                     const val = $td.data('ie-val-selected');
                     $td.removeData('ie-val-selected');
-                    $td.data('val', val).html(renderView(cfgOf(field), val));
+                    $td.data('val', val).html(renderView(cfg, val));
                 } else {
-                    // Batal pilih → revert ke nilai semula
+                    // Batal pilih (tutup tanpa pilih) atau ESC → revert ke nilai semula
+                    $td.removeData('ie-val-selected');
                     const orig = $td.data('orig');
+
                     if ($row.hasClass('ie-new-row')) {
                         // Mode add: kembalikan ke placeholder span
-                        const cfg = cfgOf(field);
                         $td.html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
                     } else {
-                        $td.data('val', orig).html(renderView(cfgOf(field), orig));
+                        $td.data('val', orig).html(renderView(cfg, orig));
+                    }
+
+                    // Jika ESC, kembalikan juga pending ke nilai asli DataTable
+                    if (isEscaping) {
+                        const key = $row.data('key');
+                        if (key && pending[key]) {
+                            const rowData = dt.row($row).data();
+                            if (rowData && field in rowData) {
+                                pending[key].fields[field] = rowData[field];
+                            } else {
+                                delete pending[key].fields[field];
+                            }
+                            if (rowData) {
+                                const hasActualChange = Object.entries(pending[key].fields).some(([k, v]) => {
+                                    return JSON.stringify(v) !== JSON.stringify(rowData[k]);
+                                });
+                                if (!hasActualChange) {
+                                    delete pending[key];
+                                }
+                            }
+                            toggleButtons(hasPending());
+                        }
                     }
                 }
             }, 0);
@@ -728,6 +838,7 @@ const InlineEditor = (() => {
                 $(window).off('beforeunload.ie');
                 $(document).off('click.ie');
                 $(document).off('keydown.ie-select2');
+                $(document).off('keydown.ie-f2');
                 $btnSave.remove();
                 $btnCancel.remove();
             },

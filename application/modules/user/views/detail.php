@@ -31,12 +31,14 @@
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
                                     <?= button_actions(['insert','save',
                                         [
-                                            'key'      => 'assign_database',
-                                            'redirect' => site_url(strtolower($access['ERP_MENU_NAME']).'/assign_db/' . base64url_encode($this->encrypt->encode($data->ERP_USER_ID))),
-                                            'class'    => 'btn-success',
-                                            'title'    => 'Tetapkan Database',
-                                            'icon'     => 'ri-database-2-line',
-                                            'needs_auth' => true
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'user/get_log_info',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->ERP_USER_ID,
+                                            ]))),
                                         ],
                                         'reload']) ?>
                                 </div>

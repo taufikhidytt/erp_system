@@ -269,14 +269,6 @@ if (! function_exists('button_actions')) {
             // ── Render ────────────────────────────────────────────────────────
             $extra_class = $btn['class_custom'] ?? '';
 
-            // Kumpulkan semua data-* untuk render
-            $data_attrs = '';
-            foreach ($btn as $attr => $val) {
-                if (strpos($attr, 'data-') === 0) {
-                    $data_attrs .= ' ' . $attr . '="' . htmlspecialchars($val) . '"';
-                }
-            }
-
             if ($type === 'dt') {
                 $url = null;
                 if (isset($btn['raw_url']) && $btn['raw_url']) {
@@ -285,7 +277,7 @@ if (! function_exists('button_actions')) {
                     $url = base_url($ci->uri->segment(1) . '/' . $btn['url']);
                 }
 
-                $results[] = [
+                $h = [
                     'text'      => '<i class="' . $btn['icon'] . '"></i>',
                     'className' => 'btn btn-sm ' . $btn['class'] . ' ' . $extra_class,
                     'url'       => $url,
@@ -295,7 +287,21 @@ if (! function_exists('button_actions')) {
                         'data-bs-placement' => 'left'
                     ]
                 ];
+                foreach ($btn as $attr => $val) {
+                    if (strpos($attr, 'data-') === 0) {
+                        $h['attr'][$attr] = $val;
+                    }
+                }
+                $results[] = $h;
             } else {
+                // Kumpulkan semua data-* untuk render
+                $data_attrs = '';
+                foreach ($btn as $attr => $val) {
+                    if (strpos($attr, 'data-') === 0) {
+                        $data_attrs .= ' ' . $attr . '="' . htmlspecialchars($val) . '"';
+                    }
+                }
+
                 if (isset($btn['url'])) {
                     $tag  = 'a';
                     $href = 'href="' . (isset($btn['raw_url']) && $btn['raw_url']

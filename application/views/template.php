@@ -55,6 +55,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
             /* font-family: Tahoma !important; */
             font-family: 'Poppins', sans-serif !important;
+            line-height: 1.25 !important;
         }
         #sidebar-menu ul li ul.sub-menu li a, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
             font-family: 'Poppins', sans-serif !important;
@@ -168,7 +169,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         }
 
         .form-xs .select2-selection__rendered {
-            line-height: 22px !important;
+            /* line-height: 22px !important; */
             font-size: 0.75rem !important;
         }
 
@@ -233,6 +234,11 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         .dataTable tbody td, .dataTable thead th{
             white-space: nowrap;
         }
+        .dataTable tfoot th{
+            font-family: monospace !important;
+            font-weight: 600 !important;
+            font-size: 0.875rem !important;
+        }
 
         .dataTable thead th,
         .dataTables_length,
@@ -280,6 +286,9 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         .btn-group-sm>.btn, .btn-sm, .modal .btn{
             font-size: 0.75rem !important;
         }
+        .swal2-styled.swal2-confirm, .swal2-styled.swal2-cancel{
+            font-size: 1rem !important;
+        }
     </style>
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
@@ -290,7 +299,7 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
         }
     </script>
     <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.2"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.12"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.14"></script>
 </head>
 
 <body data-sidebar="dark" data-update="<?= $access['update'] ?? false ?>">
@@ -654,15 +663,37 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
             var $scrollHead = $wrapper.find('.dataTables_scrollHead table');
             var $scrollBody = $wrapper.find('.dataTables_scrollBody table');
 
-            var $bodyTds = $scrollBody.find('tbody tr:first td');
-            var $headThs = $scrollHead.find('thead tr');
-            
-            $.each($bodyTds, function(k,v){
-                const $td_w = $(this).outerWidth();
-                $.each($headThs, function(){
+            var $headThs   = $scrollHead.find('thead tr');
+            var $firstRow  = $scrollBody.find('tbody tr:first');
+            var $bodyTds   = $firstRow.find('td');
+
+            var totalCols  = $headThs.first().find('th').length;
+            var isEmpty    = $bodyTds.length === 0 
+                            || ($bodyTds.length === 1 && $firstRow.hasClass('odd') && $bodyTds.first().attr('colspan'));
+
+            if (isEmpty) {
+                var $tbody = $scrollBody.find('tbody');
+                $headThs.each(function () {
+                    $(this).find('th').each(function () {
+                        var $th = $(this);
+                        var w   = $th.outerWidth();
+                        $th.css({
+                            'box-sizing': 'border-box',
+                            'width'    : w + 'px',
+                            'min-width': w + 'px',
+                        });
+                    });
+                });
+
+                return;
+            }
+
+            $bodyTds.each(function (k) {
+                var $td_w = $(this).outerWidth();
+                $headThs.each(function () {
                     $(this).find('th').eq(k).css({
                         'box-sizing': 'border-box',
-                        'width': $td_w + 'px',
+                        'width'    : $td_w + 'px',
                         'min-width': $td_w + 'px',
                     });
                 });
@@ -765,6 +796,11 @@ $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? '
 
         setTimeout(enableDataTableSearch, 300);
         setTimeout(enableDataTableSearch, 800);
+        $(document).on('click','a', function(){
+            setTimeout(() => {
+                $('#loading').hide();
+            }, 3000);
+        });
     </script>
 
     <script src="<?= base_url() ?>assets/admin/js/pages/aos.js"></script>

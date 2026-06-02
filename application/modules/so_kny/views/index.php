@@ -111,7 +111,7 @@
                                             <th>Tanggal</th>
                                             <th>Customer</th>
                                             <th>Sales</th>
-                                            <th>S.Loc</th>
+                                            <th>Storage</th>
                                             <th>Terms</th>
                                             <th>Total</th>
                                         </tr>
@@ -212,6 +212,7 @@
                 {
                     "data": "total",
                     "width": "10%",
+                    className : "text-end",
                     "render": function(data) {
                         if (!data) return '-';
                         return `<span title="${data}">${data}</span>`;
@@ -248,7 +249,7 @@
                                     <th>Diskon</th>
                                     <th>Total</th>
                                     <th>No MR</th>
-                                    <th>S.Loc-In</th>
+                                    <th>Storage</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

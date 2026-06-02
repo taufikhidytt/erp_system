@@ -118,25 +118,40 @@ class M_datatables extends CI_Model {
         }
 
         // ── SEARCH (dari DataTables input) ───────────────────
-        $i = 0;
-        $global_search_value = $this->input->post('search')['value'] ?? '';
-        if (!empty($p['column_search'])) {
-            foreach ($p['column_search'] as $item) {
-                $global_search_value = $this->input->post('search')['value'] ?? '';
-                $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
+        $search_val = $this->input->post('search')['value'] ?? '';
+        $columns    = $this->input->post('columns') ?? [];
 
-                if ($column_search_value != '') {
-                    $this->db->like($item, $column_search_value);
-                } elseif ($global_search_value != '') {
-                    if ($i === 0) {
-                        $this->db->group_start();
-                        $this->db->like($item, $global_search_value);
+        if (!empty($p['column_search'])) {
+            
+            if ($search_val !== '') {
+                $this->db->group_start();
+                $first = true;
+                
+                foreach ($p['column_search'] as $item) {
+                    if (empty(trim($item))) continue;
+                    
+                    $complex = preg_match('/[\s(]/', $item);
+                    $esc     = $this->db->escape_like_str($search_val);
+                    
+                    if ($first) {
+                        $complex ? $this->db->where("($item) LIKE '%{$esc}%' ESCAPE '!'", NULL, FALSE) : $this->db->like($item, $search_val);
+                        $first = false;
                     } else {
-                        $this->db->or_like($item, $global_search_value);
+                        $complex ? $this->db->or_where("($item) LIKE '%{$esc}%' ESCAPE '!'", NULL, FALSE) : $this->db->or_like($item, $search_val);
                     }
-                    if (count($p['column_search']) - 1 == $i) $this->db->group_end();
                 }
-                $i++;
+                $this->db->group_end();
+            }
+
+            foreach ($p['column_search'] as $i => $item) {
+                if (empty(trim($item))) continue;
+                
+                $col_val = $columns[$i]['search']['value'] ?? '';
+                
+                if ($col_val !== '') {
+                    $esc = $this->db->escape_like_str($col_val);
+                    preg_match('/[\s(]/', $item) ? $this->db->where("($item) LIKE '%{$esc}%' ESCAPE '!'", NULL, FALSE) : $this->db->like($item, $col_val);
+                }
             }
         }
 
@@ -147,7 +162,7 @@ class M_datatables extends CI_Model {
             foreach ($order_post as $o) {
                 $idx = (int) $o['column'];
                 if (isset($p['column_order'][$idx]) && $p['column_order'][$idx] !== FALSE) {
-                    $this->db->order_by($p['column_order'][$idx], $o['dir']);
+                    $this->db->order_by($p['column_order'][$idx], $o['dir'], FALSE);
                 }
             }
         } elseif (!empty($p['order'])) {
@@ -255,10 +270,11 @@ class M_datatables extends CI_Model {
             $this->db->limit((int) $length, (int) $this->input->post('start'));
         }
 
-        $list = $this->db->get()->result();
+        $list = $this->db->get();
+
         $no   = (int) $this->input->post('start');
         $data = [];
-        foreach ($list as $row) {
+        foreach ($list ? $list->result():[] as $row) {
             $data[] = $callback($row, ++$no);
         }
 

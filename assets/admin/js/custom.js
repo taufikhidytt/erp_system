@@ -164,7 +164,7 @@ function initSelect2(element) {
             if (!ignoredKeys.includes(key) && typeof value !== 'object') {
                 const attrName = key.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
                 
-                $select.find('option:selected').attr('data-' + attrName, value);
+                $select.find('option[value="' + data.id + '"]').attr('data-' + attrName, value);
             }
         });
         $select.data('_select2_selecting', true);
@@ -229,8 +229,8 @@ $(document).ready(function(){
     }
 
     checkForm();
+    getModalLog();
 });
-
 
 function getButtons(config) {
     if (!Array.isArray(config)) return [];
@@ -273,6 +273,12 @@ $(document).on('click', '.show-password', function() {
     $icon.toggleClass('ri-eye-close-fill ri-eye-fill');
 });
 
+$(document).on('click','a', function(){
+    setTimeout(function(){
+        $('#loading').hide();
+    },3000);
+});
+
 function calcDiscount(price, disc) {
     let harga = Math.max(0, parseFloat(price) || 0);
 
@@ -280,10 +286,13 @@ function calcDiscount(price, disc) {
     disc = String(disc).trim();
     if (disc === '') return 0;
 
+    // Normalisasi pemisah → semua jadi '+'
     disc = disc.replace(/[,;]/g, '+');
 
+    // Validasi: hanya angka dan +
     if (/[^0-9+]/.test(disc)) return 0;
 
+    // Validasi operator malformed
     if (/\+{2,}/.test(disc) || /^\+|\+$/.test(disc)) return 0;
 
     let remaining = harga;
@@ -295,4 +304,11 @@ function calcDiscount(price, disc) {
     }
 
     return Math.max(0, Math.min(harga - remaining, harga));
+}
+
+function getModalLog()
+{
+    $.ajax({ url: config_app.url+'dashboard/log_modal', data: {}}).done(function(data) {
+        $('body').append(data);
+    });
 }

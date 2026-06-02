@@ -84,7 +84,25 @@
         ];
         var table = $('#table').DataTable({
             dom: '<"d-flex justify-content-between mb-2 align-items-center"lB>rtip',
-            buttons: getButtons(<?= json_encode(button_actions([], 'dt')) ?>),
+            buttons: getButtons(<?= json_encode(button_actions([
+                [
+                    'key'          => 'log_info',
+                    'class'        => 'btn-info btn-log-info',
+                    'title'        => 'Log & History',
+                    'icon'         => 'ri-question-line',
+                    'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                        'h' => [
+                            't'     => 'coa_setup',
+                            'type'  => 'by_one',
+                            'id'    => 'PROGRAM_ACCOUNT',
+
+                        ],
+                        'where' => [
+                            'TABLE_NAME'    => 'COA_SETUP',
+                        ],
+                    ]))),
+                ],
+            ], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,
             "processing": true,

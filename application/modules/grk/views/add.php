@@ -119,7 +119,7 @@
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="gudang">Gudang:</label>
+                                            <label for="gudang">Storage:</label>
                                             <span class="text-danger">*</span>
                                             <div class="input-group">
                                                 <span class="input-group-text">
@@ -1308,8 +1308,8 @@
     }, true);
 
     function hitungRow(row) {
-        let qty = parseFloat(row.find(".qty-edit").val()) || 0;
-        let harga = parseFloat(row.find(".harga-input").val()) || 0;
+        let qty = $.inputNumber.unformat(row.find(".qty-edit").val()) || 0;
+        let harga = $.inputNumber.unformat(row.find(".harga-input").val()) || 0;
 
         let subtotal = qty * harga;
 
@@ -1396,3 +1396,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

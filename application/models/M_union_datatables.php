@@ -87,6 +87,9 @@ class M_union_datatables extends CI_Model {
                 $order_by = ' ORDER BY ' . implode(', ', $order_parts);
             }
         }
+        if(!$order_by && isset($config['order_by'])) {
+            $order_by = ' ORDER BY ' . $config['order_by'];
+        }
 
         // ====== FINAL QUERY (dengan pagination) ======
         $limit = '';

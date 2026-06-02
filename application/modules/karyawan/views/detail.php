@@ -32,7 +32,24 @@
                                 <div class="col-lg-6 col-md-6 col-sm-12 d-flex align-items-center gap-2 label-status">
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['insert', 'save', 'reload']) ?>
+                                    <?= button_actions(['insert', 'save',
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'h' => [
+                                                    't' => 'KARYAWAN',
+                                                    'w' => ['KARYAWAN_ID' => $data->KARYAWAN_ID]
+                                                ],
+                                                'where' => [
+                                                    'TABLE_NAME'    => 'KARYAWAN',
+                                                    'ID'      => $data->KARYAWAN_ID
+                                                ],
+                                            ]))),
+                                        ],
+                                    'reload']) ?>
                                 </div>
                             </div>
 

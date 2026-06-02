@@ -31,7 +31,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table text-center w-100 table-sm" id="table">
+                                <table class="table text-center w-100 table-sm" id="table" data-info="true">
                                     <thead>
                                         <tr>
                                             <th></th>
@@ -111,6 +111,23 @@
                     'class'    => 'btn-insert btn-primary',
                     'url'      => '',
                     'raw_url'  => true
+                ],
+                [
+                    'key'          => 'log_info',
+                    'class'        => 'btn-info btn-log-info',
+                    'title'        => 'Log & History',
+                    'icon'         => 'ri-question-line',
+                    'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                        'h' => [
+                            't'     => 'item_convertion',
+                            'type'  => 'by_one',
+                            'id'    => 'ITEM_CONVERTION_ID',
+
+                        ],
+                        'where' => [
+                            'TABLE_NAME'    => 'ITEM_CONVERTION',
+                        ],
+                    ]))),
                 ],
             ], 'dt')) ?>),
             "autoWidth": false,

@@ -33,7 +33,24 @@
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-sm-12 text-end">
-                                    <?= button_actions(['insert','save','reload']) ?>
+                                    <?= button_actions(['insert','save',
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'h' => [
+                                                    't' => 'erp_group',
+                                                    'w' => ['a.ERP_GROUP_ID' => $data->ERP_GROUP_ID]
+                                                ],
+                                                'where' => [
+                                                    'TABLE_NAME'    => 'ERP_GROUP',
+                                                    'ID'      => $data->ERP_GROUP_ID
+                                                ],
+                                            ]))),
+                                        ],
+                                    'reload']) ?>
                                 </div>
                             </div>
                         </div>

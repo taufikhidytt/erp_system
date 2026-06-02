@@ -381,14 +381,17 @@ class User_model extends CI_Model
         $account_notes  = $post['account_note'] ?? [];
         $created_by     = $this->session->userdata('id');
         $created_date   = date('Y-m-d H:i:s');
+        $arr_insert     = [];
+        $arr_update     = [];
+        $arr_not_delete = [];
         if (!empty($accounts)) {
-            $arr_insert = [];
-            $arr_update = [];
+            
             foreach ($accounts as $k => $v) {
                 $coa_id     = (int) $v;
                 $detail_id  = (int) ($account_ids[$k] ?? 0);
                 if(!$coa_id) continue;
                 if($detail_id){
+                    $arr_not_delete[] = $detail_id;
                     $arr_update[] = [
                         'ERP_USER_D_AKUN_ID'=> $detail_id,
                         'ERP_USER_ID'       => $user_id,
@@ -407,12 +410,20 @@ class User_model extends CI_Model
                     ];
                 }
             }
-            if(!empty($arr_insert)){
-                $this->db->insert_batch('erp_user_d_akun', $arr_insert);
-            }
-            if(!empty($arr_update)){
-                $this->db->update_batch('erp_user_d_akun', $arr_update, 'ERP_USER_D_AKUN_ID');
-            }
+        }
+
+        //hapus data yang tidak digunakan
+        $this->db->where('ERP_USER_ID', $user_id);
+        if(!empty($arr_not_delete)){
+            $this->db->where_not_in('ERP_USER_D_AKUN_ID', $arr_not_delete);
+        }
+        $this->db->delete('erp_user_d_akun');
+
+        if(!empty($arr_insert)){
+            $this->db->insert_batch('erp_user_d_akun', $arr_insert);
+        }
+        if(!empty($arr_update)){
+            $this->db->update_batch('erp_user_d_akun', $arr_update, 'ERP_USER_D_AKUN_ID');
         }
     }
 
@@ -424,9 +435,10 @@ class User_model extends CI_Model
         $created_by         = $this->session->userdata('id');
         $created_date       = date('Y-m-d H:i:s');
         $have_default       = false;
+        $arr_insert         = [];
+        $arr_update         = [];
+        $arr_not_delete     = [];
         if (!empty($warehouses)) {
-            $arr_insert = [];
-            $arr_update = [];
             foreach ($warehouses as $k => $v) {
                 $warehouse_id = (int) $v;
                 $detail_id = (int) ($warehouses_id[$k] ?? 0);
@@ -439,13 +451,14 @@ class User_model extends CI_Model
                 }
 
                 if($detail_id){
+                    $arr_not_delete[] = $detail_id;
                     $arr_update[] = [
                         'ERP_WAREHOUSE_ID'  => $detail_id,
                         'ERP_USER_ID'       => $user_id,
                         'WAREHOUSE_ID'      => $warehouse_id,
                         'PRIMARY_FLAG'      => $primary_flag,
                         'LAST_UPDATE_BY'    => $created_by,
-                        'LAST_UPDATE_DATE' => $created_date,
+                        'LAST_UPDATE_DATE'  => $created_date,
                     ];
                 }else{
                     $arr_insert[] = [
@@ -457,12 +470,20 @@ class User_model extends CI_Model
                     ];
                 }
             }
-            if(!empty($arr_insert)){
-                $this->db->insert_batch('erp_warehouse', $arr_insert);
-            }
-            if(!empty($arr_update)){
-                $this->db->update_batch('erp_warehouse', $arr_update, 'ERP_WAREHOUSE_ID');
-            }
+        }
+
+        //hapus data yang tidak digunakan
+        $this->db->where('ERP_USER_ID', $user_id);
+        if(!empty($arr_not_delete)){
+            $this->db->where_not_in('ERP_WAREHOUSE_ID', $arr_not_delete);
+        }
+        $this->db->delete('erp_warehouse');
+
+        if(!empty($arr_insert)){
+            $this->db->insert_batch('erp_warehouse', $arr_insert);
+        }
+        if(!empty($arr_update)){
+            $this->db->update_batch('erp_warehouse', $arr_update, 'ERP_WAREHOUSE_ID');
         }
     }
 
@@ -472,15 +493,18 @@ class User_model extends CI_Model
         $sales_id      = $post['sales_id'] ?? [];
         $created_by    = $this->session->userdata('id');
         $created_date  = date('Y-m-d H:i:s');
+        $arr_insert     = [];
+        $arr_update     = [];
+        $arr_not_delete     = [];
         if (!empty($sales)) {
-            $arr_insert = [];
-            $arr_update = [];
+            
             foreach ($sales as $k => $v) {
                 $karyawan_id    = (int) $v;
                 $detail_id      = (int) ($sales_id[$k] ?? 0);
                 if(!$karyawan_id) continue;
 
                 if($detail_id){
+                    $arr_not_delete[] = $detail_id;
                     $arr_update[] = [
                         'ERP_GROUP_SALES_ID'    => $detail_id,
                         'ERP_USER_ID'           => $user_id,
@@ -499,12 +523,32 @@ class User_model extends CI_Model
                     ];
                 }
             }
-            if(!empty($arr_insert)){
-                $this->db->insert_batch('erp_group_sales', $arr_insert);
-            }
-            if(!empty($arr_update)){
-                $this->db->update_batch('erp_group_sales', $arr_update, 'ERP_GROUP_SALES_ID');
-            }
+            
         }
+
+        //hapus data yang tidak digunakan
+        $this->db->where('ERP_USER_ID', $user_id);
+        if(!empty($arr_not_delete)){
+            $this->db->where_not_in('ERP_GROUP_SALES_ID', $arr_not_delete);
+        }
+        $this->db->delete('erp_group_sales');
+
+        if(!empty($arr_insert)){
+            $this->db->insert_batch('erp_group_sales', $arr_insert);
+        }
+        if(!empty($arr_update)){
+            $this->db->update_batch('erp_group_sales', $arr_update, 'ERP_GROUP_SALES_ID');
+        }
+    }
+
+    public function get_log_user($id)
+    {
+        $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
+        $this->db->from('erp_user a');
+        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
+        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->where('a.ERP_USER_ID', $id);
+        $this->db->limit(1);
+        return $this->db->get()->row();
     }
 }

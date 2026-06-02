@@ -28,7 +28,24 @@
                                     <h5 style="width: 100px;" id="readonlyTagKonsiId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['insert','save','reload']) ?>
+                                    <?= button_actions(['insert','save',
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'h' => [
+                                                    't' => 'mata_uang',
+                                                    'w' => ['MATA_UANG_ID' => $data->MATA_UANG_ID]
+                                                ],
+                                                'where' => [
+                                                    'TABLE_NAME'    => 'MATA_UANG',
+                                                    'ID'      => $data->MATA_UANG_ID
+                                                ],
+                                            ]))),
+                                        ],
+                                    'reload']) ?>
                                 </div>
                             </div>
 

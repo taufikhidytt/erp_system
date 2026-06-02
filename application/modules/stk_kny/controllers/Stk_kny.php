@@ -17,7 +17,6 @@ class Stk_kny extends Back_Controller
             $data['title'] = 'Info Stok Konsinyasi';
             $data['breadcrumb'] = 'Info Stok Konsinyasi';
             $data['gudang'] = $this->stk_kny->getGudang();
-            $data['item'] = $this->stk_kny->getItem();
             $data['period'] = $this->stk_kny->getPeriod();
             $this->template->load('template', 'stk_kny/index', $data);
         } catch (Exception $err) {
@@ -592,5 +591,10 @@ class Stk_kny extends Back_Controller
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
         exit;
+    }
+
+    public function get_item(){
+        $result = $this->stk_kny->getItem()->result();
+        echo json_encode($result);
     }
 }

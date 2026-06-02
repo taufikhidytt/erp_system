@@ -106,7 +106,7 @@
                                             <th>No Refrensi</th>
                                             <th>Tanggal</th>
                                             <th>Supplier</th>
-                                            <th>S.Loc</th>
+                                            <th>Storage</th>
                                             <th>Terms</th>
                                             <th>Total</th>
                                         </tr>
@@ -236,7 +236,7 @@
                                     <th>Diskon</th>
                                     <th>Total</th>
                                     <th>No MR</th>
-                                    <th>S.Loc-In</th>
+                                    <th>Storage</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

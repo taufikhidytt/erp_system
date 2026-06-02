@@ -106,4 +106,25 @@ class Dashboard_model extends CI_Model
         $this->db->join('erp_user b', 'a.user_id = b.ERP_USER_ID');
         return $this->db->count_all_results();
     }
+
+    function info_header($params, $type='updated')
+    {
+        if(isset($params['h'])) {
+            $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
+            $this->db->from($params['h']['t'].' a');
+            if(isset($params['h']['w'])) {
+                $this->db->where($params['h']['w']);
+            }
+            $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
+            $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+            if($type == 'created') {
+                $this->db->order_by('a.CREATED_DATE', 'ASC');
+            }else{
+                $this->db->order_by('a.LAST_UPDATE_DATE', 'DESC');
+            }
+            $this->db->limit(1);
+            return $this->db->get()->row();
+        }
+        return false;
+    }
 }

@@ -272,7 +272,7 @@ class Po_kny_model extends CI_Model
                 CONCAT(a.PERSON_ID, '_', ps.PERSON_SITE_ID) as id,
                 a.PERSON_CODE,
                 a.PERSON_NAME,
-                CONCAT(a.PERSON_NAME,' - [',a.PERSON_CODE,'] - ',ps.SITE_NAME) as text,
+                CONCAT('[',a.PERSON_CODE,'] - ',a.PERSON_NAME,' - ',ps.SITE_NAME) as text,
                 a.LIMIT_PIUTANG,
                 a.TUNAI_FLAG,
                 b.PAYMENT_TERM_ID,

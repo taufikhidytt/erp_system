@@ -96,7 +96,7 @@
                             <div class="tab-pane active" id="stok" role="tabpanel">
                                 <div class="row g-3 align-items-center justify-content-center mb-3">
                                     <div class="col-lg-auto col-md-auto col-sm-12 d-flex align-items-center justify-content-center">
-                                        <label for="gudang" class="form-label mb-0 me-2 fw-bold">Gudang</label>
+                                        <label for="gudang" class="form-label mb-0 me-2 fw-bold">Storage</label>
                                         <div class="form-check mb-0 d-flex align-items-center">
                                             <input type="checkbox" class="form-check-input mt-0 me-1" name="check_gudang" id="check_gudang">
                                             <label class="form-check-label" for="check_gudang">All</label>
@@ -115,7 +115,7 @@
                                         ?>
                                         <select name="gudang" id="gudang" class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
                                             <?php if (!$defaultValue): ?>
-                                                <option value="">-- Selected Gudang --</option>
+                                                <option value="">-- Selected Storage --</option>
                                             <?php endif; ?>
                                             <?php foreach ($gudang->result() as $gd): ?>
                                                 <option
@@ -198,13 +198,12 @@
                                         <label for="item" class="form-label mb-0 fw-bold">Item</label>
                                     </div>
                                     <div class="col-lg-9 col-md-9 col-sm-12">
-                                        <select name="item" id="item" class="form-control select2 <?= form_error('item') ? 'is-invalid' : null; ?>">
-                                            <option value="">-- Selected Item --</option>
-                                            <?php foreach ($item->result() as $im): ?>
-                                                <option value="<?= $im->ITEM_ID ?>" <?= set_value('item') == $im->ITEM_ID ? 'selected' : '' ?>>
-                                                    <?= strtoupper($im->ITEM_DESCRIPTION . " ~ " . $im->ITEM_CODE) ?>
-                                                </option>
-                                            <?php endforeach; ?>
+                                        <select name="item" id="item" 
+                                            data-url="stk_kny/get_item"
+                                            class="form-control select2"
+                                            data-min-input-length="2"
+                                            >
+                                            
                                         </select>
                                     </div>
                                 </div>
@@ -225,7 +224,7 @@
                                     </div>
 
                                     <div class="col-lg-auto col-md-auto col-sm-12 d-flex align-items-center">
-                                        <label for="gudang_kartu_stok" class="form-label mb-0 me-2 fw-bold">Gudang</label>
+                                        <label for="gudang_kartu_stok" class="form-label mb-0 me-2 fw-bold">Storage</label>
                                         <div class="form-check form-check mb-0 d-flex align-items-center me-2">
                                             <input class="form-check-input mt-0 me-1" type="checkbox" name="check_gudang_kartu_stok" id="check_gudang_kartu_stok">
                                             <label class="form-check-label" for="check_gudang_kartu_stok">All</label>
@@ -281,12 +280,12 @@
                                                     <th>Tanggal</th>
                                                     <th>No Transaksi</th>
                                                     <th>No Reff</th>
-                                                    <th>Supplier</th>
+                                                    <th>Customer / Supplier</th>
                                                     <th>Transaksi</th>
                                                     <th>Masuk</th>
                                                     <th>Keluar</th>
                                                     <th>Saldo</th>
-                                                    <th>Gudang</th>
+                                                    <th>Storage</th>
                                                     <th>Note</th>
                                                 </tr>
                                             </thead>
@@ -546,6 +545,7 @@
 
         //Initialize Select2 Elements
         $('.select2').each(function() {
+            if($(this).attr('id') == 'item') return false;
             $(this).select2({
                 theme: 'bootstrap-5',
                 dropdownParent: $(this).parent(),

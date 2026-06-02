@@ -242,4 +242,11 @@
     function swith_label(e, checked) {
         e.closest('.form-check').find('label').text(checked ? 'Yes' : 'No');
     }
+    $('form').on('submit', function(e){
+        e.preventDefault();
+        $.each($(document).find('[data-input-number], .input-number'), function(){
+            $(this).val($(this).inputNumber('getValue'));
+        });
+        HTMLFormElement.prototype.submit.call(this);
+    });
 </script>

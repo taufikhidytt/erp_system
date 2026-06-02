@@ -125,6 +125,22 @@
                     'icon'     => 'ri-file-upload-line',
                     'needs_auth' => true,
                 ],
+                [
+                    'key'          => 'log_info',
+                    'class'        => 'btn-info btn-log-info',
+                    'title'        => 'Log & History',
+                    'icon'         => 'ri-question-line',
+                    'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                        'h' => [
+                            't'     => 'uom',
+                            'type'  => 'by_one',
+
+                        ],
+                        'where' => [
+                            'TABLE_NAME'    => 'UOM',
+                        ],
+                    ]))),
+                ],
             ], 'dt')) ?>),
             "autoWidth": false,
             "searching": true,

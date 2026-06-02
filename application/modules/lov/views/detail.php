@@ -40,16 +40,16 @@
     }
 
     /* Paksa kolom DataTables untuk patuh pada lebar yang ditentukan tanpa mempedulikan isi bodynya */
-    .dataTables_wrapper table { table-layout: fixed !important; }
-    .dataTables_wrapper table th:nth-child(1), .dataTables_wrapper table td:nth-child(1) { width: 50px !important; min-width: 50px !important; max-width: 50px !important; }
-    .dataTables_wrapper table th:nth-child(3), .dataTables_wrapper table td:nth-child(3) { width: 40px !important; min-width: 40px !important; max-width: 40px !important; }
-    .dataTables_wrapper table th:nth-child(4), .dataTables_wrapper table td:nth-child(4) { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
-    .dataTables_wrapper table th:nth-child(5), .dataTables_wrapper table td:nth-child(5) { width: 200px !important; min-width: 200px !important; max-width: 200px !important; }
-    .dataTables_wrapper table th:nth-child(6), .dataTables_wrapper table td:nth-child(6) { width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
-    .dataTables_wrapper table th:nth-child(7), .dataTables_wrapper table td:nth-child(7) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
-    .dataTables_wrapper table th:nth-child(8), .dataTables_wrapper table td:nth-child(8) { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
-    .dataTables_wrapper table th:nth-child(9), .dataTables_wrapper table td:nth-child(9) { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
-    .dataTables_wrapper table th:nth-child(10), .dataTables_wrapper table td:nth-child(10) { width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+    #table-detail_wrapper .dataTables_wrapper table { table-layout: fixed !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(1), #table-detail_wrapper .dataTables_wrapper table td:nth-child(1) { width: 50px !important; min-width: 50px !important; max-width: 50px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(3), #table-detail_wrapper .dataTables_wrapper table td:nth-child(3) { width: 40px !important; min-width: 40px !important; max-width: 40px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(4), #table-detail_wrapper .dataTables_wrapper table td:nth-child(4) { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(5), #table-detail_wrapper .dataTables_wrapper table td:nth-child(5) { width: 200px !important; min-width: 200px !important; max-width: 200px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(6), #table-detail_wrapper .dataTables_wrapper table td:nth-child(6) { width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(7), #table-detail_wrapper .dataTables_wrapper table td:nth-child(7) { width: 80px !important; min-width: 80px !important; max-width: 80px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(8), #table-detail_wrapper .dataTables_wrapper table td:nth-child(8) { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(9), #table-detail_wrapper .dataTables_wrapper table td:nth-child(9) { width: 150px !important; min-width: 150px !important; max-width: 150px !important; }
+    #table-detail_wrapper .dataTables_wrapper table th:nth-child(10), #table-detail_wrapper .dataTables_wrapper table td:nth-child(10) { width: 100px !important; min-width: 100px !important; max-width: 100px !important; }
 
     .keterangan-view {
         white-space: pre-line;
@@ -97,6 +97,26 @@
                                     <?= button_actions([
                                         'save',
                                         'reload',
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'h' => [
+                                                    't' => 'erp_lookup_set',
+                                                    'w' => ['ERP_LOOKUP_SET_ID' => $data->ERP_LOOKUP_SET_ID]
+                                                ],
+                                                'where' => [
+                                                    'TABLE_NAME'    => 'ERP_LOOKUP_VALUE',
+                                                    'ORDER_ID'      => $data->ERP_LOOKUP_SET_ID
+                                                ],
+                                                'joins' => [
+                                                    ['erp_lookup_value t1','t1.ERP_LOOKUP_VALUE_ID = a.ID','left']
+                                                ],
+                                                'select' => 't1.DISPLAY_NAME as text'
+                                            ]))),
+                                        ],
                                     ]) ?>
                                 </div>
                             </div>

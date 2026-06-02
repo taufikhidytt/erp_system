@@ -367,7 +367,7 @@
                                 <th>Jumlah</th>
                                 <th>Sisa</th>
                                 <th>Satuan</th>
-                                <th>S.Loc</th>
+                                <th>Storage</th>
                             </tr>
                         </thead>
                     </table>
@@ -422,7 +422,7 @@
                 <th class="text-center">Tanggal</th>
                 <th class="text-end">Jumlah</th>
                 <th>Satuan</th>
-                <th>S.Loc</th>
+                <th>Storage</th>
             </tr>
         </thead>
         <tbody></tbody>

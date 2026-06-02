@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div class="mt-3" id="d-table" style="display: none;">
-                            <table class="table text-center w-100 table-sm" id="table">
+                            <table class="table text-center w-100 table-sm" id="table" data-info="true">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -98,7 +98,7 @@
             
             if (val && val !== '__empty__') {
                 $('#d-table').fadeIn(300);
-                
+
                 if (table === null) {
                     initDataTable();
                 } else {
@@ -108,6 +108,10 @@
                         period: $('#period').val()
                     });
                 }
+
+                setTimeout(() => {
+                    $(document).find('.btn-log-info').attr('data-warehouse', val);
+                }, 500);
             } else {
                 $('#d-table').fadeOut(300);
             }
@@ -124,6 +128,27 @@
                         'title'    => 'Import',
                         'icon'     => 'ri-file-upload-line',
                         'needs_auth' => true,
+                    ],
+                    [
+                        'key'          => 'log_info',
+                        'class'        => 'btn-info btn-log-info',
+                        'title'        => 'Log & History',
+                        'icon'         => 'ri-question-line',
+                        'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                            'h' => [
+                                't'     => 'item_balance',
+                                'type'  => 'by_one',
+                                'id'    => 'ITEM_BALANCE_ID',
+                                'attr'  => ['warehouse' => 't1.WAREHOUSE_ID'],
+
+                            ],
+                            'where' => [
+                                'TABLE_NAME'    => 'ITEM_BALANCE',
+                            ],
+                            'joins' => [
+                                ['item_balance t1','a.ID = t1.ITEM_BALANCE_ID','inner']
+                            ],
+                        ]))),
                     ],
                 ], 'dt')) ?>),
                 processing: true,

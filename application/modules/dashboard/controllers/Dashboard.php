@@ -46,4 +46,92 @@ class Dashboard extends Back_Controller
         );
         echo json_encode($output);
     }
+
+    public function log_modal()
+    {
+        echo $this->load->view('modal',[],true);
+    }
+
+    public function log_data()
+    {
+        $params = json_decode($this->encrypt->decode(base64_decode($this->input->post('params'))), true);
+        $this->load->model('M_datatables', 'datatables');
+        
+        $order_field = [null, 'a.LAST_UPDATE_DATE', 'u.ERP_USER_NAME', 'a.TRANSAKSI' , 'a.NOTE'];
+        $column = 'u.ERP_USER_NAME, a.TRANSAKSI, a.NOTE,';
+        if(isset($params['where'])) {
+            $where = $params['where'];
+        }else{
+            $where = ['a.ERP_LOG_EDIT_ID' => -1];
+        }
+
+        $id = (int) $this->encrypt->decode(base64_decode($this->input->post('id')));
+        if($id) {
+            $where['a.ID'] = $id;
+            $params['h']['type']    = 'all';
+            $params['h']['w']       = [$params['h']['id'] => $id];
+        }
+
+        foreach($params['h']['attr'] ?? [] as $key => $field) {
+            $val = (int) $this->encrypt->decode(base64_decode($this->input->post($key)));
+            if($val) {
+                $x = explode('.', $field);
+                $where[$x[0].'.'.$x[1]] = $val;
+                $params['h']['type']    = 'all';
+                $params['h']['w'][$x[1]]= $val;
+            }
+        }
+
+        $config = [
+            'table' => 'erp_log_edit a',
+            'select' => [['STRAIGHT_JOIN a.LAST_UPDATE_DATE',FALSE], $column],
+            'joins' => [
+                ['erp_user u','a.CREATED_BY = u.ERP_USER_ID','inner']
+            ],
+            'where' => $where,
+            'column_search' => $order_field,
+            'column_order'  => $order_field,
+            'order'         => ['a.ERP_LOG_EDIT_ID' => 'DESC']
+        ];
+        if(isset($params['select'])) {
+            $config['select'][0] .= $params['select'];
+        }
+        if(isset($params['joins'])) {
+            $config['joins'] = array_merge($config['joins'], $params['joins']);
+        }
+
+        $result = $this->datatables->generate($config, function ($row, $no) {
+            $res = [
+                'no' => $no,
+                'tanggal'   => $row->LAST_UPDATE_DATE,
+                'user'      => $row->ERP_USER_NAME,
+                'transaksi' => $row->TRANSAKSI,
+                'log'       => (isset($row->text) && $row->NOTE ? $row->text.' = ' : '').$row->NOTE,
+           ];
+            return $res;
+        });
+
+        if(isset($params['h'])) {
+            if(isset($params['h']['type']) && $params['h']['type'] == 'by_one') {
+                $header_created = $this->dashboard->info_header($params, 'created');
+                $header_updated = $this->dashboard->info_header($params, 'updated');
+                $result['header'] = [
+                    'created_date' => $header_created->CREATED_DATE ?? null,
+                    'user_created'   => $header_created->USER_CREATED ?? null,
+                    'last_update_date' => $header_updated->LAST_UPDATE_DATE ?? null,
+                    'user_updated'   => $header_updated->USER_UPDATED ?? null,
+                ];
+            }else{
+                $info_header    = $this->dashboard->info_header($params);
+                $result['header'] = [
+                    'created_date' => $info_header->CREATED_DATE ?? null,
+                    'user_created'   => $info_header->USER_CREATED ?? null,
+                    'last_update_date' => $info_header->LAST_UPDATE_DATE ?? null,
+                    'user_updated'   => $info_header->USER_UPDATED ?? null,
+                ];
+            }
+        }
+
+        echo json_encode($result);
+    }
 }

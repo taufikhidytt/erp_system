@@ -87,6 +87,16 @@
                                         'save',
                                         ['key' => 'close', 'data-id_close' => $this->encrypt->encode($data->PR_ID)],
                                         ['key' => 'delete', 'data-id' => $this->encrypt->encode($data->PR_ID)],
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-url'     => 'fpk/get_log_info',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'id' => $data->PR_ID,
+                                            ]))),
+                                        ],
                                         'reload',
                                         ['key' => 'print_out', 'redirect' => site_url('fpk/print/' . base64url_encode($this->encrypt->encode($data->PR_ID)))]
                                     ]) ?>
@@ -145,7 +155,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <label for="gudang">Gudang:</label>
+                                                <label for="gudang">Storage:</label>
                                                 <span class="text-danger">*</span>
                                                 <div class="input-group">
                                                     <span class="input-group-text">
@@ -484,7 +494,7 @@
                 <th>Tanggal</th>
                 <th>Jumlah</th>
                 <th>Satuan</th>
-                <th>S.Loc</th>
+                <th>Storage</th>
             </tr>
         </thead>
     </table>
@@ -1909,3 +1919,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

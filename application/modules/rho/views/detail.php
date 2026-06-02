@@ -403,7 +403,7 @@
                 <th>Tanggal</th>
                 <th>Jumlah</th>
                 <th>Satuan</th>
-                <th>S.Loc</th>
+                <th>Storage</th>
             </tr>
         </thead>
     </table>

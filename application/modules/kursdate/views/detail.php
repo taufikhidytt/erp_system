@@ -28,7 +28,24 @@
                                     <h5 style="width: 100px;" id="readonlyTagKonsiId"></h5>
                                 </div>
                                 <div class="col-lg-6 col-md-6 col-sm-12 text-end">
-                                    <?= button_actions(['save','reload']) ?>
+                                    <?= button_actions(['save',
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'h' => [
+                                                    't' => 'kurs_detail',
+                                                    'w' => ['KURS_DETAIL_ID' => $data->KURS_DETAIL_ID]
+                                                ],
+                                                'where' => [
+                                                    'TABLE_NAME'    => 'KURS_DETAIL',
+                                                    'ID'      => $data->KURS_DETAIL_ID
+                                                ],
+                                            ]))),
+                                        ],
+                                    'reload']) ?>
                                 </div>
                             </div>
 

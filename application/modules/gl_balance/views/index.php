@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <div class="mt-3" id="d-table">
-                            <table class="table text-center w-100 table-sm" id="table">
+                            <table class="table text-center w-100 table-sm" id="table" data-info="true">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -86,6 +86,23 @@
                     'title'    => 'Import',
                     'icon'     => 'ri-file-upload-line',
                     'needs_auth' => true,
+                ],
+                [
+                    'key'          => 'log_info',
+                    'class'        => 'btn-info btn-log-info',
+                    'title'        => 'Log & History',
+                    'icon'         => 'ri-question-line',
+                    'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                        'h' => [
+                            't'     => 'coa_balance',
+                            'type'  => 'by_one',
+                            'id'    => 'COA_BALANCE_ID',
+
+                        ],
+                        'where' => [
+                            'TABLE_NAME'    => 'COA_BALANCE',
+                        ],
+                    ]))),
                 ],
             ], 'dt')) ?>),
             processing: true,

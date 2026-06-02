@@ -119,7 +119,7 @@
                                         </div>
                                         <div class="row mb-3">
                                             <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <label for="gudang">Gudang:</label>
+                                                <label for="gudang">Storage:</label>
                                                 <span class="text-danger">*</span>
                                                 <div class="input-group">
                                                     <span class="input-group-text">
@@ -1298,3 +1298,4 @@
         });
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

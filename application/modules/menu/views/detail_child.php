@@ -39,6 +39,24 @@
                                     <button type="submit" class="btn btn-sm btn-success" title="Save" data-toggle="tooltip" data-bs-placement="left">
                                         <i class="ri-save-3-fill"></i>
                                     </button>
+                                    <?= button_actions([
+                                        [
+                                            'key'          => 'log_info',
+                                            'class'        => 'btn-info btn-log-info',
+                                            'title'        => 'Log & History',
+                                            'icon'         => 'ri-question-line',
+                                            'data-param'   => base64_encode($this->encrypt->encode(json_encode([
+                                                'h' => [
+                                                    't' => 'erp_menu',
+                                                    'w' => ['a.ERP_MENU_ID' => $data->ERP_MENU_ID]
+                                                ],
+                                                'where' => [
+                                                    'TABLE_NAME'    => 'ERP_MENU',
+                                                    'ID'      => $data->ERP_MENU_ID
+                                                ],
+                                            ]))),
+                                        ],
+                                    ]) ?>
                                     <button type="button" onclick="location.reload()" class="btn btn-sm btn-warning" title="Reload" data-toggle="tooltip" data-bs-placement="left">
                                         <i class="ri-reply-fill"></i>
                                     </button>
