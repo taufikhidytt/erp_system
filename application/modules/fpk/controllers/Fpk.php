@@ -107,7 +107,7 @@ class Fpk extends Back_Controller
             $data = $this->db->query("SELECT
                 i.ITEM_ID,
                 i.ITEM_CODE,
-                LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION,
+                LEFT(COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION), 40) AS ITEM_DESCRIPTION,
                 LEFT(i.ASSY_CODE, 30) AS ASSY_CODE,
                 LEFT(e.DISPLAY_NAME, 30) AS CATEGORY,
                 i.UOM_CODE UOM,
@@ -672,7 +672,7 @@ class Fpk extends Back_Controller
         $params = [
             'table' => 'pr_detail b',
             'select' => [
-                'b.PR_ID, b.PR_DETAIL_ID, i.ITEM_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY FPK',
+                'b.PR_ID, b.PR_DETAIL_ID, i.ITEM_ID, COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY FPK',
                 ['(b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS GRK', FALSE],
                 ['(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
             ],
@@ -680,8 +680,8 @@ class Fpk extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.PR_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['b.PR_DETAIL_ID' => 'asc'],
         ];
 

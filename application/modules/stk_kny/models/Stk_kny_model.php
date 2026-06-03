@@ -25,8 +25,8 @@ class Stk_kny_model extends CI_Model
         $this->db->select([
             'i.ITEM_ID AS id',
             'i.ITEM_CODE',
-            'LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION',
-            "CONCAT('[',i.ITEM_CODE,'] - ',LEFT(i.ITEM_DESCRIPTION, 40)) AS text",
+            'LEFT(COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION), 40) AS ITEM_DESCRIPTION',
+            "CONCAT('[',i.ITEM_CODE,'] - ',LEFT(COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION), 40)) AS text",
             'LEFT(i.ASSY_CODE, 30) AS ASSY_CODE',
             'LEFT(e.DISPLAY_NAME, 30) AS CATEGORY',
             'i.UOM_CODE AS UOM',

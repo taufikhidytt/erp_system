@@ -130,7 +130,7 @@ class Rsp_model extends CI_Model
                 FROM
                     (
                     SELECT
-                        i.ITEM_DESCRIPTION Nama_Item,
+                        COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
                         i.ITEM_CODE Kode_Item,
                         tkd.ENTERED_QTY Qty,
                         tkd.ENTERED_UOM UoM,
@@ -149,7 +149,7 @@ class Rsp_model extends CI_Model
                         JOIN pr_detail prd ON pod.PR_DETAIL_ID = prd.PR_DETAIL_ID
                         JOIN pr ON prd.PR_ID = pr.PR_ID UNION ALL
                     SELECT
-                        i.ITEM_DESCRIPTION Nama_Item,
+                        COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
                         i.ITEM_CODE Kode_Item,
                         tkd.ENTERED_QTY Qty,
                         tkd.ENTERED_UOM UoM,
@@ -228,7 +228,8 @@ class Rsp_model extends CI_Model
         return true;
     }
 
-    public function get_rsp_detail($id){
+    public function get_rsp_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
@@ -238,7 +239,7 @@ class Rsp_model extends CI_Model
         $this->db->from('tag_pinjam a');
         $this->db->join('warehouse w', 'a.DEST_WH_ID = w.WAREHOUSE_ID');
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
-        $this->db->where('a.TAG_PINJAM_ID',$id);
+        $this->db->where('a.TAG_PINJAM_ID', $id);
         return $this->db->get();
     }
 
@@ -246,8 +247,8 @@ class Rsp_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('tag_pinjam a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.TAG_PINJAM_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();

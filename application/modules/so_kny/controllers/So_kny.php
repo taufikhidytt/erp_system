@@ -162,7 +162,7 @@ class So_kny extends Back_Controller
                     w.WAREHOUSE_NAME,
                     i.ITEM_ID,
                     i.ITEM_CODE,
-                    i.ITEM_DESCRIPTION,
+                    COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
                     a.ENTERED_QTY,
                     a.BASE_QTY,
                     CASE
@@ -215,7 +215,7 @@ class So_kny extends Back_Controller
                     w.WAREHOUSE_NAME,
                     i.ITEM_ID,
                     i.ITEM_CODE,
-                    i.ITEM_DESCRIPTION,
+                    COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
                     b.ENTERED_QTY,
                     b.BASE_QTY,
                     CASE
@@ -906,7 +906,7 @@ class So_kny extends Back_Controller
         $params = [
             'table' => 'so_detail b',
             'select' => [
-                'b.SO_DETAIL_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY SO',
+                'b.SO_DETAIL_ID, COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY SO',
                 ['(b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS DO', FALSE],
                 ['(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
             ],
@@ -914,9 +914,9 @@ class So_kny extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.SO_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
-            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            'column_search' => ['COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            // 'order' => ['COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -999,7 +999,8 @@ class So_kny extends Back_Controller
         echo json_encode($result);
     }
 
-    public function get_log_info(){
+    public function get_log_info()
+    {
         $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
         $id     = (int) ($params['id'] ?? 0);
         $this->load->model('M_union_datatables', 'union_datatables');

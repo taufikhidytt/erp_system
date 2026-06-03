@@ -122,7 +122,7 @@ class Rco extends Back_Controller
                 w.WAREHOUSE_NAME GUDANG_TUJUAN,
                 b.ITEM_ID,
                 i.ITEM_CODE,
-                i.ITEM_DESCRIPTION,
+                COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
                 b.ENTERED_QTY,
                 b.BASE_QTY,
                 b.ENTERED_QTY - (
@@ -725,7 +725,8 @@ class Rco extends Back_Controller
         }
     }
 
-    public function get_log_info(){
+    public function get_log_info()
+    {
         $params = json_decode($this->encrypt->decode(base64_decode($this->input->post('params'))), true);
         $id     = (int) ($params['id'] ?? 0);
         $this->load->model('M_union_datatables', 'union_datatables');

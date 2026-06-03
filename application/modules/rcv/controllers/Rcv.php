@@ -122,7 +122,7 @@ class Rcv extends Back_Controller
                 w.WAREHOUSE_NAME GUDANG_TUJUAN,
                 b.ITEM_ID,
                 i.ITEM_CODE,
-                i.ITEM_DESCRIPTION,
+                COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
                 b.ENTERED_QTY,
                 b.BASE_QTY,
                 b.ENTERED_QTY - (
@@ -604,7 +604,7 @@ class Rcv extends Back_Controller
         $params = [
             'table' => 'tag_detail b',
             'select' => [
-                'b.TAG_DETAIL_ID,i.ITEM_DESCRIPTION Nama_Item,i.ITEM_CODE Kode_Item,b.ENTERED_UOM Satuan,b.ENTERED_QTY RCV,',
+                'b.TAG_DETAIL_ID,COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS Nama_Item,i.ITEM_CODE Kode_Item,b.ENTERED_UOM Satuan,b.ENTERED_QTY RCV,',
                 ['(b.DELIVERED_ENTERED_QTY / b.BASE_QTY) AS RHO_MR', FALSE],
                 ['b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY) AS SISA', FALSE],
             ],
@@ -612,9 +612,9 @@ class Rcv extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.TAG_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
-            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            'column_search' => ['COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, 'COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.DELIVERED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.DELIVERED_ENTERED_QTY / b.BASE_QTY))'],
+            // 'order' => ['COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {

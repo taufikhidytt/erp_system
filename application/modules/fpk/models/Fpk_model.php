@@ -115,7 +115,7 @@ class Fpk_model extends CI_Model
         $this->db->select('
             i.ITEM_ID AS ID,
             i.ITEM_CODE KODE_ITEM,
-            LEFT(i.ITEM_DESCRIPTION, 30) NAMA_ITEM,
+            LEFT(COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION), 30) NAMA_ITEM,
             i.PART_NUMBER PART_NUMBER,
             i.UOM_CODE UOM,
             a.DISPLAY_NAME JENIS,
@@ -142,7 +142,7 @@ class Fpk_model extends CI_Model
 
     public function get_detail_by_pr_id($pr_id, $limit = null, $start = null)
     {
-        $this->db->select("i.ITEM_DESCRIPTION Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL, IF(d.ENTERED_UOM = i.UOM_CODE,(d.ENTERED_QTY * d.BASE_QTY - d.RECEIVED_ENTERED_QTY * d.RECEIVED_BASE_QTY),(d.ENTERED_QTY - (d.RECEIVED_ENTERED_QTY / d.BASE_QTY))) AS Sisa");
+        $this->db->select("COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS Item_Name, i.ITEM_CODE, d.ENTERED_UOM, d.NOTE, d.ENTERED_QTY AS QTY, d.UNIT_PRICE AS PRICE, d.SUBTOTAL AS TOTAL, IF(d.ENTERED_UOM = i.UOM_CODE,(d.ENTERED_QTY * d.BASE_QTY - d.RECEIVED_ENTERED_QTY * d.RECEIVED_BASE_QTY),(d.ENTERED_QTY - (d.RECEIVED_ENTERED_QTY / d.BASE_QTY))) AS Sisa");
         $this->db->from("pr_detail d");
         $this->db->join("item i", "d.ITEM_ID = i.ITEM_ID");
         $this->db->where("d.PR_ID", $pr_id);

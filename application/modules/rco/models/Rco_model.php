@@ -126,7 +126,7 @@ class Rco_model extends CI_Model
     public function get_detail_by_tag_id($tag_id, $limit = null, $start = null)
     {
         $this->db->select("
-            i.ITEM_DESCRIPTION Nama_Item,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             td.ENTERED_QTY Qty,
             IF(
@@ -209,7 +209,8 @@ class Rco_model extends CI_Model
         return true;
     }
 
-    public function get_rco_detail($id){
+    public function get_rco_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
@@ -218,7 +219,7 @@ class Rco_model extends CI_Model
         $this->db->from('tag a');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('warehouse to_w', 'a.TO_WH_ID = to_w.WAREHOUSE_ID');
-        $this->db->where('a.TAG_ID',$id);
+        $this->db->where('a.TAG_ID', $id);
         return $this->db->get();
     }
 
@@ -226,8 +227,8 @@ class Rco_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('tag a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.TAG_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();

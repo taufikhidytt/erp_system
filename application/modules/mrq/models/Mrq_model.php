@@ -62,7 +62,7 @@ class Mrq_model extends CI_Model
             p.PERSON_CODE,
             a.UNIT AS Unit,
             i.ITEM_ID,
-            i.ITEM_DESCRIPTION AS Nama_Item,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
             a.ENTERED_UOM AS UoM
         ");
         $this->db->from('build a');
@@ -136,7 +136,7 @@ class Mrq_model extends CI_Model
             p.PERSON_NAME AS Customer,
             a.UNIT AS Unit,
             a.ITEM_ID,
-            a.ITEM_DESCRIPTION AS Nama_Item,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
             a.ENTERED_UOM AS UoM
         ");
         $this->db->from('build a');
@@ -155,7 +155,7 @@ class Mrq_model extends CI_Model
             FROM
                 (
                 SELECT
-                    i.ITEM_DESCRIPTION AS Nama_Item,
+                    COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
                     i.ITEM_CODE AS Kode_Item,
                     bmd.ENTERED_QTY AS Qty,
                     bmd.ENTERED_UOM AS UoM,
@@ -174,7 +174,7 @@ class Mrq_model extends CI_Model
                     bmd.BUILD_ID = '{$build_id}'
                     UNION ALL
                 SELECT
-                    i.ITEM_DESCRIPTION AS Nama_Item,
+                    COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
                     i.ITEM_CODE AS Kode_Item,
                     bmd.ENTERED_QTY AS Qty,
                     bmd.ENTERED_UOM AS UoM,
@@ -310,7 +310,7 @@ class Mrq_model extends CI_Model
     {
         return $this->db->query("SELECT 
                 DISTINCT i.ITEM_ID, i.ITEM_CODE,
-                LEFT(i.ITEM_DESCRIPTION, 40) AS ITEM_DESCRIPTION,
+                LEFT(COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION), 40) AS ITEM_DESCRIPTION,
                 LEFT(i.ASSY_CODE, 30) AS ASSY_CODE,
                 LEFT(e.DISPLAY_NAME, 30) AS CATEGORY, 
                 i.UOM_CODE, COALESCE(s.STOK, 0) AS STOK, 
@@ -449,9 +449,9 @@ class Mrq_model extends CI_Model
             ->distinct()
             ->select("
                 i.ITEM_ID as id, 
-                CONCAT('[',i.ITEM_CODE,'] - ', LEFT(i.ITEM_DESCRIPTION, 40)) as text,
+                CONCAT('[',i.ITEM_CODE,'] - ', LEFT(COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION), 40)) as text,
                 i.ITEM_CODE,
-                LEFT(i.ITEM_DESCRIPTION, 40) AS DESCRIPTION,
+                LEFT(COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION), 40) AS DESCRIPTION,
             ")
             ->from('item i')
             ->join('erp_lookup_value e', 'e.ERP_LOOKUP_VALUE_ID = i.GROUP_ID')
@@ -470,7 +470,7 @@ class Mrq_model extends CI_Model
             if ($searchTerm) {
                 $this->db->group_start()
                     ->like('i.ITEM_CODE', $searchTerm)
-                    ->or_like('i.ITEM_DESCRIPTION', $searchTerm)
+                    ->or_like('COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)', $searchTerm)
                     ->group_end();
             }
             $this->db->order_by('i.ITEM_CODE', 'ASC');
@@ -484,8 +484,8 @@ class Mrq_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('build a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.BUILD_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();

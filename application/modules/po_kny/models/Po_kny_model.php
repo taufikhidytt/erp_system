@@ -140,7 +140,7 @@ class Po_kny_model extends CI_Model
     public function get_detail_by_po_id($invoice_id, $limit = null, $start = null)
     {
         $sql = "SELECT
-            i.ITEM_DESCRIPTION Nama_Item,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             a.ENTERED_QTY Qty,
             a.ENTERED_UOM UoM,
@@ -443,8 +443,8 @@ class Po_kny_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('invoice a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.INVOICE_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();

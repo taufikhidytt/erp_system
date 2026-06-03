@@ -126,7 +126,7 @@ class Rcv_model extends CI_Model
     public function get_detail_by_tag_id($tag_id, $limit = null, $start = null)
     {
         $this->db->select("
-            i.ITEM_DESCRIPTION Nama_Item,
+            COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS Nama_Item,
             i.ITEM_CODE Kode_Item,
             td.ENTERED_QTY Qty,
             IF(

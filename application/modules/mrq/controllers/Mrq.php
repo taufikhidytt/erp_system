@@ -206,7 +206,7 @@ class Mrq extends Back_Controller
                 WAREHOUSE_NAME,
                 ITEM_ID,
                 ITEM_CODE,
-                ITEM_DESCRIPTION,
+                COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
                 ENTERED_QTY,
                 BASE_QTY,
                 CASE
@@ -237,7 +237,7 @@ class Mrq extends Back_Controller
                     w.WAREHOUSE_NAME,
                     i.ITEM_ID,
                     i.ITEM_CODE,
-                    i.ITEM_DESCRIPTION,
+                    COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
                     b.ENTERED_QTY,
                     b.BASE_QTY,
                     b.RECEIVED_ENTERED_QTY,
@@ -283,7 +283,7 @@ class Mrq extends Back_Controller
                     w.WAREHOUSE_NAME,
                     i.ITEM_ID,
                     i.ITEM_CODE,
-                    i.ITEM_DESCRIPTION,
+                    COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
                     b.ENTERED_QTY,
                     b.BASE_QTY,
                     b.DELIVERED_ENTERED_QTY AS RECEIVED_ENTERED_QTY,
@@ -790,20 +790,20 @@ class Mrq extends Back_Controller
             'queries' => [
                 // Query pertama: build table
                 [
-                    'select' => 'b.BUILD_ID, b.BUILD_ID AS BUILD_DETAIL_ID, i.ITEM_ID, i.ITEM_DESCRIPTION AS Nama_Item, i.ITEM_CODE AS Kode_Item, b.ENTERED_UOM AS Satuan, b.ENTERED_QTY AS MR, (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS `PO/SO`, (b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA',
+                    'select' => 'b.BUILD_ID, b.BUILD_ID AS BUILD_DETAIL_ID, i.ITEM_ID, COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item, i.ITEM_CODE AS Kode_Item, b.ENTERED_UOM AS Satuan, b.ENTERED_QTY AS MR, (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS `PO/SO`, (b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA',
                     'table'  => 'build b',
                     'join'   => ['item i', 'b.ITEM_ID = i.ITEM_ID'],
                     'where'  => 'b.BUILD_ID = ' . $id,
                 ],
                 // Query kedua: build_detail table
                 [
-                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, i.ITEM_ID, i.ITEM_DESCRIPTION AS Nama_Item, i.ITEM_CODE AS Kode_Item, b.ENTERED_UOM AS Satuan, b.ENTERED_QTY AS MR, (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS `PO/SO`, (b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA',
+                    'select' => 'b.BUILD_ID, b.BUILD_DETAIL_ID, i.ITEM_ID, COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item, i.ITEM_CODE AS Kode_Item, b.ENTERED_UOM AS Satuan, b.ENTERED_QTY AS MR, (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS `PO/SO`, (b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY)) AS SISA',
                     'table'  => 'build_detail b',
                     'join'   => ['item i', 'b.ITEM_ID = i.ITEM_ID'],
                     'where'  => 'b.BUILD_ID = ' . $id,
                 ],
             ],
-            'search_columns' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'search_columns' => ['COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
             'order_map' => [
                 0 => null,  // tombol +/- (tidak sortable)
                 1 => null,  // no (tidak sortable)
@@ -953,14 +953,14 @@ class Mrq extends Back_Controller
             'table' => 'bom a',
             'select' => [
                 'a.BOM_ID,a.DOCUMENT_NO,a.ENTERED_QTY,a.UOM_CODE,a.UNIT,a.LOKASI,a.NOTE,
-                i.ITEM_DESCRIPTION,i.ITEM_CODE',
+                COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,i.ITEM_CODE',
             ],
             'joins'         => [['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner']],
             'where'         => ['a.ITEM_ID' => $item_id],
             'where_raw'     => ["( ( a.ACTIVE_FLAG = 'Y' AND a.END_DATE >= CURDATE()) OR ( CURDATE()  BETWEEN a.START_DATE AND a.END_DATE ) )"],
-            'column_search' => ['a.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE', 'a.UNIT', 'a.LOKASI', 'a.NOTE'],
-            'column_order'  => [null, 'a.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE', 'a.UNIT', 'a.LOKASI', 'a.NOTE'],
-            'order'         => ['i.ITEM_DESCRIPTION' => 'asc'],
+            'column_search' => ['a.DOCUMENT_NO', 'ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE', 'a.UNIT', 'a.LOKASI', 'a.NOTE'],
+            'column_order'  => [null, 'a.DOCUMENT_NO', 'ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.UOM_CODE', 'a.UNIT', 'a.LOKASI', 'a.NOTE'],
+            'order'         => ['ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -990,16 +990,16 @@ class Mrq extends Back_Controller
             'table' => 'bom_detail a',
             'select' => [
                 'b.DOCUMENT_NO,a.ENTERED_QTY,a.ENTERED_UOM,a.NOTE,
-                i.ITEM_DESCRIPTION,i.ITEM_CODE',
+                COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,i.ITEM_CODE',
             ],
             'joins'         => [
                 ['bom b', 'a.BOM_ID = b.BOM_ID', 'inner'],
                 ['item i', 'a.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where'         => ['a.BOM_ID' => $bom_id],
-            'column_search' => ['b.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
-            'column_order'  => [null, 'b.DOCUMENT_NO', 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
-            'order'         => ['i.ITEM_DESCRIPTION' => 'asc'],
+            'column_search' => ['b.DOCUMENT_NO', 'ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
+            'column_order'  => [null, 'b.DOCUMENT_NO', 'ITEM_DESCRIPTION', 'i.ITEM_CODE', 'a.ENTERED_QTY', 'a.ENTERED_UOM', 'a.NOTE'],
+            'order'         => ['ITEM_DESCRIPTION' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -1027,7 +1027,8 @@ class Mrq extends Back_Controller
         echo json_encode($result);
     }
 
-    public function get_log_info(){
+    public function get_log_info()
+    {
         $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
         $id     = (int) ($params['id'] ?? 0);
         $this->load->model('M_union_datatables', 'union_datatables');

@@ -708,7 +708,7 @@ class Do_kny extends Back_Controller
         $params = [
             'table' => 'inventory_out_detail b',
             'select' => [
-                'b.INVENTORY_OUT_DETAIL_ID, i.ITEM_DESCRIPTION Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY DO',
+                'b.INVENTORY_OUT_DETAIL_ID, COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item, i.ITEM_CODE Kode_Item, b.ENTERED_UOM Satuan, b.ENTERED_QTY DO',
                 ['(b.INVOICE_ENTERED_QTY / b.BASE_QTY) AS INV', FALSE],
                 ['(b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / b.BASE_QTY)) AS SISA', FALSE],
             ],
@@ -716,9 +716,9 @@ class Do_kny extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.INVENTORY_OUT_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.INVOICE_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / b.BASE_QTY))'],
-            // 'order' => ['i.ITEM_DESCRIPTION' => 'asc'],
+            'column_search' => ['COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.INVOICE_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / b.BASE_QTY))'],
+            // 'order' => ['COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION)' => 'asc'],
         ];
 
         echo json_encode($this->datatables->generate($params, function ($row, $no) {
@@ -803,7 +803,8 @@ class Do_kny extends Back_Controller
         echo json_encode($result);
     }
 
-    public function get_log_info(){
+    public function get_log_info()
+    {
         $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
         $id     = (int) ($params['id'] ?? 0);
         $this->load->model('M_union_datatables', 'union_datatables');

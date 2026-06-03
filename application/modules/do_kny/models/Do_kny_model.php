@@ -144,7 +144,7 @@ class Do_kny_model extends CI_Model
     public function get_detail_by_inventory_out_id($inventory_out_id, $limit = null, $start = null)
     {
         $sql = "SELECT
-            i.ITEM_DESCRIPTION Nama_Item,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             a.ENTERED_QTY Qty,
             a.ENTERED_UOM UoM,
@@ -188,7 +188,7 @@ class Do_kny_model extends CI_Model
             i.ITEM_ID,
             bl.DOCUMENT_NO,
             i.ITEM_CODE,
-            i.ITEM_DESCRIPTION,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
             b.ENTERED_QTY,
             b.BASE_QTY,
             k.FIRST_NAME,
@@ -532,7 +532,7 @@ class Do_kny_model extends CI_Model
     public function get_do_detail_by_inventory_out_id($inventory_out_id)
     {
         $sql = "SELECT
-            i.ITEM_DESCRIPTION Nama_Item,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             a.ENTERED_QTY Qty,
             a.ENTERED_UOM UoM,
@@ -562,8 +562,8 @@ class Do_kny_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('inventory_out a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.INVENTORY_OUT_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();

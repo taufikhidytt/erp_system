@@ -127,7 +127,7 @@ class Sts_model extends CI_Model
     {
         //po.DOCUMENT_NO No_FPK
         $this->db->select("
-            i.ITEM_DESCRIPTION `Nama_Item`,
+            COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS `Nama_Item`,
             i.ITEM_CODE `Kode_Item`,
             tkd.ENTERED_QTY `Qty`,
             tkd.ENTERED_UOM `UoM`,

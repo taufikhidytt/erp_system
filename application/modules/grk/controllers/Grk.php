@@ -122,7 +122,7 @@ class Grk extends Back_Controller
                 k.FIRST_NAME AS SALES,
                 b.ITEM_ID,
                 i.ITEM_CODE,
-                i.ITEM_DESCRIPTION,
+                COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
                 b.ENTERED_QTY,
                 b.BASE_QTY,
                 b.ENTERED_QTY - (
@@ -586,7 +586,7 @@ class Grk extends Back_Controller
         $params = [
             'table' => 'po_detail b',
             'select' => [
-                'b.PO_DETAIL_ID,i.ITEM_DESCRIPTION Nama_Item,i.ITEM_CODE Kode_Item,b.ENTERED_UOM Satuan,b.ENTERED_QTY GRK,',
+                'b.PO_DETAIL_ID,COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS Nama_Item,i.ITEM_CODE Kode_Item,b.ENTERED_UOM Satuan,b.ENTERED_QTY GRK,',
                 ['(b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS STS_RSP_MR', FALSE],
                 ['b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY) AS SISA', FALSE],
             ],
@@ -594,8 +594,8 @@ class Grk extends Back_Controller
                 ['item i', 'b.ITEM_ID = i.ITEM_ID', 'inner'],
             ],
             'where' => ['b.PO_ID' => $id],
-            'column_search' => ['i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
-            'column_order'  => [null, null, 'i.ITEM_DESCRIPTION', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
+            'column_search' => ['COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY'],
+            'column_order'  => [null, null, 'COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)', 'i.ITEM_CODE', 'b.ENTERED_UOM', 'b.ENTERED_QTY', '(b.RECEIVED_ENTERED_QTY / b.BASE_QTY)', '(b.ENTERED_QTY - (b.RECEIVED_ENTERED_QTY / b.BASE_QTY))'],
             // 'order' => ['b.PO_DETAIL_ID' => 'asc'],
         ];
 
