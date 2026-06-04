@@ -125,4 +125,15 @@ class Api extends Back_Controller
         $result = $this->api->getTipePajak()->result();
         echo json_encode($result);
     }
+
+    public function get_storage_user()
+    {
+        $result = $this->api->getStorageUser()->result();
+        echo json_encode($result);
+    }
+    public function get_site_storage_user()
+    {
+        $result = $this->api->getSiteStorageUser()->result();
+        echo json_encode($result);
+    }
 }

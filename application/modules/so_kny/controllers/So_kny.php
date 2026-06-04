@@ -993,12 +993,6 @@ class So_kny extends Back_Controller
         echo json_encode($result);
     }
 
-    public function get_storage()
-    {
-        $result = $this->so_kny->getStorage()->result();
-        echo json_encode($result);
-    }
-
     public function get_log_info()
     {
         $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
@@ -1039,6 +1033,18 @@ class So_kny extends Back_Controller
             'last_update_date' => $info_header->LAST_UPDATE_DATE ?? '-',
             'user_updated'   => $info_header->USER_UPDATED ?? '-',
         ];
+        echo json_encode($result);
+    }
+
+    public function get_sales()
+    {
+        $result = $this->so_kny->getSales()->result();
+        echo json_encode($result);
+    }
+
+    public function get_storage()
+    {
+        $result = $this->so_kny->getStorage()->result();
         echo json_encode($result);
     }
 }

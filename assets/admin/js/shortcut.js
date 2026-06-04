@@ -89,6 +89,7 @@ $(document).ready(function () {
             icon: 'ri-settings-3-line',
             items: [
                 { keys: ['Alt', 'Q'],  desc: 'Logout' },
+                { keys: ['Alt', 'T'],  desc: 'Ganti Tema' },
                 { keys: ['Esc'],       desc: 'Tutup dropdown / panel' },
             ]
         }
@@ -550,6 +551,15 @@ $(document).ready(function () {
                 e.preventDefault();
                 showToast('Alt+R  →  Reload halaman...');
                 setTimeout(function () { window.location.reload(); }, 400);
+                break;
+            
+            /* Alt+T → Theme */
+            case 't':
+                e.preventDefault();
+                showToast('Alt+T  →  Ganti Tema...');
+                setTimeout(function () {
+                    $('#theme-toggle-btn').trigger('click');
+                }, 300);
                 break;
 
             /* Alt+Q → Logout */

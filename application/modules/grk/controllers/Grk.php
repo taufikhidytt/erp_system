@@ -795,4 +795,9 @@ class Grk extends Back_Controller
         ];
         echo json_encode($result);
     }
+
+    public function get_gudang(){
+        $result = $this->grk->getApiGudang()->result();
+        echo json_encode($result);
+    }
 }

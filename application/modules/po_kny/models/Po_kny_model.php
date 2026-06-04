@@ -186,11 +186,20 @@ class Po_kny_model extends CI_Model
         $id         = (int) $this->input->get('id');
         $user_id    = $this->encrypt->decode('user_id');
 
+        $subquery = "
+        (
+            SELECT
+                WAREHOUSE_ID,
+                MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
+            FROM erp_warehouse
+            WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+            GROUP BY WAREHOUSE_ID
+        ) g";
+
         $this->db
-            ->distinct()
-            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text, g.PRIMARY_FLAG AS USER_PRIMARY_FLAG")
+            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text")
             ->from('warehouse a')
-            ->join('erp_warehouse g', 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left')
+            ->join($subquery, 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left', false)
             ->order_by("
                 CASE
                     WHEN g.PRIMARY_FLAG IS NOT NULL THEN g.PRIMARY_FLAG
@@ -199,14 +208,30 @@ class Po_kny_model extends CI_Model
             ", 'DESC', false)
             ->order_by('a.WAREHOUSE_NAME', 'ASC');
 
+        $this->db->where("
+        (
+            (
+                EXISTS (
+                    SELECT 1
+                    FROM erp_warehouse
+                    WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                )
+                AND g.WAREHOUSE_ID IS NOT NULL
+            )
+            OR
+            NOT EXISTS (
+                SELECT 1
+                FROM erp_warehouse
+                WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+            )
+        )
+        ", null, false);
+
         if ($id) {
             $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
         } elseif ($default) {
             $this->db->where('a.ACTIVE_FLAG', 'Y');
             $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
-        } elseif ($user_id) {
-            $this->db->where('a.ACTIVE_FLAG', 'Y');
-            $this->db->where('g.ERP_USER_ID', $user_id);
         } else {
             $this->db->where('a.ACTIVE_FLAG', 'Y');
             if ($searchTerm) {

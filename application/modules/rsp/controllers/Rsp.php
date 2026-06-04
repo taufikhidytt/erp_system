@@ -712,4 +712,10 @@ class Rsp extends Back_Controller
         ];
         echo json_encode($result);
     }
+
+    public function get_main_storage()
+    {
+        $result = $this->rsp->getMainStorage()->result();
+        echo json_encode($result);
+    }
 }

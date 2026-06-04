@@ -767,4 +767,16 @@ class Rco extends Back_Controller
         ];
         echo json_encode($result);
     }
+
+    public function get_site_storage()
+    {
+        $result = $this->rco->getSiteStorage()->result();
+        echo json_encode($result);
+    }
+
+    public function get_main_storage()
+    {
+        $result = $this->rco->getMainStorage()->result();
+        echo json_encode($result);
+    }
 }

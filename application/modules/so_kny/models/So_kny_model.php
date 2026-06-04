@@ -202,48 +202,6 @@ class So_kny_model extends CI_Model
             ->count_all_results('so_detail');
     }
 
-    public function getStorage()
-    {
-        $searchTerm = trim($this->input->get('q') ?? '');
-        $default    = trim($this->input->get('default') ?? '');
-        $id         = (int) $this->input->get('id');
-        $user_id    = $this->encrypt->decode('user_id');
-
-        $this->db
-            ->distinct()
-            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text, g.PRIMARY_FLAG AS USER_PRIMARY_FLAG")
-            ->from('warehouse a')
-            ->join('erp_warehouse g', "a.WAREHOUSE_ID = g.WAREHOUSE_ID", 'left')
-            ->where('a.ACTIVE_FLAG', 'Y')
-            ->order_by("
-                CASE
-                    WHEN g.PRIMARY_FLAG IS NOT NULL THEN g.PRIMARY_FLAG
-                    ELSE a.PRIMARY_FLAG
-                END
-            ", "DESC", false)
-            ->order_by('a.WAREHOUSE_NAME', 'ASC');
-
-        if ($id) {
-            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
-        } elseif ($default) {
-            $this->db->where('a.ACTIVE_FLAG', 'Y');
-            $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
-        } elseif ($user_id) {
-            $this->db->where('a.ACTIVE_FLAG', 'Y');
-            $this->db->where('g.ERP_USER_ID', $user_id);
-        } else {
-            $this->db->where('a.ACTIVE_FLAG', 'Y');
-            if ($searchTerm) {
-                $this->db->group_start()
-                    ->like('a.WAREHOUSE_NAME', $searchTerm)
-                    ->group_end();
-            }
-            $this->db->limit(50);
-        }
-
-        return $this->db->get();
-    }
-
     public function get_storage()
     {
         return $this->db->query("SELECT DISTINCT
@@ -494,5 +452,136 @@ class So_kny_model extends CI_Model
         $this->db->where('a.SO_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();
+    }
+
+    public function getSales()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id = $this->session->id;
+
+        $subquery = "
+        (
+            SELECT
+                KARYAWAN_ID
+            FROM erp_group_sales
+            WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+            GROUP BY KARYAWAN_ID
+        ) g";
+
+        $this->db
+            ->select("k.KARYAWAN_ID as id, CONCAT(k.FIRST_NAME, ' - [' , k.LAST_NAME, ']') as text, k.KATA_DEPAN, k.DESCRIPTION")
+            ->from('karyawan k')
+            ->join($subquery, 'k.KARYAWAN_ID = g.KARYAWAN_ID', 'left', false)
+            ->where('k.DEPT_ID = FN_GET_VAR_VALUE("SALES")', null, false)
+            ->group_start()
+            ->where('k.END_DATE', 0)
+            ->or_where('k.END_DATE IS NULL', null, false)
+            ->or_where('k.END_DATE >= CURDATE()', null, false)
+            ->group_end()
+            ->order_by('k.FIRST_NAME', 'ASC');
+
+        $this->db->where("
+        (
+            (
+                EXISTS (
+                    SELECT 1
+                    FROM erp_group_sales
+                    WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                )
+                AND g.KARYAWAN_ID IS NOT NULL
+            )
+            OR
+            NOT EXISTS (
+                SELECT 1
+                FROM erp_group_sales
+                WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+            )
+        )
+        ", null, false);
+
+        if ($id) {
+            $this->db->where('k.KARYAWAN_ID', $id)->limit(1);
+        } else {
+            $this->db->where('K.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('k.FIRST_NAME', $searchTerm)
+                    ->or_like('k.LAST_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function getStorage()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id    = $this->encrypt->decode('user_id');
+
+        $subquery = "
+        (
+            SELECT
+                WAREHOUSE_ID,
+                MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
+            FROM erp_warehouse
+            WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+            GROUP BY WAREHOUSE_ID
+        ) g";
+
+        $this->db
+            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text")
+            ->from('warehouse a')
+            ->join($subquery, "a.WAREHOUSE_ID = g.WAREHOUSE_ID", 'left', false)
+            ->where('a.ACTIVE_FLAG', 'Y')
+            ->order_by("
+                CASE
+                    WHEN g.PRIMARY_FLAG IS NOT NULL THEN g.PRIMARY_FLAG
+                    ELSE a.PRIMARY_FLAG
+                END
+            ", "DESC", false)
+            ->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        if ($user_id) {
+            $this->db->where("
+                (
+                    (
+                        EXISTS (
+                            SELECT 1
+                            FROM erp_warehouse
+                            WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                        )
+                        AND g.WAREHOUSE_ID IS NOT NULL
+                    )
+                    OR
+                    NOT EXISTS (
+                        SELECT 1
+                        FROM erp_warehouse
+                        WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                    )
+                )
+                ", null, false);
+        }
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('a.PRIMARY_FLAG', 'Y')->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.WAREHOUSE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
     }
 }

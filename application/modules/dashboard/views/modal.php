@@ -206,7 +206,7 @@
     </div>
 </div>
 
-<script src="<?= base_url('assets/admin/js/log-info.js?v=1.3') ?>"></script>
+<script src="<?= base_url('assets/admin/js/log-info.js?v=1.4') ?>"></script>
 
 <script>
 function fillLogMeta(data) {

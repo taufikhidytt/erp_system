@@ -11,7 +11,8 @@ class Item_inquiry_model extends CI_Model
 
     public function getGudang()
     {
-        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN erp_warehouse g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID AND ERP_USER_ID = '{$this->session->userdata('id')}' GROUP BY a.WAREHOUSE_ID ORDER BY IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME");
+        $user_id = $this->session->userdata('id');
+        return $this->db->query("SELECT a.WAREHOUSE_ID, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME FROM warehouse a LEFT JOIN (SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG FROM erp_warehouse WHERE ERP_USER_ID = '{$user_id}' GROUP BY WAREHOUSE_ID) g ON a.WAREHOUSE_ID = g.WAREHOUSE_ID WHERE a.ACTIVE_FLAG = 'Y' AND ( ( EXISTS (SELECT 1 FROM erp_warehouse WHERE ERP_USER_ID = '{$user_id}') AND g.WAREHOUSE_ID IS NOT NULL ) OR NOT EXISTS (SELECT 1 FROM erp_warehouse WHERE ERP_USER_ID = '{$user_id}') ) ORDER BY IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) DESC, a.WAREHOUSE_NAME; ");
     }
 
     public function getItem()

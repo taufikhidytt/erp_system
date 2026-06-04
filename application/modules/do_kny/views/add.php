@@ -120,6 +120,21 @@
                                             </div>
                                             <div class="text-danger"><?= form_error('tanggal') ?></div>
                                         </div>
+                                        <!-- <div class="mb-3">
+                                            <label for="sales">Sales:</label>
+                                            <span class="text-danger">*</span>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="ri ri-user-2-fill"></i>
+                                                </span>
+                                                <select name="sales" id="sales"
+                                                    data-url="do_kny/get_sales"
+                                                    data-selected-id="<?= set_value('sales', '') ?>"
+                                                    class="form-control select2 <?= form_error('sales') ? 'is-invalid' : null; ?>">
+                                                </select>
+                                            </div>
+                                            <div class="text-danger"><?= form_error('sales') ?></div>
+                                        </div> -->
                                         <div class="mb-3">
                                             <label for="sales">Sales:</label>
                                             <span class="text-danger">*</span>

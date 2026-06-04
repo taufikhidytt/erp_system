@@ -116,18 +116,18 @@ class Dashboard extends Back_Controller
                 $header_created = $this->dashboard->info_header($params, 'created');
                 $header_updated = $this->dashboard->info_header($params, 'updated');
                 $result['header'] = [
-                    'created_date' => $header_created->CREATED_DATE ?? null,
-                    'user_created'   => $header_created->USER_CREATED ?? null,
-                    'last_update_date' => $header_updated->LAST_UPDATE_DATE ?? null,
-                    'user_updated'   => $header_updated->USER_UPDATED ?? null,
+                    'created_date' => $header_created->CREATED_DATE ?? '-',
+                    'user_created'   => $header_created->USER_CREATED ?? '-',
+                    'last_update_date' => $header_updated->LAST_UPDATE_DATE ?? '-',
+                    'user_updated'   => $header_updated->USER_UPDATED ?? '-',
                 ];
             }else{
                 $info_header    = $this->dashboard->info_header($params);
                 $result['header'] = [
-                    'created_date' => $info_header->CREATED_DATE ?? null,
-                    'user_created'   => $info_header->USER_CREATED ?? null,
-                    'last_update_date' => $info_header->LAST_UPDATE_DATE ?? null,
-                    'user_updated'   => $info_header->USER_UPDATED ?? null,
+                    'created_date' => $info_header->CREATED_DATE ?? '-',
+                    'user_created'   => $info_header->USER_CREATED ?? '-',
+                    'last_update_date' => $info_header->LAST_UPDATE_DATE ?? '-',
+                    'user_updated'   => $info_header->USER_UPDATED ?? '-',
                 ];
             }
         }

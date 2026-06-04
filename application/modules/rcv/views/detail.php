@@ -122,17 +122,8 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-2-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($site_storage->result() as $ss) {
-                                                    if ($ss->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ss->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
                                                 <select name="site_storage" id="site_storage" class="form-control select2 <?= form_error('site_storage') ? 'is-invalid' : null; ?>"
-                                                    data-url="api/get_site_storage"
+                                                    data-url="rcv/get_site_storage"
                                                     data-default="Y"
                                                     data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
                                                     data-selected-id="<?= set_value('site_storage', $data->TO_WH_ID) ?>">
@@ -147,17 +138,8 @@
                                                 <span class="input-group-text">
                                                     <i class="ri ri-building-2-fill"></i>
                                                 </span>
-                                                <?php
-                                                $defaultValue = null;
-                                                foreach ($main_storage->result() as $ms) {
-                                                    if ($ms->PRIMARY_FLAG == 'Y') {
-                                                        $defaultValue = $ms->WAREHOUSE_ID;
-                                                        break;
-                                                    }
-                                                }
-                                                ?>
                                                 <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>"
-                                                    data-url="api/get_gudang"
+                                                    data-url="rcv/get_main_storage"
                                                     data-default="Y"
                                                     data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
                                                     data-selected-id="<?= set_value('main_storage', $data->WAREHOUSE_ID) ?>">
@@ -277,7 +259,7 @@
                                                                         <input type="checkbox" class="chkDetail">
                                                                     </td>
                                                                     <td class="ellipsis">
-                                                                        <span class=" ellipsis align-middle" data-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
+                                                                        <span class=" ellipsis align-middle" data-bs-toggle="tooltip" data-placement="bottom" title="<?= $dd->DOCUMENT_NO ?>">
                                                                             <?= $dd->DOCUMENT_NO; ?>
                                                                         </span>
                                                                     </td>

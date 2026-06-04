@@ -82,7 +82,7 @@
                                                     <i class="ri ri-building-2-fill"></i>
                                                 </span>
                                                 <select name="site_storage" id="site_storage"
-                                                    data-url="api/get_site_storage"
+                                                    data-url="rho/get_site_storage"
                                                     data-default="Y"
                                                     data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
                                                     data-selected-id="<?= set_value('site_storage', '') ?>"
@@ -99,7 +99,7 @@
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
                                                 <select name="main_storage" id="main_storage"
-                                                    data-url="api/get_gudang"
+                                                    data-url="rho/get_main_storage"
                                                     data-default="Y"
                                                     data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
                                                     data-selected-id="<?= set_value('main_storage', '') ?>"

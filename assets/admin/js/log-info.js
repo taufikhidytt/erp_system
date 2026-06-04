@@ -16,6 +16,7 @@ function init_log_info_table() {
         processing   : true,
         serverSide   : true,
         searching    : true,
+        ordering     : false,
         order        : [],
         scrollX      : true,
         scrollY      : '40dvh',

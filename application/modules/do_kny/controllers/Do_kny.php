@@ -845,4 +845,10 @@ class Do_kny extends Back_Controller
         ];
         echo json_encode($result);
     }
+
+    public function get_sales()
+    {
+        $result = $this->do_kny->getSales()->result();
+        echo json_encode($result);
+    }
 }

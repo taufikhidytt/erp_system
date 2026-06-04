@@ -122,9 +122,8 @@
                                                     <i class="ri ri-home-gear-fill"></i>
                                                 </span>
                                                 <select name="gudang" id="gudang"
-                                                    data-url="api/get_gudang"
+                                                    data-url="api/get_storage_user"
                                                     data-default="Y"
-                                                    data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
                                                     data-selected-id="<?= set_value('gudang', '') ?>"
                                                     class="form-control select2 <?= form_error('gudang') ? 'is-invalid' : null; ?>">
                                                 </select>

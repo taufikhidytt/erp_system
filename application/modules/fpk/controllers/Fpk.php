@@ -794,4 +794,15 @@ class Fpk extends Back_Controller
         ];
         echo json_encode($result);
     }
+
+    public function get_gudang(){
+        $result = $this->fpk->getApiGudang()->result();
+        echo json_encode($result);
+    }
+
+    public function get_sales()
+    {
+        $result = $this->fpk->getApiSales()->result();
+        echo json_encode($result);
+    }
 }

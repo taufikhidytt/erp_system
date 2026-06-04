@@ -1,7 +1,5 @@
 <?php
 
-use FontLib\Table\Type\post;
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Rho extends Back_Controller
@@ -668,7 +666,8 @@ class Rho extends Back_Controller
         }
     }
 
-    public function get_log_info(){
+    public function get_log_info()
+    {
         $params = json_decode($this->encrypt->decode(base64url_decode($this->input->post('params'))), true);
         $id     = (int) ($params['id'] ?? 0);
         $this->load->model('M_union_datatables', 'union_datatables');
@@ -707,6 +706,18 @@ class Rho extends Back_Controller
             'last_update_date' => $info_header->LAST_UPDATE_DATE ?? '-',
             'user_updated'   => $info_header->USER_UPDATED ?? '-',
         ];
+        echo json_encode($result);
+    }
+
+    public function get_site_storage()
+    {
+        $result = $this->rho->getSiteStorage()->result();
+        echo json_encode($result);
+    }
+
+    public function get_main_storage()
+    {
+        $result = $this->rho->getMainStorage()->result();
         echo json_encode($result);
     }
 }

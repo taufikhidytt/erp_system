@@ -360,8 +360,7 @@ class Item_balance extends Back_Controller
             $app_path   = FCPATH . 'app';
             $cmd = 'php ' . escapeshellarg($app_path) . ' item_balance/import_data cli_process ' 
                 . escapeshellarg($param) . ' ' . escapeshellarg($encoded_db);
-
-            log_message('error', $cmd);
+                
             $os = strtoupper(substr(PHP_OS, 0, 3));
             if ($os === 'WIN') {
                 pclose(popen('start /B "" ' . $cmd . ' > NUL 2>&1', 'r'));
@@ -557,7 +556,7 @@ class Item_balance extends Back_Controller
         //delete file
         $json               = json_decode($job['JSON_TEXT'], true);
         $upload_dir         = FCPATH . 'assets/upload/item_balance_import/';
-        $result_filename    = $json['result_filename'];
+        $result_filename    = (isset($json['result_filename'])?$json['result_filename']:'null');
         $result_path        = $upload_dir . $result_filename;
         $exel_file          = $upload_dir.$json['filename'];
         if(file_exists($result_path)){
@@ -631,7 +630,7 @@ class Item_balance extends Back_Controller
 
             //pindahkan result file ke archived
             $upload_dir         = FCPATH . 'assets/upload/item_balance_import/';
-            $result_filename    = $json['result_filename'];
+            $result_filename    = (isset($json['result_filename'])?$json['result_filename']:'null');
             $result_path        = $upload_dir . $result_filename;
             $result_path_move   = $upload_dir.'archived/'.$result_filename;
             $exel_file          = $upload_dir.$json['filename'];

@@ -234,4 +234,49 @@ class Grk_model extends CI_Model
         $this->db->limit(1);
         return $this->db->get()->row();
     }
+
+    public function getApiGudang()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = $this->input->get('id') ? (int) $this->input->get('id') : null;
+        $default    = trim($this->input->get('default') ?? '');
+        $user_id    = (int) $this->session->id;
+
+        $this->db->select("a.WAREHOUSE_ID as id, a.WAREHOUSE_NAME as text")
+                ->from('warehouse a');
+
+        // 2. LEFT JOIN dengan Subquery Aggregasi (Menghindari duplikasi data)
+        $subquery_join = "(SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
+                        FROM erp_warehouse
+                        WHERE ERP_USER_ID = '$user_id'
+                        GROUP BY WAREHOUSE_ID) g";
+        $this->db->join($subquery_join, 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left');
+
+        $this->db->where('a.ACTIVE_FLAG', 'Y');
+        $this->db->where("a.JENIS_ID = FN_GET_VAR_VALUE('PST')", NULL, FALSE);
+
+        $this->db->where("
+            (
+                (EXISTS (SELECT 1 FROM erp_warehouse WHERE ERP_USER_ID = '$user_id') AND g.WAREHOUSE_ID IS NOT NULL)
+                OR 
+                NOT EXISTS (SELECT 1 FROM erp_warehouse WHERE ERP_USER_ID = '$user_id')
+            )
+        ", NULL, FALSE);
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) =', 'Y')->limit(1);
+        } else {
+            if ($searchTerm) {
+                $this->db->group_start()->like('a.WAREHOUSE_NAME', $searchTerm)->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        $this->db->order_by('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG)', 'DESC', FALSE);
+        $this->db->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        return $this->db->get();
+    }
 }

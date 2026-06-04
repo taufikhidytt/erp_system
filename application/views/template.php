@@ -1,21 +1,24 @@
 <?php
+date_default_timezone_set("Asia/jakarta");
 $logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? 'assets/logo/' . $this->session->setup->LOGO_FILENAME : 'assets/logo/logo.png';
 $active_theme = isset($_COOKIE['app-theme']) ? $_COOKIE['app-theme'] : 'light';
 $bs_css = $active_theme !== 'dark' ? 'bootstrap.min.css' : 'bootstrap-dark.min.css';
 $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
+$date = date('d M Y');
 ?>
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <title><?= $title; ?> | <?= $this->session->setup->NAME; ?></title>
     <link rel="icon" type="image/png" href="<?= base_url($logo) ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistem Informasi Konsinyasi untuk manajemen data, monitoring transaksi, dan laporan keuangan secara real-time, akurat, dan aman.">
 
     <!-- DataTables -->
     <link href="<?= base_url() ?>assets/admin/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
     <link href="<?= base_url() ?>assets/admin/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
-    <link href="<?= base_url() ?>assets/admin/libs/datatables.net-select-bs4/css//select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/libs/datatables.net-select-bs4/css/select.bootstrap4.min.css" rel="stylesheet" type="text/css" />
 
     <!-- Responsive datatable examples -->
     <link href="<?= base_url() ?>assets/admin/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
@@ -38,268 +41,8 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
     <link href="<?= base_url() ?>assets/admin/libs/select2/css/select2-bootstrap-5-theme.min.css" rel="stylesheet" type="text/css" />
 
     <link rel="stylesheet" href="<?= base_url() ?>assets/admin/css/aos.css">
-
-    <style>
-        @font-face {
-            font-family: 'Poppins';
-            src: url('<?= base_url('assets/admin/fonts/poppins/Poppins-Regular.ttf') ?>') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-        }
-
-        @font-face {
-            font-family: 'Poppins';
-            src: url('<?= base_url('assets/admin/fonts/poppins/Poppins-Bold.ttf') ?>') format('truetype');
-            font-weight: 700;
-            font-style: normal;
-        }
-
-        body {
-            /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
-            /* font-family: Tahoma !important; */
-            font-family: 'Poppins', sans-serif !important;
-            line-height: 1.25 !important;
-        }
-        #sidebar-menu ul li ul.sub-menu li a, .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
-            font-family: 'Poppins', sans-serif !important;
-        }
-        #sidebar-menu ul li a, .select2-container--bootstrap-5 .select2-selection{
-            font-family: 'Poppins', sans-serif !important;
-        }
-        input, optgroup, select, textarea{
-            /* font-family: 'Courier New', Courier, monospace; */
-            font-family: monospace !important;
-            font-size: 0.8rem !important;
-        }
-        .label-status .badge{
-            font-size: 1.25rem !important;
-        }
-        table thead th input, table thead th select{
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 0.7rem !important;
-        }
-        .dataTables_length label, .dataTables_length select, .dataTables_length select option{
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 0.75rem !important;
-        }
-        .modal .table thead th, .modal .table tbody td, .modal .dataTables_wrapper{
-            font-size: 0.75rem !important;
-        }
-        button{
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 0.75rem !important;
-        }
-        .swal2-popup{
-            font-family: 'Poppins', sans-serif !important;
-        }
-        .swal2-popup pre{
-            font-family: 'Poppins', sans-serif !important;
-            font-size: 1rem !important;
-        }
-
-        #loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .spinner-border {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        table.table thead,
-        tbody {
-            text-align: left !important;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .page-content {
-            font-size: 12px;
-        }
-
-        /* ===================== */
-        /* Global XS Form Size   */
-        /* ===================== */
-        .form-xs .form-control,
-        .form-xs .form-select,
-        .form-xs textarea.form-control {
-            height: 30px !important;
-            min-height: 30px !important;
-            padding: 2px 6px !important;
-            /* font-size: 0.75rem !important; */
-            font-size: 0.8rem !important;
-        }
-
-        /* Input-group icon */
-        .form-xs .input-group-text {
-            height: 30px !important;
-            padding: 2px 6px !important;
-            /* font-size: 0.75rem !important; */
-            font-size: 0.8rem !important;
-        }
-
-        /* ===================== */
-        /* Select2 XS            */
-        /* ===================== */
-        .form-xs .select2-container .select2-selection--single {
-            height: 30px !important;
-            min-height: 30px !important;
-            padding: 0 6px !important;
-            font-size: 0.75rem !important;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-xs .select2-selection__rendered {
-            /* line-height: 22px !important; */
-            font-size: 0.75rem !important;
-        }
-
-        .form-xs .select2-selection__arrow {
-            height: 22px !important;
-        }
-
-        /* Textarea fix */
-        .form-xs textarea {
-            resize: vertical;
-        }
-
-        .nav-tabs .nav-link.active {
-            background-color: #e9ecef;
-        }
-
-        .details-control {
-            font-weight: bolder;
-            color: #1DAA61;
-        }
-
-        /* 1. Reset posisi sel header */
-        table.dataTable.table-sm thead th {
-            position: relative !important;
-            vertical-align: middle !important;
-        }
-
-        /* 2. Reset total pseudo-elements dan MATIKAN properti 'bottom' bawaan */
-        table.dataTable.table-sm thead .sorting::before,
-        table.dataTable.table-sm thead .sorting_asc::before,
-        table.dataTable.table-sm thead .sorting_desc::before,
-        table.dataTable.table-sm thead .sorting::after,
-        table.dataTable.table-sm thead .sorting_asc::after,
-        table.dataTable.table-sm thead .sorting_desc::after {
-            position: absolute !important;
-            bottom: auto !important; /* KUNCI UTAMA: Matikan posisi bottom bawaan DataTables */
-            top: 50% !important;     /* Tarik ke tepat garis tengah vertikal */
-            right: 0.5em !important; /* Jarak dari kanan sel */
-            margin-top: 0 !important;
-            line-height: 0.1 !important;
-        }
-
-        /* 3. Atur panah atas (Before) agar duduk tepat di ATAS garis tengah 50% */
-        table.dataTable.table-sm thead .sorting::before,
-        table.dataTable.table-sm thead .sorting_asc::before,
-        table.dataTable.table-sm thead .sorting_desc::before {
-            transform: translateY(-100%) !important;
-            padding-bottom: 2px !important; /* Memberi sedikit jarak di tengah */
-        }
-
-        /* 4. Atur panah bawah (After) agar menggantung tepat di BAWAH garis tengah 50% */
-        table.dataTable.table-sm thead .sorting::after,
-        table.dataTable.table-sm thead .sorting_asc::after,
-        table.dataTable.table-sm thead .sorting_desc::after {
-            transform: translateY(0%) !important;
-            padding-top: 2px !important; /* Memberi sedikit jarak di tengah */
-        }
-
-        .dataTable tbody td {
-            font-family: monospace;   
-        }
-        .dataTable tbody td, .dataTable thead th{
-            white-space: nowrap;
-        }
-        .dataTable tfoot th{
-            font-family: monospace !important;
-            font-weight: 600 !important;
-            font-size: 0.875rem !important;
-        }
-
-        .dataTable thead th,
-        .dataTables_length,
-        .dataTables_filter,
-        .dataTables_paginate,
-        .dataTables_info {
-            /* font-family: Tahoma !important; */
-            font-family: 'Poppins', sans-serif !important;
-        }
-        .dataTables_info{
-            font-weight: 400 !important;
-        }
-        @media (max-width: 767.98px) {
-            li.paginate_button.next, li.paginate_button.previous{
-                font-size: 0.7rem !important;
-            }
-        }
-
-        .swal2-popup pre {
-            font-family: inherit;
-            font-size: 1em;
-            color: #545454;
-            white-space: pre-wrap;
-            text-align: center;
-            margin: 0;
-            font-weight: 400;
-        }
-        .show-password{
-            cursor: pointer;
-        }
-
-        .dt-buttons{
-            display: inline-grid !important;
-            grid-auto-flow: column;
-            grid-auto-columns: 1fr;
-            width: auto !important;
-        }
-
-        .select2-container--bootstrap-5 .select2-dropdown .select2-results__options .select2-results__option, .select2-container--bootstrap-5 .select2-dropdown .select2-search .select2-search__field{
-            font-size: 1rem !important;
-            white-space: nowrap;
-            font-family: monospace !important;
-        }
-        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered{
-            font-size: 1rem !important;
-            font-family: monospace !important;
-        }
-        .table th{
-            font-weight: 400 !important;
-        }
-        .btn-group-sm>.btn, .btn-sm, .modal .btn{
-            font-size: 0.75rem !important;
-        }
-        .swal2-styled.swal2-confirm, .swal2-styled.swal2-cancel{
-            font-size: 1rem !important;
-        }
-    </style>
-    <link href="<?= base_url() ?>assets/admin/css/custom-dark.css?v=1.0" id="custom-dark-style" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/css/custom-template.css" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/css/custom-dark.css" id="custom-dark-style" rel="stylesheet" type="text/css" />
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
     <script>
@@ -333,10 +76,7 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
                     <div class="navbar-brand-box align-content-center">
                         <a href="<?= base_url('dashboard') ?>" class="logo logo-light">
                             <span class="logo-sm">
-                                <!-- <img src="<?= base_url('assets/logo/logo.png') ?>" alt="logo" height="30"> -->
-
-
-                                <img src="<?= base_url($logo) ?>" alt="logo" height="30">
+                                <img src="<?= base_url($logo) ?>" alt="logo" style="height: 30px; width: auto; object-fit: contain;">
                             </span>
                             <span class="logo-lg">
                                 <h5 class="text-white"><?= strtoupper($this->session->setup->NAME) ?></h5>
@@ -344,7 +84,7 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
                         </a>
                     </div>
 
-                    <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect" id="vertical-menu-btn">
+                    <button type="button" class="btn btn-sm px-3 font-size-24 header-item waves-effect" id="vertical-menu-btn" aria-label="Toggle Menu">
                         <i class="ri-menu-2-line align-middle"></i>
                     </button>
 
@@ -357,27 +97,22 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
                 </div>
 
                 <div class="d-flex">
-                    
-                    <?php
-                    date_default_timezone_set("Asia/jakarta");
-                    $date = date('d M Y');
-                    ?>
-                    <div class="text-center" style="font-size: 12px; letter-spacing: 5px; margin: 10px 20px 0px 0px;">
+                    <div class="text-center" style="font-size: 12px; letter-spacing: 5px; margin: 20px 20px 0px 0px;">
                         <div><?= $date ?></div>
                         <div id="jam"></div>
                     </div>
                     <div class="dropdown d-inline-block d-lg-inline-block ms-1">
-                        <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
+                        <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen" aria-label="Fullscreen">
                             <i class="ri-fullscreen-line"></i>
                         </button>
                     </div>
                     <div class="dropdown d-inline-block d-lg-inline-block ms-1">
-                        <button type="button" class="btn header-item noti-icon waves-effect" id="theme-toggle-btn" title="Switch Theme">
+                        <button type="button" class="btn header-item noti-icon waves-effect" id="theme-toggle-btn" title="Switch Theme" aria-label="Switch Theme">
                             <i class="<?= $active_theme === 'light' ? 'ri-moon-line' : 'ri-sun-line' ?>" id="theme-icon"></i>
                         </button>
                     </div>
                     <div class="dropdown d-inline-block d-lg-inline-block ms-1 d-none">
-                        <button type="button" class="btn header-item noti-icon waves-effect" onclick="openSheet()">
+                        <button type="button" class="btn header-item noti-icon waves-effect" onclick="openSheet()" aria-label="Open Sheet">
                             <i class="ri-information-line"></i>
                         </button>
                     </div>
@@ -390,7 +125,7 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
                             <div class="d-none d-xl-inline-block ms-1">
                                 <div style="display: grid;text-align: start;">
                                     <span><?= $this->session->userdata('nama'); ?></span>
-                                    <span class="text-muted" style="font-size:x-small"><i class="mdi mdi-circle-medium circle-dot text-success me-1"></i><?= $this->session->userdata('db_alias'); ?></span>
+                                    <span style="font-size: x-small; color: #555555;"><i class="mdi mdi-circle-medium circle-dot text-success me-1"></i><?= $this->session->userdata('db_alias'); ?></span>
                                 </div>
                             </div>
                             <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
@@ -399,7 +134,7 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
                             <!-- item-->
                             <div class="d-md-none d-sm-block bg-dark border rounded-2 me-2 ms-2 mb-1 px-2 py-1" style="display: grid;">
                                 <span class="text-light"><?= $this->session->userdata('nama'); ?></span>
-                                <span class="text-muted" style="font-size:x-small"><i class="mdi mdi-circle-medium circle-dot text-success me-1"></i><?= $this->session->userdata('db_alias'); ?></span>
+                                <span style="font-size: x-small; color: #555555;"><i class="mdi mdi-circle-medium circle-dot text-success me-1"></i><?= $this->session->userdata('db_alias'); ?></span>
                             </div>
                             <a class="dropdown-item" href="<?= base_url('profile') ?>">
                                 <i class="ri-user-line align-middle me-1"></i> Profile
@@ -460,7 +195,7 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
                                                 $child = $this->db->query("SELECT * FROM erp_menu JOIN erp_group_menu ON erp_group_menu.erp_menu_id = erp_menu.erp_menu_id WHERE erp_menu.parent_id IN ($main->ERP_MENU_ID) AND active_flag = 'Y' AND erp_group_menu.erp_group_id = $id AND erp_group_menu.view_flag = 'Y' ORDER BY seq ASC");
                                             ?>
                                                 <li>
-                                                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                                    <a href="#" class="has-arrow waves-effect" aria-expanded="false">
                                                         <i class="<?= $main->MENU_ICON; ?>"></i>
                                                         <span><?= $main->PROMPT ?></span>
                                                     </a>
@@ -557,329 +292,12 @@ $app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
     <script src="<?= base_url() ?>assets/admin/libs/select2/js/select2.min.js"></script>
 
     <script src="<?= base_url() ?>assets/admin/js/app.js"></script>
-
-    <script>
-        //datatables
-        $.extend(true, $.fn.dataTable.defaults, {
-            "keys": true,
-            "showScrollToggle": true,
-            "preDrawCallback": function(settings) {
-                var api = new $.fn.dataTable.Api(settings);
-                var info = api.page.info();
-                settings._oldPage = info ? info.page : 0;
-            },
-            "initComplete": function(settings) {
-                setTimeout(function() { syncTableHeader(settings); }, 150);
-            },
-            "drawCallback": function(settings) {
-                var api   = this.api();
-                var $body = $(api.table().body());
-                var info  = api.page.info();
-                var oldPage = settings._oldPage !== undefined ? settings._oldPage : info.page;
-                var newPage = info.page;
-
-                if (!$('#dt-anim').length) {
-                    $('head').append(`<style id="dt-anim">
-                        .dt-next { animation: dtNext 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) both; }
-                        .dt-prev { animation: dtPrev 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) both; }
-                        .dt-fade { animation: dtFade 0.25s ease both; }
-                        @keyframes dtNext { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
-                        @keyframes dtPrev { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: none; } }
-                        @keyframes dtFade { from { opacity: 0; } to { opacity: 1; } }
-                    </style>`);
-                }
-
-                $body.removeClass('dt-next dt-prev dt-fade');
-                void $body[0].offsetWidth;
-
-                if (settings._isFirstDraw !== false) {
-                    settings._isFirstDraw = false;
-                    $body.addClass('dt-fade');
-                } else if (newPage > oldPage) {
-                    $body.addClass('dt-next');
-                } else if (newPage < oldPage) {
-                    $body.addClass('dt-prev');
-                } else {
-                    $body.addClass('dt-fade');
-                }
-
-                setTimeout(function() { syncTableHeader(settings); }, 100);
-            }
-        });
-        $(document).ready(function() {
-            $(document).on('init.dt', function(e, settings) {
-                if (e.namespace !== 'dt' || settings.oInit.showScrollToggle === false || !settings.nScrollBody) return;
-
-                const api = new $.fn.dataTable.Api(settings);
-                const $wrapper = $(api.table().container());
-                let isEnabled = settings.oInit.autoScrollPage === true; 
-                settings.oInit.autoScrollPage = isEnabled; 
-
-                if (!$('#dt-switch-style').length) {
-                    $('head').append(`
-                        <style id="dt-switch-style">
-                            .dt-switch { position: relative; display: inline-block; width: 34px; height: 20px; margin: 0; vertical-align: middle; }
-                            .dt-scroll-checkbox { opacity: 0; width: 0; height: 0; position: absolute; }
-                            .dt-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 20px; }
-                            .dt-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-                            .dt-scroll-checkbox:checked + .dt-slider { background-color: #0d6efd; /* Warna Biru Bootstrap */ }
-                            .dt-scroll-checkbox:checked + .dt-slider:before { transform: translateX(14px); }
-                            .dt-autoscroll-toggle { display: inline-flex; align-items: center; margin-left: 15px; user-select: none; }
-                            .dt-autoscroll-label { margin-right: 8px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; }
-                        </style>
-                    `);
-                }
-
-                const $toggleContainer = $(`
-                    <div class="dt-autoscroll-toggle align-middle">
-                        <label class="dt-switch">
-                            <input type="checkbox" id="toggle_${settings.sTableId}" class="dt-scroll-checkbox" ${isEnabled ? 'checked' : ''}>
-                            <span class="dt-slider"></span>
-                        </label>
-                        <label class="dt-autoscroll-label mt-2 ms-1" for="toggle_${settings.sTableId}">Scroll Off</label>
-                    </div>
-                `);
-
-                $toggleContainer.find('.dt-scroll-checkbox').on('change', function() {
-                    $(this).closest('.dt-autoscroll-toggle').find('.dt-autoscroll-label').text('Scroll '+(this.checked?'On':'Off'));
-                    settings.oInit.autoScrollPage = this.checked;
-                });
-
-                $wrapper.find('.dataTables_length, .dt-length').append($toggleContainer);
-            });
-
-            $(document).on('wheel', '.dataTables_scrollBody', function(e) {
-                const oe = e.originalEvent;
-                if (oe.shiftKey || Math.abs(oe.deltaX) > Math.abs(oe.deltaY)) return;
-
-                const $scrollBody = $(this);
-                const $table = $scrollBody.find('table');
-                const dt = $table.DataTable();
-
-                if (!dt || dt.settings()[0].oInit.autoScrollPage !== true || $table.data('isPageChanging')) return;
-
-                const scrollTop = $scrollBody.scrollTop();
-                const isBottom = Math.ceil(scrollTop + $scrollBody.innerHeight()) >= $scrollBody[0].scrollHeight;
-                const isTop = scrollTop === 0;
-                const info = dt.page.info();
-                
-                let action = null;
-
-                if (oe.deltaY > 0 && isBottom && info.page < info.pages - 1) action = 'next';
-                else if (oe.deltaY < 0 && isTop && info.page > 0) action = 'previous';
-
-                if (action) {
-                    $table.data('isPageChanging', true);
-                    dt.one('draw.dt', function() {
-                        setTimeout(function() {
-                            $scrollBody.scrollTop(action === 'previous' ? $scrollBody[0].scrollHeight : 0);
-                            setTimeout(() => $table.data('isPageChanging', false), 800);
-                        }, action === 'previous' ? 50 : 0); 
-                    });
-                    dt.page(action).draw('page');
-                }
-            });
-        });
-        function syncTableHeader(settings) {
-            if (!settings || settings.oInit.showScrollToggle === false || !settings.nScrollBody) return;
-
-            var api = new $.fn.dataTable.Api(settings);
-            var $wrapper = $(api.table().container());
-
-            var $scrollHead = $wrapper.find('.dataTables_scrollHead table');
-            var $scrollBody = $wrapper.find('.dataTables_scrollBody table');
-
-            var $headThs   = $scrollHead.find('thead tr');
-            var $firstRow  = $scrollBody.find('tbody tr:first');
-            var $bodyTds   = $firstRow.find('td');
-
-            var totalCols  = $headThs.first().find('th').length;
-            var isEmpty    = $bodyTds.length === 0 
-                            || ($bodyTds.length === 1 && $firstRow.hasClass('odd') && $bodyTds.first().attr('colspan'));
-
-            if (isEmpty) {
-                var $tbody = $scrollBody.find('tbody');
-                $headThs.each(function () {
-                    $(this).find('th').each(function () {
-                        var $th = $(this);
-                        var w   = $th.outerWidth();
-                        $th.css({
-                            'box-sizing': 'border-box',
-                            'width'    : w + 'px',
-                            'min-width': w + 'px',
-                        });
-                    });
-                });
-
-                return;
-            }
-
-            $bodyTds.each(function (k) {
-                var $td_w = $(this).outerWidth();
-                $headThs.each(function () {
-                    $(this).find('th').eq(k).css({
-                        'box-sizing': 'border-box',
-                        'width'    : $td_w + 'px',
-                        'min-width': $td_w + 'px',
-                    });
-                });
-            });
-        }
-        $(document).on('keydown', function(e) {
-            if (e.which === 32) {
-                const focusedCell = $(document).find('.dataTables_wrapper table tbody td.focus');
-                if (focusedCell.length > 0) {
-                    const chk = focusedCell.find('input[type="checkbox"]');
-                    if (chk.length > 0) {
-                        e.preventDefault();
-                        const currentState = chk.prop('checked');
-                        chk.prop('checked', !currentState);
-                        chk.trigger('change');
-                    }
-                }
-            }
-        });
-        
-        $(document).ready(function() {
-            $('#loading').hide();
-
-            $("a:not(.has-arrow):not(.page-link):not(.nav-link)").click(function() {
-                $('#loading').show();
-            });
-
-            $("form").on("submit", function() {
-                $('#loading').show();
-            });
-
-            const flashsuccess = $('#flashSuccess').data('success');
-            const flashwarning = $('#flashWarning').data('warning');
-            const flasherror = $('#flashError').data('error');
-            if (flashsuccess) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    html: `<pre>${flashsuccess}</pre>`,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    showConfirmButton: true,
-                    confirmButtonText: 'OK',
-                })
-            }
-
-            if (flashwarning) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Warning',
-                    html: `<pre>${flashwarning}</pre>`,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    showConfirmButton: true,
-                    confirmButtonText: 'OK',
-                })
-            }
-
-            if (flasherror) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    html: `<pre>${flasherror}</pre>`,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    showConfirmButton: true,
-                    confirmButtonText: 'OK',
-                })
-            }
-        });
-    </script>
-
-    <script>
-        function updateJam() {
-            const sekarang = new Date();
-            const jam = String(sekarang.getHours()).padStart(2, '0');
-            const menit = String(sekarang.getMinutes()).padStart(2, '0');
-            const detik = String(sekarang.getSeconds()).padStart(2, '0');
-
-            const waktuLengkap = `${jam}:${menit}:${detik}`;
-            document.getElementById('jam').textContent = waktuLengkap;
-        }
-
-        // Panggil pertama kali agar tidak delay 1 detik
-        updateJam();
-
-        // Update setiap 1 detik
-        setInterval(updateJam, 1000);
-
-        function enableDataTableSearch() {
-
-            $('.dataTables_wrapper').each(function() {
-
-                let wrapper = $(this);
-
-                wrapper.find('input[type="search"]')
-                    .prop('disabled', false)
-                    .removeAttr('disabled');
-
-                wrapper.find('.dataTables_filter')
-                    .css('pointer-events', 'auto');
-            });
-        }
-
-        $(document).ready(function() {
-            enableDataTableSearch();
-        });
-
-        $(document).ajaxComplete(function() {
-            enableDataTableSearch();
-        });
-
-        setTimeout(enableDataTableSearch, 300);
-        setTimeout(enableDataTableSearch, 800);
-        $(document).on('click','a', function(){
-            setTimeout(() => {
-                $('#loading').hide();
-            }, 3000);
-        });
-    </script>
-
     <script src="<?= base_url() ?>assets/admin/js/pages/aos.js"></script>
-
     <script>
         AOS.init();
     </script>
-    <script>
-        $(document).ready(function() {
-            const baseUrl = '<?= base_url() ?>';
-
-            function setCookie(name, value, days) {
-                let expires = "";
-                if (days) {
-                    let date = new Date();
-                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                    expires = "; expires=" + date.toUTCString();
-                }
-                document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-            }
-
-            let currentTheme = $('body').attr('data-theme') || 'dark';
-
-            $('#theme-toggle-btn').on('click', function() {
-                currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                setCookie('app-theme', currentTheme, 30);
-                if (currentTheme === 'light') {
-                    $('#bootstrap-style').attr('href', baseUrl + 'assets/admin/css/bootstrap.min.css');
-                    $('#app-style').attr('href', baseUrl + 'assets/admin/css/app.min.css');
-                    $('#theme-icon').removeClass('ri-sun-line').addClass('ri-moon-line');
-                    $('body').attr('data-theme', 'light');
-                } else {
-                    $('#bootstrap-style').attr('href', baseUrl + 'assets/admin/css/bootstrap-dark.min.css');
-                    $('#app-style').attr('href', baseUrl + 'assets/admin/css/app-dark.min.css');
-                    $('#theme-icon').removeClass('ri-moon-line').addClass('ri-sun-line');
-                    $('body').attr('data-theme', 'dark');
-                }
-            });
-        });
-    </script>
     <script src="<?= base_url() ?>assets/admin/js/shortcut.js?v=1.0"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=1.0"></script>
 </body>
 
 </html>

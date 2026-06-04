@@ -253,4 +253,69 @@ class Rsp_model extends CI_Model
         $this->db->limit(1);
         return $this->db->get()->row();
     }
+
+    public function getMainStorage()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $default    = trim($this->input->get('default') ?? '');
+        $id         = (int) $this->input->get('id');
+        $user_id    = $this->session->id;
+
+        $subquery = "
+                    (
+                        SELECT
+                            WAREHOUSE_ID,
+                            MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
+                        FROM erp_warehouse
+                        WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                        GROUP BY WAREHOUSE_ID
+                    ) g";
+
+        $this->db
+            ->select("a.WAREHOUSE_ID as id, a.ADDRESS_ID, a.PRIMARY_FLAG, a.WAREHOUSE_NAME as text ")
+            ->from('warehouse a')
+            ->join($subquery, 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left', false)
+            ->where('a.JENIS_ID = FN_GET_VAR_VALUE("PST")', null, false)
+            ->group_by('a.WAREHOUSE_ID')
+            ->order_by('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG)', 'DESC', false)
+            ->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        if ($user_id) {
+            $this->db->where("
+            (
+                (
+                    EXISTS (
+                        SELECT 1
+                        FROM erp_warehouse
+                        WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                    )
+                    AND g.WAREHOUSE_ID IS NOT NULL
+                )
+                OR
+                NOT EXISTS (
+                    SELECT 1
+                    FROM erp_warehouse
+                    WHERE ERP_USER_ID = " . $this->db->escape($user_id) . "
+                )
+            )", null, false);
+        }
+
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            $this->db->where('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) = "Y"', null, false)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.WAREHOUSE_NAME', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
 }

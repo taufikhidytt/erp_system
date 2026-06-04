@@ -228,4 +228,142 @@ class Fpk_model extends CI_Model
         $this->db->limit(1);
         return $this->db->get()->row();
     }
+
+    public function getApiGudang()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = $this->input->get('id') ? (int) $this->input->get('id') : null;
+        $default    = trim($this->input->get('default') ?? '');
+        $user_id    = (int) $this->session->id;
+
+        $this->db->select("a.WAREHOUSE_ID as id, a.WAREHOUSE_NAME as text")
+                ->from('warehouse a');
+
+        // 2. LEFT JOIN dengan Subquery Aggregasi (Menghindari duplikasi data)
+        $subquery_join = "(SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
+                        FROM erp_warehouse
+                        WHERE ERP_USER_ID = '$user_id'
+                        GROUP BY WAREHOUSE_ID) g";
+        $this->db->join($subquery_join, 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'left');
+
+        $this->db->where('a.ACTIVE_FLAG', 'Y');
+        $this->db->where("a.JENIS_ID = FN_GET_VAR_VALUE('PST')", NULL, FALSE);
+
+        $this->db->where("
+            (
+                (EXISTS (SELECT 1 FROM erp_warehouse WHERE ERP_USER_ID = '$user_id') AND g.WAREHOUSE_ID IS NOT NULL)
+                OR 
+                NOT EXISTS (SELECT 1 FROM erp_warehouse WHERE ERP_USER_ID = '$user_id')
+            )
+        ", NULL, FALSE);
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG) =', 'Y')->limit(1);
+        } else {
+            if ($searchTerm) {
+                $this->db->group_start()->like('a.WAREHOUSE_NAME', $searchTerm)->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        $this->db->order_by('IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG)', 'DESC', FALSE);
+        $this->db->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        return $this->db->get();
+    }
+
+    private function getApiGudangAlternatif()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = $this->input->get('id') ? (int) $this->input->get('id') : null;
+        $default    = trim($this->input->get('default') ?? '');
+        $user_id    = (int) $this->session->id;
+        
+        $default_field = 'a.PRIMARY_FLAG';
+
+        // Cek hak akses user
+        $user_has_warehouse = $this->db->where('ERP_USER_ID', $user_id)
+                                    ->limit(1)
+                                    ->count_all_results('erp_warehouse') > 0;
+
+        $this->db->select("a.WAREHOUSE_ID as id, a.WAREHOUSE_NAME as text")
+                ->from('warehouse a');
+
+        $this->db->where('a.ACTIVE_FLAG', 'Y');
+        $this->db->where("a.JENIS_ID = FN_GET_VAR_VALUE('PST')", NULL, FALSE);
+
+        // Jika user punya warehouse, gunakan INNER JOIN ke subquery aggregasi
+        if ($user_has_warehouse) {
+            $default_field = 'IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG)';
+            
+            $subquery_join = "(SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
+                            FROM erp_warehouse
+                            WHERE ERP_USER_ID = '$user_id'
+                            GROUP BY WAREHOUSE_ID) g";
+                            
+            $this->db->join($subquery_join, 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'inner');
+        }
+
+        if ($id) {
+            $this->db->where('a.WAREHOUSE_ID', $id)->limit(1);
+        } elseif ($default) {
+            $this->db->where($default_field, 'Y')->limit(1);
+        } else {
+            if ($searchTerm) {
+                $this->db->group_start()->like('a.WAREHOUSE_NAME', $searchTerm)->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        $this->db->order_by($default_field, 'DESC', FALSE);
+        $this->db->order_by('a.WAREHOUSE_NAME', 'ASC');
+
+        return $this->db->get();
+    }
+
+    public function getApiSales()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = $this->input->get('id') ? (int) $this->input->get('id') : null;
+        $user_id    = (int) $this->session->id;
+
+        $this->db->select("k.KARYAWAN_ID as id, CONCAT(k.FIRST_NAME, ' - [', k.LAST_NAME, ']') as text, k.KATA_DEPAN, k.DESCRIPTION")
+                ->from('karyawan k');
+
+        $subquery_join = "(SELECT KARYAWAN_ID 
+                        FROM erp_group_sales 
+                        WHERE ERP_USER_ID = '$user_id' 
+                        GROUP BY KARYAWAN_ID) g";
+        $this->db->join($subquery_join, 'k.KARYAWAN_ID = g.KARYAWAN_ID', 'left');
+
+        $this->db->where("k.DEPT_ID = FN_GET_VAR_VALUE('SALES')", NULL, FALSE);
+        $this->db->where('k.ACTIVE_FLAG', 'Y');
+        $this->db->where("(k.END_DATE = 0 OR k.END_DATE IS NULL OR k.END_DATE >= CURDATE())", NULL, FALSE);
+
+        $this->db->where("
+            (
+                (EXISTS (SELECT 1 FROM erp_group_sales WHERE ERP_USER_ID = '$user_id') AND g.KARYAWAN_ID IS NOT NULL)
+                OR 
+                NOT EXISTS (SELECT 1 FROM erp_group_sales WHERE ERP_USER_ID = '$user_id')
+            )
+        ", NULL, FALSE);
+
+        if ($id) {
+            $this->db->where('k.KARYAWAN_ID', $id)->limit(1);
+        } else {
+            if ($searchTerm) {
+                $this->db->group_start()
+                        ->like('k.FIRST_NAME', $searchTerm)
+                        ->or_like('k.LAST_NAME', $searchTerm)
+                        ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        $this->db->order_by('k.FIRST_NAME', 'ASC');
+
+        return $this->db->get();
+    }
 }

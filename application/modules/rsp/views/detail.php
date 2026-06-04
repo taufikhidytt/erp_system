@@ -133,7 +133,7 @@
                                                     <i class="ri ri-building-fill"></i>
                                                 </span>
                                                 <select name="main_storage" id="main_storage" class="form-control select2 <?= form_error('main_storage') ? 'is-invalid' : null; ?>"
-                                                    data-url="api/get_gudang"
+                                                    data-url="rsp/get_main_storage"
                                                     data-default="Y"
                                                     data-user_id="<?= $this->encrypt->encode($this->session->id); ?>"
                                                     data-selected-id="<?= set_value('main_storage', $data->DEST_WH_ID) ?>">

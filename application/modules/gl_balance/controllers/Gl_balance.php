@@ -525,7 +525,7 @@ class Gl_balance extends Back_Controller
         //delete file
         $json               = json_decode($job['JSON_TEXT'], true);
         $upload_dir         = FCPATH . 'assets/upload/coa_balance_import/';
-        $result_filename    = $json['result_filename'];
+        $result_filename    = isset($json['result_filename'])?$json['result_filename']:'null';
         $result_path        = $upload_dir . $result_filename;
         $exel_file          = $upload_dir.$json['filename'];
         if(file_exists($result_path)){
@@ -599,7 +599,7 @@ class Gl_balance extends Back_Controller
 
             //pindahkan result file ke archived
             $upload_dir         = FCPATH . 'assets/upload/coa_balance_import/';
-            $result_filename    = $json['result_filename'];
+            $result_filename    = isset($json['result_filename'])?$json['result_filename']:'null';
             $result_path        = $upload_dir . $result_filename;
             $result_path_move   = $upload_dir.'archived/'.$result_filename;
             $exel_file          = $upload_dir.$json['filename'];
