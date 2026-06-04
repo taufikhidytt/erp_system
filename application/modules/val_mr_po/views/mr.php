@@ -8,7 +8,7 @@
     <div class="card-body">
         <div class="table-responsive">
             <table class="table text-center w-100 table-sm" id="table-mr">
-                <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                     <tr>
                         <th class="text-center">No</th>
                         <th>No. SO</th>

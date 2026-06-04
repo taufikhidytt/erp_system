@@ -55,7 +55,7 @@
                                                 </select>
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th>No</th>
                                             <th>Kode</th>
                                             <th>Nama</th>
@@ -166,7 +166,7 @@
                     <div class="table-responsive">
                         <table class="table text-center w-100 table-sm" id="tb-sync">
                             <thead>
-                                <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                     <th>No</th>
                                     <th>Kode</th>
                                     <th>Nama</th>

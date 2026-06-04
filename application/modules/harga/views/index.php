@@ -86,7 +86,7 @@
                                             </th>
                                         <?php } ?>
                                     </tr>
-                                    <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                    <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                         <th rowspan="<?= $rowspan ?>">No</th>
                                         <th rowspan="<?= $rowspan ?>">Kode Item</th>
                                         <th rowspan="<?= $rowspan ?>">Nama Item</th>
@@ -98,7 +98,7 @@
                                         <th rowspan="<?= $rowspan ?>">Aktif</th>
                                     </tr>
                                     <?php if($kolom_harga){
-                                        $col = '<tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">';
+                                        $col = '<tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">';
                                         for ($i=0; $i < $kolom_harga ; $i++) { 
                                             if(isset($fields[$i])){
                                                 $col .= '<th class="d-field">'.$fields[$i]->DISPLAY_NAME.'</th>';

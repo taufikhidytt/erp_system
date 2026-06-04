@@ -84,7 +84,7 @@
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <table class="table table-bordered table-sm text-center table-striped" id="table_log_sign_in">
+                            <table class="table table-sm text-center table-striped" id="table_log_sign_in">
                                 <thead>
                                     <tr>
                                         <th>

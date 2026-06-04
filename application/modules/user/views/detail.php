@@ -206,7 +206,7 @@
                                     <button type="button" id="removeAccount" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                     <div class="table-responsive mt-3" style="max-height: 50dvh;">
                                         <table id="tbl-account" class="table mt-3 w-100 table-sm align-top">
-                                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff" class="sticky-top">
+                                            <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)" class="sticky-top">
                                                 <tr>
                                                     <th class="text-center" width="50"><input type="checkbox" id="chkAll"></th>
                                                     <th class="text-center" width="50">No</th>
@@ -246,7 +246,7 @@
                                     <button type="button" id="removeWarehouse" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                     <div class="table-responsive mt-3" style="max-height: 50dvh;">
                                         <table id="tbl-warehouse" class="table mt-3 w-100 table-sm align-top">
-                                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff" class="sticky-top">
+                                            <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)" class="sticky-top">
                                                 <tr>
                                                     <th class="text-center" width="50"><input type="checkbox" id="chkAllWarehouse"></th>
                                                     <th class="text-center" width="50">No</th>
@@ -285,7 +285,7 @@
                                     <button type="button" id="removeSales" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                     <div class="table-responsive mt-3" style="max-height: 50dvh;">
                                         <table id="tbl-sales" class="table mt-3 w-100 table-sm align-top">
-                                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff" class="sticky-top">
+                                            <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)" class="sticky-top">
                                                 <tr>
                                                     <th class="text-center" width="50"><input type="checkbox" id="chkAllSales"></th>
                                                     <th class="text-center" width="50">No</th>

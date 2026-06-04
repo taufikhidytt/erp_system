@@ -142,7 +142,7 @@
                                                     <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
                                                     <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
                                                 </tr>
-                                                <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                     <th>No</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
@@ -175,7 +175,7 @@
                                             <tr id="search-row">
                                                 <!-- Column search akan di-generate JS -->
                                             </tr>
-                                            <tr id="header-row" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                            <tr id="header-row" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                 <!-- Header akan di-generate JS -->
                                             </tr>
                                         </thead>
@@ -272,7 +272,7 @@
                                                     <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
                                                     <th><input type="text" class="column_search" placeholder="Cari.." style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;"></th>
                                                 </tr>
-                                                <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                     <th>No</th>
                                                     <th>Tanggal</th>
                                                     <th>No Transaksi</th>

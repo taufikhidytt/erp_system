@@ -546,3 +546,77 @@ if(! function_exists('fetch_currencies')){
         return $result;
     }
 }
+
+function getContrastColor($hexColor) {
+    // Hapus tanda # jika ada
+    $hex = str_replace('#', '', $hexColor);
+
+    // Jika format 3 digit, ubah ke 6 digit
+    if (strlen($hex) == 3) {
+        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    }
+
+    // Ubah ke nilai RGB
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+
+    // Hitung kecerahan dengan rumus YIQ
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+
+    // Kembalikan warna teks yang cocok
+    return ($yiq >= 128) ? '#212529' : '#ffffff';
+}
+
+function hexToRgb($hexColor) {
+    $hex = str_replace('#', '', $hexColor);
+    if (strlen($hex) == 3) {
+        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    }
+
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+    
+    return [
+        'r' => $r,
+        'g' => $g,
+        'b' => $b,
+        'string' => "$r, $g, $b"
+    ];
+}
+function generateDynamicTheme($primaryHex, $th_color = null) {
+    $hex = str_replace('#', '', $primaryHex);
+    if (strlen($hex) == 3) {
+        $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    }
+
+    // 1. Dapatkan RGB
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+
+    // 2. Dapatkan Warna Hover (Menggelapkan nilai RGB sebesar 12%)
+    $hoverR = max(0, min(255, round($r * 0.88)));
+    $hoverG = max(0, min(255, round($g * 0.88)));
+    $hoverB = max(0, min(255, round($b * 0.88)));
+    $hoverHex = sprintf("#%02x%02x%02x", $hoverR, $hoverG, $hoverB);
+
+    // 3. Dapatkan Kontras Teks
+    $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+    $contrastColor = ($yiq >= 128) ? '#212529' : '#ffffff';
+
+    // 4. Cetak variabelnya ke :root
+    return "
+    <style>
+    :root {
+        --app-primary: #$hex;
+        --app-primary-hover: $hoverHex;
+        --app-primary-contrast: $contrastColor;
+        --app-primary-hover-contrast: $contrastColor;
+        --app-primary-rgb: $r, $g, $b;
+        --app-primary-th: $th_color;
+    }
+    </style>
+    ";
+}

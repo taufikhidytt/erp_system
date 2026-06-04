@@ -215,7 +215,7 @@
                                                             </th>
                                                         <?php } ?>
                                                     </tr>
-                                                    <tr style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                    <tr style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                         <th>No</th>
                                                         <th style=" padding:0; margin:0; border:none; display: none;"></th>
                                                         <th>

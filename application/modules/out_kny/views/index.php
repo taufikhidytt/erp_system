@@ -98,7 +98,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="11" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th>No</th>
                                             <th>Tanggal</th>
                                             <th>No Transaksi</th>

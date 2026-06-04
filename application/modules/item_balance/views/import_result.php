@@ -17,7 +17,7 @@
         <?php if($success_count>0){ ?>
             <div class="table-responsive">
                 <table id="tbl-rv-success" class="table mt-3 w-100 table-sm align-middle table-striped">
-                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                    <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                         <tr>
                             <th>Baris</th>
                             <?php foreach ($header as $k => $v) { ?>
@@ -50,7 +50,7 @@
         <?php if($failed_count>0){ ?>
             <div class="table-responsive">
                 <table id="tbl-rv-failed" class="table mt-3 w-100 table-sm align-middle table-striped">
-                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                    <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                         <tr>
                             <th>Baris</th>
                             <?php foreach ($header as $k => $v) { ?>

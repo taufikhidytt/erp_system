@@ -324,7 +324,7 @@
 
                                             <div class="table-responsive overflow-auto" style="max-height: 450px;">
                                                 <table class="table table-striped table-bordered table-sm" id="table-detail">
-                                                    <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color: #ffff">
+                                                    <thead style="position: sticky; top: 0; background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                         <tr style="text-align: center !important;">
                                                             <th>No</th>
                                                             <th style="padding:0; margin:0; border:none; display: none;"></th>
@@ -438,7 +438,7 @@
                                         <div class="tab-pane" id="info-detail" role="tabpanel">
                                             <div class="table-responsive">
                                                 <table class="table w-100 table-sm" id="table-info" data-url=" <?= site_url('mrq/get_info/' . base64url_encode($this->encrypt->encode($data->BUILD_ID))) ?>">
-                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                    <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                         <tr>
                                                             <th></th>
                                                             <th>No</th>
@@ -484,7 +484,7 @@
             <div class="modal-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped table-sm" id="table-item">
-                        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                        <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                             <tr class="text-nowrap">
                                 <th>
                                     <input type="checkbox" name="checkAll" id="checkAll" class="">
@@ -545,7 +545,7 @@
 
 <div id="table-info-detail" class="d-none" data-url="<?= site_url('mrq/get_info_detail/') ?>">
     <table class="table table-sm table-bordered w-100">
-        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+        <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
             <tr class="align-middle">
                 <th width="30">No</th>
                 <th>No Transaksi</th>

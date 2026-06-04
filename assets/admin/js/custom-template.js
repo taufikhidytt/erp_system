@@ -167,6 +167,95 @@ function syncTableHeader(settings) {
         });
 }
 
+function getContrastColor(hexColor) {
+    let hex = hexColor.replace('#', '');
+
+    if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+    return (yiq >= 128) ? '#212529' : '#ffffff';
+}
+
+function hexToRgb(hexColor) {
+    let hex = hexColor.replace('#', '');
+
+    if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return {
+        r: r,
+        g: g,
+        b: b,
+        string: `${r}, ${g}, ${b}`
+    };
+}
+// Fungsi pembantu untuk menggelapkan warna HEX secara dinamis
+function adjustBrightness(hex, percent) {
+    let num = parseInt(hex.replace("#",""), 16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) + amt,
+        G = (num >> 8 & 0x00FF) + amt,
+        B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R<255?R<0?0:R:255)*0x10000 + (G<255?G<0?0:G:255)*0x100 + (B<255?B<0?0:B:255)).toString(16).slice(1);
+}
+
+// Fungsi utama untuk mengatur tema dinamis
+function setDynamicTheme(primaryHex) {
+    // 1. Bersihkan format hex
+    let hex = primaryHex.replace('#', '');
+    if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+
+    // 2. Hitung RGB
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+
+    // 3. Hitung Warna Hover (Dikurangi kecerahannya 12%)
+    const hoverHex = adjustBrightness(hex, -12);
+
+    // 4. Hitung Kontras Teks (YIQ) untuk Primary dan Hover
+    const yiqPrimary = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    const contrastColor = (yiqPrimary >= 128) ? '#212529' : '#ffffff';
+
+    // 5. Suntikkan langsung ke CSS :root HTML
+    const root = document.documentElement;
+    root.style.setProperty('--app-primary', `#${hex}`);
+    root.style.setProperty('--app-primary-hover', hoverHex);
+    root.style.setProperty('--app-primary-contrast', contrastColor);
+    root.style.setProperty('--app-primary-hover-contrast', contrastColor); // Umumnya sama
+    root.style.setProperty('--app-primary-rgb', `${r}, ${g}, ${b}`);
+    root.style.setProperty('--app-primary-th', `#${hex}`);
+}
+
+function deleteAllCookies() {
+    const cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        
+        document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;";
+        document.cookie = name + `=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname};`;
+    }
+    
+    window.location.reload();
+}
+
 $(document).on('keydown', function(e) {
     if (e.which === 32) {
         const focusedCell = $(document).find('.dataTables_wrapper table tbody td.focus');
@@ -272,7 +361,7 @@ AOS.init();
 $(document).ready(function() {
     const baseUrl = config_app.url;
 
-    function setCookie(name, value, days) {
+    window.setCookie = function(name, value, days) {
         let expires = "";
         if (days) {
             let date = new Date();
@@ -299,4 +388,189 @@ $(document).ready(function() {
             $('body').attr('data-theme', 'dark');
         }
     });
+});
+// ===== Settings Drawer Panel =====
+$(function () {
+    const baseUrl  = config_app.url;
+    const $overlay  = $('#settings-panel-overlay');
+    const $panel    = $('#settings-panel');
+    const $backdrop = $('#settings-panel-backdrop');
+    const $openBtn  = $('#settings-panel-btn');
+    const $closeBtn = $('#settings-panel-close');
+
+    function getCookie(name) {
+        const m = document.cookie.match('(?:^|; )' + name + '=([^;]*)');
+        return m ? decodeURIComponent(m[1]) : null;
+    }
+
+    // State sementara (sebelum disimpan)
+    let pending = {
+        theme   : getCookie('app-theme')          || 'light',
+        color   : getCookie('app-primary')        || '#556ee6',
+        lang    : getCookie('app-lang')           || 'id',
+        sidebar : getCookie('app-sidebar-size')   || 'default',
+        density : getCookie('app-table-density')  || 'normal',
+        datetime: getCookie('app-show-datetime')  !== null ? getCookie('app-show-datetime') : '1',
+    };
+
+    // Buka panel
+    $openBtn.on('click', function () {
+        $overlay.addClass('show');
+        setTimeout(() => $panel.addClass('slide-in'), 10);
+    });
+
+    // Tutup panel
+    function close() {
+        $panel.removeClass('slide-in');
+        setTimeout(() => $overlay.removeClass('show'), 220);
+    }
+    $closeBtn.on('click', close);
+    $backdrop.on('click', close);
+    window.spClose = close;
+    window.spReset = function() {
+        swal.fire({
+            title: 'Reset ke Default?',
+            text: 'Semua pengaturan akan dikembalikan ke nilai awal.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Reset!',
+            cancelButtonText: 'Batal',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteAllCookies();
+            }
+        });
+    };
+
+    // --- TEMA ---
+    window.spSetTheme = function (val) {
+        pending.theme = val;
+        $('.sp-theme-preview').removeClass('active');
+        $('#sp-theme-' + val).addClass('active');
+
+        setCookie('app-theme', val, 30);
+        if (val === 'light') {
+            $('#bootstrap-style').attr('href', baseUrl + 'assets/admin/css/bootstrap.min.css');
+            $('#app-style').attr('href', baseUrl + 'assets/admin/css/app.min.css');
+            $('#theme-icon').removeClass('ri-sun-line').addClass('ri-moon-line');
+            $('body').attr('data-theme', 'light');
+        } else {
+            $('#bootstrap-style').attr('href', baseUrl + 'assets/admin/css/bootstrap-dark.min.css');
+            $('#app-style').attr('href', baseUrl + 'assets/admin/css/app-dark.min.css');
+            $('#theme-icon').removeClass('ri-moon-line').addClass('ri-sun-line');
+            $('body').attr('data-theme', 'dark');
+        }
+    };
+
+    // --- WARNA PRIMER (preset swatch) ---
+    window.spSetColor = function (hex) {
+        pending.color = hex;
+        _applyColor(hex);
+        $('.sp-swatch').removeClass('active');
+        $('.sp-swatch[data-color="' + hex + '"]').addClass('active');
+        
+        // update hex input & color picker
+        $('#sp-color-hex-input').val(hex);
+        $('#sp-color-picker').val(hex);
+        
+        // reset custom swatch icon
+        $('#sp-swatch-custom-icon').show();
+        $('#sp-swatch-custom').css('background', '#cccccc');
+
+        setCookie('app-primary', hex, 30);
+    };
+
+    // --- WARNA CUSTOM (dari color picker) ---
+    window.spSetCustomColor = function (hex) {
+        pending.color = hex;
+        _applyColor(hex);
+        $('.sp-swatch').removeClass('active');
+        
+        const $customSwatch = $('#sp-swatch-custom');
+        if ($customSwatch.length) {
+            $customSwatch.css('background', hex).addClass('active');
+        }
+        
+        $('#sp-swatch-custom-icon').hide();
+        $('#sp-color-hex-input').val(hex);
+        $('#sp-color-picker').val(hex);
+
+        setCookie('app-primary', hex, 30);
+    };
+
+    // --- HEX INPUT ---
+    window.spOnHexInput = function (val) {
+        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+            $('.sp-hex-preview').css('background', val);
+        }
+    };
+    window.spOnHexBlur = function (val) {
+        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+            spSetCustomColor(val);
+        } else if (/^#[0-9a-fA-F]{3}$/.test(val)) {
+            // expand 3-digit hex
+            const hex6 = '#' + val[1] + val[1] + val[2] + val[2] + val[3] + val[3];
+            $('#sp-color-hex-input').val(hex6);
+            spSetCustomColor(hex6);
+        }
+    };
+
+    function _applyColor(hex) {
+        setDynamicTheme(hex);
+    }
+
+    // --- TOGGLE DATETIME ---
+    window.spToggleDatetime = function (checked) {
+        pending.datetime = checked ? '1' : '0';
+        if(checked){
+            $('#topbar-datetime').removeClass('d-none');
+        }else{
+            $('#topbar-datetime').addClass('d-none');
+        }
+        setCookie('app-show-datetime', pending.datetime, 30);
+    };
+
+    // --- FULLSCREEN ---
+    window.spToggleFullscreen = function () {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            $('#sp-fs-icon').attr('class', 'ri-fullscreen-exit-line');
+            $('#sp-fs-label').text('Exit Fullscreen');
+        } else {
+            document.exitFullscreen();
+            $('#sp-fs-icon').attr('class', 'ri-fullscreen-line');
+            $('#sp-fs-label').text('Fullscreen');
+        }
+    };
+    
+    $(document).on('fullscreenchange', function () {
+        if (!document.fullscreenElement) {
+            $('#sp-fs-icon').attr('class', 'ri-fullscreen-line');
+            $('#sp-fs-label').text('Fullscreen');
+        }
+    });
+
+    // --- INFORMASI (panggil fungsi existing openSheet) ---
+    window.spOpenInfo = function () {
+        close();
+        if (typeof openSheet === 'function') openSheet();
+    };
+
+    // --- BAHASA ---
+    window.spSetLang = function (code) {
+        pending.lang = code;
+        $('.sp-lang-opt').removeClass('empty active'); // Menjaga class tetap bersih
+        $('.sp-lang-opt[data-lang="' + code + '"]').addClass('active');
+    };
+
+    // --- SIMPAN & RELOAD ---
+    window.spSave = function () {
+        setCookie('app-theme',          pending.theme,    30);
+        setCookie('app-primary',         pending.color,    30);
+        setCookie('app-lang',            pending.lang,     30);
+        setCookie('app-sidebar-size',    pending.sidebar,  30);
+        setCookie('app-table-density',   pending.density,  30);
+        setCookie('app-show-datetime',   pending.datetime, 30);
+        location.reload();
+    };
 });

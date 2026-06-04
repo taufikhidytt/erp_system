@@ -64,6 +64,7 @@ $(document).ready(function () {
             items: [
                 { keys: ['Alt', 'H'],  desc: 'Kembali ke Dashboard' },
                 { keys: ['Alt', 'R'],  desc: 'Reload halaman' },
+                { keys: ['Alt', 'S'],  desc: 'Pengaturan Tampilan' },
                 { keys: ['['],         desc: 'Minimize / maximize sidebar' },
             ]
         },
@@ -525,6 +526,17 @@ $(document).ready(function () {
                 e.preventDefault();
                 window.toggleSheet();
                 break;
+            
+            /* Alt+S → settings panel */
+            case 's':
+                e.preventDefault();
+                showToast('Alt+S  →  Pengaturan Tampilan');
+                if($('#settings-panel-overlay').hasClass('show')){
+                    $('#settings-panel-close').trigger('click');
+                }else{
+                    $('#settings-panel-btn').trigger('click');
+                }
+                break;
 
             /* Alt+N → tambah data baru */
             case 'n':
@@ -558,7 +570,12 @@ $(document).ready(function () {
                 e.preventDefault();
                 showToast('Alt+T  →  Ganti Tema...');
                 setTimeout(function () {
-                    $('#theme-toggle-btn').trigger('click');
+                    if($('body').attr('data-theme') == 'dark'){
+                        $('.sp-theme-opt:first').trigger('click');
+                    }else{
+                        $('.sp-theme-opt:last').trigger('click');
+                    }
+                    
                 }, 300);
                 break;
 

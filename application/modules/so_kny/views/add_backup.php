@@ -283,7 +283,7 @@
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
                                         <table class="table table-striped table-bordered" id="table-detail">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
+                                            <thead style="position: sticky; top: 0; background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                 <tr>
                                                     <th>No</th>
                                                     <th>

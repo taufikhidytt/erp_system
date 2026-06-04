@@ -584,7 +584,7 @@
                                             <button type="button" id="removeRow" class="btn btn-danger btn-sm" style="width: 30px;">-</button>
                                             <div class="table-responsive">
                                                 <table id="tableSatuan" class="table mt-3 w-100 table-sm align-middle">
-                                                    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                                    <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                         <tr>
                                                             <th class="text-center"><input type="checkbox" id="chkAll"></th>
                                                             <th class="text-center">No</th>

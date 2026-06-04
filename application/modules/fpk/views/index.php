@@ -113,7 +113,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th></th>
                                             <th>No</th>
                                             <th>Status</th>
@@ -222,7 +222,7 @@
                 // Open row dengan child row datatable
                 var childTableId = 'child-' + prId;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
-                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                            <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                 <tr class="align-middle">
                                     <th>No</th>
                                     <th>Nama Item</th>

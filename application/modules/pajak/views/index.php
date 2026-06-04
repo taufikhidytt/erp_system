@@ -65,7 +65,7 @@
                                                 </th>
                                             <?php } ?>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th rowspan="2">No</th>
                                             <th rowspan="2">Kode Pajak</th>
                                             <th rowspan="2">Persen</th>
@@ -75,7 +75,7 @@
                                             <th colspan="2" class="text-center">Default</th>
                                             <th rowspan="2">Aktif</th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th>Kode</th>
                                             <th>Nama</th>
                                             <th>Kode</th>

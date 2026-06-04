@@ -109,7 +109,7 @@
                                                 </select>
                                             </th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th></th>
                                             <th>No</th>
                                             <th>Status</th>
@@ -231,7 +231,7 @@
                 // Open row dengan child row datatable
                 var childTableId = 'child-' + bom_id;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
-                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                            <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                 <tr class="align-middle">
                                     <th>No</th>
                                     <th>Nama Item</th>

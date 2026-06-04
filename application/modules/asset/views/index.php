@@ -73,7 +73,7 @@
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="17" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
                                         </tr>
-                                        <tr class="align-middle text-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-middle text-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th rowspan="2">No</th>
                                             <th rowspan="2">Kode Asset</th>
                                             <th rowspan="2">Nama Asset</th>
@@ -94,7 +94,7 @@
                                             <th rowspan="2">Aktif</th>
                                             <th rowspan="2">Note</th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th>Asset</th>
                                             <th>Debet</th>
                                             <th>Kredit</th>

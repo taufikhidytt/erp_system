@@ -264,7 +264,7 @@
                                             </th>
                                             <th></th>
                                         </tr>
-                                        <tr class="align-content-center" style="background: #3d7bb9; z-index: 10; color: #ffff">
+                                        <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th>No</th>
                                             <th>Pesan</th>
                                             <th>Diimport oleh</th>

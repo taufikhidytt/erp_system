@@ -213,7 +213,7 @@
                                     </div>
                                     <div class="table-responsive overflow-auto" style="max-height: 450px;">
                                         <table class="table table-striped table-bordered table-sm" id="table-detail">
-                                            <thead style="position: sticky; top: 0; background: #3d7bb9; z-index: 10; color:#ffff;">
+                                            <thead style="position: sticky; top: 0; background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                                 <tr>
                                                     <th>No</th>
                                                     <th>
@@ -258,7 +258,7 @@
             <div class="modal-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm" id="table-item">
-                        <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                        <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                             <tr class="text-nowrap">
                                 <th></th>
                                 <th></th>
@@ -911,7 +911,7 @@
                 // Open row dengan child row datatable
                 var childTableId = 'child-' + so_id;
                 var childHtml = `<table id="${childTableId}" class="table table-sm table-bordered w-100">
-                            <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+                            <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                 <tr class="align-middle">
                                     <th class="text-center">
                                         <input type="checkbox" name="checkAllChild" id="checkAllChild_${so_id}">

@@ -1,13 +1,32 @@
 <?php
 date_default_timezone_set("Asia/jakarta");
-$logo = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? 'assets/logo/' . $this->session->setup->LOGO_FILENAME : 'assets/logo/logo.png';
-$active_theme = isset($_COOKIE['app-theme']) ? $_COOKIE['app-theme'] : 'light';
-$bs_css = $active_theme !== 'dark' ? 'bootstrap.min.css' : 'bootstrap-dark.min.css';
-$app_css = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
-$date = date('d M Y');
+$logo           = file_exists('./assets/logo/' . $this->session->setup->LOGO_FILENAME) ? 'assets/logo/' . $this->session->setup->LOGO_FILENAME : 'assets/logo/logo.png';
+$active_theme   = isset($_COOKIE['app-theme']) ? $_COOKIE['app-theme'] : 'light';
+$active_lang    = isset($_COOKIE['app-lang']) ? $_COOKIE['app-lang'] : 'id';
+$bs_css         = $active_theme !== 'dark' ? 'bootstrap.min.css' : 'bootstrap-dark.min.css';
+$app_css        = $active_theme !== 'dark' ? 'app.min.css' : 'app-dark.min.css';
+$primary_color  = isset($_COOKIE['app-primary']) ? $_COOKIE['app-primary'] : '#5664d2';
+$th_color       = isset($_COOKIE['app-primary']) ? $_COOKIE['app-primary'] : '#3d7bb9';
+$show_datetime  = isset($_COOKIE['app-show-datetime'])  ? $_COOKIE['app-show-datetime']  : '1';
+$date           = date('d M Y');
+
+$lang_options = [
+    'id' => ['flag' => '🇮🇩', 'label' => 'Indonesia'],
+    'en' => ['flag' => '🇬🇧', 'label' => 'English'],
+];
+$color_presets = [
+    '#556ee6' => 'Indigo',
+    '#34c38f' => 'Hijau',
+    '#f46a6a' => 'Merah',
+    '#f1b44c' => 'Kuning',
+    '#50a5f1' => 'Biru',
+    '#74788d' => 'Abu',
+    '#e83e8c' => 'Pink',
+];
+$is_custom_color = !array_key_exists($primary_color, $color_presets);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= $active_lang ?>">
 <head>
     <meta charset="utf-8" />
     <title><?= $title; ?> | <?= $this->session->setup->NAME; ?></title>
@@ -41,8 +60,9 @@ $date = date('d M Y');
     <link href="<?= base_url() ?>assets/admin/libs/select2/css/select2-bootstrap-5-theme.min.css" rel="stylesheet" type="text/css" />
 
     <link rel="stylesheet" href="<?= base_url() ?>assets/admin/css/aos.css">
-    <link href="<?= base_url() ?>assets/admin/css/custom-template.css" rel="stylesheet" type="text/css" />
-    <link href="<?= base_url() ?>assets/admin/css/custom-dark.css" id="custom-dark-style" rel="stylesheet" type="text/css" />
+    <?= generateDynamicTheme($primary_color, $th_color); ?>
+    <link href="<?= base_url() ?>assets/admin/css/custom-template.css?v=1.6" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/css/custom-dark.css?v=1.6" id="custom-dark-style" rel="stylesheet" type="text/css" />
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
     <script>
@@ -51,8 +71,8 @@ $date = date('d M Y');
             url: '<?= site_url() ?>'
         }
     </script>
-    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.2"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.14"></script>
+    <script src="<?= base_url() ?>assets/admin/js/input_number.js?v=1.6"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom.js?v=1.6"></script>
 </head>
 
 <body data-sidebar="dark" data-theme="<?= $active_theme ?>" data-update="<?= $access['update'] ?? false ?>">
@@ -97,23 +117,14 @@ $date = date('d M Y');
                 </div>
 
                 <div class="d-flex">
-                    <div class="text-center" style="font-size: 12px; letter-spacing: 5px; margin: 20px 20px 0px 0px;">
+                    <div class="text-center<?= $show_datetime === '0' ? ' d-none' : '' ?>" id="topbar-datetime" style="font-size: 12px; letter-spacing: 5px; margin: 20px 20px 0px 0px;">
                         <div><?= $date ?></div>
                         <div id="jam"></div>
                     </div>
+
                     <div class="dropdown d-inline-block d-lg-inline-block ms-1">
-                        <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen" aria-label="Fullscreen">
-                            <i class="ri-fullscreen-line"></i>
-                        </button>
-                    </div>
-                    <div class="dropdown d-inline-block d-lg-inline-block ms-1">
-                        <button type="button" class="btn header-item noti-icon waves-effect" id="theme-toggle-btn" title="Switch Theme" aria-label="Switch Theme">
-                            <i class="<?= $active_theme === 'light' ? 'ri-moon-line' : 'ri-sun-line' ?>" id="theme-icon"></i>
-                        </button>
-                    </div>
-                    <div class="dropdown d-inline-block d-lg-inline-block ms-1 d-none">
-                        <button type="button" class="btn header-item noti-icon waves-effect" onclick="openSheet()" aria-label="Open Sheet">
-                            <i class="ri-information-line"></i>
+                        <button type="button" class="btn header-item noti-icon waves-effect" id="settings-panel-btn" title="Pengaturan Tampilan">
+                            <i class="ri-settings-3-line"></i>
                         </button>
                     </div>
 
@@ -149,6 +160,122 @@ $date = date('d M Y');
             </div>
         </header>
 
+        <!-- ===== Settings Drawer Panel ===== -->
+        <div id="settings-panel-overlay">
+            <div id="settings-panel-backdrop"></div>
+            <div id="settings-panel">
+                <div class="sp-header">
+                    <p class="sp-title"><i class="ri-settings-3-line me-1"></i> Pengaturan Tampilan</p>
+                    <button class="sp-close" id="settings-panel-close" aria-label="Tutup">&times;</button>
+                </div>
+                <div class="sp-body">
+
+                    <!-- Tema -->
+                    <div class="sp-section">
+                        <div class="sp-section-label">Tema</div>
+                        <div class="sp-theme-row">
+                            <div class="sp-theme-opt" onclick="spSetTheme('light')">
+                                <div class="sp-theme-preview light <?= $active_theme === 'light' ? 'active' : '' ?>" id="sp-theme-light">
+                                    <div class="tp-top"></div><div class="tp-bottom"></div>
+                                </div>
+                                <span class="sp-theme-name">Terang</span>
+                            </div>
+                            <div class="sp-theme-opt" onclick="spSetTheme('dark')">
+                                <div class="sp-theme-preview dark <?= $active_theme === 'dark' ? 'active' : '' ?>" id="sp-theme-dark">
+                                    <div class="tp-top"></div><div class="tp-bottom"></div>
+                                </div>
+                                <span class="sp-theme-name">Gelap</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warna Primer -->
+                    <div class="sp-section">
+                        <div class="sp-section-label">Warna Primer</div>
+                        <div class="sp-color-row">
+                            <?php foreach ($color_presets as $hex => $name): ?>
+                            <div class="sp-swatch <?= (!$is_custom_color && $primary_color === $hex) ? 'active' : '' ?>"
+                                    style="background: <?= $hex ?>;"
+                                    data-color="<?= $hex ?>"
+                                    title="<?= $name ?>"
+                                    onclick="spSetColor('<?= $hex ?>')">
+                            </div>
+                            <?php endforeach; ?>
+                            <!-- Custom color swatch -->
+                            <div class="sp-swatch sp-swatch-custom <?= $is_custom_color ? 'active' : '' ?>"
+                                    id="sp-swatch-custom"
+                                    style="background: <?= $is_custom_color ? $primary_color : '#cccccc' ?>;"
+                                    title="Warna Custom"
+                                    onclick="document.getElementById('sp-color-picker').click()">
+                                <i class="ri-add-line" id="sp-swatch-custom-icon" style="font-size:14px; line-height:22px; display:<?= $is_custom_color ? 'none' : 'block' ?>;"></i>
+                            </div>
+                            <input type="color" id="sp-color-picker"
+                                    value="<?= $is_custom_color ? $primary_color : '#556ee6' ?>"
+                                    style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+                                    oninput="spSetCustomColor(this.value)"
+                                    onchange="spSetCustomColor(this.value)">
+                        </div>
+                        <div class="sp-color-hex-row">
+                            <span class="sp-color-hex-label">Hex:</span>
+                            <div class="sp-hex-preview"></div>
+                            <input type="text" id="sp-color-hex-input" maxlength="7"
+                                    value="<?= htmlspecialchars($primary_color) ?>"
+                                    placeholder="#556ee6"
+                                    oninput="spOnHexInput(this.value)"
+                                    onblur="spOnHexBlur(this.value)" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Shortcut / Quick Actions -->
+                    <div class="sp-section">
+                        <div class="sp-section-label">Aksi Cepat</div>
+                        <div class="sp-quick-actions">
+                            <button class="sp-quick-btn" onclick="spToggleFullscreen()">
+                                <i class="ri-fullscreen-line" id="sp-fs-icon"></i>
+                                <span id="sp-fs-label">Fullscreen</span>
+                            </button>
+                            <button class="sp-quick-btn" onclick="spOpenInfo()">
+                                <i class="ri-information-line"></i>
+                                <span>Informasi</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tampilan Topbar -->
+                    <div class="sp-section">
+                        <div class="sp-section-label">Tampilan Topbar</div>
+                        <div class="sp-toggle-row">
+                            <span class="sp-toggle-label"><i class="ri-time-line me-1"></i> Tampilkan Tanggal &amp; Jam</span>
+                            <label class="sp-toggle-switch">
+                                <input type="checkbox" id="sp-toggle-datetime" <?= $show_datetime === '1' ? 'checked' : '' ?> onchange="spToggleDatetime(this.checked)">
+                                <span class="sp-toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Bahasa -->
+                    <div class="sp-section d-none">
+                        <div class="sp-section-label">Bahasa / Language</div>
+                        <div class="sp-lang-grid">
+                            <?php foreach ($lang_options as $code => $opt): ?>
+                            <button class="sp-lang-opt <?= $active_lang === $code ? 'active' : '' ?>"
+                                    data-lang="<?= $code ?>"
+                                    onclick="spSetLang('<?= $code ?>')">
+                                <span class="sp-flag"><?= $opt['flag'] ?></span>
+                                <span><?= $opt['label'] ?></span>
+                            </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="sp-footer">
+                    <button class="sp-btn" onclick="spClose()">Batal</button>
+                    <button class="sp-btn danger" onclick="spReset()">Reset</button>
+                </div>
+            </div>
+        </div>
+        <!-- ===== End Settings Drawer Panel ===== -->
 
         <!-- ========== Left Sidebar Start ========== -->
         <div class="vertical-menu">
@@ -296,8 +423,8 @@ $date = date('d M Y');
     <script>
         AOS.init();
     </script>
-    <script src="<?= base_url() ?>assets/admin/js/shortcut.js?v=1.0"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=1.0"></script>
+    <script src="<?= base_url() ?>assets/admin/js/shortcut.js?v=1.6"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=1.6"></script>
 </body>
 
 </html>

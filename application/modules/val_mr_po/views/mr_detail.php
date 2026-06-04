@@ -1,5 +1,5 @@
 <table class="table table-sm table-bordered w-100 no-footer table-sm" role="grid">
-    <thead style="background: #3d7bb9; z-index: 10; color: #ffff">
+    <thead style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
         <tr>
             <th class="text-center">No</th>
             <th>Nama Item</th>
