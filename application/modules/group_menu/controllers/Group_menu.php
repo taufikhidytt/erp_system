@@ -14,8 +14,8 @@ class Group_menu extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'Group Menu';
-            $data['breadcrumb'] = 'Group Menu';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'group_menu/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

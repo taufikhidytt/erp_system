@@ -14,8 +14,8 @@ class Rho extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'RHO';
-            $data['breadcrumb'] = 'RHO';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'rho/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -78,6 +78,7 @@ class Rho extends Back_Controller
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
                     "jumlah"    => numb_format((float)$d->Qty),
+                    "terima"    => numb_format((float)$d->Terima),
                     "sisa"      => numb_format((float)$d->Sisa),
                     "satuan"    => $d->UoM,
                     "no_rcv"    => $d->No_RCV,
@@ -193,8 +194,8 @@ class Rho extends Back_Controller
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah RHO';
-                $data['breadcrumb'] = 'Tambah RHO';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['site_storage'] = $this->rho->get_site_storage();
                 $data['main_storage'] = $this->rho->get_main_storage();
                 $data['detail'] = $this->input->post('detail');

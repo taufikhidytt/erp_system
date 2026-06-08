@@ -9,182 +9,69 @@ class Out_kny_model extends CI_Model
         setVariableMysql();
     }
 
-    var $column_order = array(
-        null,
-        "a.DOCUMENT_DATE",
-        "bd.DOCUMENT_NO",
-        "bd.DOCUMENT_REFF_NO",
-        "W.WAREHOUSE_NAME",
-        "supplier",
-        "COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)",
-        "i.ITEM_CODE",
-        "b.ENTERED_QTY",
-        "QTY_PO",
-        "QTY_SISA",
-        "b.ENTERED_UOM",
-    );
-
-    var $column_search = array(
-        null,
-        "a.DOCUMENT_DATE",
-        "bd.DOCUMENT_NO",
-        "bd.DOCUMENT_REFF_NO",
-        "W.WAREHOUSE_NAME",
-        "CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE)",
-        "COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)",
-        "i.ITEM_CODE",
-        "b.ENTERED_QTY",
-        "b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)",
-        "b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0))",
-        "b.ENTERED_UOM",
-    );
-
-    var $order = array('a.DOCUMENT_DATE' => 'ASC');
-
-    private function _get_datatables_query()
+    public function get_detail_by_pr_id($pr_id, $limit = null, $start = null)
     {
         $this->db->select("
-            b.INVENTORY_IN_DETAIL_ID,
-            b.INVENTORY_IN_ID,
-            b.BUILD_DETAIL_ID,
-            a.DOCUMENT_TYPE_ID,
-            a.STATUS_ID,
-            FN_GET_VAR_NAME(a.STATUS_ID) AS STATUS_NAME,
-            a.DOCUMENT_DATE,
-            bd.DOCUMENT_NO,
-            bd.DOCUMENT_REFF_NO,
-            p.PERSON_ID,
-            p.PERSON_CODE,
-            p.PERSON_NAME,
-            CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE) as supplier,
-            a.WAREHOUSE_ID,
-            w.WAREHOUSE_NAME,
-            i.ITEM_ID,
-            i.ITEM_CODE,
-            COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
-            b.ENTERED_QTY AS QTY_MR,
-            b.BASE_QTY,
-            b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0) AS QTY_PO,
-            b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)) AS QTY_SISA,
-            b.ENTERED_UOM,
-            b.UNIT_PRICE,
-            b.SUBTOTAL,
-            b.HARGA_INPUT,
-            i.LEAD_TIME,
-            i.BERAT,
-            b.NOTE
-        ", false);
-        $this->db->from('inventory_in a');
-        $this->db->join('inventory_in_detail b', 'a.INVENTORY_IN_ID = b.INVENTORY_IN_ID');
-        $this->db->join('item i', 'b.ITEM_ID = i.ITEM_ID');
-        $this->db->join('warehouse w', 'b.WAREHOUSE_ID = w.WAREHOUSE_ID');
-        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
-        $this->db->join('build_detail bdl', 'b.BUILD_DETAIL_ID = bdl.BUILD_DETAIL_ID');
-        $this->db->join('build bd', 'bdl.BUILD_ID = bd.BUILD_ID');
-        $this->db->where('(b.ENTERED_QTY * b.BASE_QTY) > 0', null, false);
-        $this->db->where('(b.INVOICE_ENTERED_QTY * b.INVOICE_BASE_QTY) < (b.ENTERED_QTY * b.BASE_QTY)', null, false);
-        $this->db->where("a.STATUS_ID IN (FN_GET_VAR_VALUE('NEW'), FN_GET_VAR_VALUE('PARTIAL'))", null, false);
-        $this->db->where('bd.DOCUMENT_TYPE_ID', 3);
+            pd.PR_ID,
+            pd.PR_DETAIL_ID,
+            COALESCE(
+                i.PART_NUMBER,
+                i.ITEM_DESCRIPTION
+            ) Nama_Item,
+            i.ITEM_CODE Kode_Item,
+            pd.ENTERED_QTY Jumlah,
+            pd.RECEIVED_ENTERED_QTY / NULLIF(pd.BASE_QTY, 0) Terima,
+            pd.ENTERED_QTY - (
+                pd.RECEIVED_ENTERED_QTY / NULLIF(pd.BASE_QTY, 0)
+            ) Sisa,
+            pd.ENTERED_UOM UoM,
+            pd.HARGA_INPUT Harga,
+            pd.SUBTOTAL Subtotal,
+            pd.NOTE Note
+        ");
+        $this->db->from("pr_detail pd");
+        $this->db->join('item i', 'pd.ITEM_ID = i.ITEM_ID');
+        $this->db->where('pd.PR_ID', $pr_id);
 
-        $i = 0;
-        foreach ($this->column_search as $item) {
-            $global_search_value = $this->input->post('search')['value'] ?? '';
-            $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
+        if ($limit !== null && $start !== null) {
+            $this->db->limit($limit, $start);
+        }
 
-            if ($column_search_value != '') {
-                $this->db->like($item, $column_search_value);
-            } elseif ($global_search_value != '') {
-                if ($i === 0) {
-                    $this->db->group_start();
-                    $this->db->like($item, $global_search_value);
-                } else {
-                    $this->db->or_like($item, $global_search_value);
-                }
-                if (count($this->column_search) - 1 == $i) $this->db->group_end();
+        return $this->db->get();
+    }
+
+    public function count_detail_by_pr_id($pr_id)
+    {
+        $this->db->where('PR_ID', $pr_id);
+        return $this->db->count_all_results('pr_detail');
+    }
+
+    public function getSupplier()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("a.PERSON_ID as id, a.PERSON_NAME Supplier, a.PERSON_CODE Kode, CONCAT('[',a.PERSON_CODE,'] - ',a.PERSON_NAME) as text")
+            ->from('person a')
+            ->join('person_site b', 'a.PERSON_ID = b.PERSON_ID')
+            ->where('a.FLAG_SUPP', 1)
+            ->group_by('a.PERSON_ID')
+            ->order_by('a.PERSON_NAME');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->group_end();
             }
-            $i++;
+            $this->db->limit(50);
         }
 
-        if (isset($_POST['order'])) {
-            $this->db->order_by(
-                $this->column_order[$_POST['order']['0']['column']],
-                $_POST['order']['0']['dir']
-            );
-        } elseif (isset($this->order)) {
-            $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
-        }
-    }
-
-    function get_datatables()
-    {
-        $this->_get_datatables_query();
-        if ($_POST['length'] != -1)
-            $this->db->limit(
-                $_POST['length'],
-                $_POST['start']
-            );
-        $query = $this->db->get();
-        return $query->result();
-    }
-
-    function count_filtered()
-    {
-        $this->_get_datatables_query();
-        $query = $this->db->get();
-        return $query->num_rows();
-    }
-
-    function count_all()
-    {
-        $this->db->select("
-            b.INVENTORY_IN_DETAIL_ID,
-            b.INVENTORY_IN_ID,
-            b.BUILD_DETAIL_ID,
-            a.DOCUMENT_TYPE_ID,
-            a.STATUS_ID,
-            FN_GET_VAR_NAME(a.STATUS_ID) AS STATUS_NAME,
-            a.DOCUMENT_DATE,
-            bd.DOCUMENT_NO,
-            bd.DOCUMENT_REFF_NO,
-            p.PERSON_ID,
-            p.PERSON_CODE,
-            p.PERSON_NAME,
-            CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE) as supplier,
-            a.WAREHOUSE_ID,
-            w.WAREHOUSE_NAME,
-            i.ITEM_ID,
-            i.ITEM_CODE,
-            COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
-            b.ENTERED_QTY AS QTY_MR,
-            b.BASE_QTY,
-            b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0) AS QTY_PO,
-            b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)) AS QTY_SISA,
-            b.ENTERED_UOM,
-            b.UNIT_PRICE,
-            b.SUBTOTAL,
-            b.HARGA_INPUT,
-            i.LEAD_TIME,
-            i.BERAT,
-            b.NOTE
-        ", false);
-        $this->db->from('inventory_in a');
-        $this->db->join('inventory_in_detail b', 'a.INVENTORY_IN_ID = b.INVENTORY_IN_ID');
-        $this->db->join('item i', 'b.ITEM_ID = i.ITEM_ID');
-        $this->db->join('warehouse w', 'b.WAREHOUSE_ID = w.WAREHOUSE_ID');
-        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
-        $this->db->join('build_detail bdl', 'b.BUILD_DETAIL_ID = bdl.BUILD_DETAIL_ID');
-        $this->db->join('build bd', 'bdl.BUILD_ID = bd.BUILD_ID');
-        $this->db->where('(b.ENTERED_QTY * b.BASE_QTY) > 0', null, false);
-        $this->db->where('(b.INVOICE_ENTERED_QTY * b.INVOICE_BASE_QTY) < (b.ENTERED_QTY * b.BASE_QTY)', null, false);
-        $this->db->where("a.STATUS_ID IN (FN_GET_VAR_VALUE('NEW'), FN_GET_VAR_VALUE('PARTIAL'))", null, false);
-        $this->db->where('bd.DOCUMENT_TYPE_ID', 3);
-        return $this->db->count_all_results();
-    }
-
-    public function get_datatables_export()
-    {
-        $this->_get_datatables_query();
-        return $this->db->get()->result();
+        return $this->db->get();
     }
 }

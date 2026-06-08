@@ -41,6 +41,38 @@ class Out_so_model extends CI_Model
 
     var $order = array('tmp.DOCUMENT_DATE' => 'DESC');
 
+    var $column_order_mr_po = array(
+        null,
+        "a.DOCUMENT_DATE",
+        "bd.DOCUMENT_NO",
+        "bd.DOCUMENT_REFF_NO",
+        "W.WAREHOUSE_NAME",
+        "supplier",
+        "COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)",
+        "i.ITEM_CODE",
+        "b.ENTERED_QTY",
+        "QTY_PO",
+        "QTY_SISA",
+        "b.ENTERED_UOM",
+    );
+
+    var $column_search_mr_po = array(
+        null,
+        "a.DOCUMENT_DATE",
+        "bd.DOCUMENT_NO",
+        "bd.DOCUMENT_REFF_NO",
+        "W.WAREHOUSE_NAME",
+        "CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE)",
+        "COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION)",
+        "i.ITEM_CODE",
+        "b.ENTERED_QTY",
+        "b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)",
+        "b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0))",
+        "b.ENTERED_UOM",
+    );
+
+    var $order_mr_po = array('a.DOCUMENT_DATE' => 'ASC');
+
     private function _get_datatables_query($count = false, $export = false)
     {
         // --- SUBQUERY 1: Data dari build (header) yang memiliki ITEM_ID ---
@@ -226,5 +258,152 @@ class Out_so_model extends CI_Model
     {
         $sql = $this->_get_datatables_query(false, true);
         return $this->db->query($sql)->result();
+    }
+
+    private function _get_datatables_query_mr_po()
+    {
+        $this->db->select("
+            b.INVENTORY_IN_DETAIL_ID,
+            b.INVENTORY_IN_ID,
+            b.BUILD_DETAIL_ID,
+            a.DOCUMENT_TYPE_ID,
+            a.STATUS_ID,
+            FN_GET_VAR_NAME(a.STATUS_ID) AS STATUS_NAME,
+            a.DOCUMENT_DATE,
+            bd.DOCUMENT_NO,
+            bd.DOCUMENT_REFF_NO,
+            p.PERSON_ID,
+            p.PERSON_CODE,
+            p.PERSON_NAME,
+            CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE) as supplier,
+            a.WAREHOUSE_ID,
+            w.WAREHOUSE_NAME,
+            i.ITEM_ID,
+            i.ITEM_CODE,
+            COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
+            b.ENTERED_QTY AS QTY_MR,
+            b.BASE_QTY,
+            b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0) AS QTY_PO,
+            b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)) AS QTY_SISA,
+            b.ENTERED_UOM,
+            b.UNIT_PRICE,
+            b.SUBTOTAL,
+            b.HARGA_INPUT,
+            i.LEAD_TIME,
+            i.BERAT,
+            b.NOTE
+        ", false);
+        $this->db->from('inventory_in a');
+        $this->db->join('inventory_in_detail b', 'a.INVENTORY_IN_ID = b.INVENTORY_IN_ID');
+        $this->db->join('item i', 'b.ITEM_ID = i.ITEM_ID');
+        $this->db->join('warehouse w', 'b.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('build_detail bdl', 'b.BUILD_DETAIL_ID = bdl.BUILD_DETAIL_ID');
+        $this->db->join('build bd', 'bdl.BUILD_ID = bd.BUILD_ID');
+        $this->db->where('(b.ENTERED_QTY * b.BASE_QTY) > 0', null, false);
+        $this->db->where('(b.INVOICE_ENTERED_QTY * b.INVOICE_BASE_QTY) < (b.ENTERED_QTY * b.BASE_QTY)', null, false);
+        $this->db->where("a.STATUS_ID IN (FN_GET_VAR_VALUE('NEW'), FN_GET_VAR_VALUE('PARTIAL'))", null, false);
+        $this->db->where('bd.DOCUMENT_TYPE_ID', 3);
+
+        $i = 0;
+        foreach ($this->column_search_mr_po as $item) {
+            $global_search_value = $this->input->post('search')['value'] ?? '';
+            $column_search_value = $this->input->post('columns')[$i]['search']['value'] ?? '';
+
+            if ($column_search_value != '') {
+                $this->db->like($item, $column_search_value);
+            } elseif ($global_search_value != '') {
+                if ($i === 0) {
+                    $this->db->group_start();
+                    $this->db->like($item, $global_search_value);
+                } else {
+                    $this->db->or_like($item, $global_search_value);
+                }
+                if (count($this->column_search_mr_po) - 1 == $i) $this->db->group_end();
+            }
+            $i++;
+        }
+
+        if (isset($_POST['order'])) {
+            $this->db->order_by(
+                $this->column_order_mr_po[$_POST['order']['0']['column']],
+                $_POST['order']['0']['dir']
+            );
+        } elseif (isset($this->order_mr_po)) {
+            $order = $this->order_mr_po;
+            $this->db->order_by(key($order), $order[key($order)]);
+        }
+    }
+
+    function get_datatables_mr_po()
+    {
+        $this->_get_datatables_query_mr_po();
+        if ($_POST['length'] != -1)
+            $this->db->limit(
+                $_POST['length'],
+                $_POST['start']
+            );
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    function count_filtered_mr_po()
+    {
+        $this->_get_datatables_query_mr_po();
+        $query = $this->db->get();
+        return $query->num_rows();
+    }
+
+    function count_all_mr_po()
+    {
+        $this->db->select("
+            b.INVENTORY_IN_DETAIL_ID,
+            b.INVENTORY_IN_ID,
+            b.BUILD_DETAIL_ID,
+            a.DOCUMENT_TYPE_ID,
+            a.STATUS_ID,
+            FN_GET_VAR_NAME(a.STATUS_ID) AS STATUS_NAME,
+            a.DOCUMENT_DATE,
+            bd.DOCUMENT_NO,
+            bd.DOCUMENT_REFF_NO,
+            p.PERSON_ID,
+            p.PERSON_CODE,
+            p.PERSON_NAME,
+            CONCAT(p.PERSON_NAME, ' ', p.PERSON_CODE) as supplier,
+            a.WAREHOUSE_ID,
+            w.WAREHOUSE_NAME,
+            i.ITEM_ID,
+            i.ITEM_CODE,
+            COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS ITEM_DESCRIPTION,
+            b.ENTERED_QTY AS QTY_MR,
+            b.BASE_QTY,
+            b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0) AS QTY_PO,
+            b.ENTERED_QTY - (b.INVOICE_ENTERED_QTY / NULLIF(b.BASE_QTY,0)) AS QTY_SISA,
+            b.ENTERED_UOM,
+            b.UNIT_PRICE,
+            b.SUBTOTAL,
+            b.HARGA_INPUT,
+            i.LEAD_TIME,
+            i.BERAT,
+            b.NOTE
+        ", false);
+        $this->db->from('inventory_in a');
+        $this->db->join('inventory_in_detail b', 'a.INVENTORY_IN_ID = b.INVENTORY_IN_ID');
+        $this->db->join('item i', 'b.ITEM_ID = i.ITEM_ID');
+        $this->db->join('warehouse w', 'b.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('build_detail bdl', 'b.BUILD_DETAIL_ID = bdl.BUILD_DETAIL_ID');
+        $this->db->join('build bd', 'bdl.BUILD_ID = bd.BUILD_ID');
+        $this->db->where('(b.ENTERED_QTY * b.BASE_QTY) > 0', null, false);
+        $this->db->where('(b.INVOICE_ENTERED_QTY * b.INVOICE_BASE_QTY) < (b.ENTERED_QTY * b.BASE_QTY)', null, false);
+        $this->db->where("a.STATUS_ID IN (FN_GET_VAR_VALUE('NEW'), FN_GET_VAR_VALUE('PARTIAL'))", null, false);
+        $this->db->where('bd.DOCUMENT_TYPE_ID', 3);
+        return $this->db->count_all_results();
+    }
+
+    public function get_datatables_export_mr_po()
+    {
+        $this->_get_datatables_query_mr_po();
+        return $this->db->get()->result();
     }
 }

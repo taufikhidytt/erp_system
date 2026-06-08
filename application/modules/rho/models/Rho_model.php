@@ -129,15 +129,8 @@ class Rho_model extends CI_Model
             COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION) AS Nama_Item,
             i.ITEM_CODE Kode_Item,
             rqd.ENTERED_QTY Qty,
-            IF(
-                rqd.ENTERED_UOM = i.UOM_CODE,
-                (
-                    rqd.ENTERED_QTY * rqd.BASE_QTY - rqd.DELIVER_QTY * rqd.DELIVER_BASE_QTY
-                ),
-                (
-                    rqd.ENTERED_QTY - (rqd.DELIVER_QTY / rqd.BASE_QTY)
-                )
-            ) Sisa,
+            rqd.DELIVER_QTY / NULLIF(rqd.BASE_QTY, 0) Terima,
+            rqd.ENTERED_QTY - ( rqd.DELIVER_QTY / NULLIF(rqd.BASE_QTY, 0) ) Sisa,
             rqd.ENTERED_UOM UoM,
             tag.DOCUMENT_NO No_RCV,
             rqd.NOTE Note,

@@ -14,8 +14,8 @@ class Po_kny extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'PO KNY';
-            $data['breadcrumb'] = 'PO KNY';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'po_kny/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -300,8 +300,8 @@ class Po_kny extends Back_Controller
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah PO KNY';
-                $data['breadcrumb'] = 'Tambah PO KNY';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['supplier'] = $this->po_kny->get_supplier();
                 $data['storage'] = $this->po_kny->get_storage();
                 $data['payment_term'] = $this->po_kny->get_payment_term();

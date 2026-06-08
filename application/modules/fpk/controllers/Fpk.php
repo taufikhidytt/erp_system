@@ -13,8 +13,8 @@ class Fpk extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'FPK';
-            $data['breadcrumb'] = 'FPK';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'fpk/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -81,6 +81,7 @@ class Fpk extends Back_Controller
                     "item_code" => $d->ITEM_CODE,
                     "entered_uom" => $d->ENTERED_UOM,
                     "qty"       => numb_format((float)$d->QTY),
+                    "terima"    => numb_format((float)$d->Terima),
                     "sisa"       => numb_format((float)$d->Sisa),
                     "price"     => numb_format($d->PRICE),
                     "total"     => numb_format($d->TOTAL),
@@ -248,8 +249,8 @@ class Fpk extends Back_Controller
             $this->form_validation->set_rules('sales', 'sales', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah FPK';
-                $data['breadcrumb'] = 'Tambah FPK';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['supplier'] = $this->fpk->getSupplier();
                 $data['gudang'] = $this->fpk->getGudang();
                 $data['sales'] = $this->fpk->getSales();

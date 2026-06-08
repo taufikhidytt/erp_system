@@ -153,7 +153,8 @@ class Grk_model extends CI_Model
             pd.NOTE Note,
             pd.PO_DETAIL_ID,
             pd.PR_DETAIL_ID,
-            IF(pd.ENTERED_UOM = i.UOM_CODE,(pd.ENTERED_QTY * pd.BASE_QTY - pd.RECEIVED_ENTERED_QTY * pd.RECEIVED_BASE_QTY),(pd.ENTERED_QTY - (pd.RECEIVED_ENTERED_QTY / pd.BASE_QTY))) AS Sisa
+            pd.RECEIVED_ENTERED_QTY / NULLIF(pd.BASE_QTY, 0) Terima,
+            (pd.ENTERED_QTY - (pd.RECEIVED_ENTERED_QTY / NULLIF(pd.BASE_QTY, 0)) ) AS Sisa
         ");
         $this->db->from("po_detail pd");
         $this->db->join("item i", "pd.ITEM_ID = i.ITEM_ID");

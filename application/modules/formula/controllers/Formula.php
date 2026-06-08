@@ -14,8 +14,8 @@ class Formula extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'Formula';
-            $data['breadcrumb'] = 'Formula';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'formula/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

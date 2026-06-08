@@ -56,7 +56,7 @@
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item">
-                                <a href="<?= base_url('do_kny') ?>" class="text-decoration-underline">DO KNY</a>
+                                <a href="<?= base_url('do_kny') ?>" class="text-decoration-underline"><?= $access['PROMPT'] ?></a>
                             </li>
                             <li class="breadcrumb-item active text-decoration-underline"><?= $breadcrumb ?></li>
                         </ol>

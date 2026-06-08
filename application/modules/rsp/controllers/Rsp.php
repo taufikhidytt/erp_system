@@ -14,8 +14,8 @@ class Rsp extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'RSP';
-            $data['breadcrumb'] = 'RSP';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'rsp/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -271,8 +271,8 @@ class Rsp extends Back_Controller
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah RSP';
-                $data['breadcrumb'] = 'Tambah RSP';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['main_storage'] = $this->rsp->get_main_storage();
                 $data['supplier'] = $this->rsp->get_supplier();
                 $data['detail'] = $this->input->post('detail');

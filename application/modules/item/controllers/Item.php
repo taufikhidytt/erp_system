@@ -13,8 +13,8 @@ class Item extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'Item';
-            $data['breadcrumb'] = 'Item';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'item/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

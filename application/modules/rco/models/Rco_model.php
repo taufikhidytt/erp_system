@@ -129,17 +129,8 @@ class Rco_model extends CI_Model
             COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             td.ENTERED_QTY Qty,
-            IF(
-                td.ENTERED_UOM = i.UOM_CODE,
-                (
-                    td.ENTERED_QTY * td.BASE_QTY - td.DELIVERED_ENTERED_QTY * td.DELIVERED_BASE_QTY
-                ),
-                (
-                    td.ENTERED_QTY - (
-                        td.DELIVERED_ENTERED_QTY / td.BASE_QTY
-                    )
-                )
-            ) Sisa,
+            td.DELIVERED_ENTERED_QTY / NULLIF(td.BASE_QTY, 0) Terima,
+            td.ENTERED_QTY - ( td.DELIVERED_ENTERED_QTY / NULLIF(td.BASE_QTY, 0) ) Sisa,
             td.ENTERED_UOM UoM,
             tk.DOCUMENT_NO No_RHO,
             td.NOTE Note,

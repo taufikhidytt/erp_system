@@ -13,8 +13,8 @@ class Sts extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'STS';
-            $data['breadcrumb'] = 'STS';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'sts/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -77,7 +77,8 @@ class Sts extends Back_Controller
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
                     "qty"       => numb_format((float)$d->Qty),
-                    "sisa"       => numb_format((float)$d->Sisa),
+                    "terima"    => numb_format((float)$d->Terima),
+                    "sisa"      => numb_format((float)$d->Sisa),
                     "uom"       => $d->UoM,
                     "no_fpk"    => $d->No_FPK,
                     "note"      => $d->Note,
@@ -253,8 +254,8 @@ class Sts extends Back_Controller
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah STS';
-                $data['breadcrumb'] = 'Tambah STS';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['main_storage'] = $this->sts->get_main_storage();
                 $data['site_storage'] = $this->sts->get_site_storage();
                 $data['detail'] = $this->input->post('detail');

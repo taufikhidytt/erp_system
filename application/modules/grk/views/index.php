@@ -201,6 +201,7 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>Kirim / Retur</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
                                     <th>Harga</th>
@@ -246,6 +247,13 @@
                         },
                         {
                             "data": "qty",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "terima",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

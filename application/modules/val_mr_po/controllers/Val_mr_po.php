@@ -15,8 +15,8 @@ class Val_mr_po extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'Validasi MR VS PO';
-            $data['breadcrumb'] = 'Validasi MR VS PO';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'val_mr_po/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

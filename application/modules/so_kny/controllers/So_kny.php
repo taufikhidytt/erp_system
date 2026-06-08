@@ -14,8 +14,8 @@ class So_kny extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'SO KNY';
-            $data['breadcrumb'] = 'SO KNY';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'so_kny/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -355,8 +355,8 @@ class So_kny extends Back_Controller
             $this->form_validation->set_rules('po_customer', 'po customer', 'trim|required|callback_check_po_customer');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah SO KNY';
-                $data['breadcrumb'] = 'Tambah SO KNY';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['customer'] = $this->so_kny->get_customer();
                 $data['storage'] = $this->so_kny->get_storage();
                 $data['sales'] = $this->so_kny->get_sales();

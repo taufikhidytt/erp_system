@@ -14,8 +14,8 @@ class Rco extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'RCO';
-            $data['breadcrumb'] = 'RCO';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'rco/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -78,6 +78,7 @@ class Rco extends Back_Controller
                     "nama_item" => $d->Nama_Item,
                     "kode_item" => $d->Kode_Item,
                     "jumlah"    => numb_format((float)$d->Qty),
+                    "terima"    => numb_format((float)$d->Terima),
                     "sisa"      => numb_format((float)$d->Sisa),
                     "satuan"    => $d->UoM,
                     "no_rho"    => $d->No_RHO,
@@ -208,8 +209,8 @@ class Rco extends Back_Controller
             $this->form_validation->set_rules('tanggal', 'tanggal', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah RCO';
-                $data['breadcrumb'] = 'Tambah RCO';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['main_storage'] = $this->rco->get_main_storage();
                 $data['site_storage'] = $this->rco->get_site_storage();
                 $data['detail'] = $this->input->post('detail');

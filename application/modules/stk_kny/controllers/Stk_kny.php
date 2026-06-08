@@ -14,8 +14,8 @@ class Stk_kny extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'Info Stok Konsinyasi';
-            $data['breadcrumb'] = 'Info Stok Konsinyasi';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $data['gudang'] = $this->stk_kny->getGudang();
             $data['period'] = $this->stk_kny->getPeriod();
             $this->template->load('template', 'stk_kny/index', $data);

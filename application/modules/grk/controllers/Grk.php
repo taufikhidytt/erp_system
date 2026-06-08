@@ -13,8 +13,8 @@ class Grk extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'GRK';
-            $data['breadcrumb'] = 'GRK';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'grk/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -77,6 +77,7 @@ class Grk extends Back_Controller
                     "item"      => $d->Nama_Item,
                     "item_code" => $d->Kode_Item,
                     "qty"       => numb_format((float)$d->Qty),
+                    "terima"       => numb_format((float)$d->Terima),
                     "sisa"       => numb_format((float)$d->Sisa),
                     "uom"       => $d->UoM,
                     "harga"     => numb_format($d->Harga),
@@ -213,8 +214,8 @@ class Grk extends Back_Controller
             $this->form_validation->set_rules('gudang', 'gudang', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah GRK';
-                $data['breadcrumb'] = 'Tambah GRK';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['supplier'] = $this->grk->getSupplier();
                 $data['gudang'] = $this->grk->getGudang();
                 $data['detail'] = $this->input->post('detail');

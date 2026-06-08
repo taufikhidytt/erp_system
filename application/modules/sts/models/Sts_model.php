@@ -134,7 +134,8 @@ class Sts_model extends CI_Model
             tkd.NOTE `Note`,
             tkd.TAG_KONSI_DETAIL_ID,
             tkd.PO_DETAIL_ID,
-            IF(tkd.ENTERED_UOM = i.UOM_CODE,(tkd.ENTERED_QTY * tkd.BASE_QTY - tkd.RECEIVED_ENTERED_QTY * tkd.RECEIVED_BASE_QTY),(tkd.ENTERED_QTY - (tkd.RECEIVED_ENTERED_QTY / tkd.BASE_QTY))) AS Sisa,
+            tkd.RECEIVED_ENTERED_QTY / NULLIF(tkd.BASE_QTY, 0) Terima,
+            (tkd.ENTERED_QTY - ( tkd.RECEIVED_ENTERED_QTY / NULLIF(tkd.BASE_QTY, 0) ) ) AS Sisa,
             IF(tkd.PO_DETAIL_ID IS NOT NULL,po.DOCUMENT_NO,tg.DOCUMENT_NO) as No_FPK,
         ");
         $this->db->from("tag_konsi_detail tkd");

@@ -14,8 +14,8 @@ class Mrq extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'MRQ';
-            $data['breadcrumb'] = 'MRQ';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'mrq/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -370,8 +370,8 @@ class Mrq extends Back_Controller
             $this->form_validation->set_rules('ship_date', 'ship date', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah MRQ';
-                $data['breadcrumb'] = 'Tambah MRQ';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['ship_to'] = $this->mrq->get_ship_to();
                 $data['storage'] = $this->mrq->get_storage();
                 // $data['item_finish_goods'] = $this->mrq->get_item_finish_goods();

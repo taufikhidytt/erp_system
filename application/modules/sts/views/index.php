@@ -191,6 +191,7 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>Terima</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
                                     <th>No GRK / No RCO</th>
@@ -234,6 +235,13 @@
                         },
                         {
                             "data": "qty",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "terima",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

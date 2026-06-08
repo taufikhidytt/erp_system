@@ -14,8 +14,8 @@ class User extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'User';
-            $data['breadcrumb'] = 'User';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'user/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());

@@ -184,7 +184,7 @@ class Po_kny_model extends CI_Model
         $searchTerm = trim($this->input->get('q') ?? '');
         $default    = trim($this->input->get('default') ?? '');
         $id         = (int) $this->input->get('id');
-        $user_id    = $this->encrypt->decode('user_id');
+        $user_id    = $this->session->id;;
 
         $subquery = "
         (

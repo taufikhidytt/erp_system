@@ -14,8 +14,8 @@ class Do_kny extends Back_Controller
     public function index()
     {
         try {
-            $data['title'] = 'DO KNY';
-            $data['breadcrumb'] = 'DO KNY';
+            $data['title'] = $this->access['PROMPT'];
+            $data['breadcrumb'] = $this->access['PROMPT'];
             $this->template->load('template', 'do_kny/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -279,8 +279,8 @@ class Do_kny extends Back_Controller
             $this->form_validation->set_rules('storage', 'storage', 'trim|required');
 
             if ($this->form_validation->run() == false) {
-                $data['title'] = 'Tambah DO KNY';
-                $data['breadcrumb'] = 'Tambah DO KNY';
+                $data['title'] = 'Tambah';
+                $data['breadcrumb'] = 'Tambah';
                 $data['customer'] = $this->do_kny->get_customer();
                 $data['storage'] = $this->do_kny->get_storage();
                 $data['detail'] = $this->input->post('detail');
