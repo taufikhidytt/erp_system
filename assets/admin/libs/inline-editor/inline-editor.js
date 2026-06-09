@@ -109,7 +109,6 @@ const InlineEditor = (() => {
         if (Object.keys(attrs).length) $el.attr(attrs);
 
         if (cfg.attrs?.class?.includes('input-number')) {
-            console.log(attrs);
             $el.inputNumber();
         }
 
@@ -121,7 +120,7 @@ const InlineEditor = (() => {
     // ================================================================
     function init(config) {
 
-        const { fields, urls, extraData, add = true, edit = true } = config;
+        const { fields, urls, extraData, add = true, edit = true, beforeAdd, afterSave} = config;
 
         // Terima string selector atau instance DataTable
         const dt = typeof config.table === 'string'
@@ -438,6 +437,21 @@ const InlineEditor = (() => {
         // ── Tombol Insert ─────────────────────────────────────────
         if (add) {
             $(document).on('click', '.dt-button-insert, .btn-insert, [data-action="insert"]', function (e) {
+                if (beforeAdd) {
+                    let callbackFunc = null;
+
+                    if (typeof beforeAdd === 'function') {
+                        callbackFunc = beforeAdd;
+                    } else if (typeof beforeAdd === 'string' && typeof window[beforeAdd] === 'function') {
+                        callbackFunc = window[beforeAdd];
+                    }
+
+                    if (callbackFunc) {
+                        const hasil = callbackFunc(e);
+                        if (hasil === false) return;
+                    }
+                }
+
                 e.stopImmediatePropagation();
                 const key = 'new-' + Date.now();
                 const $tr = $('<tr class="ie-new-row">').data({ id: '', key });
@@ -452,13 +466,18 @@ const InlineEditor = (() => {
                         if (cfg.type === 'checkbox') {
                             $td.data('val', def).html(renderView(cfg, def)).addClass('text-center');
                         } else if (cfg.type === 'select2') {
-                            // Di mode add, select2 tidak langsung di-init semua sekaligus.
-                            // Render sebagai placeholder text dulu, baru init saat diklik/Tab masuk.
-                            $td.data('val', null).data('orig', null)
-                               .html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
+                            // Jika ada default value untuk select2
+                            if (cfg.value !== undefined && cfg.value !== null && cfg.value !== '') {
+                                $td.data('val', cfg.value).data('orig', cfg.value)
+                                    .html(`<span class="ie-select2-placeholder text-muted">${cfg.value.label}</span>`);
+                            }else{
+                                $td.data('val', null).data('orig', null)
+                                    .html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
+                            }
                         } else {
                             const $input = makeInput(cfg, def);
                             $td.data('orig', def).append($input);
+                            $td.addClass('ie-editing');
                         }
                     }
 
@@ -478,7 +497,12 @@ const InlineEditor = (() => {
                 $table.find('tbody').prepend($tr);
 
                 // Fokus ke input text/number pertama saja
-                $tr.find('input[type="text"], input[type="number"]').first().focus();
+                const $firstInput = $tr.find('input[type="text"], input[type="number"]').first();
+                if ($firstInput.length) {
+                    $firstInput.focus();
+                    const tmp = $firstInput.val();
+                    $firstInput.val('').val(tmp);
+                }
             });
         }
 
@@ -621,7 +645,6 @@ const InlineEditor = (() => {
         });
 
         // ── Select2: close → destroy & render view ────────────────
-        // Selalu fired setelah select2:select, sehingga destroy cukup di sini
         $table.on('select2:close', 'td.ie-cell select', function () {
             const $select = $(this);
 
@@ -653,11 +676,22 @@ const InlineEditor = (() => {
                     $td.removeData('ie-val-selected');
                     const orig = $td.data('orig');
 
-                    if ($row.hasClass('ie-new-row')) {
-                        // Mode add: kembalikan ke placeholder span
-                        $td.html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
-                    } else {
+                    // ─────────────────────────────────────────────────────────────
+                    // PERBAIKAN: Cek apakah nilai lama (orig) benar-benar ada
+                    // ─────────────────────────────────────────────────────────────
+                    const hasOrigValue = orig !== null && orig !== undefined && 
+                        (typeof orig === 'object' ? (orig.id !== undefined && orig.id !== null && orig.id !== '') : orig !== '');
+
+                    if (hasOrigValue) {
+                        // Jika ada nilai terakhir/default, kembalikan ke nilai tersebut
                         $td.data('val', orig).html(renderView(cfg, orig));
+                    } else {
+                        // Jika benar-benar kosong, baru tampilkan placeholder
+                        if ($row.hasClass('ie-new-row')) {
+                            $td.html(`<span class="ie-select2-placeholder text-muted">${cfg.select2?.placeholder ?? ''}</span>`);
+                        } else {
+                            $td.data('val', orig).html(renderView(cfg, orig));
+                        }
                     }
 
                     // Jika ESC, kembalikan juga pending ke nilai asli DataTable
@@ -754,12 +788,29 @@ const InlineEditor = (() => {
                         title: 'Berhasil',
                         text: res.message,
                         icon: 'success',
-                        timer: 3000,
-                        timerProgressBar: true,
-                        showConfirmButton: true,
+                        timer: 1000,
+                        timerProgressBar: false,
+                        showConfirmButton: false,
                         confirmButtonText: 'OK',
                         willClose: () => {
-                            dt.ajax.reload(null, false);
+                            const is_callback = false;
+                            if (afterSave) {
+                                let callbackFunc = null;
+
+                                if (typeof afterSave === 'function') {
+                                    callbackFunc = afterSave;
+                                } else if (typeof afterSave === 'string' && typeof window[afterSave] === 'function') {
+                                    callbackFunc = window[afterSave];
+                                }
+
+                                if (callbackFunc) {
+                                    callbackFunc(res);
+                                    is_callback = true;
+                                }
+                            }
+                            if(!is_callback){
+                                dt.ajax.reload(null, false);
+                            }
                         }
                     });
                 })
@@ -834,6 +885,12 @@ const InlineEditor = (() => {
             clearPending() { pending = {}; toggleButtons(false); },
             setSaveUrl(newUrl) { urls.save = newUrl; },
             setExtraData(newData) { config.extraData = newData; },
+            setDefaultValue(fieldName, newValue) {
+                const cfg = fields.find(f => f.field === fieldName);
+                if (cfg) {
+                    cfg.value = newValue;
+                }
+            },
             destroy() {
                 $(window).off('beforeunload.ie');
                 $(document).off('click.ie');

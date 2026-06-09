@@ -27,6 +27,7 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
 ?>
 <!DOCTYPE html>
 <html lang="<?= $active_lang ?>">
+
 <head>
     <meta charset="utf-8" />
     <title><?= $title; ?> | <?= $this->session->setup->NAME; ?></title>
@@ -61,7 +62,7 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
 
     <link rel="stylesheet" href="<?= base_url() ?>assets/admin/css/aos.css">
     <?= generateDynamicTheme($primary_color, $th_color); ?>
-    <link href="<?= base_url() ?>assets/admin/css/custom-template.css?v=1.6" rel="stylesheet" type="text/css" />
+    <link href="<?= base_url() ?>assets/admin/css/custom-template.css?v=1.7" rel="stylesheet" type="text/css" />
     <link href="<?= base_url() ?>assets/admin/css/custom-dark.css?v=1.6" id="custom-dark-style" rel="stylesheet" type="text/css" />
 
     <script src="<?= base_url() ?>assets/admin/libs/jquery/jquery.min.js"></script>
@@ -122,6 +123,24 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
                         <div id="jam"></div>
                     </div>
 
+                    <div class="dropdown d-inline-block d-lg-none ms-2">
+                        <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-search-dropdown"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="ri-search-line"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                            aria-labelledby="page-header-search-dropdown">
+
+                            <form class="p-3">
+                                <div class="mb-3 m-0">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search ...">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                     <div class="dropdown d-inline-block d-lg-inline-block ms-1">
                         <button type="button" class="btn header-item noti-icon waves-effect" id="settings-panel-btn" title="Pengaturan Tampilan">
                             <i class="ri-settings-3-line"></i>
@@ -176,13 +195,15 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
                         <div class="sp-theme-row">
                             <div class="sp-theme-opt" onclick="spSetTheme('light')">
                                 <div class="sp-theme-preview light <?= $active_theme === 'light' ? 'active' : '' ?>" id="sp-theme-light">
-                                    <div class="tp-top"></div><div class="tp-bottom"></div>
+                                    <div class="tp-top"></div>
+                                    <div class="tp-bottom"></div>
                                 </div>
                                 <span class="sp-theme-name">Terang</span>
                             </div>
                             <div class="sp-theme-opt" onclick="spSetTheme('dark')">
                                 <div class="sp-theme-preview dark <?= $active_theme === 'dark' ? 'active' : '' ?>" id="sp-theme-dark">
-                                    <div class="tp-top"></div><div class="tp-bottom"></div>
+                                    <div class="tp-top"></div>
+                                    <div class="tp-bottom"></div>
                                 </div>
                                 <span class="sp-theme-name">Gelap</span>
                             </div>
@@ -194,35 +215,35 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
                         <div class="sp-section-label">Warna Primer</div>
                         <div class="sp-color-row">
                             <?php foreach ($color_presets as $hex => $name): ?>
-                            <div class="sp-swatch <?= (!$is_custom_color && $primary_color === $hex) ? 'active' : '' ?>"
+                                <div class="sp-swatch <?= (!$is_custom_color && $primary_color === $hex) ? 'active' : '' ?>"
                                     style="background: <?= $hex ?>;"
                                     data-color="<?= $hex ?>"
                                     title="<?= $name ?>"
                                     onclick="spSetColor('<?= $hex ?>')">
-                            </div>
+                                </div>
                             <?php endforeach; ?>
                             <!-- Custom color swatch -->
                             <div class="sp-swatch sp-swatch-custom <?= $is_custom_color ? 'active' : '' ?>"
-                                    id="sp-swatch-custom"
-                                    style="background: <?= $is_custom_color ? $primary_color : '#cccccc' ?>;"
-                                    title="Warna Custom"
-                                    onclick="document.getElementById('sp-color-picker').click()">
+                                id="sp-swatch-custom"
+                                style="background: <?= $is_custom_color ? $primary_color : '#cccccc' ?>;"
+                                title="Warna Custom"
+                                onclick="document.getElementById('sp-color-picker').click()">
                                 <i class="ri-add-line" id="sp-swatch-custom-icon" style="font-size:14px; line-height:22px; display:<?= $is_custom_color ? 'none' : 'block' ?>;"></i>
                             </div>
                             <input type="color" id="sp-color-picker"
-                                    value="<?= $is_custom_color ? $primary_color : '#556ee6' ?>"
-                                    style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
-                                    oninput="spSetCustomColor(this.value)"
-                                    onchange="spSetCustomColor(this.value)">
+                                value="<?= $is_custom_color ? $primary_color : '#556ee6' ?>"
+                                style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+                                oninput="spSetCustomColor(this.value)"
+                                onchange="spSetCustomColor(this.value)">
                         </div>
                         <div class="sp-color-hex-row">
                             <span class="sp-color-hex-label">Hex:</span>
                             <div class="sp-hex-preview"></div>
                             <input type="text" id="sp-color-hex-input" maxlength="7"
-                                    value="<?= htmlspecialchars($primary_color) ?>"
-                                    placeholder="#556ee6"
-                                    oninput="spOnHexInput(this.value)"
-                                    onblur="spOnHexBlur(this.value)" readonly>
+                                value="<?= htmlspecialchars($primary_color) ?>"
+                                placeholder="#556ee6"
+                                oninput="spOnHexInput(this.value)"
+                                onblur="spOnHexBlur(this.value)" readonly>
                         </div>
                     </div>
 
@@ -258,12 +279,12 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
                         <div class="sp-section-label">Bahasa / Language</div>
                         <div class="sp-lang-grid">
                             <?php foreach ($lang_options as $code => $opt): ?>
-                            <button class="sp-lang-opt <?= $active_lang === $code ? 'active' : '' ?>"
+                                <button class="sp-lang-opt <?= $active_lang === $code ? 'active' : '' ?>"
                                     data-lang="<?= $code ?>"
                                     onclick="spSetLang('<?= $code ?>')">
-                                <span class="sp-flag"><?= $opt['flag'] ?></span>
-                                <span><?= $opt['label'] ?></span>
-                            </button>
+                                    <span class="sp-flag"><?= $opt['flag'] ?></span>
+                                    <span><?= $opt['label'] ?></span>
+                                </button>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -424,7 +445,7 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
         AOS.init();
     </script>
     <script src="<?= base_url() ?>assets/admin/js/shortcut.js?v=1.6"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=1.6"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=1.8"></script>
 </body>
 
 </html>

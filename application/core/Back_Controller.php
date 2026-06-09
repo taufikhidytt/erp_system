@@ -4,7 +4,7 @@ class Back_Controller extends MX_Controller
 {
     public $access = [];
     public $version=[
-        'inline-editor' => '1.1'
+        'inline-editor' => '1.7'
     ];
     public function __construct()
     {

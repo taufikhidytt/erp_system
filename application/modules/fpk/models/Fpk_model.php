@@ -112,31 +112,26 @@ class Fpk_model extends CI_Model
 
     function count_all()
     {
-        $this->db->select('
-            i.ITEM_ID AS ID,
-            i.ITEM_CODE KODE_ITEM,
-            LEFT(COALESCE(i.PART_NUMBER,i.ITEM_DESCRIPTION), 30) NAMA_ITEM,
-            i.PART_NUMBER PART_NUMBER,
-            i.UOM_CODE UOM,
-            a.DISPLAY_NAME JENIS,
-            b.DISPLAY_NAME KATEGORY,
-            c.DISPLAY_NAME MADE_IN,
-            d.DISPLAY_NAME KOMODITI,
-            e.DISPLAY_NAME BRAND,
-            f.DISPLAY_NAME TRADE,
-            i.PRICE_LAST_BUY,
-            i.PRICE_LAST_SELL,
-            i.LEAD_TIME,
-            i.ITEM_KMS KONSY,
-            i.APPROVE_FLAG APPROVED,
-            i.OBSOLETE_FLAG OBSOLETE');
-        $this->db->from('item i');
-        $this->db->join('erp_lookup_value a', 'i.JENIS_ID = a.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value b', 'i.GROUP_ID = b.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value c', 'i.MADE_IN_ID = c.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value d', 'i.TIPE_ID = d.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value e', 'i.MEREK_ID = e.ERP_LOOKUP_VALUE_ID', 'left');
-        $this->db->join('erp_lookup_value f', 'i.TYPE_ID = f.ERP_LOOKUP_VALUE_ID', 'left');
+        $tipe_id = $this->db->query("SELECT DISTINCT a.ERP_TABLE_ID, b.PROMPT, b.TYPE_ID FROM erp_table a JOIN erp_menu b ON ( a.TABLE_NAME = b.TABLE_NAME ) WHERE b.PROMPT = '{$this->uri->segment(1)}'")->row_array();
+
+        $this->db->distinct();
+        $this->db->select("
+            a.PR_ID,
+            b.DISPLAY_NAME Status, b.MENU_ICON Warna_Status,
+            a.DOCUMENT_NO No_Transaksi,
+            a.DOCUMENT_REFF_NO No_Referensi,
+            a.DOCUMENT_DATE Tanggal,
+            a.TOTAL_AMOUNT Total,
+            CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) Supplier,
+            w.WAREHOUSE_NAME Gudang,
+            k.FIRST_NAME Sales
+        ");
+        $this->db->from('pr a');
+        $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
+        $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('karyawan k', 'a.KARYAWAN_ID = k.KARYAWAN_ID');
+        $this->db->where('a.DOCUMENT_TYPE_ID', $tipe_id['TYPE_ID']);
         return $this->db->count_all_results();
     }
 
@@ -223,8 +218,8 @@ class Fpk_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('pr a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.PR_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();
@@ -238,7 +233,7 @@ class Fpk_model extends CI_Model
         $user_id    = (int) $this->session->id;
 
         $this->db->select("a.WAREHOUSE_ID as id, a.WAREHOUSE_NAME as text")
-                ->from('warehouse a');
+            ->from('warehouse a');
 
         // 2. LEFT JOIN dengan Subquery Aggregasi (Menghindari duplikasi data)
         $subquery_join = "(SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
@@ -281,16 +276,16 @@ class Fpk_model extends CI_Model
         $id         = $this->input->get('id') ? (int) $this->input->get('id') : null;
         $default    = trim($this->input->get('default') ?? '');
         $user_id    = (int) $this->session->id;
-        
+
         $default_field = 'a.PRIMARY_FLAG';
 
         // Cek hak akses user
         $user_has_warehouse = $this->db->where('ERP_USER_ID', $user_id)
-                                    ->limit(1)
-                                    ->count_all_results('erp_warehouse') > 0;
+            ->limit(1)
+            ->count_all_results('erp_warehouse') > 0;
 
         $this->db->select("a.WAREHOUSE_ID as id, a.WAREHOUSE_NAME as text")
-                ->from('warehouse a');
+            ->from('warehouse a');
 
         $this->db->where('a.ACTIVE_FLAG', 'Y');
         $this->db->where("a.JENIS_ID = FN_GET_VAR_VALUE('PST')", NULL, FALSE);
@@ -298,12 +293,12 @@ class Fpk_model extends CI_Model
         // Jika user punya warehouse, gunakan INNER JOIN ke subquery aggregasi
         if ($user_has_warehouse) {
             $default_field = 'IFNULL(g.PRIMARY_FLAG, a.PRIMARY_FLAG)';
-            
+
             $subquery_join = "(SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG
                             FROM erp_warehouse
                             WHERE ERP_USER_ID = '$user_id'
                             GROUP BY WAREHOUSE_ID) g";
-                            
+
             $this->db->join($subquery_join, 'a.WAREHOUSE_ID = g.WAREHOUSE_ID', 'inner');
         }
 
@@ -331,7 +326,7 @@ class Fpk_model extends CI_Model
         $user_id    = (int) $this->session->id;
 
         $this->db->select("k.KARYAWAN_ID as id, CONCAT(k.FIRST_NAME, ' - [', k.LAST_NAME, ']') as text, k.KATA_DEPAN, k.DESCRIPTION")
-                ->from('karyawan k');
+            ->from('karyawan k');
 
         $subquery_join = "(SELECT KARYAWAN_ID 
                         FROM erp_group_sales 
@@ -356,9 +351,9 @@ class Fpk_model extends CI_Model
         } else {
             if ($searchTerm) {
                 $this->db->group_start()
-                        ->like('k.FIRST_NAME', $searchTerm)
-                        ->or_like('k.LAST_NAME', $searchTerm)
-                        ->group_end();
+                    ->like('k.FIRST_NAME', $searchTerm)
+                    ->or_like('k.LAST_NAME', $searchTerm)
+                    ->group_end();
             }
             $this->db->limit(50);
         }
