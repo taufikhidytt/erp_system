@@ -170,8 +170,8 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No Trx 1</th>
-                                                    <th>No Trx 2</th>
+                                                    <th>Reff Batch 1</th>
+                                                    <th>Reff Batch 2</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -215,8 +215,8 @@
                                 </th>
                                 <th>No</th>
                                 <th>Status</th>
-                                <th>No Ref Trx 1</th>
-                                <th>No Ref Trx 2</th>
+                                <th>Reff Batch 1</th>
+                                <th>Reff Batch 2</th>
                                 <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
@@ -957,13 +957,13 @@
 
                     toggleStorageDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                 }
             });
         });

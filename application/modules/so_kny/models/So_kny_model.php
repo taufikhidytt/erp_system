@@ -166,6 +166,8 @@ class So_kny_model extends CI_Model
                     COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
                     i.ITEM_CODE Kode_Item,
                     a.ENTERED_QTY Qty,
+                    a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) Kirim,
+                    a.ENTERED_QTY - ( a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) ) Sisa,
                     a.ENTERED_UOM UoM,
                     a.UNIT_PRICE Harga,
                     a.DISCOUNT_PRICE Diskon,
@@ -186,7 +188,9 @@ class So_kny_model extends CI_Model
                         ON a.GUDANG_ID = w.WAREHOUSE_ID
                     JOIN build b
                         ON a.BUILD_ID = b.BUILD_ID
-                WHERE a.SO_ID = '${so_id}'";
+                WHERE a.SO_ID = '${so_id}'
+                ORDER BY a.SO_DETAIL_ID ASC
+                ";
 
         if ($limit !== null && $start !== null) {
             $sql .= " LIMIT {$start}, {$limit}";

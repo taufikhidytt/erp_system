@@ -1292,13 +1292,13 @@
 
                     toggleItemDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
-                        // timer: 2500,
-                        showConfirmButton: true
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                    //     // timer: 2500,
+                    //     showConfirmButton: true
+                    // });
                 }
             });
         });

@@ -1398,13 +1398,13 @@
                     tableDetail.draw(false);
                     $("#checkAllParent").prop("checked", false);
                     toggleStorageDisabled();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                     let row = $(rowsToRemove);
                     let ppn = $('#cal_ppn_code').val();
                     let ppn_code = $('#cal_ppn_code option:selected').text().trim();
@@ -1445,11 +1445,16 @@
                         success: function(res) {
                             if (res.status) {
                                 Swal.fire({
-                                    title: 'Berhasil!',
+                                    title: 'Berhasil',
                                     text: res.message,
-                                    icon: 'success'
-                                }).then(() => {
-                                    location.reload();
+                                    icon: 'success',
+                                    timer: 1000,
+                                    timerProgressBar: false,
+                                    showConfirmButton: false,
+                                    confirmButtonText: 'OK',
+                                    willClose: () => {
+                                        location.reload();
+                                    }
                                 });
                             } else {
                                 Swal.fire({

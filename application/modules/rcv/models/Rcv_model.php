@@ -142,7 +142,7 @@ class Rcv_model extends CI_Model
         $this->db->join("tag_konsi_detail tkd", "td.TAG_KONSI_DETAIL_ID = tkd.TAG_KONSI_DETAIL_ID");
         $this->db->join("tag_konsi tk", "tkd.TAG_KONSI_ID = tk.TAG_KONSI_ID");
         $this->db->where("td.TAG_ID", $tag_id);
-        $this->db->order_by('td.TAG_ID', 'ASC');
+        $this->db->order_by('td.TAG_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);

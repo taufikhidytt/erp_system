@@ -204,8 +204,8 @@
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
                                     <th>Satuan</th>
-                                    <th>No Reff 1</th>
-                                    <th>No Reff 2</th>
+                                    <th>Reff Batch 1</th>
+                                    <th>Reff Batch 2</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

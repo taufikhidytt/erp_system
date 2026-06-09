@@ -110,6 +110,7 @@
                     'key'      => 'insert',
                     'class'    => 'btn-insert btn-primary',
                     'url'      => '',
+                    'title'    => 'Tambah',
                     'raw_url'  => true
                 ],
                 [

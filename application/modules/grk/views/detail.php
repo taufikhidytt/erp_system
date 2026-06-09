@@ -1275,13 +1275,13 @@
 
                     toggleSupplierDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                 }
             });
         });
@@ -1756,7 +1756,7 @@
     }, true);
 
     $(document).on('click', '#myForm .btn-delete', function() {
-        let id = $(this).data('id_del');
+        let id = $(this).data('id');
 
         Swal.fire({
             title: 'Yakin mau hapus?',
@@ -1788,11 +1788,16 @@
                     success: function(res) {
                         if (res.status) {
                             Swal.fire({
-                                title: 'Berhasil!',
+                                title: 'Berhasil',
                                 text: 'Data berhasil dihapus.',
-                                icon: 'success'
-                            }).then(() => {
-                                location.reload();
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: false,
+                                showConfirmButton: false,
+                                confirmButtonText: 'OK',
+                                willClose: () => {
+                                    location.reload();
+                                }
                             });
                         } else {
                             Swal.fire({

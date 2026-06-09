@@ -240,11 +240,13 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>Kirim</th>
+                                    <th>Sisa</th>
                                     <th>Satuan</th>
                                     <th>Harga</th>
                                     <th>Diskon</th>
                                     <th>Total</th>
-                                    <th>No MR</th>
+                                    <th>Reff No</th>
                                     <th>Storage</th>
                                     <th>Note</th>
                                 </tr>
@@ -286,6 +288,20 @@
                         },
                         {
                             "data": "jumlah",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "kirim",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "sisa",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

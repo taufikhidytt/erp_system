@@ -12,13 +12,13 @@ class Grk_model extends CI_Model
     var $column_order = array(
         null,
         null,
-        "a.PO_ID",
         "b.DISPLAY_NAME",
         "a.DOCUMENT_NO",
         "a.DOCUMENT_REFF_NO",
         "a.DOCUMENT_DATE",
         "Supplier",
-        "w.WAREHOUSE_NAME"
+        "w.WAREHOUSE_NAME",
+        "a.TOTAL_NET"
     );
 
     var $column_search = array(
@@ -33,7 +33,8 @@ class Grk_model extends CI_Model
             p . PERSON_CODE,
             ']'
         )",
-        "w.WAREHOUSE_NAME"
+        "w.WAREHOUSE_NAME",
+        "a.TOTAL_NET"
     );
 
     var $order = array('a.DOCUMENT_DATE' => 'DESC');
@@ -50,6 +51,7 @@ class Grk_model extends CI_Model
             a.DOCUMENT_REFF_NO `No_Referensi`,
             a.DOCUMENT_DATE `Tanggal`,
             a.NEED_DATE `Dibutuhkan`,
+            a.TOTAL_NET,
             CONCAT(
                 p.PERSON_NAME,
                 ' - [',
@@ -162,7 +164,7 @@ class Grk_model extends CI_Model
         $this->db->join("pr", "prd.PR_ID = pr.PR_ID");
         $this->db->join("karyawan k", "pr.KARYAWAN_ID = k.KARYAWAN_ID");
         $this->db->where("pd.PO_ID", $po_id);
-        $this->db->order_by('pd.PR_DETAIL_ID', 'ASC');
+        $this->db->order_by('pd.PO_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);

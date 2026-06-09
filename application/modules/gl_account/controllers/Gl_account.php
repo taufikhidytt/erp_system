@@ -17,6 +17,7 @@ class Gl_account extends Back_Controller
             $data['title']      = $this->access['PROMPT'];
             $data['breadcrumb'] = $this->access['PROMPT'];
             $data['account']    = $this->get_account();
+            $data['mata_uang']  = $this->gl_account->get_mata_uang_default()->row();
             $this->template->load('template', $this->access['url'] . '/index', $data);
         } catch (Exception $err) {
             return sendError('Server Error', $err->getMessage());
@@ -25,10 +26,12 @@ class Gl_account extends Back_Controller
 
     private function get_account() {
         // 1. Ambil data dari database sesuai query Anda
-        $this->db->select('a.ACCOUNT_ID, a.ACCOUNT_CODE, a.PARENT_FLAG, a.PARENT_ID, a.ACCOUNT_NAME, a.ACCOUNT_TYPE_ID, a.ACTIVE_FLAG,
-            b.DISPLAY_NAME AS ACCOUNT_TYPE,
+        $this->db->select('a.ACCOUNT_ID, a.ACCOUNT_CODE, a.PARENT_FLAG, a.PARENT_ID, a.ACCOUNT_NAME, a.ACCOUNT_TYPE_ID, a.ACTIVE_FLAG, a.MATA_UANG_ID, a.KATA,
+            b.DISPLAY_NAME AS ACCOUNT_TYPE, b.PROGRAM_CODE1,
+            c.MATA_UANG_CODE,
         ');
         $this->db->join('erp_lookup_value b','b.ERP_LOOKUP_VALUE_ID = a.ACCOUNT_TYPE_ID');
+        $this->db->join('mata_uang c','c.MATA_UANG_ID = a.MATA_UANG_ID');
         $this->db->order_by('a.ACCOUNT_CODE', 'ASC');
         $account = $this->db->get('account a')->result_array();
 
@@ -64,6 +67,10 @@ class Gl_account extends Back_Controller
 
     public function get_type(){
         $result = $this->gl_account->get_type()->result();
+        echo json_encode($result);
+    }
+    public function get_mata_uang(){
+        $result = $this->gl_account->get_mata_uang()->result();
         echo json_encode($result);
     }
 
@@ -163,6 +170,8 @@ class Gl_account extends Back_Controller
                         'ACCOUNT_CODE'      => (int) ($fields['code']  ?? 0),
                         'ACCOUNT_NAME'      => $fields['name']  ?? null,
                         'ACCOUNT_TYPE_ID'   => (int) ($fields['type'] ?? 0),
+                        'MATA_UANG_ID'      => (int) ($fields['mata_uang'] ?? 0),
+                        'KATA'              => $fields['kata']  ?? null,
                         'ACTIVE_FLAG'       => $fields['active_flag']  ?? null,
                         'CREATED_BY'        => $user_id,
                         'CREATED_DATE'      => $now,
@@ -176,6 +185,8 @@ class Gl_account extends Back_Controller
                         'ACCOUNT_CODE'     => $fields['code']  ?? $existing[$id]['ACCOUNT_CODE'],
                         'ACCOUNT_NAME'     => $fields['name']  ?? $existing[$id]['ACCOUNT_NAME'],
                         'ACCOUNT_TYPE_ID'  => $fields['type'] ?? $existing[$id]['ACCOUNT_TYPE_ID'],
+                        'MATA_UANG_ID'     => $fields['mata_uang'] ?? $existing[$id]['MATA_UANG_ID'],
+                        'KATA'             => $fields['kata']  ?? $existing[$id]['KATA'],
                         'ACTIVE_FLAG'      => $fields['active_flag']  ?? $existing[$id]['ACTIVE_FLAG'],
                         'LAST_UPDATE_BY'   => $user_id,
                         'LAST_UPDATE_DATE' => $now,

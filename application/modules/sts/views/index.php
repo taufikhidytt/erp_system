@@ -194,7 +194,7 @@
                                     <th>Terima</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No GRK / No RCO</th>
+                                    <th>Batch No</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

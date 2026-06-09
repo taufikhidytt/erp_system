@@ -206,7 +206,7 @@
                                     <th>Pakai / Retur</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No SJS</th>
+                                    <th>Batch No</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

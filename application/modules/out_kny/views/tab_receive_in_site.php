@@ -270,7 +270,7 @@
             ],
             columnDefs: [{
                     className: 'text-center',
-                    targets: [1, 2, 5],
+                    targets: [1, 2, 5, 8],
                 },
                 {
                     orderable: false,

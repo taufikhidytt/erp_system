@@ -194,20 +194,30 @@ class Rsp extends Back_Controller
                     tag a
                     JOIN tag_detail b
                         ON a.TAG_ID = b.TAG_ID
-                    JOIN po_detail pod
-                        ON b.PO_DETAIL_ID = pod.PO_DETAIL_ID
-                    JOIN po po
-                        ON pod.PO_ID = po.PO_ID
-                    JOIN pr_detail pd
-                        ON pod.PR_DETAIL_ID = pd.PR_DETAIL_ID
-                    JOIN pr pr
-                        ON pd.PR_ID = pr.PR_ID
                     JOIN item i
                         ON b.ITEM_ID = i.ITEM_ID
                     JOIN person psn
                         ON i.PERSON_ID = psn.PERSON_ID
                     JOIN warehouse w
                         ON b.TO_WH_ID = w.WAREHOUSE_ID
+                    LEFT JOIN po_detail pod_direct
+                        ON b.PO_DETAIL_ID = pod_direct.PO_DETAIL_ID
+                    LEFT JOIN request_qty_detail rqd
+                        ON b.REQUEST_QTY_DETAIL_ID = rqd.REQUEST_QTY_DETAIL_ID
+                        AND rqd.PO_DETAIL_ID IS NULL
+                    LEFT JOIN tag_konsi_detail tkd
+                        ON rqd.TAG_KONSI_DETAIL_ID = tkd.TAG_KONSI_DETAIL_ID
+                    LEFT JOIN tag_detail td
+                        ON tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID
+                    LEFT JOIN po_detail pod_indirect
+                        ON td.PO_DETAIL_ID = pod_indirect.PO_DETAIL_ID
+                    LEFT JOIN pr_detail prd
+                        ON COALESCE(
+                            pod_direct.PR_DETAIL_ID,
+                            pod_indirect.PR_DETAIL_ID
+                        ) = prd.PR_DETAIL_ID
+                    LEFT JOIN pr
+                        ON prd.PR_ID = pr.PR_ID
                     JOIN erp_lookup_value s
                         ON s.ERP_LOOKUP_VALUE_ID = a.STATUS_ID
                 WHERE (b.ENTERED_QTY * b.BASE_QTY) > 0
@@ -220,8 +230,13 @@ class Rsp extends Back_Controller
                     )
                     AND a.DOCUMENT_TYPE_ID = 5
                     AND b.TO_WH_ID = '{$main_storage}'
-                    AND psn.PERSON_ID = '{$supplier}'
+                    AND i.PERSON_ID = '{$supplier}'
+                    AND (
+                        pod_direct.PO_DETAIL_ID IS NOT NULL
+                        OR pod_indirect.PO_DETAIL_ID IS NOT NULL
+                    )
                 GROUP BY b.TAG_DETAIL_ID) AS tmp
+
             ORDER BY tmp.PO_DETAIL_ID
             ");
 

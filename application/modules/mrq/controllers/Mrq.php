@@ -81,6 +81,8 @@ class Mrq extends Back_Controller
                     "nama_item"     => $d->Nama_Item,
                     "kode_item"     => $d->Kode_Item,
                     "jumlah"        => numb_format((float)$d->Qty),
+                    "po"            => numb_format((float)$d->PO),
+                    "sisa"          => numb_format((float)$d->Sisa),
                     "satuan"        => $d->UoM,
                     "no_reff_trx"   => $d->Reff_Trx,
                     "note"          => $d->Note,
@@ -206,7 +208,7 @@ class Mrq extends Back_Controller
                 WAREHOUSE_NAME,
                 ITEM_ID,
                 ITEM_CODE,
-                COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) ITEM_DESCRIPTION,
+                ITEM_DESCRIPTION,
                 ENTERED_QTY,
                 BASE_QTY,
                 CASE

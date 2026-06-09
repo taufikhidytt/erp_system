@@ -1013,13 +1013,13 @@
 
                     toggleItemDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                 }
             });
         });

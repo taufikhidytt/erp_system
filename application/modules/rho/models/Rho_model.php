@@ -30,7 +30,10 @@ class Rho_model extends CI_Model
         "wh.WAREHOUSE_NAME",
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array(
+        'a.DOCUMENT_DATE' => 'DESC',
+        'a.REQUEST_QTY_ID' => 'DESC',
+    );
 
     private function _get_datatables_query()
     {
@@ -78,7 +81,9 @@ class Rho_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 
@@ -142,7 +147,7 @@ class Rho_model extends CI_Model
         $this->db->join("tag_detail td", "rqd.TAG_DETAIL_ID = td.TAG_DETAIL_ID");
         $this->db->join("tag", "td.TAG_ID = tag.TAG_ID");
         $this->db->where("rqd.REQUEST_QTY_ID", $request_qty_id);
-        $this->db->order_by('td.REQUEST_QTY_DETAIL_ID', 'ASC');
+        $this->db->order_by('rqd.REQUEST_QTY_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);

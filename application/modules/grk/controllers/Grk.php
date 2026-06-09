@@ -40,6 +40,7 @@ class Grk extends Back_Controller
             $row['tanggal'] = $grk->Tanggal ? date('Y-m-d H:i', strtotime($grk->Tanggal)) : '-';
             $row['supplier'] = $grk->Supplier ? $grk->Supplier : '-';
             $row['gudang'] = $grk->Gudang ? $grk->Gudang : '-';
+            $row['total_nett'] = numb_format($grk->TOTAL_NET);
 
             $row['po_id'] = $this->encrypt->encode($grk->PO_ID);
             $data[] = $row;

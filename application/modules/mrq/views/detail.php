@@ -331,7 +331,7 @@
                                                             <th>
                                                                 <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                             </th>
-                                                            <th>No Transaksi</th>
+                                                            <th>Batch No</th>
                                                             <th>Nama Item</th>
                                                             <th>Kode Item</th>
                                                             <th>Jumlah</th>
@@ -491,8 +491,8 @@
                                 </th>
                                 <th>No</th>
                                 <th>Status</th>
-                                <th>Tanggal</th>
-                                <th>No Transaksi</th>
+                                <th>Batch Date</th>
+                                <th>Batch No</th>
                                 <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
@@ -1366,13 +1366,13 @@
                     toggleStorageDisabled();
                     toggleShipToDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
-                        // timer: 2500,
-                        showConfirmButton: true
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                    //     // timer: 2500,
+                    //     showConfirmButton: true
+                    // });
                 }
             });
         });
@@ -1881,11 +1881,16 @@
                     success: function(res) {
                         if (res.status) {
                             Swal.fire({
-                                title: 'Berhasil!',
+                                title: 'Berhasil',
                                 text: res.message,
-                                icon: 'success'
-                            }).then(() => {
-                                location.reload();
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: false,
+                                showConfirmButton: false,
+                                confirmButtonText: 'OK',
+                                willClose: () => {
+                                    location.reload();
+                                }
                             });
                         } else {
                             Swal.fire({

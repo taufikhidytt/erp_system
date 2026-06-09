@@ -101,7 +101,7 @@
                                             <th>Status</th>
                                             <th>No Transaksi</th>
                                             <th>PO Customer</th>
-                                            <th>No SO</th>
+                                            <th>Sales Order</th>
                                             <th>Tanggal</th>
                                             <th>Customer</th>
                                             <th>Sales</th>
@@ -215,8 +215,10 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>Invoice</th>
+                                    <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No MR</th>
+                                    <th>Reff No</th>
                                     <th>Storage</th>
                                     <th>Note</th>
                                 </tr>
@@ -258,6 +260,20 @@
                         },
                         {
                             "data": "jumlah",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "invoice",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "sisa",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

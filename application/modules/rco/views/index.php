@@ -207,7 +207,7 @@
                                     <th>Kirim / Retur</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No RHO</th>
+                                    <th>Batch No</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

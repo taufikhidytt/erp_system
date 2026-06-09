@@ -1220,13 +1220,13 @@
                     tableDetail.draw(false);
                     $("#checkAllParent").prop("checked", false);
                     toggleStorageDisabled();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                     let row = $(rowsToRemove);
                     let ppn = $('#cal_ppn_code').val();
                     let ppn_code = $('#cal_ppn_code option:selected').text().trim();
@@ -1756,3 +1756,4 @@
         $("#storage").prop("disabled", false);
     });
 </script>
+<script src="<?= base_url() ?>assets/admin/js/pages/fpk.js?v=<?= $version['inline-editor'] ?>"></script>

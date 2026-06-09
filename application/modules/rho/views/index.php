@@ -206,7 +206,7 @@
                                     <th>Terima</th>
                                     <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No RCV</th>
+                                    <th>Batch No</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>

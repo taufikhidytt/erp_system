@@ -147,7 +147,7 @@ class Sts_model extends CI_Model
         $this->db->join("tag tg", "td.TAG_ID = tg.TAG_ID","left");
         
         $this->db->where("tkd.TAG_KONSI_ID", $tag_konsi_id);
-        $this->db->order_by('tkd.TAG_KONSI_ID', 'ASC');
+        $this->db->order_by('tkd.TAG_KONSI_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);

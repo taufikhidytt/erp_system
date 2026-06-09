@@ -143,7 +143,7 @@ class Rco_model extends CI_Model
         $this->db->join("request_qty tk", "tkd.REQUEST_QTY_ID = tk.REQUEST_QTY_ID");
         $this->db->join("warehouse wh", "tk.WAREHOUSE_ID = wh.WAREHOUSE_ID");
         $this->db->where("td.TAG_ID", $tag_id);
-        $this->db->order_by('td.REQUEST_QTY_DETAIL_ID', 'ASC');
+        $this->db->order_by('td.TAG_DETAIL_ID', 'ASC');
 
         if ($limit !== null && $start !== null) {
             $this->db->limit($limit, $start);

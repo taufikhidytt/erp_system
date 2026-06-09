@@ -252,8 +252,10 @@
                                     <th>Nama Item</th>
                                     <th>Kode Item</th>
                                     <th>Jumlah</th>
+                                    <th>PO</th>
+                                    <th>Sisa</th>
                                     <th>Satuan</th>
-                                    <th>No Reff Trx</th>
+                                    <th>Batch No</th>
                                     <th>Note</th>
                                 </tr>
                             </thead>
@@ -294,6 +296,20 @@
                         },
                         {
                             "data": "jumlah",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "po",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "sisa",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

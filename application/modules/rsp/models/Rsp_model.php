@@ -170,7 +170,9 @@ class Rsp_model extends CI_Model
                         JOIN pr ON prd.PR_ID = pr.PR_ID 
                     ) AS tmp 
                 WHERE
-                    tmp.TAG_PINJAM_ID = '{$tag_pinjam_id}'";
+                    tmp.TAG_PINJAM_ID = '{$tag_pinjam_id}'
+                ORDER BY tmp.TAG_PINJAM_DETAIL_ID ASC    
+                ";
 
         if ($limit !== null && $start !== null) {
             $sql .= " LIMIT {$start}, {$limit}";

@@ -143,6 +143,8 @@ class Po_kny_model extends CI_Model
             COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             a.ENTERED_QTY Qty,
+            a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) Retur,
+            a.ENTERED_QTY - ( a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) ) Sisa,
             a.ENTERED_UOM UoM,
             a.UNIT_PRICE Harga,
             a.DISCOUNT_PRICE Diskon,
@@ -163,7 +165,9 @@ class Po_kny_model extends CI_Model
             JOIN build_detail bd ON iid.BUILD_DETAIL_ID = bd.BUILD_DETAIL_ID
             JOIN build b ON bd.BUILD_ID = b.BUILD_ID 
         WHERE
-            a.INVOICE_ID = {$invoice_id}";
+            a.INVOICE_ID = {$invoice_id}
+        ORDER BY a.INVOICE_DETAIL_ID ASC    
+        ";
 
         if ($limit !== null && $start !== null) {
             $sql .= " LIMIT {$start}, {$limit}";

@@ -43,7 +43,7 @@ class So_kny extends Back_Controller
             $row['sales'] = $so_kny->Sales ? $so_kny->Sales : '-';
             $row['s_loc'] = $so_kny->S_Loc ? $so_kny->S_Loc : '-';
             $row['terms'] = $so_kny->Terms ? $so_kny->Terms : '-';
-            $row['total'] = $so_kny->Total ? number_format($so_kny->Total, 2, '.', ',') : '-';
+            $row['total'] = $so_kny->Total ? numb_format($so_kny->Total) : '-';
 
             $row['so_id'] = $this->encrypt->encode($so_kny->SO_ID);
             $data[] = $row;
@@ -79,11 +79,13 @@ class So_kny extends Back_Controller
                     "no"            => $no++,
                     "nama_item"     => $d->Nama_Item,
                     "kode_item"     => $d->Kode_Item,
-                    "jumlah"        => number_format($d->Qty, 2, '.', ''),
+                    "jumlah"        => numb_format($d->Qty),
+                    "kirim"         => numb_format($d->Kirim),
+                    "sisa"          => numb_format($d->Sisa),
                     "satuan"        => $d->UoM,
-                    "harga"         => number_format($d->Harga, 2, '.', ','),
-                    "diskon"        => number_format($d->Diskon, 2, '.', ','),
-                    "total"         => number_format($d->Total, 2, '.', ','),
+                    "harga"         => numb_format($d->Harga),
+                    "diskon"        => numb_format($d->Diskon),
+                    "total"         => numb_format($d->Total),
                     "no_mr"         => $d->No_MR,
                     "s_loc_in"      => $d->S_Loc_In,
                     "note"          => $d->Note,
@@ -926,9 +928,9 @@ class So_kny extends Back_Controller
                 'nama_item' => $row->Nama_Item,
                 'kode_item' => $row->Kode_Item,
                 'satuan' => $row->Satuan,
-                'so' => number_format((float)$row->SO, 2, '.', ','),
-                'do' => number_format((float)$row->DO, 2, '.', ','),
-                'sisa' => number_format((float)$row->SISA, 2, '.', ','),
+                'so' => numb_format((float)$row->SO),
+                'do' => numb_format((float)$row->DO),
+                'sisa' => numb_format((float)$row->SISA),
             ];
         }));
     }
@@ -961,7 +963,7 @@ class So_kny extends Back_Controller
                 'no_transaksi' => '<a href="' . site_url('do_kny/detail/' . base64url_encode($this->encrypt->encode($row->INVENTORY_OUT_ID))) . '" target="_blank">' . $row->No_Transaksi . '</a>',
                 'tanggal' => date('Y-m-d H:i', strtotime($row->Tanggal)),
                 'satuan' => $row->Satuan,
-                'jumlah' => number_format((float)$row->Jumlah, 2, '.', ','),
+                'jumlah' => numb_format((float)$row->Jumlah),
                 's_loc' => $row->S_Loc,
             ];
         }));

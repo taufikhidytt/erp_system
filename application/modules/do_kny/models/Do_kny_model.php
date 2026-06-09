@@ -147,6 +147,8 @@ class Do_kny_model extends CI_Model
             COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) Nama_Item,
             i.ITEM_CODE Kode_Item,
             a.ENTERED_QTY Qty,
+            a.INVOICE_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) Invoice,
+            a.ENTERED_QTY - ( a.INVOICE_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) ) Sisa,
             a.ENTERED_UOM UoM,
             b.DOCUMENT_NO No_MR,
             w.WAREHOUSE_NAME S_Loc,
@@ -161,7 +163,9 @@ class Do_kny_model extends CI_Model
             JOIN warehouse w ON a.WAREHOUSE_ID = w.WAREHOUSE_ID
             JOIN build b ON a.BUILD_ID = b.BUILD_ID 
         WHERE
-            a.INVENTORY_OUT_ID = '{$inventory_out_id}'";
+            a.INVENTORY_OUT_ID = '{$inventory_out_id}'
+        ORDER BY a.INVENTORY_OUT_DETAIL_ID ASC
+        ";
 
         if ($limit !== null && $start !== null) {
             $sql .= " LIMIT {$start}, {$limit}";

@@ -79,6 +79,8 @@ class Do_kny extends Back_Controller
                     "nama_item"     => $d->Nama_Item ?? '-',
                     "kode_item"     => $d->Kode_Item ?? '-',
                     "jumlah"        => numb_format((float)$d->Qty) ?? '-',
+                    "invoice"       => numb_format((float)$d->Invoice) ?? '-',
+                    "sisa"          => numb_format((float)$d->Sisa) ?? '-',
                     "satuan"        => $d->UoM ?? '-',
                     "no_mr"         => $d->No_MR ?? '-',
                     "s_loc"         => $d->S_Loc ?? '-',

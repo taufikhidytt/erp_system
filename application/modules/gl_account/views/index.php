@@ -88,6 +88,7 @@
     .coa-badge-level { background:rgba(var(--app-primary-rgb,85,110,230),.1); color:var(--app-primary,#556ee6); }
     .coa-badge-active { background:rgba(34,197,94,.1); color:#16a34a; }
     .coa-badge-inactive { background:rgba(148,163,184,.12); color:#64748b; }
+    .coa-badge-info { background:rgba(80, 165, 241, 0.12); color:#50a5f1; }
     body[data-theme="dark"] .coa-badge-active { background:rgba(52,195,143,.15); color:#34c38f; }
     body[data-theme="dark"] .coa-badge-inactive { background:rgba(255,61,96,.15); color:#ff3d60; }
 
@@ -119,7 +120,7 @@
     .coa-empty-state p { font-size:.8rem; margin:0; }
 </style>
 
-<div class="page-content" data-aos="zoom-in">
+<div class="page-content" data-aos="zoom-in"<?= $mata_uang?' data-mata_uang_default="'.base64_encode(json_encode($mata_uang)).'"':'' ?>>
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
@@ -198,20 +199,20 @@
                                         </div>
                                     </div>
 
-                                    <div class="coa-info-grid">
-                                        <div class="coa-info-item">
+                                    <div class="row">
+                                        <div class="col-xl-3 col-md-4 coa-info-item mb-3">
                                             <span class="info-label">Kode Account</span>
                                             <span class="info-value" id="info-kode">—</span>
                                         </div>
-                                        <div class="coa-info-item">
+                                        <div class="col-xl-5 col-md-4 coa-info-item mb-3">
                                             <span class="info-label">Nama Account</span>
                                             <span class="info-value" id="info-nama">—</span>
                                         </div>
-                                        <div class="coa-info-item">
+                                        <div class="col-xl-3 col-md-4 coa-info-item mb-3">
                                             <span class="info-label">Tipe Account</span>
                                             <span class="info-value" id="info-tipe">—</span>
                                         </div>
-                                        <div class="coa-info-item">
+                                        <div class="col-xl-1 col-md-2 coa-info-item mb-3">
                                             <span class="info-label">Aktif</span>
                                             <div class="mt-2">
                                                 <span class="info-value" id="info-status">—</span>
@@ -227,9 +228,14 @@
                                             Sub-Account
                                             <span class="coa-sub-count d-none" id="sub-count">0</span>
                                         </h6>
-                                        <span class="coa-badge coa-badge-level" id="info-badge-sub-level">
-                                            <i class="ri-stack-line"></i> Level —
-                                        </span>
+                                        <div>
+                                            <span class="coa-badge coa-badge-info" style="font-weight: 400;">
+                                                <i class="ri-information-line"></i> <span class="fst-italic">Note : Yang bisa jadi COA adalah 6 digit</span>
+                                            </span>
+                                            <span class="coa-badge coa-badge-level" id="info-badge-sub-level">
+                                                <i class="ri-stack-line"></i> Level —
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <div id="sub-table-wrapper">
@@ -244,6 +250,8 @@
                                                     <th>Kode</th>
                                                     <th>Nama Account</th>
                                                     <th>Tipe</th>
+                                                    <th>Mata Uang</th>
+                                                    <th>Kode Transaksi</th>
                                                     <th>Aktif</th>
                                                 </tr>
                                             </thead>
@@ -278,7 +286,9 @@ $(function () {
                 id    : $n.data('id'),
                 code  : $n.data('code'),
                 name  : $n.data('name'),
+                kata  : $n.data('kata'),
                 type  : {id : $n.data('type_id'), label : $n.data('type')},
+                mata_uang  : {id : $n.data('mata_uang_id'), label : $n.data('mata_uang')},
                 active_flag: $n.data('active')
             });
         });
@@ -305,6 +315,8 @@ $(function () {
                 { data: 'code', width: '130px' },
                 { data: 'name' },
                 { data: 'type', width: '180px' },
+                { data: 'mata_uang', width: '30' },
+                { data: 'kata', width: '100px' },
                 { data: 'active_flag', width: '90px', className: 'text-center'
                 }
             ],
@@ -316,11 +328,11 @@ $(function () {
             add   : <?= $access['insert']?'true':'false' ?>,
             edit  : <?= $access['update']?'true':'false' ?>,
             urls  : {
-                save : config_app.url+'gl_account/save'
+                save : config_app.url+'gl_account/save',
             },
             fields: [
-                { field: 'code',         type: 'number', maxlength: 18, required: true, label: 'Kode Account' },
-                { field: 'name',         type: 'text', maxlength: 18, required: true, label: 'Nama Account'},
+                { field: 'code',         type: 'number', maxlength: 40, required: true, label: 'Kode Account' },
+                { field: 'name',         type: 'text', maxlength: 80, required: true, label: 'Nama Account'},
                 { field: 'type',       type: 'select2',required: true, label: 'Tipe Account', 
                     select2: {
                         url         : '/gl_account/get_type',
@@ -328,8 +340,29 @@ $(function () {
                     },
                     attrs: {
                         'data-dropdown-parent' : 'body',
+                    },
+                    onChange(val, $row, { fields, cfgOf }) {
+                        const program_code = val?.PROGRAM_CODE1;
+                        const kataCfg = cfgOf('kata');
+                        if (!kataCfg || !program_code) return;
+
+                        if (program_code === 'ACC_KASBANK' || program_code === 'ACC_GIRO') {
+                            kataCfg.required = true;
+                        } else {
+                            kataCfg.required = false;
+                        }
+                    },
+                },
+                { field: 'mata_uang',       type: 'select2',required: true, label: 'Tipe Account', 
+                    select2: {
+                        url         : '/gl_account/get_mata_uang',
+                        placeholder : 'Pilih Mata Uang',
+                    },
+                    attrs: {
+                        'data-dropdown-parent' : 'body',
                     }
                 },
+                { field: 'kata',         type: 'text', maxlength: 10, label: 'Kode Transaksi'},
                 { field: 'active_flag',  type: 'checkbox', value: 'Y'},
             ],
             beforeAdd: beforeAdd,
@@ -366,6 +399,12 @@ $(function () {
         state.editor.setExtraData({parent_id : state.id});
         state.editor.setDefaultValue('code', $node.data('code'));
         state.editor.setDefaultValue('type', { id: $node.data('type_id'), label: $node.data('type') });
+        state.editor.setFieldConfig('kata', { required: ($node.data('program_code') === 'ACC_KASBANK' || $node.data('program_code') === 'ACC_GIRO') });
+
+        if($('.page-content').attr('data-mata_uang_default')){
+            const mata_uang_default = JSON.parse(atob($('.page-content').attr('data-mata_uang_default')));
+            state.editor.setDefaultValue('mata_uang', mata_uang_default);
+        }
 
         $('#sub-count').text(state.dt.page.info().recordsTotal);
     }
@@ -409,7 +448,6 @@ $(function () {
         $active.addClass('active-node');
 
         $active.parents('ul').slideDown(150, function() {
-            // Logika mencocokkan icon folder terbuka (ri-folder-3-fill & ri-subtract-line)
             var $li = $(this).closest('li');
             $li.find('> .node-toggle i').removeClass('ri-add-line').addClass('ri-subtract-line');
             $li.find('> .tree-node .node-icon-folder').removeClass('ri-folder-3-line').addClass('ri-folder-3-fill');
@@ -488,5 +526,8 @@ $(function () {
         $('html,body').animate({ scrollTop: $('.coa-tree-panel').offset().top - 20 }, 400);
     });
 
+    $(document).on('click', '.btn-info-digit', function(){
+        swal.Fire('Informasi Account', 'Yang bisa jadi COA adalah 6 digit');
+    });
 });
 </script>

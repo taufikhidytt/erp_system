@@ -172,7 +172,7 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No RCV</th>
+                                                    <th>Batch No</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -216,8 +216,8 @@
                                 </th>
                                 <th>No</th>
                                 <th>Status</th>
-                                <th>Tanggal</th>
-                                <th>No Transaksi</th>
+                                <th>Batch Date</th>
+                                <th>Batch No</th>
                                 <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
@@ -902,13 +902,13 @@
 
                     toggleStorageDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                 }
             });
         });

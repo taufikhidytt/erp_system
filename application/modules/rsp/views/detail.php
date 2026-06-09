@@ -209,8 +209,8 @@
                                                     <th>
                                                         <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                     </th>
-                                                    <th>No Trx 1</th>
-                                                    <th>No Trx 2</th>
+                                                    <th>Reff Batch 1</th>
+                                                    <th>Reff Batch 2</th>
                                                     <th>Nama Item</th>
                                                     <th>Kode Item</th>
                                                     <th>Jumlah</th>
@@ -351,8 +351,8 @@
                                 </th>
                                 <th>No</th>
                                 <th>Status</th>
-                                <th>No Ref Trx 1</th>
-                                <th>No Ref Trx 2</th>
+                                <th>Reff Batch 1</th>
+                                <th>Reff Batch 2</th>
                                 <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
@@ -1183,13 +1183,13 @@
 
                     toggleStorageDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
-                        // timer: 2500,
-                        showConfirmButton: true
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                    //     // timer: 2500,
+                    //     showConfirmButton: true
+                    // });
                 }
             });
         });
@@ -1527,11 +1527,16 @@
                     success: function(res) {
                         if (res.status) {
                             Swal.fire({
-                                title: 'Berhasil!',
-                                text: res.message,
-                                icon: 'success'
-                            }).then(() => {
-                                location.reload();
+                                title: 'Berhasil',
+                                text: 'Data berhasil dihapus.',
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: false,
+                                showConfirmButton: false,
+                                confirmButtonText: 'OK',
+                                willClose: () => {
+                                    location.reload();
+                                }
                             });
                         } else {
                             Swal.fire({

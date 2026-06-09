@@ -79,6 +79,8 @@ class Po_kny extends Back_Controller
                     "nama_item"     => $d->Nama_Item,
                     "kode_item"     => $d->Kode_Item,
                     "jumlah"        => numb_format((float)$d->Qty),
+                    "retur"         => numb_format((float)$d->Retur),
+                    "sisa"          => numb_format((float)$d->Sisa),
                     "satuan"        => $d->UoM,
                     "harga"         => numb_format($d->Harga),
                     "diskon"        => numb_format($d->Diskon),

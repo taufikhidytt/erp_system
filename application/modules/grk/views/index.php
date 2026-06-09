@@ -98,6 +98,9 @@
                                             <th>
                                                 <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
                                             </th>
+                                            <th>
+                                                <input type="text" placeholder="Cari.." class="column_search input-number text-end" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                            </th>
                                         </tr>
                                         <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th></th>
@@ -108,6 +111,7 @@
                                             <th>Tanggal</th>
                                             <th>Supplier</th>
                                             <th>Storage</th>
+                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -174,7 +178,11 @@
                 },
                 {
                     "data": "gudang"
-                }
+                },
+                {
+                    "data": "total_nett",
+                    "className" : "text-end"
+                },
             ]
         });
 
@@ -206,7 +214,7 @@
                                     <th>Satuan</th>
                                     <th>Harga</th>
                                     <th>Subtotal</th>
-                                    <th>No FPK</th>
+                                    <th>Reff No</th>
                                     <th>Sales</th>
                                     <th>Note</th>
                                 </tr>

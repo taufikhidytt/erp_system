@@ -1840,13 +1840,13 @@
 
                     toggleStorageDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus',
+                    //     timer: 1500,
+                    //     showConfirmButton: false
+                    // });
                 }
             });
         });
@@ -1884,11 +1884,16 @@
                         success: function(res) {
                             if (res.status) {
                                 Swal.fire({
-                                    title: 'Berhasil!',
+                                    title: 'Berhasil',
                                     text: res.message,
-                                    icon: 'success'
-                                }).then(() => {
-                                    location.reload();
+                                    icon: 'success',
+                                    timer: 1000,
+                                    timerProgressBar: false,
+                                    showConfirmButton: false,
+                                    confirmButtonText: 'OK',
+                                    willClose: () => {
+                                        location.reload();
+                                    }
                                 });
                             } else {
                                 Swal.fire({

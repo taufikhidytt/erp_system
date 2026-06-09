@@ -218,7 +218,7 @@
                                                             <th>
                                                                 <input type="checkbox" name="checkAllParent" id="checkAllParent" class="">
                                                             </th>
-                                                            <th>No RHO</th>
+                                                            <th>Batch No</th>
                                                             <th>Nama Item</th>
                                                             <th>Kode Item</th>
                                                             <th>Jumlah</th>
@@ -367,15 +367,14 @@
                                 </th>
                                 <th>No</th>
                                 <th>Status</th>
-                                <th>Tanggal</th>
-                                <th>No Transaksi</th>
+                                <th>Batch Date</th>
+                                <th>Batch No</th>
                                 <th>No Referensi</th>
                                 <th>Nama Item</th>
                                 <th>Kode Item</th>
                                 <th>Jumlah</th>
                                 <th>Sisa</th>
                                 <th>Satuan</th>
-                                <th>Storage</th>
                             </tr>
                         </thead>
                     </table>
@@ -1183,13 +1182,13 @@
 
                     toggleStorageDisabled();
 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
-                        // timer: 2500,
-                        showConfirmButton: true
-                    });
+                    // Swal.fire({
+                    //     icon: 'success',
+                    //     title: 'Success',
+                    //     text: 'Item berhasil dihapus didaftar detail, klik save untuk menyimpan data.',
+                    //     // timer: 2500,
+                    //     showConfirmButton: true
+                    // });
                 }
             });
         });
@@ -1350,7 +1349,6 @@
                                 <td class="text-center">${data.Tanggal}</td>
                                 <td class="text-end">${data.Jumlah}</td>
                                 <td>${data.Satuan}</td>
-                                <td>${data['S.Loc']}</td>
                             </tr>`;
                         });
                     } else {
@@ -1677,11 +1675,16 @@
                     success: function(res) {
                         if (res.status) {
                             Swal.fire({
-                                title: 'Berhasil!',
-                                text: res.message,
-                                icon: 'success'
-                            }).then(() => {
-                                location.reload();
+                                title: 'Berhasil',
+                                text: 'Data berhasil dihapus.',
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: false,
+                                showConfirmButton: false,
+                                confirmButtonText: 'OK',
+                                willClose: () => {
+                                    location.reload();
+                                }
                             });
                         } else {
                             Swal.fire({
