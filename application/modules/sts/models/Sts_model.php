@@ -30,7 +30,10 @@ class Sts_model extends CI_Model
         "wh.WAREHOUSE_NAME",
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array(
+        'a.TAG_KONSI_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC',
+    );
 
     private function _get_datatables_query()
     {
@@ -78,7 +81,9 @@ class Sts_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 
@@ -139,13 +144,13 @@ class Sts_model extends CI_Model
             IF(tkd.PO_DETAIL_ID IS NOT NULL,po.DOCUMENT_NO,tg.DOCUMENT_NO) as No_FPK,
         ");
         $this->db->from("tag_konsi_detail tkd");
-        
+
         $this->db->join("item i", "tkd.ITEM_ID = i.ITEM_ID");
-        $this->db->join("po_detail pod", "tkd.PO_DETAIL_ID = pod.PO_DETAIL_ID",'left');
-        $this->db->join("po", "pod.PO_ID = po.PO_ID","left");
-        $this->db->join("tag_detail td", "tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID",'left');
-        $this->db->join("tag tg", "td.TAG_ID = tg.TAG_ID","left");
-        
+        $this->db->join("po_detail pod", "tkd.PO_DETAIL_ID = pod.PO_DETAIL_ID", 'left');
+        $this->db->join("po", "pod.PO_ID = po.PO_ID", "left");
+        $this->db->join("tag_detail td", "tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID", 'left');
+        $this->db->join("tag tg", "td.TAG_ID = tg.TAG_ID", "left");
+
         $this->db->where("tkd.TAG_KONSI_ID", $tag_konsi_id);
         $this->db->order_by('tkd.TAG_KONSI_DETAIL_ID', 'ASC');
 
@@ -205,7 +210,8 @@ class Sts_model extends CI_Model
         return true;
     }
 
-    public function get_sts_detail($id){
+    public function get_sts_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
@@ -214,7 +220,7 @@ class Sts_model extends CI_Model
         $this->db->from('tag_konsi a');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->join('warehouse to_w', 'a.TO_WH_ID = to_w.WAREHOUSE_ID');
-        $this->db->where('a.TAG_KONSI_ID',$id);
+        $this->db->where('a.TAG_KONSI_ID', $id);
         return $this->db->get();
     }
 
@@ -222,8 +228,8 @@ class Sts_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('tag_konsi a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.TAG_KONSI_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();

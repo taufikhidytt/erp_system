@@ -19,7 +19,11 @@ class Po_kny_model extends CI_Model
         "Supplier",
         "WAREHOUSE_NAME",
         "PAYMENT_TERM_NAME",
-        "Total"
+        "a.TOTAL_AMOUNT",
+        "a.TOTAL_DISCOUNT",
+        "a.PPN_AMOUNT",
+        "a.TOTAL_NET",
+        "a.PPN_CODE"
     );
 
     var $column_search = array(
@@ -31,10 +35,17 @@ class Po_kny_model extends CI_Model
         "CONCAT(p . PERSON_NAME, ' - [', p . PERSON_CODE, ']')",
         "WAREHOUSE_NAME",
         "PAYMENT_TERM_NAME",
-        "TOTAL_NET"
+        "a.TOTAL_AMOUNT",
+        "a.TOTAL_DISCOUNT",
+        "a.PPN_AMOUNT",
+        "a.TOTAL_NET",
+        "a.PPN_CODE"
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array(
+        'a.INVOICE_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC',
+    );
 
     private function _get_datatables_query()
     {
@@ -52,7 +63,11 @@ class Po_kny_model extends CI_Model
             w.WAREHOUSE_NAME S_Loc,
             py.PAYMENT_TERM_ID,
             py.PAYMENT_TERM_NAME Terms,
-            a.TOTAL_NET Total
+            a.TOTAL_AMOUNT `Total_Amount`,	
+            a.TOTAL_DISCOUNT `Total_Diskon`,	
+            a.PPN_AMOUNT `Total_PPN`,	
+            a.TOTAL_NET `Total_Net`,	
+            a.PPN_CODE `PPN`
         ");
         $this->db->from('invoice a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
@@ -87,7 +102,9 @@ class Po_kny_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 
@@ -149,6 +166,7 @@ class Po_kny_model extends CI_Model
             a.UNIT_PRICE Harga,
             a.DISCOUNT_PRICE Diskon,
             a.SUBTOTAL Total,
+            a.DISCOUNT_PRICE1 Diskon_Total,
             b.DOCUMENT_NO No_MR,
             w.WAREHOUSE_NAME S_Loc_In,
             a.NOTE Note,

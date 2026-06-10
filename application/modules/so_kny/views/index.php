@@ -66,37 +66,13 @@
                                 <table class="table text-center w-100 table-sm" id="table">
                                     <thead>
                                         <tr>
-                                            <th>
-                                            </th>
-                                            <th>
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="1" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="2" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="3" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="date" placeholder="Cari.." class="column_search" data-column="4" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="5" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="6" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="7" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="8" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
-                                            <th>
-                                                <input type="text" placeholder="Cari.." class="column_search" data-column="9" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
-                                            </th>
+                                            <th></th>
+                                            <th></th>
+                                            <?php for ($i=1; $i <= 13 ; $i++) { ?>
+                                                <th>
+                                                    <input type="<?= $i==4?'date':'text' ?>" placeholder="Cari.." class="column_search<?= $i>=9 && $i<=12?' input-number text-end':'' ?>" data-column="<?= $i ?>" style="border-radius: 5%; box-sizing: border-box; border: 1px solid #CED4DA; padding: 8px; width: 100%;">
+                                                </th>
+                                            <?php } ?>
                                         </tr>
                                         <tr class="align-content-center" style="background: var(--app-primary-th); z-index: 10; color: var(--app-primary-contrast)">
                                             <th></th>
@@ -107,9 +83,13 @@
                                             <th>Tanggal</th>
                                             <th>Customer</th>
                                             <th>Sales</th>
-                                            <th>Storage</th>
                                             <th>Terms</th>
-                                            <th>Total</th>
+                                            <th>Storage</th>
+                                            <th>Total Amount</th>
+                                            <th>Total Diskon</th>
+                                            <th>Total PPN</th>
+                                            <th>Total Net</th>
+                                            <th>PPN</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -190,14 +170,6 @@
                     }
                 },
                 {
-                    "data": "s_loc",
-                    "width": "10%",
-                    "render": function(data) {
-                        if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
-                    }
-                },
-                {
                     "data": "terms",
                     "width": "10%",
                     "render": function(data) {
@@ -206,13 +178,47 @@
                     }
                 },
                 {
-                    "data": "total",
+                    "data": "s_loc",
                     "width": "10%",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                {
+                    "data": "total_amount",
                     className: "text-end",
                     "render": function(data) {
                         if (!data) return '-';
                         return `<span title="${data}">${data}</span>`;
                     }
+                },
+                {
+                    "data": "total_discount",
+                    className: "text-end",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                {
+                    "data": "total_ppn",
+                    className: "text-end",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                {
+                    "data": "total_net",
+                    className: "text-end",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                {
+                    "data": "ppn_code",
                 },
             ]
         });
@@ -246,6 +252,7 @@
                                     <th>Harga</th>
                                     <th>Diskon</th>
                                     <th>Total</th>
+                                    <th>Diskon Total</th>
                                     <th>Reff No</th>
                                     <th>Storage</th>
                                     <th>Note</th>
@@ -329,6 +336,13 @@
                         },
                         {
                             "data": "total",
+                            "className": "text-end",
+                            createdCell: function(td) {
+                                td.style.fontFamily = 'monospace';
+                            }
+                        },
+                        {
+                            "data": "diskon_total",
                             "className": "text-end",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';

@@ -112,11 +112,11 @@
                                             <th>No Transaksi</th>
                                             <th>No Referensi</th>
                                             <th>Tanggal</th>
-                                            <th>Storage</th>
                                             <th>Customer</th>
-                                            <th>Unit</th>
+                                            <th>Storage</th>
                                             <th>Nama Item</th>
                                             <th>Satuan</th>
+                                            <th>Unit</th>
                                             <th>Flag</th>
                                         </tr>
                                     </thead>
@@ -161,12 +161,12 @@
                     "orderable": false,
                     "searchable": false,
                     "width": "5%",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "status",
                     "width": "10%",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
                 {
                     "data": "no_transaksi",
@@ -179,15 +179,7 @@
                 {
                     "data": "tanggal",
                     "width": "10%",
-                    "className" : "text-center",
-                },
-                {
-                    "data": "storage",
-                    "width": "10%",
-                    "render": function(data) {
-                        if (!data) return '-';
-                        return `<span title="${data}">${data}</span>`;
-                    }
+                    "className": "text-center",
                 },
                 {
                     "data": "customer",
@@ -198,7 +190,7 @@
                     }
                 },
                 {
-                    "data": "unit",
+                    "data": "storage",
                     "width": "10%",
                     "render": function(data) {
                         if (!data) return '-';
@@ -222,9 +214,17 @@
                     }
                 },
                 {
+                    "data": "unit",
+                    "width": "10%",
+                    "render": function(data) {
+                        if (!data) return '-';
+                        return `<span title="${data}">${data}</span>`;
+                    }
+                },
+                {
                     "data": "flag",
                     "width": "10%",
-                    "className" : "text-center",
+                    "className": "text-center",
                 },
             ]
         });
@@ -276,7 +276,7 @@
                     },
                     "columns": [{
                             "data": "no",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }
@@ -289,7 +289,7 @@
                         },
                         {
                             "data": "kode_item",
-                            className : "text-center",
+                            className: "text-center",
                             createdCell: function(td) {
                                 td.style.fontFamily = 'monospace';
                             }

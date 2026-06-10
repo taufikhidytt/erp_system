@@ -18,9 +18,13 @@ class So_kny_model extends CI_Model
         "a.DOCUMENT_DATE",
         "Customer",
         "k.FIRST_NAME",
-        "w.WAREHOUSE_NAME",
         "py.PAYMENT_TERM_NAME",
-        "a.TOTAL_NET"
+        "w.WAREHOUSE_NAME",
+        "a.TOTAL_AMOUNT",	
+        "a.TOTAL_DISCOUNT",	
+        "a.PPN_AMOUNT",	
+        "a.TOTAL_NET",	
+        "a.PPN_CODE"
     );
 
     var $column_search = array(
@@ -36,12 +40,16 @@ class So_kny_model extends CI_Model
             ']'
         )",
         "k.FIRST_NAME",
-        "w.WAREHOUSE_NAME",
         "py.PAYMENT_TERM_NAME",
-        "a.TOTAL_NET"
+        "w.WAREHOUSE_NAME",
+        "a.TOTAL_AMOUNT",	
+        "a.TOTAL_DISCOUNT",	
+        "a.PPN_AMOUNT",	
+        "a.TOTAL_NET",	
+        "a.PPN_CODE"
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array('a.SO_ID' => 'DESC','a.DOCUMENT_DATE' => 'DESC');
 
     private function _get_datatables_query()
     {
@@ -66,7 +74,12 @@ class So_kny_model extends CI_Model
             w.WAREHOUSE_NAME `S_Loc`,
             py.PAYMENT_TERM_ID,
             py.PAYMENT_TERM_NAME Terms,
-            a.TOTAL_NET Total
+            a.TOTAL_AMOUNT `Total_Amount`,	
+            a.TOTAL_DISCOUNT `Total_Diskon`,	
+            a.PPN_AMOUNT `Total_PPN`,	
+            a.TOTAL_NET `Total_Net`,	
+            a.PPN_CODE `PPN`
+
         ");
         $this->db->from('so a');
         $this->db->join('erp_lookup_value b', 'a.STATUS_ID = b.ERP_LOOKUP_VALUE_ID');
@@ -102,7 +115,9 @@ class So_kny_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field,$direction);
+            }
         }
     }
 
@@ -172,6 +187,7 @@ class So_kny_model extends CI_Model
                     a.UNIT_PRICE Harga,
                     a.DISCOUNT_PRICE Diskon,
                     a.SUBTOTAL Total,
+                    a.DISCOUNT_PRICE1 Diskon_Total,
                     a.DESKRIPSI,
                     b.DOCUMENT_NO No_MR,
                     w.WAREHOUSE_NAME `S_Loc_In`,

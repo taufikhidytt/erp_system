@@ -30,7 +30,10 @@ class Rsp_model extends CI_Model
         "w.WAREHOUSE_NAME",
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array(
+        'a.TAG_PINJAM_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC',
+    );
 
     private function _get_datatables_query()
     {
@@ -78,7 +81,9 @@ class Rsp_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 

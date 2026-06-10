@@ -37,7 +37,10 @@ class Grk_model extends CI_Model
         "a.TOTAL_NET"
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array(
+        'a.PO_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC'
+    );
 
     private function _get_datatables_query()
     {
@@ -92,7 +95,9 @@ class Grk_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 
@@ -213,17 +218,18 @@ class Grk_model extends CI_Model
         return ($this->db->error()['code'] == 0);
     }
 
-    public function get_grk_detail($id){
+    public function get_grk_detail($id)
+    {
         $this->db->select("
             a.DOCUMENT_DATE,a.DOCUMENT_NO,a.DOCUMENT_REFF_NO,a.TOTAL_AMOUNT,a.NOTE,
             w.WAREHOUSE_NAME,
         ");
         // $this->db->select("CONCAT( p.PERSON_NAME, ' - [', p.PERSON_CODE, ']' ) as SUPPLIER",true);
-        $this->db->select("p.PERSON_NAME as SUPPLIER",true);
+        $this->db->select("p.PERSON_NAME as SUPPLIER", true);
         $this->db->join('person p', 'a.PERSON_ID = p.PERSON_ID');
         $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
         $this->db->from('po a');
-        $this->db->where('a.PO_ID',$id);
+        $this->db->where('a.PO_ID', $id);
         return $this->db->get();
     }
 
@@ -231,8 +237,8 @@ class Grk_model extends CI_Model
     {
         $this->db->select('a.CREATED_DATE,a.LAST_UPDATE_DATE,c.ERP_USER_NAME as USER_CREATED,u.ERP_USER_NAME as USER_UPDATED');
         $this->db->from('po a');
-        $this->db->join('erp_user c','a.CREATED_BY = c.ERP_USER_ID','left');
-        $this->db->join('erp_user u','a.LAST_UPDATE_BY = u.ERP_USER_ID','left');
+        $this->db->join('erp_user c', 'a.CREATED_BY = c.ERP_USER_ID', 'left');
+        $this->db->join('erp_user u', 'a.LAST_UPDATE_BY = u.ERP_USER_ID', 'left');
         $this->db->where('a.PO_ID', $id);
         $this->db->limit(1);
         return $this->db->get()->row();
@@ -246,7 +252,7 @@ class Grk_model extends CI_Model
         $user_id    = (int) $this->session->id;
 
         $this->db->select("a.WAREHOUSE_ID as id, a.WAREHOUSE_NAME as text")
-                ->from('warehouse a');
+            ->from('warehouse a');
 
         // 2. LEFT JOIN dengan Subquery Aggregasi (Menghindari duplikasi data)
         $subquery_join = "(SELECT WAREHOUSE_ID, MAX(PRIMARY_FLAG) AS PRIMARY_FLAG

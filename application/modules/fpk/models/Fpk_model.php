@@ -36,7 +36,10 @@ class Fpk_model extends CI_Model
         "a.TOTAL_AMOUNT",
     );
 
-    var $order = array('a.PR_ID' => 'DESC');
+    var $order = array(
+        'a.PR_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC'
+    );
 
     private function _get_datatables_query()
     {
@@ -87,7 +90,9 @@ class Fpk_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 

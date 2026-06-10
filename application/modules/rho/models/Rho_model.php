@@ -31,8 +31,8 @@ class Rho_model extends CI_Model
     );
 
     var $order = array(
-        'a.DOCUMENT_DATE' => 'DESC',
         'a.REQUEST_QTY_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC',
     );
 
     private function _get_datatables_query()

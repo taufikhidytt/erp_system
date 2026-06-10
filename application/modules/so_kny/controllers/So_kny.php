@@ -43,7 +43,11 @@ class So_kny extends Back_Controller
             $row['sales'] = $so_kny->Sales ? $so_kny->Sales : '-';
             $row['s_loc'] = $so_kny->S_Loc ? $so_kny->S_Loc : '-';
             $row['terms'] = $so_kny->Terms ? $so_kny->Terms : '-';
-            $row['total'] = $so_kny->Total ? numb_format($so_kny->Total) : '-';
+            $row['total_amount'] = $so_kny->Total_Amount ? numb_format($so_kny->Total_Amount) : '-';
+            $row['total_discount'] = $so_kny->Total_Diskon ? numb_format($so_kny->Total_Diskon) : '-';
+            $row['total_ppn'] = $so_kny->Total_PPN ? numb_format($so_kny->Total_PPN) : '-';
+            $row['total_net'] = $so_kny->Total_Net ? numb_format($so_kny->Total_Net) : '-';
+            $row['ppn_code'] = $so_kny->PPN ? $so_kny->PPN : '-';
 
             $row['so_id'] = $this->encrypt->encode($so_kny->SO_ID);
             $data[] = $row;
@@ -86,6 +90,7 @@ class So_kny extends Back_Controller
                     "harga"         => numb_format($d->Harga),
                     "diskon"        => numb_format($d->Diskon),
                     "total"         => numb_format($d->Total),
+                    "diskon_total"  => numb_format($d->Diskon_Total),
                     "no_mr"         => $d->No_MR,
                     "s_loc_in"      => $d->S_Loc_In,
                     "note"          => $d->Note,

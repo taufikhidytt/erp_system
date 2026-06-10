@@ -42,7 +42,11 @@ class Po_kny extends Back_Controller
             $row['supplier'] = $po_kny->Supplier ? $po_kny->Supplier : '-';
             $row['s_loc'] = $po_kny->S_Loc ? $po_kny->S_Loc : '-';
             $row['terms'] = $po_kny->Terms ? $po_kny->Terms : '-';
-            $row['total'] = $po_kny->Total ? numb_format($po_kny->Total) : '-';
+            $row['total_amount'] = $po_kny->Total_Amount ? numb_format($po_kny->Total_Amount) : '-';
+            $row['total_discount'] = $po_kny->Total_Diskon ? numb_format($po_kny->Total_Diskon) : '-';
+            $row['total_ppn'] = $po_kny->Total_PPN ? numb_format($po_kny->Total_PPN) : '-';
+            $row['total_net'] = $po_kny->Total_Net ? numb_format($po_kny->Total_Net) : '-';
+            $row['ppn_code'] = $po_kny->PPN ? $po_kny->PPN : '-';
 
             $row['invoice_id'] = $this->encrypt->encode($po_kny->INVOICE_ID);
             $data[] = $row;
@@ -85,6 +89,7 @@ class Po_kny extends Back_Controller
                     "harga"         => numb_format($d->Harga),
                     "diskon"        => numb_format($d->Diskon),
                     "total"         => numb_format($d->Total),
+                    "diskon_total"  => numb_format($d->Diskon_Total),
                     "no_mr"         => $d->No_MR,
                     "s_loc_in"      => $d->S_Loc_In,
                     "note"          => $d->Note,

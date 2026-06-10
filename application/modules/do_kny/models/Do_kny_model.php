@@ -34,7 +34,10 @@ class Do_kny_model extends CI_Model
         "WAREHOUSE_NAME",
     );
 
-    var $order = array('a.DOCUMENT_DATE' => 'DESC');
+    var $order = array(
+        'a.INVENTORY_OUT_ID' => 'DESC',
+        'a.DOCUMENT_DATE' => 'DESC'
+    );
 
     private function _get_datatables_query()
     {
@@ -89,7 +92,9 @@ class Do_kny_model extends CI_Model
             );
         } elseif (isset($this->order)) {
             $order = $this->order;
-            $this->db->order_by(key($order), $order[key($order)]);
+            foreach ($order as $field => $direction) {
+                $this->db->order_by($field, $direction);
+            }
         }
     }
 
