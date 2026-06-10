@@ -658,15 +658,45 @@ $(function () {
 	};
 });
 
+// $(document).ready(function () {
+// 	let current_url = (window.location.href).replace(config_app.url,'').split('/');
+// 	let key_tab 	= '';
+// 	for (let index = 0; index < current_url.length; index++) {
+// 		if(index>1) break;
+// 		key_tab += current_url[index]+'/';
+// 	}
+// 	key_tab = btoa(key_tab);
+
+// 	var activeTab = localStorage.getItem(key_tab+"_activeTab");
+// 	if (activeTab) {
+// 		$('.nav-tabs a[href="' + activeTab + '"]').tab("show");
+// 	}
+
+// 	$('a[data-bs-toggle="tab"]').on("shown.bs.tab", function (e) {
+// 		localStorage.setItem(key_tab+"_activeTab", $(e.target).attr("href"));
+// 	});
+// });
+
 $(document).ready(function () {
-	// Aktifkan tab terakhir setelah refresh
-	var activeTab = localStorage.getItem("activeTab");
-	if (activeTab) {
-		$('.nav-tabs a[href="' + activeTab + '"]').tab("show");
+	let current_url = window.location.href.replace(config_app.url, "").split("/");
+	let key_tab = "";
+
+	for (let index = 0; index < current_url.length; index++) {
+		if (index > 1) break;
+		key_tab += current_url[index] + "/";
 	}
 
-	// Simpan tab yang sedang aktif
+	key_tab = btoa(key_tab);
+
+	var activeTab = sessionStorage.getItem(key_tab + "_activeTab");
+
+	if (activeTab) {
+		$('.nav-tabs a[href="' + activeTab + '"]').tab("show");
+	} else {
+		$('.nav-tabs a[href="#fpk"]').tab("show");
+	}
+
 	$('a[data-bs-toggle="tab"]').on("shown.bs.tab", function (e) {
-		localStorage.setItem("activeTab", $(e.target).attr("href"));
+		sessionStorage.setItem(key_tab + "_activeTab", $(e.target).attr("href"));
 	});
 });

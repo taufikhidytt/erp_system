@@ -220,35 +220,77 @@
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $dataDetail = $this->db->query("SELECT COALESCE
-                                                    (
-                                                    IF
-                                                        (
-                                                            a.PO_DETAIL_ID IS NOT NULL,
-                                                            b.ENTERED_QTY - ( b.RECEIVED_ENTERED_QTY / b.BASE_QTY ),
-                                                            c.ENTERED_QTY - ( c.DELIVERED_ENTERED_QTY / c.BASE_QTY ) 
+                                                $dataDetail = $this->db->query("SELECT
+                                                    COALESCE(
+                                                        td.ENTERED_QTY - (
+                                                            td.DELIVERED_ENTERED_QTY / td.BASE_QTY
                                                         ),
-                                                        0 
-                                                    ) BALANCE,
-                                                    a.*,
+                                                        pod_direct.ENTERED_QTY - (
+                                                            pod_direct.RECEIVED_ENTERED_QTY / pod_direct.BASE_QTY
+                                                        )
+                                                    ) AS BALANCE,
+                                                    COALESCE(
+                                                        i.PART_NUMBER,
+                                                        i.ITEM_DESCRIPTION
+                                                    ) AS ITEM_DESCRIPTION,
                                                     i.ITEM_CODE,
-                                                    i.ITEM_DESCRIPTION,
-                                                    IF(a.PO_DETAIL_ID IS NOT NULL, pr.DOCUMENT_NO, pra.DOCUMENT_NO ) No_Reff_1,
-                                                    IF(a.PO_DETAIL_ID IS NOT NULL, po.DOCUMENT_NO, tg.DOCUMENT_NO) No_Reff_2 
+                                                    i.ITEM_ID,
+                                                    tkd.ENTERED_QTY,
+                                                    tkd.ENTERED_UOM,
+                                                    tkd.BASE_QTY,
+                                                    tkd.UNIT_PRICE,
+                                                    tkd.SUBTOTAL,
+                                                    tkd.WAREHOUSE_ID,
+                                                    tkd.HARGA_INPUT,
+                                                    tkd.BERAT,
+                                                    COALESCE(
+                                                        pr_indirect.DOCUMENT_NO,
+                                                        pr_direct.DOCUMENT_NO
+                                                    ) AS No_Reff_1,
+                                                    COALESCE(
+                                                        tg.DOCUMENT_NO,
+                                                        po_direct.DOCUMENT_NO
+                                                    ) AS No_Reff_2,
+                                                    tkd.NOTE,
+                                                    tkd.TAG_PINJAM_ID,
+                                                    tkd.TAG_PINJAM_DETAIL_ID,
+                                                    tkd.PO_DETAIL_ID,
+                                                    td.TAG_DETAIL_ID
                                                 FROM
-                                                    tag_pinjam_detail a
-                                                    LEFT JOIN po_detail b ON a.PO_DETAIL_ID = b.PO_DETAIL_ID
-                                                    LEFT JOIN pr_detail pd ON b.PR_DETAIL_ID = pd.PR_DETAIL_ID
-                                                    LEFT JOIN pr pr ON pd.PR_ID = pr.PR_ID
-                                                    LEFT JOIN po ON b.PO_ID = po.PO_ID
-                                                    LEFT JOIN tag_detail c ON a.TAG_DETAIL_ID = c.TAG_DETAIL_ID
-                                                    LEFT JOIN tag tg ON c.TAG_ID = tg.TAG_ID
-                                                    LEFT JOIN po_detail pod ON c.PO_DETAIL_ID = pod.PO_DETAIL_ID
-                                                    LEFT JOIN pr_detail prd ON pod.PR_DETAIL_ID = prd.PR_DETAIL_ID
-                                                    LEFT JOIN pr pra ON prd.PR_ID = pra.PR_ID
-                                                    JOIN item i ON a.ITEM_ID = i.ITEM_ID 
-                                                WHERE
-                                                    a.TAG_PINJAM_ID = '{$data->TAG_PINJAM_ID}'");
+                                                    tag_pinjam_detail tkd
+                                                    JOIN item i
+                                                        ON tkd.ITEM_ID = i.ITEM_ID
+                                                    LEFT JOIN po_detail pod_direct
+                                                        ON tkd.PO_DETAIL_ID = pod_direct.PO_DETAIL_ID
+                                                    LEFT JOIN po po_direct
+                                                        ON pod_direct.PO_ID = po_direct.PO_ID
+                                                    LEFT JOIN pr_detail prd_direct
+                                                        ON pod_direct.PR_DETAIL_ID = prd_direct.PR_DETAIL_ID
+                                                    LEFT JOIN pr pr_direct
+                                                        ON prd_direct.PR_ID = pr_direct.PR_ID
+                                                    LEFT JOIN tag_detail td
+                                                        ON tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID
+                                                    LEFT JOIN tag tg
+                                                        ON td.TAG_ID = tg.TAG_ID
+                                                    LEFT JOIN po_detail pod_indirect_1
+                                                        ON td.PO_DETAIL_ID = pod_indirect_1.PO_DETAIL_ID
+                                                    LEFT JOIN request_qty_detail rqd
+                                                        ON td.REQUEST_QTY_DETAIL_ID = rqd.REQUEST_QTY_DETAIL_ID
+                                                        AND rqd.PO_DETAIL_ID IS NULL
+                                                    LEFT JOIN tag_konsi_detail tdl
+                                                        ON rqd.TAG_KONSI_DETAIL_ID = tdl.TAG_KONSI_DETAIL_ID
+                                                    LEFT JOIN tag_detail tdi
+                                                        ON tdl.TAG_DETAIL_ID = tdi.TAG_DETAIL_ID
+                                                    LEFT JOIN po_detail pod_indirect_2
+                                                        ON tdi.PO_DETAIL_ID = pod_indirect_2.PO_DETAIL_ID
+                                                    LEFT JOIN pr_detail prd_indirect
+                                                        ON COALESCE(
+                                                            pod_indirect_1.PR_DETAIL_ID,
+                                                            pod_indirect_2.PR_DETAIL_ID
+                                                        ) = prd_indirect.PR_DETAIL_ID
+                                                    LEFT JOIN pr pr_indirect
+                                                        ON prd_indirect.PR_ID = pr_indirect.PR_ID
+                                                WHERE tkd.TAG_PINJAM_ID = {$data->TAG_PINJAM_ID}");
 
                                                 if ($dataDetail->num_rows() > 0) { ?>
                                                     <?php

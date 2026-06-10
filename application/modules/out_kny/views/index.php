@@ -105,6 +105,24 @@
                                     <span class="d-none d-sm-block">Receive in Site</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#return_to_ho" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Return to HO"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">Return to HO</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#receive_in_ho" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Receive in HO"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">Receive in HO</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#return_to_supplier" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Return to Supplier"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">Return to Supplier</span>
+                                </a>
+                            </li>
                         </ul>
 
                         <!-- Tab panes -->
@@ -123,6 +141,18 @@
 
                             <div class="tab-pane fade" id="receive_in_site">
                                 <?php $this->load->view('tab_receive_in_site'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="return_to_ho">
+                                <?php $this->load->view('tab_return_to_ho'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="receive_in_ho">
+                                <?php $this->load->view('tab_receive_in_ho'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="return_to_supplier">
+                                <?php $this->load->view('tab_return_to_supplier'); ?>
                             </div>
                         </div>
                     </div>

@@ -445,7 +445,7 @@ $is_custom_color = !array_key_exists($primary_color, $color_presets);
         AOS.init();
     </script>
     <script src="<?= base_url() ?>assets/admin/js/shortcut.js?v=1.6"></script>
-    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=1.8"></script>
+    <script src="<?= base_url() ?>assets/admin/js/custom-template.js?v=2.0"></script>
 </body>
 
 </html>

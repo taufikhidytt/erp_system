@@ -162,12 +162,30 @@ class Rsp_model extends CI_Model
                         td.TAG_DETAIL_ID 
                     FROM
                         tag_pinjam_detail tkd
-                        JOIN item i ON tkd.ITEM_ID = i.ITEM_ID
-                        JOIN tag_detail td ON tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID
-                        JOIN tag tg ON td.TAG_ID = tg.TAG_ID
-                        JOIN po_detail pod ON td.PO_DETAIL_ID = pod.PO_DETAIL_ID
-                        JOIN pr_detail prd ON pod.PR_DETAIL_ID = prd.PR_DETAIL_ID
-                        JOIN pr ON prd.PR_ID = pr.PR_ID 
+                        JOIN item i
+                            ON tkd.ITEM_ID = i.ITEM_ID
+                        JOIN tag_detail td
+                            ON tkd.TAG_DETAIL_ID = td.TAG_DETAIL_ID
+                        JOIN tag tg
+                            ON td.TAG_ID = tg.TAG_ID
+                        LEFT JOIN po_detail pod_direct
+                            ON td.PO_DETAIL_ID = pod_direct.PO_DETAIL_ID
+                        LEFT JOIN request_qty_detail rqd
+                            ON td.REQUEST_QTY_DETAIL_ID = rqd.REQUEST_QTY_DETAIL_ID
+                            AND rqd.PO_DETAIL_ID IS NULL
+                        LEFT JOIN tag_konsi_detail tdl
+                            ON rqd.TAG_KONSI_DETAIL_ID = tdl.TAG_KONSI_DETAIL_ID
+                        LEFT JOIN tag_detail tdi
+                            ON tdl.TAG_DETAIL_ID = tdi.TAG_DETAIL_ID
+                        LEFT JOIN po_detail pod_indirect
+                            ON tdi.PO_DETAIL_ID = pod_indirect.PO_DETAIL_ID
+                        LEFT JOIN pr_detail prd
+                            ON COALESCE(
+                                pod_direct.PR_DETAIL_ID,
+                                pod_indirect.PR_DETAIL_ID
+                            ) = prd.PR_DETAIL_ID
+                        LEFT JOIN pr
+                            ON prd.PR_ID = pr.PR_ID
                     ) AS tmp 
                 WHERE
                     tmp.TAG_PINJAM_ID = '{$tag_pinjam_id}'
