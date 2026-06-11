@@ -398,4 +398,279 @@ class Out_kny_model extends CI_Model
         $query = $this->db->query($sql, [$tag_pinjam_id, $tag_pinjam_id]);
         return $query->row()->total;
     }
+
+    public function getSupplierMr()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("a.PERSON_ID as id, a.PERSON_NAME Supplier, a.PERSON_CODE Kode, CONCAT('[',a.PERSON_CODE,'] - ',a.PERSON_NAME) as text")
+            ->from('person a')
+            ->join('person_site b', 'a.PERSON_ID = b.PERSON_ID')
+            ->where('a.FLAG_SUPP', 0)
+            ->group_by('a.PERSON_ID')
+            ->order_by('a.PERSON_NAME');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function get_detail_by_build_id($build_id, $limit = null, $start = null)
+    {
+        $this->db->select("
+            bmd.BUILD_ID,
+            bmd.BUILD_DETAIL_ID,
+            pod.PO_DETAIL_ID,
+            td.TAG_DETAIL_ID,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
+            i.ITEM_CODE AS Kode_Item,
+            bmd.ENTERED_QTY AS Jumlah,
+            bmd.RECEIVED_ENTERED_QTY / NULLIF(bmd.BASE_QTY, 0) AS PO,
+            bmd.ENTERED_QTY - (bmd.RECEIVED_ENTERED_QTY / NULLIF(bmd.BASE_QTY, 0)) AS Sisa,
+            bmd.ENTERED_UOM AS Satuan,
+            COALESCE(tg.DOCUMENT_NO, po.DOCUMENT_NO) AS Batch_No,
+            bmd.NOTE AS Note
+        ");
+        $this->db->from('BUILD_DETAIL bmd');
+        $this->db->join('ITEM i', 'bmd.ITEM_ID = i.ITEM_ID');
+        $this->db->join('PO_DETAIL pod', 'bmd.PO_DETAIL_ID = pod.PO_DETAIL_ID', 'left');
+        $this->db->join('PO po', 'pod.PO_ID = po.PO_ID', 'left');
+        $this->db->join('TAG_DETAIL td', 'bmd.TAG_DETAIL_ID = td.TAG_DETAIL_ID', 'left');
+        $this->db->join('TAG tg', 'td.TAG_ID = tg.TAG_ID', 'left');
+        $this->db->where('bmd.BUILD_ID', $build_id);
+        $this->db->order_by('bmd.BUILD_DETAIL_ID', 'ASC');
+
+        if ($limit !== null && $start !== null) {
+            $this->db->limit($limit, $start);
+        }
+
+        return $this->db->get();
+    }
+
+    public function count_detail_by_build_id($build_id)
+    {
+        $this->db->where('BUILD_ID', $build_id);
+        return $this->db->count_all_results('BUILD_DETAIL');
+    }
+
+    public function getSupplierSk()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("a.PERSON_ID as id, a.PERSON_NAME Supplier, a.PERSON_CODE Kode, CONCAT('[',a.PERSON_CODE,'] - ',a.PERSON_NAME) as text")
+            ->from('person a')
+            ->join('person_site b', 'a.PERSON_ID = b.PERSON_ID')
+            ->where('a.FLAG_SUPP', 0)
+            ->group_by('a.PERSON_ID')
+            ->order_by('a.PERSON_NAME');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function get_detail_by_so_id($so_id, $limit = null, $start = null)
+    {
+        $this->db->select("
+            a.SO_DETAIL_ID,
+            a.SO_ID,
+            a.BUILD_ID,
+            w.WAREHOUSE_ID,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
+            i.ITEM_CODE AS Kode_Item,
+            a.ENTERED_QTY AS Jumlah,
+            a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) AS Kirim,
+            a.ENTERED_QTY - (a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0)) AS Sisa,
+            a.ENTERED_UOM AS Satuan,
+            a.UNIT_PRICE AS Harga,
+            a.DISCOUNT_PRICE AS Diskon,
+            a.SUBTOTAL AS Total,
+            a.DISCOUNT_PRICE1 AS Disc_Total,
+            b.DOCUMENT_NO AS Reff_No,
+            w.WAREHOUSE_NAME AS Storage,
+            a.NOTE AS Note
+        ");
+        $this->db->from('so_detail a');
+        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID');
+        $this->db->join('warehouse w', 'a.GUDANG_ID = w.WAREHOUSE_ID');
+        $this->db->join('build b', 'a.BUILD_ID = b.BUILD_ID');
+        $this->db->where('a.SO_ID', $so_id);
+        $this->db->order_by('a.SO_DETAIL_ID', 'ASC');
+
+        if ($limit !== null && $start !== null) {
+            $this->db->limit($limit, $start);
+        }
+
+        return $this->db->get();
+    }
+
+    public function count_detail_by_so_id($so_id)
+    {
+        $this->db->where('SO_ID', $so_id);
+        return $this->db->count_all_results('so_detail');
+    }
+
+    public function getSupplierDk()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("a.PERSON_ID as id, a.PERSON_NAME Supplier, a.PERSON_CODE Kode, CONCAT('[',a.PERSON_CODE,'] - ',a.PERSON_NAME) as text")
+            ->from('person a')
+            ->join('person_site b', 'a.PERSON_ID = b.PERSON_ID')
+            ->where('a.FLAG_SUPP', 0)
+            ->group_by('a.PERSON_ID')
+            ->order_by('a.PERSON_NAME');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function get_detail_by_inventory_out_id($inventory_out_id, $limit = null, $start = null)
+    {
+        $this->db->select("
+            a.INVENTORY_OUT_DETAIL_ID,
+            a.INVENTORY_OUT_ID,
+            a.BUILD_ID,
+            w.WAREHOUSE_ID,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
+            i.ITEM_CODE AS Kode_Item,
+            a.ENTERED_QTY AS Jumlah,
+            a.INVOICE_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) AS Invoice,
+            a.ENTERED_QTY - (a.INVOICE_ENTERED_QTY / NULLIF(a.BASE_QTY, 0)) AS Sisa,
+            a.ENTERED_UOM AS Satuan,
+            b.DOCUMENT_NO AS Reff_No,
+            w.WAREHOUSE_NAME AS Storage,
+            a.NOTE AS Note
+        ");
+        $this->db->from('inventory_out_detail a');
+        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('build b', 'a.BUILD_ID = b.BUILD_ID');
+        $this->db->where('a.INVENTORY_OUT_ID', $inventory_out_id);
+        $this->db->order_by('a.INVENTORY_OUT_DETAIL_ID', 'ASC');
+
+        if ($limit !== null && $start !== null) {
+            $this->db->limit($limit, $start);
+        }
+
+        return $this->db->get();
+    }
+
+    public function count_detail_by_inventory_out_id($inventory_out_id)
+    {
+        $this->db->where('INVENTORY_OUT_ID', $inventory_out_id);
+        return $this->db->count_all_results('inventory_out_detail');
+    }
+
+    public function getSupplierPk()
+    {
+        $searchTerm = trim($this->input->get('q') ?? '');
+        $id         = (int) $this->input->get('id');
+
+        $this->db
+            ->select("a.PERSON_ID as id, a.PERSON_NAME Supplier, a.PERSON_CODE Kode, CONCAT('[',a.PERSON_CODE,'] - ',a.PERSON_NAME) as text")
+            ->from('person a')
+            ->join('person_site b', 'a.PERSON_ID = b.PERSON_ID')
+            ->where('a.FLAG_SUPP', 1)
+            ->group_by('a.PERSON_ID')
+            ->order_by('a.PERSON_NAME');
+
+        if ($id) {
+            $this->db->where('a.PERSON_ID', $id)->limit(1);
+        } else {
+            $this->db->where('a.ACTIVE_FLAG', 'Y');
+            if ($searchTerm) {
+                $this->db->group_start()
+                    ->like('a.PERSON_NAME', $searchTerm)
+                    ->or_like('a.PERSON_CODE', $searchTerm)
+                    ->group_end();
+            }
+            $this->db->limit(50);
+        }
+
+        return $this->db->get();
+    }
+
+    public function get_detail_by_invoice_id($invoice_id, $limit = null, $start = null)
+    {
+        $this->db->select("
+            a.INVOICE_DETAIL_ID,
+            a.INVOICE_ID,
+            a.INVENTORY_IN_DETAIL_ID,
+            w.WAREHOUSE_ID,
+            COALESCE(i.PART_NUMBER, i.ITEM_DESCRIPTION) AS Nama_Item,
+            i.ITEM_CODE AS Kode_Item,
+            a.ENTERED_QTY AS Jumlah,
+            a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0) AS Retur,
+            a.ENTERED_QTY - (a.RECEIVED_ENTERED_QTY / NULLIF(a.BASE_QTY, 0)) AS Sisa,
+            a.ENTERED_UOM AS Satuan,
+            a.UNIT_PRICE AS Harga,
+            a.DISCOUNT_PRICE AS Diskon,
+            a.SUBTOTAL AS Total,
+            a.DISCOUNT_PRICE1 AS Disc_Total,
+            b.DOCUMENT_NO AS Reff_No,
+            w.WAREHOUSE_NAME AS Storage,
+            a.NOTE AS Note
+        ");
+        $this->db->from('invoice_detail a');
+        $this->db->join('item i', 'a.ITEM_ID = i.ITEM_ID');
+        $this->db->join('warehouse w', 'a.WAREHOUSE_ID = w.WAREHOUSE_ID');
+        $this->db->join('inventory_in_detail iid', 'a.INVENTORY_IN_DETAIL_ID = iid.INVENTORY_IN_DETAIL_ID');
+        $this->db->join('build_detail bd', 'iid.BUILD_DETAIL_ID = bd.BUILD_DETAIL_ID');
+        $this->db->join('build b', 'bd.BUILD_ID = b.BUILD_ID');
+        $this->db->where('a.INVOICE_ID', $invoice_id);
+        $this->db->order_by('a.INVOICE_DETAIL_ID', 'ASC');
+
+        if ($limit !== null && $start !== null) {
+            $this->db->limit($limit, $start);
+        }
+
+        return $this->db->get();
+    }
+
+    public function count_detail_by_invoice_id($invoice_id)
+    {
+        $this->db->where('INVOICE_ID', $invoice_id);
+        return $this->db->count_all_results('invoice_detail');
+    }
 }

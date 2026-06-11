@@ -123,6 +123,30 @@
                                     <span class="d-none d-sm-block">Return to Supplier</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#material_requirement" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="Material Requirement"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">Material Requirement</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#so_kny" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="SO KNY"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">SO KNY</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#do_kny" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="DO KNY"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">DO KNY</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#po_kny" role="tab" aria-selected="false">
+                                    <span class="d-block d-sm-none" data-toggle="tooltip" data-placement="bottom" title="PO KNY"><i class="ri ri-stock-fill"></i></span>
+                                    <span class="d-none d-sm-block">PO KNY</span>
+                                </a>
+                            </li>
                         </ul>
 
                         <!-- Tab panes -->
@@ -153,6 +177,22 @@
 
                             <div class="tab-pane fade" id="return_to_supplier">
                                 <?php $this->load->view('tab_return_to_supplier'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="material_requirement">
+                                <?php $this->load->view('tab_material_requirement'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="so_kny">
+                                <?php $this->load->view('tab_so_kny'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="do_kny">
+                                <?php $this->load->view('tab_do_kny'); ?>
+                            </div>
+
+                            <div class="tab-pane fade" id="po_kny">
+                                <?php $this->load->view('tab_po_kny'); ?>
                             </div>
                         </div>
                     </div>
