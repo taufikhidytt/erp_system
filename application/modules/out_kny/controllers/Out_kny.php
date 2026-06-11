@@ -5081,7 +5081,7 @@ class Out_kny extends Back_Controller
             'CLOSE' => 'CLOSE,DELETE,CLOSED',
             'COMPLETE' => 'FULL_PAID',
             'PARTIAL' => 'PARTIAL_PAID',
-            'OUTSTANDING' => 'NEW,PARTIAL',
+            'OUTSTANDING' => 'NEW,PARTIAL_PAID',
             'BILLED' => 'BILLED',
         ];
 

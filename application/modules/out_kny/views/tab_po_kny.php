@@ -39,7 +39,7 @@
     <div class="col-md-10">
         <div class="form-control d-flex flex-wrap gap-3 align-items-center justify-content-center align-items-center" style="min-height: 38px;" id="card-status-pk">
             <label class=" mb-0 me-3">
-                <input type="radio" name="status_pk" value="LUNAS" class="form-check-input">
+                <input type="radio" name="status_pk" value="FULL_PAID" class="form-check-input">
                 LUNAS
             </label>
 
@@ -49,7 +49,7 @@
             </label>
 
             <label class="mb-0 me-3">
-                <input type="radio" name="status_pk" value="BELUM_LUNAS" class="form-check-input">
+                <input type="radio" name="status_pk" value="PARTIAL_PAID" class="form-check-input">
                 BELUM LUNAS
             </label>
 
@@ -64,7 +64,7 @@
             </label>
 
             <label class="mb-0 me-3">
-                <input type="radio" name="status_pk" value="TERTAGIH" class="form-check-input">
+                <input type="radio" name="status_pk" value="BILLED" class="form-check-input">
                 TERTAGIH
             </label>
         </div>
